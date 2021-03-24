@@ -10,29 +10,33 @@ Scaffold _getScaffold(BuildContext context, Widget body) {
   return Scaffold(
     appBar: AppBar(
       automaticallyImplyLeading: false,
-      title: DropdownButton<String>(
-        value: ModalRoute.of(context)!.settings.name,
-        onChanged: (v) {
-          switch (v) {
-            case '/paginated':
-              Navigator.of(context).pushNamed('/paginated');
-              break;
-            case '/datatable':
-              Navigator.of(context).pushNamed('/datatable');
-              break;
-          }
-        },
-        items: [
-          DropdownMenuItem(
-            child: Text('PaginatedDataTable'),
-            value: '/paginated',
-          ),
-          DropdownMenuItem(
-            child: Text('DataTable'),
-            value: '/datatable',
-          )
-        ],
-      ),
+      title: Row(children: [
+        DropdownButton<String>(
+          style: Theme.of(context).textTheme.headline6,
+          value: ModalRoute.of(context)!.settings.name,
+          onChanged: (v) {
+            switch (v) {
+              case '/paginated':
+                Navigator.of(context).pushNamed('/paginated');
+                break;
+              case '/datatable':
+                Navigator.of(context).pushNamed('/datatable');
+                break;
+            }
+          },
+          items: [
+            DropdownMenuItem(
+              child: Text('PaginatedDataTable'),
+              value: '/paginated',
+            ),
+            DropdownMenuItem(
+              child: Text('DataTable'),
+              value: '/datatable',
+            )
+          ],
+        ),
+        Text(' - demo page'),
+      ]),
     ),
     body: Scrollbar(child: body),
   );
@@ -44,7 +48,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: Colors.grey[300],
       ),
       initialRoute: '/paginated',
       routes: {
