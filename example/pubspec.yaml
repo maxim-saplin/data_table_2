@@ -1,0 +1,15 @@
+name: example
+description: data_table_2 example
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.12.0-0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  intl: ^0.17.0
+  cupertino_icons: ^1.0.2
