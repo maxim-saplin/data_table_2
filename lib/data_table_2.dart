@@ -73,7 +73,7 @@ class DataColumn2 {
 
   final ColumnSize size;
 
-  bool get _debugInteractive => onSort != null;
+  // bool get _debugInteractive => onSort != null;
 }
 
 /// Row configuration and cell data for a [DataTable2].
@@ -680,7 +680,7 @@ class DataTable2 extends StatelessWidget {
     label = Row(
       textDirection: numeric ? TextDirection.rtl : null,
       children: <Widget>[
-        label,
+        Flexible(child: label),
         if (onSort != null) ...<Widget>[
           _SortArrow(
             visible: sorted,

@@ -117,6 +117,8 @@ class _DataTable2DemoState extends State<DataTable2Demo> with RestorationMixin {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: DataTable2(
+          columnSpacing: 6,
+          horizontalMargin: 6,
           sortColumnIndex: _sortColumnIndex.value,
           sortAscending: _sortAscending.value,
           onSelectAll: _dessertsDataSource.selectAll,
