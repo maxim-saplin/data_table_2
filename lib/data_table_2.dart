@@ -157,7 +157,7 @@ class DataRow2 {
   ///
   /// There must be exactly as many cells as there are columns in the
   /// table.
-  final List<DataCell2> cells;
+  final List<DataCell> cells;
 
   /// The color for the row.
   ///
@@ -191,75 +191,9 @@ class DataRow2 {
   final VoidCallback? onSecondaryTap;
   final GestureTapDownCallback? onSecondaryTapDown;
 
-  bool get _debugInteractive =>
-      onSelectChanged != null ||
-      cells.any((DataCell2 cell) => cell._debugInteractive);
-}
-
-/// The data for a cell of a [DataTable2].
-///
-/// One list of [DataCell2] objects must be provided for each [DataRow2]
-/// in the [DataTable2], in the new [DataRow2] constructor's `cells`
-/// argument.
-@immutable
-class DataCell2 {
-  /// Creates an object to hold the data for a cell in a [DataTable2].
-  ///
-  /// The first argument is the widget to show for the cell, typically
-  /// a [Text] or [DropdownButton] widget; this becomes the [child]
-  /// property and must not be null.
-  ///
-  /// If the cell has no data, then a [Text] widget with placeholder
-  /// text should be provided instead, and then the [placeholder]
-  /// argument should be set to true.
-  const DataCell2(
-    this.child, {
-    this.placeholder = false,
-    this.showEditIcon = false,
-    this.onTap,
-  });
-
-  /// A cell that has no content and has zero width and height.
-  static const DataCell2 empty = DataCell2(SizedBox(width: 0.0, height: 0.0));
-
-  /// The data for the row.
-  ///
-  /// Typically a [Text] widget or a [DropdownButton] widget.
-  ///
-  /// If the cell has no data, then a [Text] widget with placeholder
-  /// text should be provided instead, and [placeholder] should be set
-  /// to true.
-  ///
-  /// {@macro flutter.widgets.ProxyWidget.child}
-  final Widget child;
-
-  /// Whether the [child] is actually a placeholder.
-  ///
-  /// If this is true, the default text style for the cell is changed
-  /// to be appropriate for placeholder text.
-  final bool placeholder;
-
-  /// Whether to show an edit icon at the end of the cell.
-  ///
-  /// This does not make the cell actually editable; the caller must
-  /// implement editing behavior if desired (initiated from the
-  /// [onTap] callback).
-  ///
-  /// If this is set, [onTap] should also be set, otherwise tapping
-  /// the icon will have no effect.
-  final bool showEditIcon;
-
-  /// Called if the cell is tapped.
-  ///
-  /// If non-null, tapping the cell will call this callback. If
-  /// null, tapping the cell will attempt to select the row (if
-  /// [DataRow2.onSelectChanged] is provided).
-  ///
-  /// To define a tap behavior for the entire row, see
-  /// [DataRow2.onSelectChanged].
-  final VoidCallback? onTap;
-
-  bool get _debugInteractive => onTap != null;
+  // bool get _debugInteractive =>
+  //     onSelectChanged != null ||
+  //     cells.any((DataCell2 cell) => cell._debugInteractive);
 }
 
 /// A material design data table.
@@ -648,10 +582,10 @@ class DataTable2 extends StatelessWidget {
   /// around the table defined by [decoration].
   final bool showBottomBorder;
 
-  bool get _debugInteractive {
-    return columns.any((DataColumn2 column) => column._debugInteractive) ||
-        rows.any((DataRow2 row) => row._debugInteractive);
-  }
+  // bool get _debugInteractive {
+  //   return columns.any((DataColumn2 column) => column._debugInteractive) ||
+  //       rows.any((DataRow2 row) => row._debugInteractive);
+  // }
 
   static final LocalKey _headingRowKey = UniqueKey();
 
@@ -863,7 +797,8 @@ class DataTable2 extends StatelessWidget {
   Widget build(BuildContext context) {
     var sw = Stopwatch();
     sw.start();
-    assert(!_debugInteractive || debugCheckHasMaterial(context));
+    // assert(!_debugInteractive || debugCheckHasMaterial(context));
+    assert(debugCheckHasMaterial(context));
 
     final ThemeData theme = Theme.of(context);
     final MaterialStateProperty<Color?>? effectiveHeadingRowColor =
@@ -940,42 +875,42 @@ class DataTable2 extends StatelessWidget {
       },
     );
 
-    int rowIndex;
-
-    int displayColumnIndex = 0;
-    double checkBoxWidth = 0;
-    if (displayCheckboxColumn) {
-      checkBoxWidth = effectiveHorizontalMargin +
-          Checkbox.width +
-          effectiveHorizontalMargin / 2.0;
-      tableColumns[0] = FixedColumnWidth(checkBoxWidth);
-      tableRows[0].children![0] = _buildCheckbox(
-        context: context,
-        checked: someChecked ? null : allChecked,
-        onRowTap: null,
-        onCheckboxChanged: (bool? checked) =>
-            _handleSelectAll(checked, someChecked),
-        overlayColor: null,
-        tristate: true,
-      );
-      rowIndex = 1;
-      for (final DataRow2 row in rows) {
-        tableRows[rowIndex].children![0] = _buildCheckbox(
-          context: context,
-          checked: row.selected,
-          onRowTap: () => row.onSelectChanged != null
-              ? row.onSelectChanged!(!row.selected)
-              : null,
-          onCheckboxChanged: row.onSelectChanged,
-          overlayColor: row.color ?? effectiveDataRowColor,
-          tristate: false,
-        );
-        rowIndex += 1;
-      }
-      displayColumnIndex += 1;
-    }
-
     var builder = LayoutBuilder(builder: (context, constraints) {
+      int rowIndex;
+
+      int displayColumnIndex = 0;
+      double checkBoxWidth = 0;
+      if (displayCheckboxColumn) {
+        checkBoxWidth = effectiveHorizontalMargin +
+            Checkbox.width +
+            effectiveHorizontalMargin / 2.0;
+        tableColumns[0] = FixedColumnWidth(checkBoxWidth);
+        tableRows[0].children![0] = _buildCheckbox(
+          context: context,
+          checked: someChecked ? null : allChecked,
+          onRowTap: null,
+          onCheckboxChanged: (bool? checked) =>
+              _handleSelectAll(checked, someChecked),
+          overlayColor: null,
+          tristate: true,
+        );
+        rowIndex = 1;
+        for (final DataRow2 row in rows) {
+          tableRows[rowIndex].children![0] = _buildCheckbox(
+            context: context,
+            checked: row.selected,
+            onRowTap: () => row.onSelectChanged != null
+                ? row.onSelectChanged!(!row.selected)
+                : null,
+            onCheckboxChanged: row.onSelectChanged,
+            overlayColor: row.color ?? effectiveDataRowColor,
+            tristate: false,
+          );
+          rowIndex += 1;
+        }
+        displayColumnIndex += 1;
+      }
+
       // var availableWidth = MediaQuery.of(context).size.width - checkBoxWidth;
       // var d = MediaQuery.of(context);
       var availableWidth = constraints.maxWidth - checkBoxWidth;
@@ -1050,7 +985,7 @@ class DataTable2 extends StatelessWidget {
         );
         rowIndex = 1;
         for (final DataRow2 row in rows) {
-          final DataCell2 cell = row.cells[dataColumnIndex];
+          final DataCell cell = row.cells[dataColumnIndex];
           tableRows[rowIndex].children![displayColumnIndex] = _buildDataCell(
             context: context,
             padding: padding,

@@ -462,14 +462,14 @@ class DessertDataSource extends DataTableSource {
         }
       },
       cells: [
-        DataCell2(Text(dessert.name)),
-        DataCell2(Text('${dessert.calories}')),
-        DataCell2(Text(dessert.fat.toStringAsFixed(1))),
-        DataCell2(Text('${dessert.carbs}')),
-        DataCell2(Text(dessert.protein.toStringAsFixed(1))),
-        DataCell2(Text('${dessert.sodium}')),
-        DataCell2(Text('${format.format(dessert.calcium / 100)}')),
-        DataCell2(Text('${format.format(dessert.iron / 100)}')),
+        DataCell(Text(dessert.name)),
+        DataCell(Text('${dessert.calories}')),
+        DataCell(Text(dessert.fat.toStringAsFixed(1))),
+        DataCell(Text('${dessert.carbs}')),
+        DataCell(Text(dessert.protein.toStringAsFixed(1))),
+        DataCell(Text('${dessert.sodium}')),
+        DataCell(Text('${format.format(dessert.calcium / 100)}')),
+        DataCell(Text('${format.format(dessert.iron / 100)}')),
       ],
     );
   }

@@ -45,11 +45,11 @@ void main() {
             onSelectChanged: (bool? selected) {
               log.add('row-selected: ${dessert.name}');
             },
-            cells: <DataCell2>[
-              DataCell2(
+            cells: <DataCell>[
+              DataCell(
                 Text(dessert.name),
               ),
-              DataCell2(
+              DataCell(
                 Text('${dessert.calories}'),
                 showEditIcon: true,
                 onTap: () {
@@ -125,7 +125,7 @@ void main() {
         rows: List<DataRow2>.generate(
           numItems,
           (int index) => DataRow2(
-            cells: <DataCell2>[DataCell2(Text('Row $index'))],
+            cells: <DataCell>[DataCell(Text('Row $index'))],
             selected: selected[index],
             onSelectChanged: index == disabledIndex
                 ? null
@@ -207,11 +207,11 @@ void main() {
             onSelectChanged: (bool? selected) {
               log.add('row-selected: ${dessert.name}');
             },
-            cells: <DataCell2>[
-              DataCell2(
+            cells: <DataCell>[
+              DataCell(
                 Text(dessert.name),
               ),
-              DataCell2(
+              DataCell(
                 Text('${dessert.calories}'),
                 showEditIcon: true,
                 onTap: () {
@@ -264,8 +264,8 @@ void main() {
             ],
             rows: const <DataRow2>[
               DataRow2(
-                cells: <DataCell2>[
-                  DataCell2(
+                cells: <DataCell>[
+                  DataCell(
                     Text('X'),
                   ),
                 ],
@@ -298,8 +298,8 @@ void main() {
             ],
             rows: const <DataRow2>[
               DataRow2(
-                cells: <DataCell2>[
-                  DataCell2(
+                cells: <DataCell>[
+                  DataCell(
                     Text('X'),
                   ),
                 ],
@@ -329,8 +329,8 @@ void main() {
             ],
             rows: <DataRow2>[
               DataRow2(
-                cells: <DataCell2>[
-                  DataCell2(
+                cells: <DataCell>[
+                  DataCell(
                     Text('X' * 2000),
                   ),
                 ],
@@ -360,8 +360,8 @@ void main() {
             ],
             rows: <DataRow2>[
               DataRow2(
-                cells: <DataCell2>[
-                  DataCell2(
+                cells: <DataCell>[
+                  DataCell(
                     Text('X ' * 2000), // wraps
                   ),
                 ],
@@ -390,8 +390,8 @@ void main() {
             ],
             rows: const <DataRow2>[
               DataRow2(
-                cells: <DataCell2>[
-                  DataCell2(
+                cells: <DataCell>[
+                  DataCell(
                     Text('Lollipop'), // wraps
                   ),
                 ],
@@ -421,8 +421,8 @@ void main() {
         ],
         rows: kDesserts.map<DataRow2>((Dessert dessert) {
           return DataRow2(
-            cells: <DataCell2>[
-              DataCell2(
+            cells: <DataCell>[
+              DataCell(
                 Text(dessert.name),
               ),
             ],
@@ -466,8 +466,8 @@ void main() {
             ],
             rows: const <DataRow2>[
               DataRow2(
-                cells: <DataCell2>[
-                  DataCell2(
+                cells: <DataCell>[
+                  DataCell(
                     Text('Lollipop'), // wraps
                   ),
                 ],
@@ -511,11 +511,11 @@ void main() {
           return DataRow2(
             key: ValueKey<String>(dessert.name),
             onSelectChanged: (bool? selected) {},
-            cells: <DataCell2>[
-              DataCell2(
+            cells: <DataCell>[
+              DataCell(
                 Text(dessert.name),
               ),
-              DataCell2(
+              DataCell(
                 Text('${dessert.calories}'),
                 showEditIcon: true,
                 onTap: () {},
@@ -547,11 +547,11 @@ void main() {
             return DataRow2(
               key: ValueKey<String>(dessert.name),
               onSelectChanged: (bool? selected) {},
-              cells: <DataCell2>[
-                DataCell2(
+              cells: <DataCell>[
+                DataCell(
                   Text(dessert.name),
                 ),
-                DataCell2(
+                DataCell(
                   Text('${dessert.calories}'),
                   showEditIcon: true,
                   onTap: () {},
@@ -634,16 +634,16 @@ void main() {
           return DataRow2(
             key: ValueKey<String>(dessert.name),
             onSelectChanged: (bool? selected) {},
-            cells: <DataCell2>[
-              DataCell2(
+            cells: <DataCell>[
+              DataCell(
                 Text(dessert.name),
               ),
-              DataCell2(
+              DataCell(
                 Text('${dessert.calories}'),
                 showEditIcon: true,
                 onTap: () {},
               ),
-              DataCell2(
+              DataCell(
                 Text('${dessert.fat}'),
                 showEditIcon: true,
                 onTap: () {},
@@ -674,7 +674,7 @@ void main() {
     // default first column padding
     padding = find.widgetWithText(Padding, 'Frozen yogurt');
     cellContent = find.widgetWithText(Align,
-        'Frozen yogurt'); // DataTable2 wraps its DataCell2s in an Align widget
+        'Frozen yogurt'); // DataTable2 wraps its DataCells in an Align widget
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
       _defaultHorizontalMargin / 2,
@@ -742,16 +742,16 @@ void main() {
           return DataRow2(
             key: ValueKey<String>(dessert.name),
             onSelectChanged: (bool? selected) {},
-            cells: <DataCell2>[
-              DataCell2(
+            cells: <DataCell>[
+              DataCell(
                 Text(dessert.name),
               ),
-              DataCell2(
+              DataCell(
                 Text('${dessert.calories}'),
                 showEditIcon: true,
                 onTap: () {},
               ),
-              DataCell2(
+              DataCell(
                 Text('${dessert.fat}'),
                 showEditIcon: true,
                 onTap: () {},
@@ -786,7 +786,7 @@ void main() {
     // custom first column padding
     padding = find.widgetWithText(Padding, 'Frozen yogurt').first;
     cellContent = find.widgetWithText(Align,
-        'Frozen yogurt'); // DataTable2 wraps its DataCell2s in an Align widget
+        'Frozen yogurt'); // DataTable2 wraps its DataCells in an Align widget
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
       _customHorizontalMargin / 2,
@@ -858,16 +858,16 @@ void main() {
         rows: kDesserts.map<DataRow2>((Dessert dessert) {
           return DataRow2(
             key: ValueKey<String>(dessert.name),
-            cells: <DataCell2>[
-              DataCell2(
+            cells: <DataCell>[
+              DataCell(
                 Text(dessert.name),
               ),
-              DataCell2(
+              DataCell(
                 Text('${dessert.calories}'),
                 showEditIcon: true,
                 onTap: () {},
               ),
-              DataCell2(
+              DataCell(
                 Text('${dessert.fat}'),
                 showEditIcon: true,
                 onTap: () {},
@@ -886,7 +886,7 @@ void main() {
     // default first column padding
     padding = find.widgetWithText(Padding, 'Frozen yogurt');
     cellContent = find.widgetWithText(Align,
-        'Frozen yogurt'); // DataTable2 wraps its DataCell2s in an Align widget
+        'Frozen yogurt'); // DataTable2 wraps its DataCells in an Align widget
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
       _defaultHorizontalMargin,
@@ -952,16 +952,16 @@ void main() {
         rows: kDesserts.map<DataRow2>((Dessert dessert) {
           return DataRow2(
             key: ValueKey<String>(dessert.name),
-            cells: <DataCell2>[
-              DataCell2(
+            cells: <DataCell>[
+              DataCell(
                 Text(dessert.name),
               ),
-              DataCell2(
+              DataCell(
                 Text('${dessert.calories}'),
                 showEditIcon: true,
                 onTap: () {},
               ),
-              DataCell2(
+              DataCell(
                 Text('${dessert.fat}'),
                 showEditIcon: true,
                 onTap: () {},
@@ -984,7 +984,7 @@ void main() {
     // custom first column padding
     padding = find.widgetWithText(Padding, 'Frozen yogurt');
     cellContent = find.widgetWithText(Align,
-        'Frozen yogurt'); // DataTable2 wraps its DataCell2s in an Align widget
+        'Frozen yogurt'); // DataTable2 wraps its DataCells in an Align widget
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
       _customHorizontalMargin,
@@ -1025,9 +1025,9 @@ void main() {
       DataColumn2(label: Text('column2')),
     ];
 
-    const List<DataCell2> cells = <DataCell2>[
-      DataCell2(Text('cell1')),
-      DataCell2(Text('cell2')),
+    const List<DataCell> cells = <DataCell>[
+      DataCell(Text('cell1')),
+      DataCell(Text('cell2')),
     ];
 
     const List<DataRow2> rows = <DataRow2>[
@@ -1077,9 +1077,9 @@ void main() {
       DataColumn2(label: Text('column2')),
     ];
 
-    const List<DataCell2> cells = <DataCell2>[
-      DataCell2(Text('cell1')),
-      DataCell2(Text('cell2')),
+    const List<DataCell> cells = <DataCell>[
+      DataCell(Text('cell1')),
+      DataCell(Text('cell2')),
     ];
 
     const List<DataRow2> rows = <DataRow2>[
@@ -1134,8 +1134,8 @@ void main() {
           ],
           rows: const <DataRow2>[
             DataRow2(
-              cells: <DataCell2>[
-                DataCell2(Text('A long desert name')),
+              cells: <DataCell>[
+                DataCell(Text('A long desert name')),
               ],
             ),
           ]);
@@ -1219,9 +1219,9 @@ void main() {
           ],
           rows: const <DataRow2>[
             DataRow2(
-              cells: <DataCell2>[
-                DataCell2(Text('Content1')),
-                DataCell2(Text('Content2')),
+              cells: <DataCell>[
+                DataCell(Text('Content1')),
+                DataCell(Text('Content2')),
               ],
             ),
           ]);
@@ -1265,8 +1265,8 @@ void main() {
               DataRow2(
                 onSelectChanged: (bool? checked) {},
                 selected: selected,
-                cells: const <DataCell2>[
-                  DataCell2(Text('Content1')),
+                cells: const <DataCell>[
+                  DataCell(Text('Content1')),
                 ],
               ),
             ],
@@ -1307,8 +1307,8 @@ void main() {
             rows: <DataRow2>[
               DataRow2(
                 onSelectChanged: (bool? checked) {},
-                cells: const <DataCell2>[
-                  DataCell2(Text('Content1')),
+                cells: const <DataCell>[
+                  DataCell(Text('Content1')),
                 ],
               ),
             ],
@@ -1349,8 +1349,8 @@ void main() {
                   return defaultColor;
                 },
               ),
-              cells: const <DataCell2>[
-                DataCell2(Text('Content1')),
+              cells: const <DataCell>[
+                DataCell(Text('Content1')),
               ],
             ),
           ],
@@ -1390,8 +1390,8 @@ void main() {
           ],
           rows: <DataRow2>[
             DataRow2(
-              cells: const <DataCell2>[
-                DataCell2(Text('Content1')),
+              cells: const <DataCell>[
+                DataCell(Text('Content1')),
               ],
               onSelectChanged: (bool? value) {},
             ),
@@ -1403,8 +1403,8 @@ void main() {
                   return defaultColor;
                 },
               ),
-              cells: const <DataCell2>[
-                DataCell2(Text('Content2')),
+              cells: const <DataCell>[
+                DataCell(Text('Content2')),
               ],
               onSelectChanged: disabled ? null : (bool? value) {},
             ),
@@ -1447,8 +1447,8 @@ void main() {
             },
           ),
           onSelectChanged: (bool? value) {},
-          cells: const <DataCell2>[
-            DataCell2(Text('Content1')),
+          cells: const <DataCell>[
+            DataCell(Text('Content1')),
           ],
         ),
       ]);
@@ -1479,7 +1479,7 @@ void main() {
                 DataColumn2(label: Text('Col1')),
               ],
               rows: const <DataRow2>[
-                DataRow2(cells: <DataCell2>[DataCell2(Text('1'))]),
+                DataRow2(cells: <DataCell>[DataCell(Text('1'))]),
               ],
             ),
             scrollable: true,
@@ -1515,7 +1515,7 @@ void main() {
             DataColumn2(label: Text('Col1')),
           ],
           rows: const <DataRow2>[
-            DataRow2(cells: <DataCell2>[DataCell2(Text('1'))]),
+            DataRow2(cells: <DataCell>[DataCell(Text('1'))]),
           ],
         ),
       ),
