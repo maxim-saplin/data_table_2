@@ -1,3 +1,4 @@
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -76,7 +77,7 @@ class DessertDataSource extends DataTableSource {
   DessertDataSource(this.context) {
     desserts = <Dessert>[
       Dessert(
-        'localizations.dataTableRowFrozenYogurt',
+        'Frozen Yogurt',
         159,
         6.0,
         24,
@@ -86,7 +87,7 @@ class DessertDataSource extends DataTableSource {
         1,
       ),
       Dessert(
-        'localizations.dataTableRowIceCreamSandwich',
+        'Ice Cream Sandwich',
         237,
         9.0,
         37,
@@ -96,7 +97,7 @@ class DessertDataSource extends DataTableSource {
         1,
       ),
       Dessert(
-        'localizations.dataTableRowEclair',
+        'Eclair',
         262,
         16.0,
         24,
@@ -106,7 +107,7 @@ class DessertDataSource extends DataTableSource {
         7,
       ),
       Dessert(
-        'localizations.dataTableRowCupcake',
+        'Cupcake',
         305,
         3.7,
         67,
@@ -116,7 +117,7 @@ class DessertDataSource extends DataTableSource {
         8,
       ),
       Dessert(
-        'localizations.dataTableRowGingerbread',
+        'Gingerbread',
         356,
         16.0,
         49,
@@ -126,7 +127,7 @@ class DessertDataSource extends DataTableSource {
         16,
       ),
       Dessert(
-        'localizations.dataTableRowJellyBean',
+        'Jelly Bean',
         375,
         0.0,
         94,
@@ -136,7 +137,7 @@ class DessertDataSource extends DataTableSource {
         0,
       ),
       Dessert(
-        'localizations.dataTableRowLollipop',
+        'Lollipop',
         392,
         0.2,
         98,
@@ -146,7 +147,7 @@ class DessertDataSource extends DataTableSource {
         2,
       ),
       Dessert(
-        'localizations.dataTableRowHoneycomb',
+        'Honeycomb',
         408,
         3.2,
         87,
@@ -156,7 +157,7 @@ class DessertDataSource extends DataTableSource {
         45,
       ),
       Dessert(
-        'localizations.dataTableRowDonut',
+        'Donut',
         452,
         25.0,
         51,
@@ -166,7 +167,7 @@ class DessertDataSource extends DataTableSource {
         22,
       ),
       Dessert(
-        'localizations.dataTableRowApplePie',
+        'Apple Pie',
         518,
         26.0,
         65,
@@ -176,7 +177,7 @@ class DessertDataSource extends DataTableSource {
         6,
       ),
       Dessert(
-        'Frozen yougurt with sugar',
+        'Frozen Yougurt with sugar',
         168,
         6.0,
         26,
@@ -436,6 +437,39 @@ class DessertDataSource extends DataTableSource {
         DataCell(Text('${dessert.sodium}')),
         DataCell(Text('${format.format(dessert.calcium / 100)}')),
         DataCell(Text('${format.format(dessert.iron / 100)}')),
+      ],
+    );
+  }
+
+  @override
+  DataRow2 getRow2(int index) {
+    final format = NumberFormat.decimalPercentPattern(
+      locale: 'en',
+      decimalDigits: 0,
+    );
+    assert(index >= 0);
+    if (index >= desserts.length) throw 'index > _desserts.length';
+    final dessert = desserts[index];
+    return DataRow2.byIndex(
+      index: index,
+      selected: dessert.selected,
+      onSelectChanged: (value) {
+        if (dessert.selected != value) {
+          _selectedCount += value! ? 1 : -1;
+          assert(_selectedCount >= 0);
+          dessert.selected = value;
+          notifyListeners();
+        }
+      },
+      cells: [
+        DataCell2(Text(dessert.name)),
+        DataCell2(Text('${dessert.calories}')),
+        DataCell2(Text(dessert.fat.toStringAsFixed(1))),
+        DataCell2(Text('${dessert.carbs}')),
+        DataCell2(Text(dessert.protein.toStringAsFixed(1))),
+        DataCell2(Text('${dessert.sodium}')),
+        DataCell2(Text('${format.format(dessert.calcium / 100)}')),
+        DataCell2(Text('${format.format(dessert.iron / 100)}')),
       ],
     );
   }

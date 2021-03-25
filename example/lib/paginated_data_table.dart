@@ -30,7 +30,7 @@ class _PaginatedDataTableDemoState extends State<PaginatedDataTableDemo>
   bool initialized = false;
 
   @override
-  String get restorationId => 'data_table_demo';
+  String get restorationId => 'paginated_data_table_demo';
 
   @override
   void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
@@ -113,7 +113,7 @@ class _PaginatedDataTableDemoState extends State<PaginatedDataTableDemo>
   @override
   Widget build(BuildContext context) {
     return ListView(
-      restorationId: 'data_table_list_view',
+      restorationId: 'paginated_data_table_list_view',
       padding: const EdgeInsets.all(16),
       children: [
         PaginatedDataTable(

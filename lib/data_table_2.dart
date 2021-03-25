@@ -86,6 +86,8 @@ class DataColumn2 {
 /// property of the [DataRow2] object.
 @immutable
 class DataRow2 {
+  //DataRow2.fromDataRow(DataRow row) : this.cells = row.cells;
+
   /// Creates the configuration for a row of a [DataTable2].
   ///
   /// The [cells] argument must not be null.
@@ -973,129 +975,136 @@ class DataTable2 extends StatelessWidget {
       displayColumnIndex += 1;
     }
 
-    var availableWidth = MediaQuery.of(context).size.width - checkBoxWidth;
-    var columnWidth = availableWidth / columns.length;
-    var totalWidth = 0.0;
+    var builder = LayoutBuilder(builder: (context, constraints) {
+      // var availableWidth = MediaQuery.of(context).size.width - checkBoxWidth;
+      // var d = MediaQuery.of(context);
+      var availableWidth = constraints.maxWidth - checkBoxWidth;
+      var columnWidth = availableWidth / columns.length;
+      var totalWidth = 0.0;
 
-    var widths = List<double>.generate(columns.length, (i) {
-      var w = columnWidth;
-      if (columns[i].size == ColumnSize.S) {
-        w *= SM_ratio;
-      } else if (columns[i].size == ColumnSize.L) {
-        w *= LM_ratio;
+      var widths = List<double>.generate(columns.length, (i) {
+        var w = columnWidth;
+        if (columns[i].size == ColumnSize.S) {
+          w *= SM_ratio;
+        } else if (columns[i].size == ColumnSize.L) {
+          w *= LM_ratio;
+        }
+        totalWidth += w;
+        return w;
+      });
+
+      var ratio = availableWidth / totalWidth;
+
+      for (var i = 0; i < widths.length; i++) {
+        widths[i] *= ratio;
       }
-      totalWidth += w;
+
+      for (int dataColumnIndex = 0;
+          dataColumnIndex < columns.length;
+          dataColumnIndex += 1) {
+        final DataColumn2 column = columns[dataColumnIndex];
+
+        final double paddingStart;
+        if (dataColumnIndex == 0 && displayCheckboxColumn) {
+          paddingStart = effectiveHorizontalMargin / 2.0;
+        } else if (dataColumnIndex == 0 && !displayCheckboxColumn) {
+          paddingStart = effectiveHorizontalMargin;
+        } else {
+          paddingStart = effectiveColumnSpacing / 2.0;
+        }
+
+        final double paddingEnd;
+        if (dataColumnIndex == columns.length - 1) {
+          paddingEnd = effectiveHorizontalMargin;
+        } else {
+          paddingEnd = effectiveColumnSpacing / 2.0;
+        }
+
+        final EdgeInsetsDirectional padding = EdgeInsetsDirectional.only(
+          start: paddingStart,
+          end: paddingEnd,
+        );
+
+        tableColumns[displayColumnIndex] = //const IntrinsicColumnWidth();
+            FixedColumnWidth(widths[dataColumnIndex]);
+
+        // if (dataColumnIndex == _onlyTextColumn) {
+        //   tableColumns[displayColumnIndex] =
+        //       const IntrinsicColumnWidth(flex: 1.0);
+        // } else {
+        //   tableColumns[displayColumnIndex] = const IntrinsicColumnWidth();
+        // }
+        tableRows[0].children![displayColumnIndex] = _buildHeadingCell(
+          context: context,
+          padding: padding,
+          label: column.label,
+          tooltip: column.tooltip,
+          numeric: column.numeric,
+          onSort: column.onSort != null
+              ? () => column.onSort!(dataColumnIndex,
+                  sortColumnIndex != dataColumnIndex || !sortAscending)
+              : null,
+          sorted: dataColumnIndex == sortColumnIndex,
+          ascending: sortAscending,
+          overlayColor: effectiveHeadingRowColor,
+        );
+        rowIndex = 1;
+        for (final DataRow2 row in rows) {
+          final DataCell2 cell = row.cells[dataColumnIndex];
+          tableRows[rowIndex].children![displayColumnIndex] = _buildDataCell(
+            context: context,
+            padding: padding,
+            label: cell.child,
+            numeric: column.numeric,
+            placeholder: cell.placeholder,
+            showEditIcon: cell.showEditIcon,
+            onTap: cell.onTap,
+            onRowTap: row.onTap,
+            onRowSecondaryTap: row.onSecondaryTap,
+            onRowSecondaryTapDown: row.onSecondaryTapDown,
+            onSelectChanged: () => row.onSelectChanged != null
+                ? row.onSelectChanged!(!row.selected)
+                : null,
+            overlayColor: row.color ?? effectiveDataRowColor,
+          );
+          rowIndex += 1;
+        }
+        displayColumnIndex += 1;
+      }
+
+      var widthsAsMap = tableColumns.asMap();
+
+      var w = Container(
+          decoration: decoration ?? theme.dataTableTheme.decoration,
+          child: Material(
+            type: MaterialType.transparency,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Table(
+                  columnWidths: widthsAsMap,
+                  children: [
+                    tableRows[0]
+                  ], // TODO - generate above 2 lists right away
+                ),
+                Flexible(
+                    fit: FlexFit.loose,
+                    child: SingleChildScrollView(
+                        child: Table(
+                      columnWidths: widthsAsMap,
+                      children:
+                          tableRows.skip(1).take(tableRows.length - 1).toList(),
+                    )))
+              ],
+            ),
+          ));
+
       return w;
     });
 
-    var ratio = availableWidth / totalWidth;
-
-    for (var i = 0; i < widths.length; i++) {
-      widths[i] *= ratio;
-    }
-
-    for (int dataColumnIndex = 0;
-        dataColumnIndex < columns.length;
-        dataColumnIndex += 1) {
-      final DataColumn2 column = columns[dataColumnIndex];
-
-      final double paddingStart;
-      if (dataColumnIndex == 0 && displayCheckboxColumn) {
-        paddingStart = effectiveHorizontalMargin / 2.0;
-      } else if (dataColumnIndex == 0 && !displayCheckboxColumn) {
-        paddingStart = effectiveHorizontalMargin;
-      } else {
-        paddingStart = effectiveColumnSpacing / 2.0;
-      }
-
-      final double paddingEnd;
-      if (dataColumnIndex == columns.length - 1) {
-        paddingEnd = effectiveHorizontalMargin;
-      } else {
-        paddingEnd = effectiveColumnSpacing / 2.0;
-      }
-
-      final EdgeInsetsDirectional padding = EdgeInsetsDirectional.only(
-        start: paddingStart,
-        end: paddingEnd,
-      );
-
-      tableColumns[displayColumnIndex] = //const IntrinsicColumnWidth();
-          FixedColumnWidth(widths[dataColumnIndex]);
-
-      // if (dataColumnIndex == _onlyTextColumn) {
-      //   tableColumns[displayColumnIndex] =
-      //       const IntrinsicColumnWidth(flex: 1.0);
-      // } else {
-      //   tableColumns[displayColumnIndex] = const IntrinsicColumnWidth();
-      // }
-      tableRows[0].children![displayColumnIndex] = _buildHeadingCell(
-        context: context,
-        padding: padding,
-        label: column.label,
-        tooltip: column.tooltip,
-        numeric: column.numeric,
-        onSort: column.onSort != null
-            ? () => column.onSort!(dataColumnIndex,
-                sortColumnIndex != dataColumnIndex || !sortAscending)
-            : null,
-        sorted: dataColumnIndex == sortColumnIndex,
-        ascending: sortAscending,
-        overlayColor: effectiveHeadingRowColor,
-      );
-      rowIndex = 1;
-      for (final DataRow2 row in rows) {
-        final DataCell2 cell = row.cells[dataColumnIndex];
-        tableRows[rowIndex].children![displayColumnIndex] = _buildDataCell(
-          context: context,
-          padding: padding,
-          label: cell.child,
-          numeric: column.numeric,
-          placeholder: cell.placeholder,
-          showEditIcon: cell.showEditIcon,
-          onTap: cell.onTap,
-          onRowTap: row.onTap,
-          onRowSecondaryTap: row.onSecondaryTap,
-          onRowSecondaryTapDown: row.onSecondaryTapDown,
-          onSelectChanged: () => row.onSelectChanged != null
-              ? row.onSelectChanged!(!row.selected)
-              : null,
-          overlayColor: row.color ?? effectiveDataRowColor,
-        );
-        rowIndex += 1;
-      }
-      displayColumnIndex += 1;
-    }
-
-    var widthsAsMap = tableColumns.asMap();
-
-    var w = Container(
-        decoration: decoration ?? theme.dataTableTheme.decoration,
-        child: Material(
-          type: MaterialType.transparency,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Table(
-                columnWidths: widthsAsMap,
-                children: [
-                  tableRows[0]
-                ], // TODO - generate above 2 lists right away
-              ),
-              Flexible(
-                  fit: FlexFit.loose,
-                  child: SingleChildScrollView(
-                      child: Table(
-                    columnWidths: widthsAsMap,
-                    children:
-                        tableRows.skip(1).take(tableRows.length - 1).toList(),
-                  )))
-            ],
-          ),
-        ));
     sw.stop();
     print('DataTable2 built: ${sw.elapsedMilliseconds}ms');
-    return w;
+    return builder;
   }
 }
 
