@@ -3,6 +3,7 @@ import 'package:example/paginated_data_table.dart';
 import 'package:flutter/material.dart';
 
 import 'data_table2.dart';
+import 'paginated_data_table2.dart';
 
 void main() {
   runApp(MyApp());
@@ -21,11 +22,15 @@ Scaffold _getScaffold(BuildContext context, Widget body) {
               case '/datatable2':
                 Navigator.of(context).pushNamed('/datatable2');
                 break;
-              case '/paginated':
-                Navigator.of(context).pushNamed('/paginated');
+              case '/paginated2':
+                Navigator.of(context).pushNamed('/paginated2');
                 break;
+
               case '/datatable':
                 Navigator.of(context).pushNamed('/datatable');
+                break;
+              case '/paginated':
+                Navigator.of(context).pushNamed('/paginated');
                 break;
             }
           },
@@ -35,13 +40,17 @@ Scaffold _getScaffold(BuildContext context, Widget body) {
               value: '/datatable2',
             ),
             DropdownMenuItem(
-              child: Text('PaginatedDataTable'),
-              value: '/paginated',
+              child: Text('PaginatedDataTable2'),
+              value: '/paginated2',
             ),
             DropdownMenuItem(
               child: Text('DataTable'),
               value: '/datatable',
-            )
+            ),
+            DropdownMenuItem(
+              child: Text('PaginatedDataTable'),
+              value: '/paginated',
+            ),
           ],
         ),
         Text(' - demo page'),
@@ -62,9 +71,11 @@ class MyApp extends StatelessWidget {
       initialRoute: '/datatable2',
       routes: {
         '/datatable2': (context) => _getScaffold(context, DataTable2Demo()),
+        '/paginated2': (context) =>
+            _getScaffold(context, PaginatedDataTable2Demo()),
+        '/datatable': (context) => _getScaffold(context, DataTableDemo()),
         '/paginated': (context) =>
             _getScaffold(context, PaginatedDataTableDemo()),
-        '/datatable': (context) => _getScaffold(context, DataTableDemo())
       },
     );
   }

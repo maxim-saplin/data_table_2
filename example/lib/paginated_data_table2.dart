@@ -114,79 +114,73 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo>
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      restorationId: 'paginated_data_table_list_view',
-      padding: const EdgeInsets.all(16),
-      children: [
-        PaginatedDataTable2(
-          header: Text('PaginatedDataTable2'),
-          rowsPerPage: _rowsPerPage.value,
-          onRowsPerPageChanged: (value) {
-            setState(() {
-              _rowsPerPage.value = value!;
-            });
-          },
-          initialFirstRowIndex: _rowIndex.value,
-          onPageChanged: (rowIndex) {
-            setState(() {
-              _rowIndex.value = rowIndex;
-            });
-          },
-          sortColumnIndex: _sortColumnIndex.value,
-          sortAscending: _sortAscending.value,
-          onSelectAll: _dessertsDataSource.selectAll,
-          columns: [
-            DataColumn(
-              label: Text('Desert'),
-              onSort: (columnIndex, ascending) =>
-                  sort<String>((d) => d.name, columnIndex, ascending),
-            ),
-            DataColumn(
-              label: Text('Calories'),
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  sort<num>((d) => d.calories, columnIndex, ascending),
-            ),
-            DataColumn(
-              label: Text('Fat (gm)'),
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  sort<num>((d) => d.fat, columnIndex, ascending),
-            ),
-            DataColumn(
-              label: Text('Carbs (gm)'),
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  sort<num>((d) => d.carbs, columnIndex, ascending),
-            ),
-            DataColumn(
-              label: Text('Protein (gm)'),
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  sort<num>((d) => d.protein, columnIndex, ascending),
-            ),
-            DataColumn(
-              label: Text('Sodium (mg)'),
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  sort<num>((d) => d.sodium, columnIndex, ascending),
-            ),
-            DataColumn(
-              label: Text('Calcium (%)'),
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  sort<num>((d) => d.calcium, columnIndex, ascending),
-            ),
-            DataColumn(
-              label: Text('Iron (%)'),
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  sort<num>((d) => d.iron, columnIndex, ascending),
-            ),
-          ],
-          source: _dessertsDataSource,
+    return PaginatedDataTable2(
+      header: Text('PaginatedDataTable2'),
+      rowsPerPage: _rowsPerPage.value,
+      onRowsPerPageChanged: (value) {
+        setState(() {
+          _rowsPerPage.value = value!;
+        });
+      },
+      initialFirstRowIndex: _rowIndex.value,
+      onPageChanged: (rowIndex) {
+        setState(() {
+          _rowIndex.value = rowIndex;
+        });
+      },
+      sortColumnIndex: _sortColumnIndex.value,
+      sortAscending: _sortAscending.value,
+      onSelectAll: _dessertsDataSource.selectAll,
+      columns: [
+        DataColumn(
+          label: Text('Desert'),
+          onSort: (columnIndex, ascending) =>
+              sort<String>((d) => d.name, columnIndex, ascending),
+        ),
+        DataColumn(
+          label: Text('Calories'),
+          numeric: true,
+          onSort: (columnIndex, ascending) =>
+              sort<num>((d) => d.calories, columnIndex, ascending),
+        ),
+        DataColumn(
+          label: Text('Fat (gm)'),
+          numeric: true,
+          onSort: (columnIndex, ascending) =>
+              sort<num>((d) => d.fat, columnIndex, ascending),
+        ),
+        DataColumn(
+          label: Text('Carbs (gm)'),
+          numeric: true,
+          onSort: (columnIndex, ascending) =>
+              sort<num>((d) => d.carbs, columnIndex, ascending),
+        ),
+        DataColumn(
+          label: Text('Protein (gm)'),
+          numeric: true,
+          onSort: (columnIndex, ascending) =>
+              sort<num>((d) => d.protein, columnIndex, ascending),
+        ),
+        DataColumn(
+          label: Text('Sodium (mg)'),
+          numeric: true,
+          onSort: (columnIndex, ascending) =>
+              sort<num>((d) => d.sodium, columnIndex, ascending),
+        ),
+        DataColumn(
+          label: Text('Calcium (%)'),
+          numeric: true,
+          onSort: (columnIndex, ascending) =>
+              sort<num>((d) => d.calcium, columnIndex, ascending),
+        ),
+        DataColumn(
+          label: Text('Iron (%)'),
+          numeric: true,
+          onSort: (columnIndex, ascending) =>
+              sort<num>((d) => d.iron, columnIndex, ascending),
         ),
       ],
+      source: _dessertsDataSource,
     );
   }
 }

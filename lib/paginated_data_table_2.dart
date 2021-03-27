@@ -501,31 +501,37 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                     ),
                   ),
                 ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                dragStartBehavior: widget.dragStartBehavior,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minWidth: constraints.minWidth),
-                  child: DataTable(
-                    key: _tableKey,
-                    columns: widget.columns,
-                    sortColumnIndex: widget.sortColumnIndex,
-                    sortAscending: widget.sortAscending,
-                    onSelectAll: widget.onSelectAll,
-                    // Make sure no decoration is set on the DataTable
-                    // from the theme, as its already wrapped in a Card.
-                    decoration: const BoxDecoration(),
-                    dataRowHeight: widget.dataRowHeight,
-                    headingRowHeight: widget.headingRowHeight,
-                    horizontalMargin: widget.horizontalMargin,
-                    checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
-                    columnSpacing: widget.columnSpacing,
-                    showCheckboxColumn: widget.showCheckboxColumn,
-                    showBottomBorder: true,
-                    rows: _getRows(_firstRowIndex, widget.rowsPerPage),
-                  ),
-                ),
-              ),
+              Flexible(
+                  fit: FlexFit.loose,
+                  child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        dragStartBehavior: widget.dragStartBehavior,
+                        child: ConstrainedBox(
+                          constraints:
+                              BoxConstraints(minWidth: constraints.minWidth),
+                          child: DataTable(
+                            key: _tableKey,
+                            columns: widget.columns,
+                            sortColumnIndex: widget.sortColumnIndex,
+                            sortAscending: widget.sortAscending,
+                            onSelectAll: widget.onSelectAll,
+                            // Make sure no decoration is set on the DataTable
+                            // from the theme, as its already wrapped in a Card.
+                            decoration: const BoxDecoration(),
+                            dataRowHeight: widget.dataRowHeight,
+                            headingRowHeight: widget.headingRowHeight,
+                            horizontalMargin: widget.horizontalMargin,
+                            checkboxHorizontalMargin:
+                                widget.checkboxHorizontalMargin,
+                            columnSpacing: widget.columnSpacing,
+                            showCheckboxColumn: widget.showCheckboxColumn,
+                            showBottomBorder: true,
+                            rows: _getRows(_firstRowIndex, widget.rowsPerPage),
+                          ),
+                        ),
+                      ))),
               DefaultTextStyle(
                 style: footerTextStyle!,
                 child: IconTheme.merge(
