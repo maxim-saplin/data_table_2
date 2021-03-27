@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:data_table_2/paginated_data_table_2.dart';
 
 import 'data_source.dart';
@@ -115,6 +114,7 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo>
   @override
   Widget build(BuildContext context) {
     return PaginatedDataTable2(
+      wrapInCard: false,
       header: Text('PaginatedDataTable2'),
       rowsPerPage: _rowsPerPage.value,
       onRowsPerPageChanged: (value) {

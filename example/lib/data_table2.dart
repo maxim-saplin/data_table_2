@@ -117,8 +117,9 @@ class _DataTable2DemoState extends State<DataTable2Demo> with RestorationMixin {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: DataTable2(
-          columnSpacing: 6,
-          horizontalMargin: 6,
+          columnSpacing: 0,
+          horizontalMargin: 12,
+          minWidth: 600,
           sortColumnIndex: _sortColumnIndex.value,
           sortAscending: _sortAscending.value,
           onSelectAll: _dessertsDataSource.selectAll,
@@ -179,8 +180,8 @@ class _DataTable2DemoState extends State<DataTable2Demo> with RestorationMixin {
                   _sort<num>((d) => d.iron, columnIndex, ascending),
             ),
           ],
-          rows: List<DataRow2>.generate(_dessertsDataSource.rowCount,
-              (index) => _dessertsDataSource.getRow2(index))),
+          rows: List<DataRow>.generate(_dessertsDataSource.rowCount,
+              (index) => _dessertsDataSource.getRow(index))),
     );
   }
 }
