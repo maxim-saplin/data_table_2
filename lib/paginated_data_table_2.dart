@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+import 'data_table_2.dart';
+
 /// A material design data table that shows data using multiple pages.
 ///
 /// A paginated data table shows [rowsPerPage] rows of data per page and
@@ -503,36 +505,30 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                 ),
               ),
             Flexible(
-                fit: FlexFit.loose,
-                child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      dragStartBehavior: widget.dragStartBehavior,
-                      child: ConstrainedBox(
-                        constraints:
-                            BoxConstraints(minWidth: constraints.minWidth),
-                        child: DataTable(
-                          key: _tableKey,
-                          columns: widget.columns,
-                          sortColumnIndex: widget.sortColumnIndex,
-                          sortAscending: widget.sortAscending,
-                          onSelectAll: widget.onSelectAll,
-                          // Make sure no decoration is set on the DataTable
-                          // from the theme, as its already wrapped in a Card.
-                          decoration: const BoxDecoration(),
-                          dataRowHeight: widget.dataRowHeight,
-                          headingRowHeight: widget.headingRowHeight,
-                          horizontalMargin: widget.horizontalMargin,
-                          checkboxHorizontalMargin:
-                              widget.checkboxHorizontalMargin,
-                          columnSpacing: widget.columnSpacing,
-                          showCheckboxColumn: widget.showCheckboxColumn,
-                          showBottomBorder: true,
-                          rows: _getRows(_firstRowIndex, widget.rowsPerPage),
-                        ),
-                      ),
-                    ))),
+              fit: FlexFit.loose,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minWidth: constraints.minWidth),
+                child: DataTable2(
+                  key: _tableKey,
+                  columns: widget.columns,
+                  sortColumnIndex: widget.sortColumnIndex,
+                  sortAscending: widget.sortAscending,
+                  onSelectAll: widget.onSelectAll,
+                  // Make sure no decoration is set on the DataTable
+                  // from the theme, as its already wrapped in a Card.
+                  decoration: const BoxDecoration(),
+                  dataRowHeight: widget.dataRowHeight,
+                  headingRowHeight: widget.headingRowHeight,
+                  horizontalMargin: widget.horizontalMargin,
+                  //TODO - fix when Flutter 2.1.0 goes stable
+                  //checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
+                  columnSpacing: widget.columnSpacing,
+                  showCheckboxColumn: widget.showCheckboxColumn,
+                  showBottomBorder: true,
+                  rows: _getRows(_firstRowIndex, widget.rowsPerPage),
+                ),
+              ),
+            ),
             DefaultTextStyle(
               style: footerTextStyle!,
               child: IconTheme.merge(

@@ -114,6 +114,9 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo>
   @override
   Widget build(BuildContext context) {
     return PaginatedDataTable2(
+      horizontalMargin: 12,
+      checkboxHorizontalMargin: 12,
+      columnSpacing: 0,
       wrapInCard: false,
       header: Text('PaginatedDataTable2'),
       rowsPerPage: _rowsPerPage.value,
