@@ -441,7 +441,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
         IconButton(
           icon: const Icon(Icons.skip_previous),
           padding: EdgeInsets.zero,
-          tooltip: localizations.firstPageTooltip,
+          //tooltip: localizations.firstPageTooltip,
           onPressed: _firstRowIndex <= 0 ? null : _handleFirst,
         ),
       IconButton(
@@ -461,7 +461,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
         IconButton(
           icon: const Icon(Icons.skip_next),
           padding: EdgeInsets.zero,
-          tooltip: localizations.lastPageTooltip,
+          //tooltip: localizations.lastPageTooltip,
           onPressed: _isNextPageUnavailable() ? null : _handleLast,
         ),
       Container(width: 14.0),
