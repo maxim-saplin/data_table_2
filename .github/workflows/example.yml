@@ -37,14 +37,9 @@ jobs:
     - name: Build Web
       run: flutter build web
       working-directory: ./example
-    - name: Deploy
-      run: |
-        cd ./example/build/web
-        git init
-        git config user.name  "CI"
-        git config user.email "flutter-ci@github.com"
-        git remote add secure-origin https://${{ secrets.GITHUB_TOKEN }}@github.com/maxim-saplin/data_table_2.git
-        git checkout -b gh-pages
-        git add .
-        git commit -m "Updated data_table_2 example"
-        git push --force secure-origin gh-pages
+    
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@4.1.1
+      with:
+        branch: gh-pages # The branch the action should deploy to.
+        folder: ./example/build/web
