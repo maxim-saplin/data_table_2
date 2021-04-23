@@ -39,7 +39,7 @@ jobs:
       working-directory: ./example
     - name: Deploy
       run: |
-        cd ./build/web
+        cd ./example/build/web
         git init
         git config user.name  "CI"
         git config user.email "flutter-ci@github.com"
