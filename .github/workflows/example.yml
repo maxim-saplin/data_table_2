@@ -12,7 +12,7 @@ jobs:
         java-version: '12.x'
     - uses: subosito/flutter-action@v1
       with:
-        flutter-version: '2.0.0'
+        flutter-version: '2.0.5'
         channel: 'stable'
     - name: Flutter Doctor
       run: flutter doctor
@@ -46,5 +46,5 @@ jobs:
         git remote add secure-origin https://${{ secrets.ACCESS_TOKEN }}@github.com/maxim-saplin/data_table_2.git
         git checkout -b gh-pages
         git add .
-        git commit -m "Updated dikt"
+        git commit -m "Updated data_table_2 example"
         git push --force secure-origin gh-pages
