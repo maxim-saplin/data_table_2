@@ -43,7 +43,7 @@ jobs:
         git init
         git config user.name  "CI"
         git config user.email "flutter-ci@github.com"
-        git remote add secure-origin https://${{ secrets.ACCESS_TOKEN }}@github.com/maxim-saplin/dikt.git
+        git remote add secure-origin https://${{ secrets.ACCESS_TOKEN }}@github.com/maxim-saplin/data_table_2.git
         git checkout -b gh-pages
         git add .
         git commit -m "Updated dikt"
