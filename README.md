@@ -1,4 +1,5 @@
-In-place replacement for Flutter's stock **DataTable** and **PaginatedDataTable** widgets with fixed/sticky header (also footer/paginator for **PaginatedDataTable**) and a few extra features.
+In-place substitute for Flutter's stock **DataTable** and **PaginatedDataTable** widgets with fixed/sticky header (also footer/paginator for **PaginatedDataTable**) and a few extra features. **DataTable2** and **PaginatedDataTable2** widgets are based on the sources of Flutter originals, mimics the API and provide seamless integration.
+If you've been using (or considered using) standard Flutter's widgets for displaying tables/data grids and missed the sticky headers - you've come to the right place. No need to learn yet another API of a new control, just stick to well described DataTable/PaginatedDataTable.
 
 # [LIVE DEMO](https://maxim-saplin.github.io/data_table_2/)
 <img width="866" alt="image" src="https://user-images.githubusercontent.com/7947027/115952188-48c4e600-a4ed-11eb-9ff9-e5b4deaf9580.png">
