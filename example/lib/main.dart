@@ -1,9 +1,10 @@
-import 'package:example/data_table.dart';
-import 'package:example/paginated_data_table.dart';
 import 'package:flutter/material.dart';
 
 import 'data_table2.dart';
+import 'data_table2_simple.dart';
 import 'paginated_data_table2.dart';
+import 'data_table.dart';
+import 'paginated_data_table.dart';
 
 void main() {
   runApp(MyApp());
@@ -31,6 +32,9 @@ Scaffold _getScaffold(BuildContext context, Widget body) {
                   case '/datatable2':
                     Navigator.of(context).pushNamed('/datatable2');
                     break;
+                  case '/datatable2simple':
+                    Navigator.of(context).pushNamed('/datatable2simple');
+                    break;
                   case '/paginated2':
                     Navigator.of(context).pushNamed('/paginated2');
                     break;
@@ -46,6 +50,10 @@ Scaffold _getScaffold(BuildContext context, Widget body) {
                 DropdownMenuItem(
                   child: Text('DataTable2'),
                   value: '/datatable2',
+                ),
+                DropdownMenuItem(
+                  child: Text('DataTable2 Simple'),
+                  value: '/datatable2simple',
                 ),
                 DropdownMenuItem(
                   child: Text('PaginatedDataTable2'),
@@ -79,6 +87,8 @@ class MyApp extends StatelessWidget {
       initialRoute: '/datatable2',
       routes: {
         '/datatable2': (context) => _getScaffold(context, DataTable2Demo()),
+        '/datatable2simple': (context) =>
+            _getScaffold(context, DataTable2SimpleDemo()),
         '/paginated2': (context) =>
             _getScaffold(context, PaginatedDataTable2Demo()),
         '/datatable': (context) => _getScaffold(context, DataTableDemo()),
