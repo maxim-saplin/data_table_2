@@ -4,7 +4,7 @@ If you've been using (or considered using) standard Flutter's widgets for displa
 
 # [LIVE DEMO](https://maxim-saplin.github.io/data_table_2/)
 <img width="866" alt="image" src="https://user-images.githubusercontent.com/7947027/115952188-48c4e600-a4ed-11eb-9ff9-e5b4deaf9580.png">
-- please check the example(https://github.com/maxim-saplin/data_table_2/tree/main/example) folder which recreates the Flutter Gallery's Data Table sample (with PgaintedDataTable and DataSource) as well as has a few more samples.
+- please check the example folder (https://github.com/maxim-saplin/data_table_2/tree/main/example) which recreates the Flutter Gallery's Data Table sample (with PgaintedDataTable and DataSource) as well as has a few more samples.
 
 ## About
 The differences/distrinctions from stock widgets:
