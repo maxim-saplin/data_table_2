@@ -25,12 +25,12 @@ void main() {
         onSelectAll: (bool? value) {
           log.add('select-all: $value');
         },
-        columns: <DataColumn>[
-          const DataColumn(
+        columns: <DataColumn2>[
+          const DataColumn2(
             label: Text('Name'),
             tooltip: 'Name',
           ),
-          DataColumn(
+          DataColumn2(
             label: const Text('Calories'),
             tooltip: 'Calories',
             numeric: true,
@@ -116,8 +116,8 @@ void main() {
         onSelectAll: (bool? value) {
           log.add('select-all: $value');
         },
-        columns: const <DataColumn>[
-          DataColumn(
+        columns: const <DataColumn2>[
+          DataColumn2(
             label: Text('Name'),
             tooltip: 'Name',
           ),
@@ -190,12 +190,12 @@ void main() {
         onSelectAll: (bool? value) {
           log.add('select-all: $value');
         },
-        columns: const <DataColumn>[
-          DataColumn(
+        columns: const <DataColumn2>[
+          DataColumn2(
             label: Text('Name'),
             tooltip: 'Name',
           ),
-          DataColumn(
+          DataColumn2(
             label: Text('Calories'),
             tooltip: 'Calories',
             numeric: true,
@@ -257,8 +257,8 @@ void main() {
               letterSpacing:
                   0.0, // Will overflow if letter spacing is larger than 0.0.
             ),
-            columns: <DataColumn>[
-              DataColumn(
+            columns: <DataColumn2>[
+              DataColumn2(
                 label: Text('X' * 2000),
               ),
             ],
@@ -290,8 +290,8 @@ void main() {
       MaterialApp(
         home: Material(
           child: DataTable2(
-            columns: <DataColumn>[
-              DataColumn(
+            columns: <DataColumn2>[
+              DataColumn2(
                 label: Text('X ' *
                     2000), // has soft wrap points, but they should be ignored
               ),
@@ -322,8 +322,8 @@ void main() {
       MaterialApp(
         home: Material(
           child: DataTable2(
-            columns: const <DataColumn>[
-              DataColumn(
+            columns: const <DataColumn2>[
+              DataColumn2(
                 label: Text('X'),
               ),
             ],
@@ -353,8 +353,8 @@ void main() {
       MaterialApp(
         home: Material(
           child: DataTable2(
-            columns: const <DataColumn>[
-              DataColumn(
+            columns: const <DataColumn2>[
+              DataColumn2(
                 label: Text('X'),
               ),
             ],
@@ -383,8 +383,8 @@ void main() {
       MaterialApp(
         home: Material(
           child: DataTable2(
-            columns: const <DataColumn>[
-              DataColumn(
+            columns: const <DataColumn2>[
+              DataColumn2(
                 label: Text('Dessert'),
               ),
             ],
@@ -412,8 +412,8 @@ void main() {
       return DataTable2(
         sortColumnIndex: 0,
         sortAscending: sortAscending,
-        columns: <DataColumn>[
-          DataColumn(
+        columns: <DataColumn2>[
+          DataColumn2(
             label: const Text('Name'),
             tooltip: 'Name',
             onSort: (int columnIndex, bool ascending) {},
@@ -459,8 +459,8 @@ void main() {
       MaterialApp(
         home: Material(
           child: DataTable2(
-            columns: const <DataColumn>[
-              DataColumn(
+            columns: const <DataColumn2>[
+              DataColumn2(
                 label: Text('Dessert'),
               ),
             ],
@@ -495,12 +495,12 @@ void main() {
         onSelectAll: (bool? value) {},
         dataRowHeight: dataRowHeight,
         headingRowHeight: headingRowHeight,
-        columns: <DataColumn>[
-          const DataColumn(
+        columns: <DataColumn2>[
+          const DataColumn2(
             label: Text('Name'),
             tooltip: 'Name',
           ),
-          DataColumn(
+          DataColumn2(
             label: const Text('Calories'),
             tooltip: 'Calories',
             numeric: true,
@@ -531,12 +531,12 @@ void main() {
       home: Material(
         child: DataTable2(
           onSelectAll: (bool? value) {},
-          columns: <DataColumn>[
-            const DataColumn(
+          columns: <DataColumn2>[
+            const DataColumn2(
               label: Text('Name'),
               tooltip: 'Name',
             ),
-            DataColumn(
+            DataColumn2(
               label: const Text('Calories'),
               tooltip: 'Calories',
               numeric: true,
@@ -612,18 +612,18 @@ void main() {
         sortColumnIndex: sortColumnIndex,
         sortAscending: sortAscending,
         onSelectAll: (bool? value) {},
-        columns: <DataColumn>[
-          const DataColumn(
+        columns: <DataColumn2>[
+          const DataColumn2(
             label: Text('Name'),
             tooltip: 'Name',
           ),
-          DataColumn(
+          DataColumn2(
             label: const Text('Calories'),
             tooltip: 'Calories',
             numeric: true,
             onSort: (int columnIndex, bool ascending) {},
           ),
-          DataColumn(
+          DataColumn2(
             label: const Text('Fat'),
             tooltip: 'Fat',
             numeric: true,
@@ -720,19 +720,21 @@ void main() {
         onSelectAll: (bool? value) {},
         horizontalMargin: horizontalMargin,
         columnSpacing: columnSpacing,
-        columns: <DataColumn>[
-          const DataColumn(
+        columns: <DataColumn2>[
+          const DataColumn2(
             label: Text('Name'),
             tooltip: 'Name',
           ),
-          DataColumn(
+          DataColumn2(
             label: const Text('Calories'),
+            size: ColumnSize.S,
             tooltip: 'Calories',
             numeric: true,
             onSort: (int columnIndex, bool ascending) {},
           ),
-          DataColumn(
+          DataColumn2(
             label: const Text('Fat'),
+            size: ColumnSize.S,
             tooltip: 'Fat',
             numeric: true,
             onSort: (int columnIndex, bool ascending) {},
@@ -837,18 +839,18 @@ void main() {
       return DataTable2(
         sortColumnIndex: sortColumnIndex,
         sortAscending: sortAscending,
-        columns: <DataColumn>[
-          const DataColumn(
+        columns: <DataColumn2>[
+          const DataColumn2(
             label: Text('Name'),
             tooltip: 'Name',
           ),
-          DataColumn(
+          DataColumn2(
             label: const Text('Calories'),
             tooltip: 'Calories',
             numeric: true,
             onSort: (int columnIndex, bool ascending) {},
           ),
-          DataColumn(
+          DataColumn2(
             label: const Text('Fat'),
             tooltip: 'Fat',
             numeric: true,
@@ -931,18 +933,18 @@ void main() {
         sortAscending: sortAscending,
         horizontalMargin: horizontalMargin,
         columnSpacing: columnSpacing,
-        columns: <DataColumn>[
-          const DataColumn(
+        columns: <DataColumn2>[
+          const DataColumn2(
             label: Text('Name'),
             tooltip: 'Name',
           ),
-          DataColumn(
+          DataColumn2(
             label: const Text('Calories'),
             tooltip: 'Calories',
             numeric: true,
             onSort: (int columnIndex, bool ascending) {},
           ),
-          DataColumn(
+          DataColumn2(
             label: const Text('Fat'),
             tooltip: 'Fat',
             numeric: true,
@@ -1020,9 +1022,9 @@ void main() {
   });
 
   testWidgets('DataTable2 set border width test', (WidgetTester tester) async {
-    const List<DataColumn> columns = <DataColumn>[
-      DataColumn(label: Text('column1')),
-      DataColumn(label: Text('column2')),
+    const List<DataColumn2> columns = <DataColumn2>[
+      DataColumn2(label: Text('column1')),
+      DataColumn2(label: Text('column2')),
     ];
 
     const List<DataCell> cells = <DataCell>[
@@ -1072,9 +1074,9 @@ void main() {
   });
 
   testWidgets('DataTable2 set show bottom border', (WidgetTester tester) async {
-    const List<DataColumn> columns = <DataColumn>[
-      DataColumn(label: Text('column1')),
-      DataColumn(label: Text('column2')),
+    const List<DataColumn2> columns = <DataColumn2>[
+      DataColumn2(label: Text('column1')),
+      DataColumn2(label: Text('column2')),
     ];
 
     const List<DataCell> cells = <DataCell>[
@@ -1123,19 +1125,22 @@ void main() {
   testWidgets('DataTable2 column heading cell - with and without sorting',
       (WidgetTester tester) async {
     Widget buildTable({int? sortColumnIndex, bool sortEnabled = true}) {
-      return DataTable2(sortColumnIndex: sortColumnIndex, columns: <DataColumn>[
-        DataColumn(
-          label: Center(child: Text('Name')),
-          tooltip: 'Name',
-          onSort: sortEnabled ? (_, __) {} : null,
-        ),
-      ], rows: const <DataRow2>[
-        DataRow2(
-          cells: <DataCell>[
-            DataCell(Text('A long desert name')),
+      return DataTable2(
+          sortColumnIndex: sortColumnIndex,
+          columns: <DataColumn2>[
+            DataColumn2(
+              label: Center(child: Text('Name')),
+              tooltip: 'Name',
+              onSort: sortEnabled ? (_, __) {} : null,
+            ),
           ],
-        ),
-      ]);
+          rows: const <DataRow2>[
+            DataRow2(
+              cells: <DataCell>[
+                DataCell(Text('A long desert name')),
+              ],
+            ),
+          ]);
     }
 
     // Start with without sorting
@@ -1201,24 +1206,27 @@ void main() {
     // https://github.com/flutter/flutter/pull/43735#issuecomment-589459947
     // Filed at https://github.com/flutter/flutter/issues/51152
     Widget buildTable({int? sortColumnIndex}) {
-      return DataTable2(sortColumnIndex: sortColumnIndex, columns: <DataColumn>[
-        const DataColumn(
-          label: Center(child: Text('column1')),
-          tooltip: 'Column1',
-        ),
-        DataColumn(
-          label: Center(child: Text('column2')),
-          tooltip: 'Column2',
-          onSort: (_, __) {},
-        ),
-      ], rows: const <DataRow2>[
-        DataRow2(
-          cells: <DataCell>[
-            DataCell(Text('Content1')),
-            DataCell(Text('Content2')),
+      return DataTable2(
+          sortColumnIndex: sortColumnIndex,
+          columns: <DataColumn2>[
+            const DataColumn2(
+              label: Center(child: Text('column1')),
+              tooltip: 'Column1',
+            ),
+            DataColumn2(
+              label: Center(child: Text('column2')),
+              tooltip: 'Column2',
+              onSort: (_, __) {},
+            ),
           ],
-        ),
-      ]);
+          rows: const <DataRow2>[
+            DataRow2(
+              cells: <DataCell>[
+                DataCell(Text('Content1')),
+                DataCell(Text('Content2')),
+              ],
+            ),
+          ]);
     }
 
     await tester.pumpWidget(MaterialApp(
@@ -1250,8 +1258,8 @@ void main() {
         theme: _themeData,
         home: Material(
           child: DataTable2(
-            columns: const <DataColumn>[
-              DataColumn(
+            columns: const <DataColumn2>[
+              DataColumn2(
                 label: Text('Column1'),
               ),
             ],
@@ -1293,8 +1301,8 @@ void main() {
         theme: _themeData,
         home: Material(
           child: DataTable2(
-            columns: const <DataColumn>[
-              DataColumn(
+            columns: const <DataColumn2>[
+              DataColumn2(
                 label: Text('Column1'),
               ),
             ],
@@ -1328,8 +1336,8 @@ void main() {
     Widget buildTable({bool selected = false}) {
       return Material(
         child: DataTable2(
-          columns: const <DataColumn>[
-            DataColumn(
+          columns: const <DataColumn2>[
+            DataColumn2(
               label: Text('Column1'),
             ),
           ],
@@ -1377,8 +1385,8 @@ void main() {
     Widget buildTable({bool disabled = false}) {
       return Material(
         child: DataTable2(
-          columns: const <DataColumn>[
-            DataColumn(
+          columns: const <DataColumn2>[
+            DataColumn2(
               label: Text('Column1'),
             ),
           ],
@@ -1428,8 +1436,8 @@ void main() {
       (WidgetTester tester) async {
     const Color pressedColor = Color(0xff4caf50);
     Widget buildTable() {
-      return DataTable2(columns: const <DataColumn>[
-        DataColumn(
+      return DataTable2(columns: const <DataColumn2>[
+        DataColumn2(
           label: Text('Column1'),
         ),
       ], rows: <DataRow2>[
@@ -1469,8 +1477,8 @@ void main() {
         home: Material(
           child: AlertDialog(
             content: DataTable2(
-              columns: const <DataColumn>[
-                DataColumn(label: Text('Col1')),
+              columns: const <DataColumn2>[
+                DataColumn2(label: Text('Col1')),
               ],
               rows: const <DataRow2>[
                 DataRow2(cells: <DataCell>[DataCell(Text('1'))]),
@@ -1505,8 +1513,8 @@ void main() {
                   BorderSide(width: borderHorizontal, color: borderColor),
             ),
           ),
-          columns: const <DataColumn>[
-            DataColumn(label: Text('Col1')),
+          columns: const <DataColumn2>[
+            DataColumn2(label: Text('Col1')),
           ],
           rows: const <DataRow2>[
             DataRow2(cells: <DataCell>[DataCell(Text('1'))]),
