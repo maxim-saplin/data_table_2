@@ -1,11 +1,11 @@
 {
-    "name": "example",
-    "short_name": "example",
+    "name": "DataTable2 Example",
+    "short_name": "DataTable2 Example",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "DataTable2 flutter widget example",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
