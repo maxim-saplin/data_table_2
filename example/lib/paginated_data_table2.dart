@@ -18,75 +18,21 @@ class PaginatedDataTable2Demo extends StatefulWidget {
       _PaginatedDataTable2DemoState();
 }
 
-class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo>
-    with RestorationMixin {
-  final RestorableDessertSelections _dessertSelections =
-      RestorableDessertSelections();
-  final RestorableInt _rowIndex = RestorableInt(0);
-  final RestorableInt _rowsPerPage =
-      RestorableInt(PaginatedDataTable.defaultRowsPerPage);
-  final RestorableBool _sortAscending = RestorableBool(true);
-  final RestorableIntN _sortColumnIndex = RestorableIntN(null);
+class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
+  int _rowIndex = 0;
+  int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
+  bool _sortAscending = true;
+  int? _sortColumnIndex;
   late DessertDataSource _dessertsDataSource;
-  bool initialized = false;
-
-  @override
-  String get restorationId => 'paginated_data_table_demo';
-
-  @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_dessertSelections, 'selected_row_indices');
-    registerForRestoration(_rowIndex, 'current_row_index');
-    registerForRestoration(_rowsPerPage, 'rows_per_page');
-    registerForRestoration(_sortAscending, 'sort_ascending');
-    registerForRestoration(_sortColumnIndex, 'sort_column_index');
-
-    if (!initialized) {
-      _dessertsDataSource = DessertDataSource(context);
-      initialized = true;
-    }
-    switch (_sortColumnIndex.value) {
-      case 0:
-        _dessertsDataSource.sort<String>((d) => d.name, _sortAscending.value);
-        break;
-      case 1:
-        _dessertsDataSource.sort<num>((d) => d.calories, _sortAscending.value);
-        break;
-      case 2:
-        _dessertsDataSource.sort<num>((d) => d.fat, _sortAscending.value);
-        break;
-      case 3:
-        _dessertsDataSource.sort<num>((d) => d.carbs, _sortAscending.value);
-        break;
-      case 4:
-        _dessertsDataSource.sort<num>((d) => d.protein, _sortAscending.value);
-        break;
-      case 5:
-        _dessertsDataSource.sort<num>((d) => d.sodium, _sortAscending.value);
-        break;
-      case 6:
-        _dessertsDataSource.sort<num>((d) => d.calcium, _sortAscending.value);
-        break;
-      case 7:
-        _dessertsDataSource.sort<num>((d) => d.iron, _sortAscending.value);
-        break;
-    }
-    _dessertsDataSource.updateSelectedDesserts(_dessertSelections);
-    _dessertsDataSource.addListener(_updateSelectedDessertRowListener);
-  }
+  bool _initialized = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!initialized) {
+    if (!_initialized) {
       _dessertsDataSource = DessertDataSource(context);
-      initialized = true;
+      _initialized = true;
     }
-    _dessertsDataSource.addListener(_updateSelectedDessertRowListener);
-  }
-
-  void _updateSelectedDessertRowListener() {
-    _dessertSelections.setDessertSelections(_dessertsDataSource.desserts);
   }
 
   void sort<T>(
@@ -96,17 +42,13 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo>
   ) {
     _dessertsDataSource.sort<T>(getField, ascending);
     setState(() {
-      _sortColumnIndex.value = columnIndex;
-      _sortAscending.value = ascending;
+      _sortColumnIndex = columnIndex;
+      _sortAscending = ascending;
     });
   }
 
   @override
   void dispose() {
-    _rowsPerPage.dispose();
-    _sortColumnIndex.dispose();
-    _sortAscending.dispose();
-    _dessertsDataSource.removeListener(_updateSelectedDessertRowListener);
     _dessertsDataSource.dispose();
     super.dispose();
   }
@@ -114,25 +56,27 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo>
   @override
   Widget build(BuildContext context) {
     return PaginatedDataTable2(
-      horizontalMargin: 12,
+      horizontalMargin: 20,
       checkboxHorizontalMargin: 12,
       columnSpacing: 0,
       wrapInCard: false,
       header: Text('PaginatedDataTable2'),
-      rowsPerPage: _rowsPerPage.value,
+      rowsPerPage: _rowsPerPage,
+      minWidth: 400,
+      fit: FlexFit.tight,
       onRowsPerPageChanged: (value) {
         setState(() {
-          _rowsPerPage.value = value!;
+          _rowsPerPage = value!;
         });
       },
-      initialFirstRowIndex: _rowIndex.value,
+      initialFirstRowIndex: _rowIndex,
       onPageChanged: (rowIndex) {
         setState(() {
-          _rowIndex.value = rowIndex;
+          _rowIndex = rowIndex;
         });
       },
-      sortColumnIndex: _sortColumnIndex.value,
-      sortAscending: _sortAscending.value,
+      sortColumnIndex: _sortColumnIndex,
+      sortAscending: _sortAscending,
       onSelectAll: _dessertsDataSource.selectAll,
       columns: [
         DataColumn(

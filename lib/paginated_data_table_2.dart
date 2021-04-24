@@ -56,35 +56,37 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// Themed by [DataTableTheme]. [DataTableThemeData.decoration] is ignored.
   /// To modify the border or background color of the [PaginatedDataTable2], use
   /// [CardTheme], since a [Card] wraps the inner [DataTable].
-  PaginatedDataTable2({
-    Key? key,
-    this.header,
-    this.actions,
-    required this.columns,
-    this.sortColumnIndex,
-    this.sortAscending = true,
-    this.onSelectAll,
-    this.dataRowHeight = kMinInteractiveDimension,
-    this.headingRowHeight = 56.0,
-    this.horizontalMargin = 24.0,
-    this.columnSpacing = 56.0,
-    this.showCheckboxColumn = true,
-    this.showFirstLastButtons = false,
-    this.initialFirstRowIndex = 0,
-    this.onPageChanged,
-    this.rowsPerPage = defaultRowsPerPage,
-    this.availableRowsPerPage = const <int>[
-      defaultRowsPerPage,
-      defaultRowsPerPage * 2,
-      defaultRowsPerPage * 5,
-      defaultRowsPerPage * 10
-    ],
-    this.onRowsPerPageChanged,
-    this.dragStartBehavior = DragStartBehavior.start,
-    required this.source,
-    this.checkboxHorizontalMargin,
-    this.wrapInCard = true,
-  })  : assert(actions == null || (header != null)),
+  PaginatedDataTable2(
+      {Key? key,
+      this.header,
+      this.actions,
+      required this.columns,
+      this.sortColumnIndex,
+      this.sortAscending = true,
+      this.onSelectAll,
+      this.dataRowHeight = kMinInteractiveDimension,
+      this.headingRowHeight = 56.0,
+      this.horizontalMargin = 24.0,
+      this.columnSpacing = 56.0,
+      this.showCheckboxColumn = true,
+      this.showFirstLastButtons = false,
+      this.initialFirstRowIndex = 0,
+      this.onPageChanged,
+      this.rowsPerPage = defaultRowsPerPage,
+      this.availableRowsPerPage = const <int>[
+        defaultRowsPerPage,
+        defaultRowsPerPage * 2,
+        defaultRowsPerPage * 5,
+        defaultRowsPerPage * 10
+      ],
+      this.onRowsPerPageChanged,
+      this.dragStartBehavior = DragStartBehavior.start,
+      required this.source,
+      this.checkboxHorizontalMargin,
+      this.wrapInCard = true,
+      this.minWidth,
+      this.fit = FlexFit.loose})
+      : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
             (sortColumnIndex >= 0 && sortColumnIndex < columns.length)),
@@ -225,6 +227,21 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// and the content in the first data column. This value defaults to 24.0.
   final double? checkboxHorizontalMargin;
 
+  /// If set, the table will stop shrinking below the threshold and provide
+  /// horizontal scrolling. Useful for the cases with narrow screens (e.g. portrait phone orientation)
+  /// and lots of columns (that get messed with little space)
+  // TODO add test
+  final double? minWidth;
+
+  /// Data rows are wrapped in Flexible widget, this property sets its' fit property.
+  /// When ther're few rows it determines if the core
+  /// of the table must grow and fill the contrainer (FlexFit.tight - useful if
+  /// you want the paginator to stick to the bottom when there're few rows) or
+  /// of you want to have the table to take minimal space and do not have bottom
+  /// pager stick to the bottom (FlexFit.loose)
+  // TODO add test
+  final FlexFit fit;
+
   @override
   PaginatedDataTable2State createState() => PaginatedDataTable2State();
 }
@@ -364,7 +381,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
         MaterialLocalizations.of(context);
     // HEADER
     final List<Widget> headerWidgets = <Widget>[];
-    double startPadding = 24.0;
+    double startPadding = widget.horizontalMargin;
     if (_selectedRowCount == 0 && widget.header != null) {
       headerWidgets.add(Expanded(child: widget.header!));
       if (widget.header is ButtonBar) {
@@ -505,7 +522,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                 ),
               ),
             Flexible(
-              fit: FlexFit.loose,
+              fit: widget.fit,
               child: ConstrainedBox(
                 constraints: BoxConstraints(minWidth: constraints.minWidth),
                 child: DataTable2(
@@ -526,6 +543,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                   showCheckboxColumn: widget.showCheckboxColumn,
                   showBottomBorder: true,
                   rows: _getRows(_firstRowIndex, widget.rowsPerPage),
+                  minWidth: widget.minWidth,
                 ),
               ),
             ),

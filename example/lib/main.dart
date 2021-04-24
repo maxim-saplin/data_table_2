@@ -63,7 +63,7 @@ Scaffold _getScaffold(BuildContext context, Widget body) {
             )),
       ]),
     ),
-    body: Scrollbar(child: body),
+    body: body,
   );
 }
 

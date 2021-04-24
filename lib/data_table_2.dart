@@ -168,6 +168,9 @@ class DataTable2 extends DataTable {
   static const Duration _sortArrowAnimationDuration =
       Duration(milliseconds: 150);
 
+  /// If set, the table will stop shrinking below the threshold and provide
+  /// horizontal scrolling. Useful for the cases with narrow screens (e.g. portrait phone orientation)
+  /// and lots of columns (that get messed with little space)
   // TODO add test
   final double? minWidth;
 
@@ -593,7 +596,7 @@ class DataTable2 extends DataTable {
     });
 
     sw.stop();
-    print('DataTable2 built: ${sw.elapsedMilliseconds}ms');
+    if (!kReleaseMode) print('DataTable2 built: ${sw.elapsedMilliseconds}ms');
     return builder;
   }
 }

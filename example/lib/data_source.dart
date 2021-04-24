@@ -407,6 +407,20 @@ class DessertDataSource extends DataTableSource {
     notifyListeners();
   }
 
+  void updateSelectedDessertsFromSet(Set<int> selectedRows) {
+    _selectedCount = 0;
+    for (var i = 0; i < desserts.length; i += 1) {
+      var dessert = desserts[i];
+      if (selectedRows.contains(i)) {
+        dessert.selected = true;
+        _selectedCount += 1;
+      } else {
+        dessert.selected = false;
+      }
+    }
+    notifyListeners();
+  }
+
   @override
   DataRow getRow(int index) {
     final format = NumberFormat.decimalPercentPattern(
