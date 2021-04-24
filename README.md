@@ -1,12 +1,13 @@
-In-place substitute for Flutter's stock **DataTable** and **PaginatedDataTable** widgets with fixed/sticky header (also footer/paginator for **PaginatedDataTable**) and a few extra features. **DataTable2** and **PaginatedDataTable2** widgets are based on the sources of Flutter originals, mimics the API and provide seamless integration.
+In-place substitute for Flutter's stock **DataTable** and **PaginatedDataTable** widgets with fixed/sticky header/top row (and footer/paginator for **PaginatedDataTable**) and a few extra features. **DataTable2** and **PaginatedDataTable2** widgets are based on the sources of Flutter's originals, mimic the API and provide seamless integration.
 
 If you've been using (or considered using) standard Flutter's widgets for displaying tables/data grids and missed the sticky headers - you've come to the right place. No need to learn yet another API of a new control, just stick to well described DataTable/PaginatedDataTable.
 
 # [LIVE DEMO](https://maxim-saplin.github.io/data_table_2/)
 <img width="866" alt="image" src="https://user-images.githubusercontent.com/7947027/115952188-48c4e600-a4ed-11eb-9ff9-e5b4deaf9580.png">
-- please check the example folder (https://github.com/maxim-saplin/data_table_2/tree/main/example) which recreates the Flutter Gallery's Data Table sample (with PgaintedDataTable and DataSource) as well as has a few more samples.
 
-## About
+- please check the [example folder](https://github.com/maxim-saplin/data_table_2/tree/main/example) which recreates the [Flutter Gallery's](https://gallery.flutter.dev/#/demo/data-table) Data Table sample (with PgaintedDataTable and DataSource) as well as has a few more samples.
+
+## Differences
 The differences/distrinctions from stock widgets:
 - Sticky headers (both widgets) and paginator (PabinatedDataTable2 only)
 - Vertiacally scrollable main area (with data rows)
@@ -15,21 +16,18 @@ The differences/distrinctions from stock widgets:
   - You can limit the minimal width of the control and scroll it horizontaly if the viewport is narrow (by setting **minWidth** property) which is useful in portrait orientations with multiple columns
   - Fixed width columns are faster than default implementation of DataTable which does 2 passes to determine contents size and justify column widths
 - Data rows are wrapped with Flexible and SingleScrollView widgets to allow widget fill parent container and scroll
+- There's **DataRow2** alternative to stock **DataRow** which provide row level tap events (including right clicks)
 
 ## Usage
 
-Add reference to pubspec.yaml:
-```yaml
-dependencies:
-  data_table_2: "^2.0.0-dev.1"
-```
+1. Add reference to pubspec.yaml.
 
-Import:
+2. Import:
 ```dart
 import 'package:data_table_2/data_table_2.dart';
 ```
 
-Sample code:
+3. Code:
 ```dart
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
