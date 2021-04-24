@@ -1,6 +1,7 @@
 In-place replacement for Flutter's stock **DataTable** and **PaginatedDataTable** widgets with fixed/sticky header (also footer/paginator for **PaginatedDataTable**) and a few extra features.
 
 # [LIVE DEMO](https://maxim-saplin.github.io/data_table_2/)
+<img width="866" alt="image" src="https://user-images.githubusercontent.com/7947027/115952160-2c28ae00-a4ed-11eb-9d04-e91db844749e.png">
 
 You can reference the package and add '2' to the names of the stock widgets (making them **DataTable2** or **PaginatedDataTable2**) and that is it. The differences are:
 - Sticky headers and paginator
