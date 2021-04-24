@@ -21,7 +21,7 @@ The differences/distrinctions from stock widgets:
 Add reference to pubspec.yaml:
 ```yaml
 dependencies:
-  data_table_2: "^2.0.0"
+  data_table_2: "^2.0.0-dev.1"
 ```
 
 Import:
