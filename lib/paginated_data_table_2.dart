@@ -13,49 +13,20 @@ import 'package:flutter/widgets.dart';
 
 import 'data_table_2.dart';
 
-/// A material design data table that shows data using multiple pages.
-///
-/// A paginated data table shows [rowsPerPage] rows of data per page and
-/// provides controls for showing other pages.
-///
-/// Data is read lazily from from a [DataTableSource]. The widget is presented
-/// as a [Card].
-///
+/// In-place replacement of standard [PaginatedDataTable] widget, mimics it API.
+/// Has the header row and paginatior always fixed to top and bottom (correspondingly).
+/// Core of the table (with data rows) is scrollable and stretching to max width/height of it's container.
+/// You can set minimal width of the table via [minWidth] property and Flex behavior of
+/// table core via [fit] property.
+/// By using [DataColumn2] instead of [DataColumn] it is possible to control
+/// relative column sizes (setting them to S, M and L). [DataRow2] provides
+/// row-level tap event handlers.
 /// See also:
 ///
-///  * [DataTable], which is not paginated.
-///  * <https://material.io/go/design-data-tables#data-tables-tables-within-cards>
+///  * [DataTable2], which is not paginated.
 class PaginatedDataTable2 extends StatefulWidget {
-  /// Creates a widget describing a paginated [DataTable] on a [Card].
-  ///
-  /// The [header] should give the card's header, typically a [Text] widget.
-  ///
-  /// The [columns] argument must be a list of as many [DataColumn] objects as
-  /// the table is to have columns, ignoring the leading checkbox column if any.
-  /// The [columns] argument must have a length greater than zero and cannot be
-  /// null.
-  ///
-  /// If the table is sorted, the column that provides the current primary key
-  /// should be specified by index in [sortColumnIndex], 0 meaning the first
-  /// column in [columns], 1 being the next one, and so forth.
-  ///
-  /// The actual sort order can be specified using [sortAscending]; if the sort
-  /// order is ascending, this should be true (the default), otherwise it should
-  /// be false.
-  ///
-  /// The [source] must not be null. The [source] should be a long-lived
-  /// [DataTableSource]. The same source should be provided each time a
-  /// particular [PaginatedDataTable2] widget is created; avoid creating a new
-  /// [DataTableSource] with each new instance of the [PaginatedDataTable2]
-  /// widget unless the data table really is to now show entirely different
-  /// data from a new source.
-  ///
-  /// The [rowsPerPage] and [availableRowsPerPage] must not be null (they
-  /// both have defaults, though, so don't have to be specified).
-  ///
-  /// Themed by [DataTableTheme]. [DataTableThemeData.decoration] is ignored.
-  /// To modify the border or background color of the [PaginatedDataTable2], use
-  /// [CardTheme], since a [Card] wraps the inner [DataTable].
+  /// Check out [PaginatedDataTable] for the API decription.
+  /// Key differences are [minWidth] and [fit] properties.
   PaginatedDataTable2(
       {Key? key,
       this.header,

@@ -17,17 +17,25 @@ double _smRatio = 0.67;
 double _lmRatio = 1.2;
 
 /// Relative size of a column determines the share of total table width allocated
-/// to each individual column. See [smRatio], [lmRatio] and [setColumnSizeRatios].
+/// to each individual column. When determining column widths ratios between S, M and L
+/// columns are kept (i.e. Large columns are set to 1.2x width of Medium ones)
+/// - see [smRatio], [lmRatio] and [setColumnSizeRatios].
 enum ColumnSize { S, M, L }
 
+/// Small to Medium column width ratio, 0.67 default
 double get smRatio => _smRatio;
+
+/// Large to Medium column width ratio, 1.2 default
 double get lmRatio => _lmRatio;
 
+/// Use this method to change the default ratios of columns sizes/widths (see [ColumnSize])
 void setColumnSizeRatios(double sm, double lm) {
   _smRatio = sm;
   _lmRatio = lm;
 }
 
+/// Extension of stovk [DataColumn], adds the capability to set relative column
+/// size via [size] property
 @immutable
 class DataColumn2 extends DataColumn {
   /// Creates the configuration for a column of a [DataTable2].
@@ -47,6 +55,9 @@ class DataColumn2 extends DataColumn {
   final ColumnSize size;
 }
 
+/// Extension of standard [DataRow], adds row level tap events. Also there're
+/// onSecondaryTap and onSecondaryTapDown which are not available in DataCells and
+/// which can be useful in Desktop settings when a reaction to the right click is required.
 @immutable
 class DataRow2 extends DataRow {
   //DataRow2.fromDataRow(DataRow row) : this.cells = row.cells;
@@ -86,12 +97,23 @@ class DataRow2 extends DataRow {
             color: color,
             cells: cells);
 
+  /// Row tap handler
   // TODO add tests
   final VoidCallback? onTap;
+
+  /// Row right click handler
   final VoidCallback? onSecondaryTap;
+
+  /// Row right mouse down handler
   final GestureTapDownCallback? onSecondaryTapDown;
 }
 
+/// In-place replacement of standard [DataTable] widget, mimics it API.
+/// Has the header row always fixed and core of the table (with data rows)
+/// scrollable and stretching to max width/height of it's container.
+/// By using [DataColumn2] instead of [DataColumn] it is possible to control
+/// relative column sizes (setting them to S, M and L). [DataRow2] provides
+/// row-level tap event handlers.
 class DataTable2 extends DataTable {
   DataTable2({
     Key? key,
