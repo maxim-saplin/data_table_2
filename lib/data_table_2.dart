@@ -496,11 +496,19 @@ class DataTable2 extends DataTable {
         displayColumnIndex += 1;
       }
 
-      var availableWidth = constraints.maxWidth - checkBoxWidth;
+      var availableWidth = constraints.maxWidth;
       if (minWidth != null && availableWidth < minWidth!) {
         availableWidth = minWidth!;
       }
-      var columnWidth = availableWidth / columns.length;
+
+      availableWidth -= checkBoxWidth;
+      var totalColWidth = availableWidth -
+          effectiveHorizontalMargin -
+          (displayCheckboxColumn
+              ? effectiveHorizontalMargin / 2
+              : effectiveHorizontalMargin);
+
+      var columnWidth = totalColWidth / columns.length;
       var totalWidth = 0.0;
 
       var widths = List<double>.generate(columns.length, (i) {
@@ -517,10 +525,29 @@ class DataTable2 extends DataTable {
         return w;
       });
 
-      var ratio = availableWidth / totalWidth;
+      var ratio = totalColWidth / totalWidth;
 
       for (var i = 0; i < widths.length; i++) {
         widths[i] *= ratio;
+      }
+
+      if (widths.length == 1) {
+        widths[0] = math.max(
+            0,
+            widths[0] +
+                effectiveHorizontalMargin +
+                (displayCheckboxColumn
+                    ? effectiveHorizontalMargin / 2
+                    : effectiveHorizontalMargin));
+      } else if (widths.length > 1) {
+        widths[0] = math.max(
+            0,
+            widths[0] +
+                (displayCheckboxColumn
+                    ? effectiveHorizontalMargin / 2
+                    : effectiveHorizontalMargin));
+        widths[widths.length - 1] =
+            math.max(0, widths[widths.length - 1] + effectiveHorizontalMargin);
       }
 
       for (int dataColumnIndex = 0;

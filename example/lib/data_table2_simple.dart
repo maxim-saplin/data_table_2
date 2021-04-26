@@ -16,8 +16,8 @@ class DataTable2SimpleDemo extends StatelessWidget {
           minWidth: 600,
           columns: [
             DataColumn2(
-              label: Text('Column A'),
               size: ColumnSize.L,
+              label: Text('Column A'),
             ),
             DataColumn(
               label: Text('Column B'),

@@ -69,7 +69,7 @@ class _DataTable2DemoState extends State<DataTable2Demo> {
           columns: [
             DataColumn2(
               label: Text('Desert'),
-              size: ColumnSize.L,
+              size: ColumnSize.S,
               onSort: (columnIndex, ascending) =>
                   _sort<String>((d) => d.name, columnIndex, ascending),
             ),
