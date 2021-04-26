@@ -3,9 +3,10 @@ In-place substitute for Flutter's stock **DataTable** and **PaginatedDataTable**
 If you've been using (or considered using) standard Flutter's widgets for displaying tables/data grids and missed the sticky headers - you've come to the right place. No need to learn yet another API of a new control, just stick to well described DataTable/PaginatedDataTable.
 
 # [LIVE DEMO](https://maxim-saplin.github.io/data_table_2/)
+
 <img width="866" alt="image" src="https://user-images.githubusercontent.com/7947027/115952188-48c4e600-a4ed-11eb-9ff9-e5b4deaf9580.png">
 
-- please check the [example folder](https://github.com/maxim-saplin/data_table_2/tree/main/example) which recreates the [Flutter Gallery's](https://gallery.flutter.dev/#/demo/data-table) Data Table sample (with PgaintedDataTable and DataSource) as well as has a few more samples.
+\- please check the [example folder](https://github.com/maxim-saplin/data_table_2/tree/main/example) which recreates the [Flutter Gallery's](https://gallery.flutter.dev/#/demo/data-table) Data Table sample (with PgaintedDataTable and DataSource) as well as has a few more samples. There's also a [DataGrid Sample](https://maxim-saplin.github.io/flutter_web_spa_sample/canvaskit/) in separate repo.
 
 ## Differences
 The differences/distrinctions from stock widgets:
