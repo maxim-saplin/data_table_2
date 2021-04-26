@@ -34,7 +34,7 @@ void setColumnSizeRatios(double sm, double lm) {
   _lmRatio = lm;
 }
 
-/// Extension of stovk [DataColumn], adds the capability to set relative column
+/// Extension of stock [DataColumn], adds the capability to set relative column
 /// size via [size] property
 @immutable
 class DataColumn2 extends DataColumn {
@@ -408,24 +408,37 @@ class DataTable2 extends DataTable {
     final List<TableColumnWidth> tableColumns = List<TableColumnWidth>.filled(
         columns.length + (displayCheckboxColumn ? 1 : 0),
         const _NullTableColumnWidth());
+
+    var headingRow = TableRow(
+      key: _headingRowKey,
+      decoration: BoxDecoration(
+        border: showBottomBorder
+            ? Border(
+                bottom: Divider.createBorderSide(
+                context,
+                width: dividerThickness ??
+                    theme.dataTableTheme.dividerThickness ??
+                    _dividerThickness,
+              ))
+            : null,
+        color: effectiveHeadingRowColor?.resolve(<MaterialState>{}),
+      ),
+      children: List<Widget>.filled(tableColumns.length, const _NullWidget()),
+    );
+
     final List<TableRow> tableRows = List<TableRow>.generate(
-      rows.length + 1, // the +1 is for the header row
+      rows.length,
       (int index) {
-        final bool isSelected = index > 0 && rows[index - 1].selected;
-        final bool isDisabled = index > 0 &&
-            anyRowSelectable &&
-            rows[index - 1].onSelectChanged == null;
+        final bool isSelected = rows[index].selected;
+        final bool isDisabled =
+            anyRowSelectable && rows[index].onSelectChanged == null;
         final Set<MaterialState> states = <MaterialState>{
           if (isSelected) MaterialState.selected,
           if (isDisabled) MaterialState.disabled,
         };
-        final Color? resolvedDataRowColor = index > 0
-            ? (rows[index - 1].color ?? effectiveDataRowColor)?.resolve(states)
-            : null;
-        final Color? resolvedHeadingRowColor =
-            effectiveHeadingRowColor?.resolve(<MaterialState>{});
-        final Color? rowColor =
-            index > 0 ? resolvedDataRowColor : resolvedHeadingRowColor;
+        final Color? resolvedDataRowColor =
+            (rows[index].color ?? effectiveDataRowColor)?.resolve(states);
+        final Color? rowColor = resolvedDataRowColor;
         final BorderSide borderSide = Divider.createBorderSide(
           context,
           width: dividerThickness ??
@@ -434,11 +447,9 @@ class DataTable2 extends DataTable {
         );
         final Border? border = showBottomBorder
             ? Border(bottom: borderSide)
-            : index == 0
-                ? null
-                : Border(top: borderSide);
+            : Border(top: borderSide);
         return TableRow(
-          key: index == 0 ? _headingRowKey : rows[index - 1].key,
+          key: rows[index].key,
           decoration: BoxDecoration(
             border: border,
             color: rowColor ?? defaultRowColor.resolve(states),
@@ -459,7 +470,7 @@ class DataTable2 extends DataTable {
             Checkbox.width +
             effectiveHorizontalMargin / 2.0;
         tableColumns[0] = FixedColumnWidth(checkBoxWidth);
-        tableRows[0].children![0] = _buildCheckbox(
+        headingRow.children![0] = _buildCheckbox(
           context: context,
           checked: someChecked ? null : allChecked,
           onRowTap: null,
@@ -468,7 +479,7 @@ class DataTable2 extends DataTable {
           overlayColor: null,
           tristate: true,
         );
-        rowIndex = 1;
+        rowIndex = 0;
         for (final DataRow row in rows) {
           tableRows[rowIndex].children![0] = _buildCheckbox(
             context: context,
@@ -514,7 +525,7 @@ class DataTable2 extends DataTable {
 
       for (int dataColumnIndex = 0;
           dataColumnIndex < columns.length;
-          dataColumnIndex += 1) {
+          dataColumnIndex++) {
         final DataColumn column = columns[dataColumnIndex];
 
         final double paddingStart;
@@ -541,13 +552,7 @@ class DataTable2 extends DataTable {
         tableColumns[displayColumnIndex] = //const IntrinsicColumnWidth();
             FixedColumnWidth(widths[dataColumnIndex]);
 
-        // if (dataColumnIndex == _onlyTextColumn) {
-        //   tableColumns[displayColumnIndex] =
-        //       const IntrinsicColumnWidth(flex: 1.0);
-        // } else {
-        //   tableColumns[displayColumnIndex] = const IntrinsicColumnWidth();
-        // }
-        tableRows[0].children![displayColumnIndex] = _buildHeadingCell(
+        headingRow.children![displayColumnIndex] = _buildHeadingCell(
           context: context,
           padding: padding,
           label: column.label,
@@ -561,7 +566,8 @@ class DataTable2 extends DataTable {
           ascending: sortAscending,
           overlayColor: effectiveHeadingRowColor,
         );
-        rowIndex = 1;
+
+        rowIndex = 0;
         for (final DataRow row in rows) {
           final DataCell cell = row.cells[dataColumnIndex];
           tableRows[rowIndex].children![displayColumnIndex] = _buildDataCell(
@@ -593,14 +599,14 @@ class DataTable2 extends DataTable {
         children: [
           Table(
             columnWidths: widthsAsMap,
-            children: [tableRows[0]],
+            children: [headingRow],
           ),
           Flexible(
               fit: FlexFit.loose,
               child: SingleChildScrollView(
                   child: Table(
                 columnWidths: widthsAsMap,
-                children: tableRows.skip(1).take(tableRows.length - 1).toList(),
+                children: tableRows,
               )))
         ],
       );

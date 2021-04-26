@@ -2,4 +2,8 @@
 
 ## 2.0.0
 
-The very first relase
+Perf. optimization of DataTable.build(), finishing off the package for roll-out to pub.dev
+
+## 2.0.0-dev.1
+
+The very first relase to pub.dev
