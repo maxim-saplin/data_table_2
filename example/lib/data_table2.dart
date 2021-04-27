@@ -61,6 +61,7 @@ class _DataTable2DemoState extends State<DataTable2Demo> {
       child: DataTable2(
           columnSpacing: 0,
           horizontalMargin: 12,
+          bottomMargin: 10,
           minWidth: 600,
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,

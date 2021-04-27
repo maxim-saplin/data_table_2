@@ -129,6 +129,7 @@ class DataTable2 extends DataTable {
     double? headingRowHeight,
     TextStyle? headingTextStyle,
     double? horizontalMargin,
+    this.bottomMargin,
     double? columnSpacing,
     bool showCheckboxColumn = true,
     bool showBottomBorder = false,
@@ -195,6 +196,11 @@ class DataTable2 extends DataTable {
   /// and lots of columns (that get messed with little space)
   // TODO add test
   final double? minWidth;
+
+  /// If set the table will have empty space added after the the last row and allow scroll the
+  /// core of the table higher (e.g. if you would like to have iOS navigation UI at the bottom overlapping the table and
+  /// have the ability to slightly scroll up the bototm row to avoid the obstruction)
+  final double? bottomMargin;
 
   Widget _buildCheckbox({
     required BuildContext context,
@@ -576,7 +582,7 @@ class DataTable2 extends DataTable {
           end: paddingEnd,
         );
 
-        tableColumns[displayColumnIndex] = //const IntrinsicColumnWidth();
+        tableColumns[displayColumnIndex] =
             FixedColumnWidth(widths[dataColumnIndex]);
 
         headingRow.children![displayColumnIndex] = _buildHeadingCell(
@@ -621,6 +627,19 @@ class DataTable2 extends DataTable {
 
       var widthsAsMap = tableColumns.asMap();
 
+      var marginedT = bottomMargin != null && bottomMargin! > 0
+          ? Column(mainAxisSize: MainAxisSize.min, children: [
+              Table(
+                columnWidths: widthsAsMap,
+                children: tableRows,
+              ),
+              SizedBox(height: bottomMargin!)
+            ])
+          : Table(
+              columnWidths: widthsAsMap,
+              children: tableRows,
+            );
+
       var t = Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -630,11 +649,7 @@ class DataTable2 extends DataTable {
           ),
           Flexible(
               fit: FlexFit.loose,
-              child: SingleChildScrollView(
-                  child: Table(
-                columnWidths: widthsAsMap,
-                children: tableRows,
-              )))
+              child: SingleChildScrollView(child: marginedT))
         ],
       );
 
