@@ -135,6 +135,7 @@ class DataTable2 extends DataTable {
     bool showBottomBorder = false,
     double? dividerThickness,
     this.minWidth,
+    this.scrollController,
     required List<DataRow> rows,
   }) : super(
             key: key,
@@ -201,6 +202,9 @@ class DataTable2 extends DataTable {
   /// core of the table higher (e.g. if you would like to have iOS navigation UI at the bottom overlapping the table and
   /// have the ability to slightly scroll up the bototm row to avoid the obstruction)
   final double? bottomMargin;
+
+  /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
+  final ScrollController? scrollController;
 
   Widget _buildCheckbox({
     required BuildContext context,
@@ -649,7 +653,8 @@ class DataTable2 extends DataTable {
           ),
           Flexible(
               fit: FlexFit.loose,
-              child: SingleChildScrollView(child: marginedT))
+              child: SingleChildScrollView(
+                  child: marginedT, controller: scrollController))
         ],
       );
 
