@@ -199,9 +199,6 @@ class DataTablePlus extends DataTable {
     required bool tristate,
   }) {
     final ThemeData themeData = Theme.of(context);
-    final double effectiveHorizontalMargin = horizontalMargin ??
-        themeData.dataTableTheme.horizontalMargin ??
-        _horizontalMargin;
     Widget contents = Semantics(
       container: true,
       child: Center(
@@ -576,18 +573,6 @@ class DataTablePlus extends DataTable {
         ),
       ),
     );
-  }
-
-  static int? _initOnlyTextColumn(List<DataColumn> columns) {
-    int? result;
-    for (int index = 0; index < columns.length; index += 1) {
-      final DataColumn column = columns[index];
-      if (!column.numeric) {
-        if (result != null) return null;
-        result = index;
-      }
-    }
-    return result;
   }
 }
 
