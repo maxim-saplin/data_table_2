@@ -522,8 +522,13 @@ class DataTablePlus extends DataTable {
       );
 
       if (effectiveTableColumns[displayColumnIndex] is _NullTableColumnWidth) {
-        effectiveTableColumns[displayColumnIndex] =
-            (const IntrinsicColumnWidth(flex: 1.0));
+        if (displayColumnIndex == columns.length - 1) {
+          effectiveTableColumns[displayColumnIndex] =
+              (const IntrinsicColumnWidth(flex: 1.0));
+        } else {
+          effectiveTableColumns[displayColumnIndex] =
+              (const IntrinsicColumnWidth());
+        }
       }
       tableRows[0].children![displayColumnIndex] = _buildHeadingCell(
         context: context,
