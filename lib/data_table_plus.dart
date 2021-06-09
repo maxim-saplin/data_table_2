@@ -545,9 +545,13 @@ class DataTablePlus extends DataTable {
       for (final DataRow row in rows) {
         final DataCell cell = row.cells[dataColumnIndex];
         tableRows[rowIndex].children![displayColumnIndex] = _buildDataCell(
-          onRowTap: () {},
-          onRowSecondaryTap: () {},
-          onRowSecondaryTapDown: (details) {},
+          onRowTap: row is DataRowPlus ? row.onTap : null,
+          onRowSecondaryTap: row is DataRowPlus ? row.onSecondaryTap : null,
+          onRowSecondaryTapDown:
+              row is DataRowPlus ? row.onSecondaryTapDown : null,
+          onSelectChanged: () => row.onSelectChanged != null
+              ? row.onSelectChanged!(!row.selected)
+              : null,
           context: context,
           padding: padding,
           label: cell.child,
@@ -555,7 +559,6 @@ class DataTablePlus extends DataTable {
           placeholder: cell.placeholder,
           showEditIcon: cell.showEditIcon,
           onTap: cell.onTap,
-          onSelectChanged: () => row.onSelectChanged?.call(!row.selected),
           overlayColor: row.color ?? effectiveDataRowColor,
         );
         rowIndex += 1;
