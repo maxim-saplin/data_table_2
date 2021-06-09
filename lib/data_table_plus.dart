@@ -124,7 +124,7 @@ class DataTablePlus extends DataTable {
       double? dividerThickness,
       this.scrollController,
       required List<DataRow> rows,
-      this.tableColumns})
+      this.tableColumnsWidth})
       : super(
             key: key,
             columns: columns,
@@ -188,7 +188,7 @@ class DataTablePlus extends DataTable {
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? scrollController;
 
-  final List<TableColumnWidth>? tableColumns;
+  final Map<int, TableColumnWidth>? tableColumnsWidth;
 
   Widget _buildCheckbox({
     required BuildContext context,
@@ -400,22 +400,14 @@ class DataTablePlus extends DataTable {
             themeData.dataTableTheme.checkboxHorizontalMargin ??
             effectiveHorizontalMargin / 2.0;
 
-    late List<TableColumnWidth> effectiveTableColumns;
-    if (tableColumns != null) {
-      effectiveTableColumns = tableColumns!;
-
-      /// If you don't have all the columns, complete the list
-      if (effectiveTableColumns.length < columns.length) {
-        effectiveTableColumns.addAll(List<TableColumnWidth>.filled(
-            (columns.length + (displayCheckboxColumn ? 1 : 0)) -
-                tableColumns!.length,
-            const _NullTableColumnWidth()));
+    late List<TableColumnWidth> effectiveTableColumns = [];
+    List.generate(columns.length + (displayCheckboxColumn ? 1 : 0), (index) {
+      if (tableColumnsWidth != null && tableColumnsWidth![index] != null) {
+        effectiveTableColumns.add(tableColumnsWidth![index]!);
+      } else {
+        effectiveTableColumns.add(const _NullTableColumnWidth());
       }
-    } else {
-      effectiveTableColumns = List<TableColumnWidth>.filled(
-          columns.length + (displayCheckboxColumn ? 1 : 0),
-          const _NullTableColumnWidth());
-    }
+    });
 
     final List<TableRow> tableRows = List<TableRow>.generate(
       rows.length + 1, // the +1 is for the header row
