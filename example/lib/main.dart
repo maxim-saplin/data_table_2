@@ -30,14 +30,14 @@ Scaffold _getScaffold(BuildContext context, Widget body) {
               value: ModalRoute.of(context)!.settings.name,
               onChanged: (v) {
                 switch (v) {
-                  case '/datatable2':
-                    Navigator.of(context).pushNamed('/datatable2');
+                  case '/DataTablePlus':
+                    Navigator.of(context).pushNamed('/DataTablePlus');
                     break;
-                  case '/datatable2simple':
-                    Navigator.of(context).pushNamed('/datatable2simple');
+                  case '/DataTablePlussimple':
+                    Navigator.of(context).pushNamed('/DataTablePlussimple');
                     break;
-                  case '/datatable2scrollup':
-                    Navigator.of(context).pushNamed('/datatable2scrollup');
+                  case '/DataTablePlusscrollup':
+                    Navigator.of(context).pushNamed('/DataTablePlusscrollup');
                     break;
                   case '/paginated2':
                     Navigator.of(context).pushNamed('/paginated2');
@@ -52,19 +52,19 @@ Scaffold _getScaffold(BuildContext context, Widget body) {
               },
               items: [
                 DropdownMenuItem(
-                  child: Text('DataTable2'),
-                  value: '/datatable2',
+                  child: Text('DataTablePlus'),
+                  value: '/DataTablePlus',
                 ),
                 DropdownMenuItem(
-                  child: Text('DataTable2 Simple'),
-                  value: '/datatable2simple',
+                  child: Text('DataTablePlus Simple'),
+                  value: '/DataTablePlussimple',
                 ),
                 DropdownMenuItem(
-                  child: Text('DataTable2 Scroll-up'),
-                  value: '/datatable2scrollup',
+                  child: Text('DataTablePlus Scroll-up'),
+                  value: '/DataTablePlusscrollup',
                 ),
                 DropdownMenuItem(
-                  child: Text('PaginatedDataTable2'),
+                  child: Text('PaginatedDataTablePlus'),
                   value: '/paginated2',
                 ),
                 DropdownMenuItem(
@@ -92,15 +92,16 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.grey[300],
       ),
-      initialRoute: '/datatable2',
+      initialRoute: '/DataTablePlus',
       routes: {
-        '/datatable2': (context) => _getScaffold(context, DataTable2Demo()),
-        '/datatable2simple': (context) =>
-            _getScaffold(context, DataTable2SimpleDemo()),
-        '/datatable2scrollup': (context) =>
-            _getScaffold(context, DataTable2ScrollupDemo()),
+        '/DataTablePlus': (context) =>
+            _getScaffold(context, DataTablePlusDemo()),
+        '/DataTablePlussimple': (context) =>
+            _getScaffold(context, DataTablePlusSimpleDemo()),
+        '/DataTablePlusscrollup': (context) =>
+            _getScaffold(context, DataTablePlusScrollupDemo()),
         '/paginated2': (context) =>
-            _getScaffold(context, PaginatedDataTable2Demo()),
+            _getScaffold(context, PaginatedDataTablePlusDemo()),
         '/datatable': (context) => _getScaffold(context, DataTableDemo()),
         '/paginated': (context) =>
             _getScaffold(context, PaginatedDataTableDemo()),

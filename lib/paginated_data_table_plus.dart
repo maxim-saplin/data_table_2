@@ -11,23 +11,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-import 'data_table_2.dart';
+import 'data_table_plus.dart';
 
 /// In-place replacement of standard [PaginatedDataTable] widget, mimics it API.
 /// Has the header row and paginatior always fixed to top and bottom (correspondingly).
 /// Core of the table (with data rows) is scrollable and stretching to max width/height of it's container.
 /// You can set minimal width of the table via [minWidth] property and Flex behavior of
 /// table core via [fit] property.
-/// By using [DataColumn2] instead of [DataColumn] it is possible to control
-/// relative column sizes (setting them to S, M and L). [DataRow2] provides
+/// By using [DataColumnPlus] instead of [DataColumn] it is possible to control
+/// relative column sizes (setting them to S, M and L). [DataRowPlus] provides
 /// row-level tap event handlers.
 /// See also:
 ///
-///  * [DataTable2], which is not paginated.
-class PaginatedDataTable2 extends StatefulWidget {
+///  * [DataTablePlus], which is not paginated.
+class PaginatedDataTablePlus extends StatefulWidget {
   /// Check out [PaginatedDataTable] for the API decription.
   /// Key differences are [minWidth] and [fit] properties.
-  PaginatedDataTable2(
+  PaginatedDataTablePlus(
       {Key? key,
       this.header,
       this.actions,
@@ -185,8 +185,8 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// The data source which provides data to show in each row. Must be non-null.
   ///
   /// This object should generally have a lifetime longer than the
-  /// [PaginatedDataTable2] widget itself; it should be reused each time the
-  /// [PaginatedDataTable2] constructor is called.
+  /// [PaginatedDataTablePlus] widget itself; it should be reused each time the
+  /// [PaginatedDataTablePlus] constructor is called.
   final DataTableSource source;
 
   /// {@macro flutter.widgets.scrollable.dragStartBehavior}
@@ -219,13 +219,13 @@ class PaginatedDataTable2 extends StatefulWidget {
   final ScrollController? scrollController;
 
   @override
-  PaginatedDataTable2State createState() => PaginatedDataTable2State();
+  PaginatedDataTablePlusState createState() => PaginatedDataTablePlusState();
 }
 
-/// Holds the state of a [PaginatedDataTable2].
+/// Holds the state of a [PaginatedDataTablePlus].
 ///
 /// The table can be programmatically paged using the [pageTo] method.
-class PaginatedDataTable2State extends State<PaginatedDataTable2> {
+class PaginatedDataTablePlusState extends State<PaginatedDataTablePlus> {
   late int _firstRowIndex;
   late int _rowCount;
   late bool _rowCountApproximate;
@@ -243,7 +243,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   }
 
   @override
-  void didUpdateWidget(PaginatedDataTable2 oldWidget) {
+  void didUpdateWidget(PaginatedDataTablePlus oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.source != widget.source) {
       oldWidget.source.removeListener(_handleDataSourceChanged);
@@ -501,7 +501,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
               fit: widget.fit,
               child: ConstrainedBox(
                 constraints: BoxConstraints(minWidth: constraints.minWidth),
-                child: DataTable2(
+                child: DataTablePlus(
                   key: _tableKey,
                   columns: widget.columns,
                   sortColumnIndex: widget.sortColumnIndex,
@@ -519,7 +519,6 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                   showCheckboxColumn: widget.showCheckboxColumn,
                   showBottomBorder: true,
                   rows: _getRows(_firstRowIndex, widget.rowsPerPage),
-                  minWidth: widget.minWidth,
                   scrollController: widget.scrollController,
                 ),
               ),

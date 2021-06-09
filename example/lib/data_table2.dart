@@ -1,4 +1,4 @@
-import 'package:data_table_2/data_table_2.dart';
+import 'package:data_table_plus/data_table_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -11,14 +11,14 @@ import 'data_source.dart';
 // The file was extracted from GitHub: https://github.com/flutter/gallery
 // Changes and modifications by Maxim Saplin, 2021
 
-class DataTable2Demo extends StatefulWidget {
-  const DataTable2Demo();
+class DataTablePlusDemo extends StatefulWidget {
+  const DataTablePlusDemo();
 
   @override
-  _DataTable2DemoState createState() => _DataTable2DemoState();
+  _DataTablePlusDemoState createState() => _DataTablePlusDemoState();
 }
 
-class _DataTable2DemoState extends State<DataTable2Demo> {
+class _DataTablePlusDemoState extends State<DataTablePlusDemo> {
   bool _sortAscending = true;
   int? _sortColumnIndex;
   late DessertDataSource _dessertsDataSource;
@@ -58,67 +58,58 @@ class _DataTable2DemoState extends State<DataTable2Demo> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: DataTable2(
+      child: DataTablePlus(
           columnSpacing: 0,
           horizontalMargin: 12,
           bottomMargin: 10,
-          minWidth: 600,
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
           onSelectAll: (val) =>
               setState(() => _dessertsDataSource.selectAll(val)),
           columns: [
-            DataColumn2(
+            DataColumnPlus(
               label: Text('Desert'),
-              size: ColumnSize.S,
               onSort: (columnIndex, ascending) =>
                   _sort<String>((d) => d.name, columnIndex, ascending),
             ),
-            DataColumn2(
+            DataColumnPlus(
               label: Text('Calories'),
-              size: ColumnSize.S,
               numeric: true,
               onSort: (columnIndex, ascending) =>
                   _sort<num>((d) => d.calories, columnIndex, ascending),
             ),
-            DataColumn2(
+            DataColumnPlus(
               label: Text('Fat (gm)'),
-              size: ColumnSize.S,
               numeric: true,
               onSort: (columnIndex, ascending) =>
                   _sort<num>((d) => d.fat, columnIndex, ascending),
             ),
-            DataColumn2(
+            DataColumnPlus(
               label: Text('Carbs (gm)'),
-              size: ColumnSize.S,
               numeric: true,
               onSort: (columnIndex, ascending) =>
                   _sort<num>((d) => d.carbs, columnIndex, ascending),
             ),
-            DataColumn2(
+            DataColumnPlus(
               label: Text('Protein (gm)'),
-              size: ColumnSize.S,
               numeric: true,
               onSort: (columnIndex, ascending) =>
                   _sort<num>((d) => d.protein, columnIndex, ascending),
             ),
-            DataColumn2(
+            DataColumnPlus(
               label: Text('Sodium (mg)'),
-              size: ColumnSize.S,
               numeric: true,
               onSort: (columnIndex, ascending) =>
                   _sort<num>((d) => d.sodium, columnIndex, ascending),
             ),
-            DataColumn2(
+            DataColumnPlus(
               label: Text('Calcium (%)'),
-              size: ColumnSize.S,
               numeric: true,
               onSort: (columnIndex, ascending) =>
                   _sort<num>((d) => d.calcium, columnIndex, ascending),
             ),
-            DataColumn2(
+            DataColumnPlus(
               label: Text('Iron (%)'),
-              size: ColumnSize.S,
               numeric: true,
               onSort: (columnIndex, ascending) =>
                   _sort<num>((d) => d.iron, columnIndex, ascending),

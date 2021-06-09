@@ -1,5 +1,5 @@
 name: example
-description: data_table_2 example
+description: data_table_plus example
 
 publish_to: 'none'
 
@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
   intl: ^0.17.0
   cupertino_icons: ^1.0.2
-  data_table_2:
+  data_table_plus:
     path: ../
 
 flutter:

@@ -1,5 +1,5 @@
+import 'package:data_table_plus/paginated_data_table_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:data_table_2/paginated_data_table_2.dart';
 
 import 'data_source.dart';
 
@@ -10,15 +10,16 @@ import 'data_source.dart';
 // The file was extracted from GitHub: https://github.com/flutter/gallery
 // Changes and modifications by Maxim Saplin, 2021
 
-class PaginatedDataTable2Demo extends StatefulWidget {
-  const PaginatedDataTable2Demo();
+class PaginatedDataTablePlusDemo extends StatefulWidget {
+  const PaginatedDataTablePlusDemo();
 
   @override
-  _PaginatedDataTable2DemoState createState() =>
-      _PaginatedDataTable2DemoState();
+  _PaginatedDataTablePlusDemoState createState() =>
+      _PaginatedDataTablePlusDemoState();
 }
 
-class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
+class _PaginatedDataTablePlusDemoState
+    extends State<PaginatedDataTablePlusDemo> {
   int _rowIndex = 0;
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   bool _sortAscending = true;
@@ -55,12 +56,12 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
 
   @override
   Widget build(BuildContext context) {
-    return PaginatedDataTable2(
+    return PaginatedDataTablePlus(
       horizontalMargin: 20,
       checkboxHorizontalMargin: 12,
       columnSpacing: 0,
       wrapInCard: false,
-      header: Text('PaginatedDataTable2'),
+      header: Text('PaginatedDataTablePlus'),
       rowsPerPage: _rowsPerPage,
       minWidth: 400,
       fit: FlexFit.tight,

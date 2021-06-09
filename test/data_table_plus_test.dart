@@ -5,32 +5,32 @@
 @TestOn('!chrome')
 import 'dart:math' as math;
 
-import 'package:data_table_2/data_table_2.dart';
+import 'package:data_table_plus/data_table_plus.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vector_math/vector_math_64.dart' show Matrix3;
 
 import 'mock_canvas.dart';
-import 'data_table_2_test_utils.dart';
+import 'data_table_plus_test_utils.dart';
 
 void main() {
-  testWidgets('DataTable2 control test', (WidgetTester tester) async {
+  testWidgets('DataTablePlus control test', (WidgetTester tester) async {
     final List<String> log = <String>[];
 
     Widget buildTable({int? sortColumnIndex, bool sortAscending = true}) {
-      return DataTable2(
+      return DataTablePlus(
         sortColumnIndex: sortColumnIndex,
         sortAscending: sortAscending,
         onSelectAll: (bool? value) {
           log.add('select-all: $value');
         },
-        columns: <DataColumn2>[
-          const DataColumn2(
+        columns: <DataColumn>[
+          const DataColumn(
             label: Text('Name'),
             tooltip: 'Name',
           ),
-          DataColumn2(
+          DataColumn(
             label: const Text('Calories'),
             tooltip: 'Calories',
             numeric: true,
@@ -39,8 +39,8 @@ void main() {
             },
           ),
         ],
-        rows: kDesserts.map<DataRow2>((Dessert dessert) {
-          return DataRow2(
+        rows: kDesserts.map<DataRowPlus>((Dessert dessert) {
+          return DataRowPlus(
             key: ValueKey<String>(dessert.name),
             onSelectChanged: (bool? selected) {
               log.add('row-selected: ${dessert.name}');
@@ -107,24 +107,24 @@ void main() {
     log.clear();
   });
 
-  testWidgets('DataTable2 control test - tristate',
+  testWidgets('DataTablePlus control test - tristate',
       (WidgetTester tester) async {
     final List<String> log = <String>[];
     const int numItems = 3;
     Widget buildTable(List<bool> selected, {int? disabledIndex}) {
-      return DataTable2(
+      return DataTablePlus(
         onSelectAll: (bool? value) {
           log.add('select-all: $value');
         },
-        columns: const <DataColumn2>[
-          DataColumn2(
+        columns: const <DataColumn>[
+          DataColumn(
             label: Text('Name'),
             tooltip: 'Name',
           ),
         ],
-        rows: List<DataRow2>.generate(
+        rows: List<DataRowPlus>.generate(
           numItems,
-          (int index) => DataRow2(
+          (int index) => DataRowPlus(
             cells: <DataCell>[DataCell(Text('Row $index'))],
             selected: selected[index],
             onSelectChanged: index == disabledIndex
@@ -180,29 +180,29 @@ void main() {
     log.clear();
   });
 
-  testWidgets('DataTable2 control test - no checkboxes',
+  testWidgets('DataTablePlus control test - no checkboxes',
       (WidgetTester tester) async {
     final List<String> log = <String>[];
 
     Widget buildTable({bool checkboxes = false}) {
-      return DataTable2(
+      return DataTablePlus(
         showCheckboxColumn: checkboxes,
         onSelectAll: (bool? value) {
           log.add('select-all: $value');
         },
-        columns: const <DataColumn2>[
-          DataColumn2(
+        columns: const <DataColumn>[
+          DataColumn(
             label: Text('Name'),
             tooltip: 'Name',
           ),
-          DataColumn2(
+          DataColumn(
             label: Text('Calories'),
             tooltip: 'Calories',
             numeric: true,
           ),
         ],
-        rows: kDesserts.map<DataRow2>((Dessert dessert) {
-          return DataRow2(
+        rows: kDesserts.map<DataRowPlus>((Dessert dessert) {
+          return DataRowPlus(
             key: ValueKey<String>(dessert.name),
             onSelectChanged: (bool? selected) {
               log.add('row-selected: ${dessert.name}');
@@ -247,23 +247,24 @@ void main() {
     log.clear();
   });
 
-  testWidgets('DataTable2 overflow test - header', (WidgetTester tester) async {
+  testWidgets('DataTablePlus overflow test - header',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Material(
-          child: DataTable2(
+          child: DataTablePlus(
             headingTextStyle: const TextStyle(
               fontSize: 14.0,
               letterSpacing:
                   0.0, // Will overflow if letter spacing is larger than 0.0.
             ),
-            columns: <DataColumn2>[
-              DataColumn2(
+            columns: <DataColumn>[
+              DataColumn(
                 label: Text('X' * 2000),
               ),
             ],
-            rows: const <DataRow2>[
-              DataRow2(
+            rows: const <DataRowPlus>[
+              DataRowPlus(
                 cells: <DataCell>[
                   DataCell(
                     Text('X'),
@@ -284,20 +285,20 @@ void main() {
         isNull); // column overflows table, but text doesn't overflow cell
   }, skip: false);
 
-  testWidgets('DataTable2 overflow test - header with spaces',
+  testWidgets('DataTablePlus overflow test - header with spaces',
       (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Material(
-          child: DataTable2(
-            columns: <DataColumn2>[
-              DataColumn2(
+          child: DataTablePlus(
+            columns: <DataColumn>[
+              DataColumn(
                 label: Text('X ' *
                     2000), // has soft wrap points, but they should be ignored
               ),
             ],
-            rows: const <DataRow2>[
-              DataRow2(
+            rows: const <DataRowPlus>[
+              DataRowPlus(
                 cells: <DataCell>[
                   DataCell(
                     Text('X'),
@@ -317,18 +318,18 @@ void main() {
         isNull); // column overflows table, but text doesn't overflow cell
   }, skip: true); // https://github.com/flutter/flutter/issues/13512
 
-  testWidgets('DataTable2 overflow test', (WidgetTester tester) async {
+  testWidgets('DataTablePlus overflow test', (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Material(
-          child: DataTable2(
-            columns: const <DataColumn2>[
-              DataColumn2(
+          child: DataTablePlus(
+            columns: const <DataColumn>[
+              DataColumn(
                 label: Text('X'),
               ),
             ],
-            rows: <DataRow2>[
-              DataRow2(
+            rows: <DataRowPlus>[
+              DataRowPlus(
                 cells: <DataCell>[
                   DataCell(
                     Text('X' * 2000),
@@ -348,18 +349,18 @@ void main() {
         isNull); // cell overflows table, but text doesn't overflow cell
   });
 
-  testWidgets('DataTable2 overflow test', (WidgetTester tester) async {
+  testWidgets('DataTablePlus overflow test', (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Material(
-          child: DataTable2(
-            columns: const <DataColumn2>[
-              DataColumn2(
+          child: DataTablePlus(
+            columns: const <DataColumn>[
+              DataColumn(
                 label: Text('X'),
               ),
             ],
-            rows: <DataRow2>[
-              DataRow2(
+            rows: <DataRowPlus>[
+              DataRowPlus(
                 cells: <DataCell>[
                   DataCell(
                     Text('X ' * 2000), // wraps
@@ -378,18 +379,18 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('DataTable2 column onSort test', (WidgetTester tester) async {
+  testWidgets('DataTablePlus column onSort test', (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Material(
-          child: DataTable2(
-            columns: const <DataColumn2>[
-              DataColumn2(
+          child: DataTablePlus(
+            columns: const <DataColumn>[
+              DataColumn(
                 label: Text('Dessert'),
               ),
             ],
-            rows: const <DataRow2>[
-              DataRow2(
+            rows: const <DataRowPlus>[
+              DataRowPlus(
                 cells: <DataCell>[
                   DataCell(
                     Text('Lollipop'), // wraps
@@ -406,21 +407,21 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('DataTable2 sort indicator orientation',
+  testWidgets('DataTablePlus sort indicator orientation',
       (WidgetTester tester) async {
     Widget buildTable({bool sortAscending = true}) {
-      return DataTable2(
+      return DataTablePlus(
         sortColumnIndex: 0,
         sortAscending: sortAscending,
-        columns: <DataColumn2>[
-          DataColumn2(
+        columns: <DataColumn>[
+          DataColumn(
             label: const Text('Name'),
             tooltip: 'Name',
             onSort: (int columnIndex, bool ascending) {},
           ),
         ],
-        rows: kDesserts.map<DataRow2>((Dessert dessert) {
-          return DataRow2(
+        rows: kDesserts.map<DataRowPlus>((Dessert dessert) {
+          return DataRowPlus(
             cells: <DataCell>[
               DataCell(
                 Text(dessert.name),
@@ -453,19 +454,19 @@ void main() {
         equals(Matrix3.rotationZ(math.pi)));
   });
 
-  testWidgets('DataTable2 row onSelectChanged test',
+  testWidgets('DataTablePlus row onSelectChanged test',
       (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Material(
-          child: DataTable2(
-            columns: const <DataColumn2>[
-              DataColumn2(
+          child: DataTablePlus(
+            columns: const <DataColumn>[
+              DataColumn(
                 label: Text('Dessert'),
               ),
             ],
-            rows: const <DataRow2>[
-              DataRow2(
+            rows: const <DataRowPlus>[
+              DataRowPlus(
                 cells: <DataCell>[
                   DataCell(
                     Text('Lollipop'), // wraps
@@ -482,33 +483,33 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('DataTable2 custom row height', (WidgetTester tester) async {
+  testWidgets('DataTablePlus custom row height', (WidgetTester tester) async {
     Widget buildCustomTable({
       int? sortColumnIndex,
       bool sortAscending = true,
       double dataRowHeight = 48.0,
       double headingRowHeight = 56.0,
     }) {
-      return DataTable2(
+      return DataTablePlus(
         sortColumnIndex: sortColumnIndex,
         sortAscending: sortAscending,
         onSelectAll: (bool? value) {},
         dataRowHeight: dataRowHeight,
         headingRowHeight: headingRowHeight,
-        columns: <DataColumn2>[
-          const DataColumn2(
+        columns: <DataColumn>[
+          const DataColumn(
             label: Text('Name'),
             tooltip: 'Name',
           ),
-          DataColumn2(
+          DataColumn(
             label: const Text('Calories'),
             tooltip: 'Calories',
             numeric: true,
             onSort: (int columnIndex, bool ascending) {},
           ),
         ],
-        rows: kDesserts.map<DataRow2>((Dessert dessert) {
-          return DataRow2(
+        rows: kDesserts.map<DataRowPlus>((Dessert dessert) {
+          return DataRowPlus(
             key: ValueKey<String>(dessert.name),
             onSelectChanged: (bool? selected) {},
             cells: <DataCell>[
@@ -529,22 +530,22 @@ void main() {
     // DEFAULT VALUES
     await tester.pumpWidget(MaterialApp(
       home: Material(
-        child: DataTable2(
+        child: DataTablePlus(
           onSelectAll: (bool? value) {},
-          columns: <DataColumn2>[
-            const DataColumn2(
+          columns: <DataColumn>[
+            const DataColumn(
               label: Text('Name'),
               tooltip: 'Name',
             ),
-            DataColumn2(
+            DataColumn(
               label: const Text('Calories'),
               tooltip: 'Calories',
               numeric: true,
               onSort: (int columnIndex, bool ascending) {},
             ),
           ],
-          rows: kDesserts.map<DataRow2>((Dessert dessert) {
-            return DataRow2(
+          rows: kDesserts.map<DataRowPlus>((Dessert dessert) {
+            return DataRowPlus(
               key: ValueKey<String>(dessert.name),
               onSelectChanged: (bool? selected) {},
               cells: <DataCell>[
@@ -594,7 +595,7 @@ void main() {
     expect(tester.getSize(findFirstContainerFor('Frozen yogurt')).height, 56.0);
   });
 
-  testWidgets('DataTable2 custom horizontal padding - checkbox',
+  testWidgets('DataTablePlus custom horizontal padding - checkbox',
       (WidgetTester tester) async {
     const double _defaultHorizontalMargin = 24.0;
     const double _defaultColumnSpacing = 56.0;
@@ -608,30 +609,30 @@ void main() {
       int? sortColumnIndex,
       bool sortAscending = true,
     }) {
-      return DataTable2(
+      return DataTablePlus(
         sortColumnIndex: sortColumnIndex,
         sortAscending: sortAscending,
         onSelectAll: (bool? value) {},
-        columns: <DataColumn2>[
-          const DataColumn2(
+        columns: <DataColumn>[
+          const DataColumn(
             label: Text('Name'),
             tooltip: 'Name',
           ),
-          DataColumn2(
+          DataColumn(
             label: const Text('Calories'),
             tooltip: 'Calories',
             numeric: true,
             onSort: (int columnIndex, bool ascending) {},
           ),
-          DataColumn2(
+          DataColumn(
             label: const Text('Fat'),
             tooltip: 'Fat',
             numeric: true,
             onSort: (int columnIndex, bool ascending) {},
           ),
         ],
-        rows: kDesserts.map<DataRow2>((Dessert dessert) {
-          return DataRow2(
+        rows: kDesserts.map<DataRowPlus>((Dessert dessert) {
+          return DataRowPlus(
             key: ValueKey<String>(dessert.name),
             onSelectChanged: (bool? selected) {},
             cells: <DataCell>[
@@ -674,7 +675,7 @@ void main() {
     // default first column padding
     padding = find.widgetWithText(Padding, 'Frozen yogurt');
     cellContent = find.widgetWithText(Align,
-        'Frozen yogurt'); // DataTable2 wraps its DataCells in an Align widget
+        'Frozen yogurt'); // DataTablePlus wraps its DataCells in an Align widget
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
       _defaultHorizontalMargin / 2,
@@ -714,34 +715,32 @@ void main() {
       double? horizontalMargin,
       double? columnSpacing,
     }) {
-      return DataTable2(
+      return DataTablePlus(
         sortColumnIndex: sortColumnIndex,
         sortAscending: sortAscending,
         onSelectAll: (bool? value) {},
         horizontalMargin: horizontalMargin,
         columnSpacing: columnSpacing,
-        columns: <DataColumn2>[
-          const DataColumn2(
+        columns: <DataColumn>[
+          const DataColumn(
             label: Text('Name'),
             tooltip: 'Name',
           ),
-          DataColumn2(
+          DataColumn(
             label: const Text('Calories'),
-            size: ColumnSize.S,
             tooltip: 'Calories',
             numeric: true,
             onSort: (int columnIndex, bool ascending) {},
           ),
-          DataColumn2(
+          DataColumn(
             label: const Text('Fat'),
-            size: ColumnSize.S,
             tooltip: 'Fat',
             numeric: true,
             onSort: (int columnIndex, bool ascending) {},
           ),
         ],
-        rows: kDesserts.map<DataRow2>((Dessert dessert) {
-          return DataRow2(
+        rows: kDesserts.map<DataRowPlus>((Dessert dessert) {
+          return DataRowPlus(
             key: ValueKey<String>(dessert.name),
             onSelectChanged: (bool? selected) {},
             cells: <DataCell>[
@@ -788,7 +787,7 @@ void main() {
     // custom first column padding
     padding = find.widgetWithText(Padding, 'Frozen yogurt').first;
     cellContent = find.widgetWithText(Align,
-        'Frozen yogurt'); // DataTable2 wraps its DataCells in an Align widget
+        'Frozen yogurt'); // DataTablePlus wraps its DataCells in an Align widget
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
       _customHorizontalMargin / 2,
@@ -823,7 +822,7 @@ void main() {
     );
   });
 
-  testWidgets('DataTable2 custom horizontal padding - no checkbox',
+  testWidgets('DataTablePlus custom horizontal padding - no checkbox',
       (WidgetTester tester) async {
     const double _defaultHorizontalMargin = 24.0;
     const double _defaultColumnSpacing = 56.0;
@@ -836,29 +835,29 @@ void main() {
       int? sortColumnIndex,
       bool sortAscending = true,
     }) {
-      return DataTable2(
+      return DataTablePlus(
         sortColumnIndex: sortColumnIndex,
         sortAscending: sortAscending,
-        columns: <DataColumn2>[
-          const DataColumn2(
+        columns: <DataColumn>[
+          const DataColumn(
             label: Text('Name'),
             tooltip: 'Name',
           ),
-          DataColumn2(
+          DataColumn(
             label: const Text('Calories'),
             tooltip: 'Calories',
             numeric: true,
             onSort: (int columnIndex, bool ascending) {},
           ),
-          DataColumn2(
+          DataColumn(
             label: const Text('Fat'),
             tooltip: 'Fat',
             numeric: true,
             onSort: (int columnIndex, bool ascending) {},
           ),
         ],
-        rows: kDesserts.map<DataRow2>((Dessert dessert) {
-          return DataRow2(
+        rows: kDesserts.map<DataRowPlus>((Dessert dessert) {
+          return DataRowPlus(
             key: ValueKey<String>(dessert.name),
             cells: <DataCell>[
               DataCell(
@@ -888,7 +887,7 @@ void main() {
     // default first column padding
     padding = find.widgetWithText(Padding, 'Frozen yogurt');
     cellContent = find.widgetWithText(Align,
-        'Frozen yogurt'); // DataTable2 wraps its DataCells in an Align widget
+        'Frozen yogurt'); // DataTablePlus wraps its DataCells in an Align widget
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
       _defaultHorizontalMargin,
@@ -928,31 +927,31 @@ void main() {
       double? horizontalMargin,
       double? columnSpacing,
     }) {
-      return DataTable2(
+      return DataTablePlus(
         sortColumnIndex: sortColumnIndex,
         sortAscending: sortAscending,
         horizontalMargin: horizontalMargin,
         columnSpacing: columnSpacing,
-        columns: <DataColumn2>[
-          const DataColumn2(
+        columns: <DataColumn>[
+          const DataColumn(
             label: Text('Name'),
             tooltip: 'Name',
           ),
-          DataColumn2(
+          DataColumn(
             label: const Text('Calories'),
             tooltip: 'Calories',
             numeric: true,
             onSort: (int columnIndex, bool ascending) {},
           ),
-          DataColumn2(
+          DataColumn(
             label: const Text('Fat'),
             tooltip: 'Fat',
             numeric: true,
             onSort: (int columnIndex, bool ascending) {},
           ),
         ],
-        rows: kDesserts.map<DataRow2>((Dessert dessert) {
-          return DataRow2(
+        rows: kDesserts.map<DataRowPlus>((Dessert dessert) {
+          return DataRowPlus(
             key: ValueKey<String>(dessert.name),
             cells: <DataCell>[
               DataCell(
@@ -986,7 +985,7 @@ void main() {
     // custom first column padding
     padding = find.widgetWithText(Padding, 'Frozen yogurt');
     cellContent = find.widgetWithText(Align,
-        'Frozen yogurt'); // DataTable2 wraps its DataCells in an Align widget
+        'Frozen yogurt'); // DataTablePlus wraps its DataCells in an Align widget
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
       _customHorizontalMargin,
@@ -1021,10 +1020,11 @@ void main() {
     );
   });
 
-  testWidgets('DataTable2 set border width test', (WidgetTester tester) async {
-    const List<DataColumn2> columns = <DataColumn2>[
-      DataColumn2(label: Text('column1')),
-      DataColumn2(label: Text('column2')),
+  testWidgets('DataTablePlus set border width test',
+      (WidgetTester tester) async {
+    const List<DataColumn> columns = <DataColumn>[
+      DataColumn(label: Text('column1')),
+      DataColumn(label: Text('column2')),
     ];
 
     const List<DataCell> cells = <DataCell>[
@@ -1032,17 +1032,17 @@ void main() {
       DataCell(Text('cell2')),
     ];
 
-    const List<DataRow2> rows = <DataRow2>[
-      DataRow2(cells: cells),
-      DataRow2(cells: cells),
+    const List<DataRowPlus> rows = <DataRowPlus>[
+      DataRowPlus(cells: cells),
+      DataRowPlus(cells: cells),
     ];
 
     // no thickness provided - border should be default: i.e "1.0" as it
-    // set in DataTable2 constructor
+    // set in DataTablePlus constructor
     await tester.pumpWidget(
       MaterialApp(
         home: Material(
-          child: DataTable2(
+          child: DataTablePlus(
             columns: columns,
             rows: rows,
           ),
@@ -1059,7 +1059,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Material(
-          child: DataTable2(
+          child: DataTablePlus(
             dividerThickness: thickness,
             columns: columns,
             rows: rows,
@@ -1073,10 +1073,11 @@ void main() {
     expect(boxDecoration.border!.top.width, thickness);
   });
 
-  testWidgets('DataTable2 set show bottom border', (WidgetTester tester) async {
-    const List<DataColumn2> columns = <DataColumn2>[
-      DataColumn2(label: Text('column1')),
-      DataColumn2(label: Text('column2')),
+  testWidgets('DataTablePlus set show bottom border',
+      (WidgetTester tester) async {
+    const List<DataColumn> columns = <DataColumn>[
+      DataColumn(label: Text('column1')),
+      DataColumn(label: Text('column2')),
     ];
 
     const List<DataCell> cells = <DataCell>[
@@ -1084,15 +1085,15 @@ void main() {
       DataCell(Text('cell2')),
     ];
 
-    const List<DataRow2> rows = <DataRow2>[
-      DataRow2(cells: cells),
-      DataRow2(cells: cells),
+    const List<DataRowPlus> rows = <DataRowPlus>[
+      DataRowPlus(cells: cells),
+      DataRowPlus(cells: cells),
     ];
 
     await tester.pumpWidget(
       MaterialApp(
         home: Material(
-          child: DataTable2(
+          child: DataTablePlus(
             showBottomBorder: true,
             columns: columns,
             rows: rows,
@@ -1109,7 +1110,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Material(
-          child: DataTable2(
+          child: DataTablePlus(
             columns: columns,
             rows: rows,
           ),
@@ -1122,20 +1123,20 @@ void main() {
     expect(boxDecoration.border!.bottom.width, 0.0);
   });
 
-  testWidgets('DataTable2 column heading cell - with and without sorting',
+  testWidgets('DataTablePlus column heading cell - with and without sorting',
       (WidgetTester tester) async {
     Widget buildTable({int? sortColumnIndex, bool sortEnabled = true}) {
-      return DataTable2(
+      return DataTablePlus(
           sortColumnIndex: sortColumnIndex,
-          columns: <DataColumn2>[
-            DataColumn2(
+          columns: <DataColumn>[
+            DataColumn(
               label: Center(child: Text('Name')),
               tooltip: 'Name',
               onSort: sortEnabled ? (_, __) {} : null,
             ),
           ],
-          rows: const <DataRow2>[
-            DataRow2(
+          rows: const <DataRowPlus>[
+            DataRowPlus(
               cells: <DataCell>[
                 DataCell(Text('A long desert name')),
               ],
@@ -1200,27 +1201,27 @@ void main() {
     }
   });
 
-  testWidgets('DataTable2 correctly renders with a mouse',
+  testWidgets('DataTablePlus correctly renders with a mouse',
       (WidgetTester tester) async {
     // Regression test for a bug described in
     // https://github.com/flutter/flutter/pull/43735#issuecomment-589459947
     // Filed at https://github.com/flutter/flutter/issues/51152
     Widget buildTable({int? sortColumnIndex}) {
-      return DataTable2(
+      return DataTablePlus(
           sortColumnIndex: sortColumnIndex,
-          columns: <DataColumn2>[
-            const DataColumn2(
+          columns: <DataColumn>[
+            const DataColumn(
               label: Center(child: Text('column1')),
               tooltip: 'Column1',
             ),
-            DataColumn2(
+            DataColumn(
               label: Center(child: Text('column2')),
               tooltip: 'Column2',
               onSort: (_, __) {},
             ),
           ],
-          rows: const <DataRow2>[
-            DataRow2(
+          rows: const <DataRowPlus>[
+            DataRowPlus(
               cells: <DataCell>[
                 DataCell(Text('Content1')),
                 DataCell(Text('Content2')),
@@ -1257,14 +1258,14 @@ void main() {
       return MaterialApp(
         theme: _themeData,
         home: Material(
-          child: DataTable2(
-            columns: const <DataColumn2>[
-              DataColumn2(
+          child: DataTablePlus(
+            columns: const <DataColumn>[
+              DataColumn(
                 label: Text('Column1'),
               ),
             ],
-            rows: <DataRow2>[
-              DataRow2(
+            rows: <DataRowPlus>[
+              DataRowPlus(
                 onSelectChanged: (bool? checked) {},
                 selected: selected,
                 cells: const <DataCell>[
@@ -1300,14 +1301,14 @@ void main() {
       return MaterialApp(
         theme: _themeData,
         home: Material(
-          child: DataTable2(
-            columns: const <DataColumn2>[
-              DataColumn2(
+          child: DataTablePlus(
+            columns: const <DataColumn>[
+              DataColumn(
                 label: Text('Column1'),
               ),
             ],
-            rows: <DataRow2>[
-              DataRow2(
+            rows: <DataRowPlus>[
+              DataRowPlus(
                 onSelectChanged: (bool? checked) {},
                 cells: const <DataCell>[
                   DataCell(Text('Content1')),
@@ -1335,14 +1336,14 @@ void main() {
 
     Widget buildTable({bool selected = false}) {
       return Material(
-        child: DataTable2(
-          columns: const <DataColumn2>[
-            DataColumn2(
+        child: DataTablePlus(
+          columns: const <DataColumn>[
+            DataColumn(
               label: Text('Column1'),
             ),
           ],
-          rows: <DataRow2>[
-            DataRow2(
+          rows: <DataRowPlus>[
+            DataRowPlus(
               selected: selected,
               color: MaterialStateProperty.resolveWith<Color>(
                 (Set<MaterialState> states) {
@@ -1384,20 +1385,20 @@ void main() {
 
     Widget buildTable({bool disabled = false}) {
       return Material(
-        child: DataTable2(
-          columns: const <DataColumn2>[
-            DataColumn2(
+        child: DataTablePlus(
+          columns: const <DataColumn>[
+            DataColumn(
               label: Text('Column1'),
             ),
           ],
-          rows: <DataRow2>[
-            DataRow2(
+          rows: <DataRowPlus>[
+            DataRowPlus(
               cells: const <DataCell>[
                 DataCell(Text('Content1')),
               ],
               onSelectChanged: (bool? value) {},
             ),
-            DataRow2(
+            DataRowPlus(
               color: MaterialStateProperty.resolveWith<Color>(
                 (Set<MaterialState> states) {
                   if (states.contains(MaterialState.disabled))
@@ -1436,12 +1437,12 @@ void main() {
       (WidgetTester tester) async {
     const Color pressedColor = Color(0xff4caf50);
     Widget buildTable() {
-      return DataTable2(columns: const <DataColumn2>[
-        DataColumn2(
+      return DataTablePlus(columns: const <DataColumn>[
+        DataColumn(
           label: Text('Column1'),
         ),
-      ], rows: <DataRow2>[
-        DataRow2(
+      ], rows: <DataRowPlus>[
+        DataRowPlus(
           color: MaterialStateProperty.resolveWith<Color>(
             (Set<MaterialState> states) {
               if (states.contains(MaterialState.pressed)) return pressedColor;
@@ -1470,18 +1471,18 @@ void main() {
     await gesture.up();
   });
 
-  testWidgets('DataTable2 can\'t render inside an AlertDialog',
+  testWidgets('DataTablePlus can\'t render inside an AlertDialog',
       (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Material(
           child: AlertDialog(
-            content: DataTable2(
-              columns: const <DataColumn2>[
-                DataColumn2(label: Text('Col1')),
+            content: DataTablePlus(
+              columns: const <DataColumn>[
+                DataColumn(label: Text('Col1')),
               ],
-              rows: const <DataRow2>[
-                DataRow2(cells: <DataCell>[DataCell(Text('1'))]),
+              rows: const <DataRowPlus>[
+                DataRowPlus(cells: <DataCell>[DataCell(Text('1'))]),
               ],
             ),
             scrollable: true,
@@ -1493,7 +1494,7 @@ void main() {
     expect(tester.takeException(), isNotNull);
   });
 
-  testWidgets('DataTable2 renders with border and background decoration',
+  testWidgets('DataTablePlus renders with border and background decoration',
       (WidgetTester tester) async {
     // const double width = 800;
     // const double height = 600;
@@ -1504,7 +1505,7 @@ void main() {
 
     await tester.pumpWidget(MaterialApp(
       home: Material(
-        child: DataTable2(
+        child: DataTablePlus(
           decoration: const BoxDecoration(
             color: backgroundColor,
             border: Border.symmetric(
@@ -1513,11 +1514,11 @@ void main() {
                   BorderSide(width: borderHorizontal, color: borderColor),
             ),
           ),
-          columns: const <DataColumn2>[
-            DataColumn2(label: Text('Col1')),
+          columns: const <DataColumn>[
+            DataColumn(label: Text('Col1')),
           ],
-          rows: const <DataRow2>[
-            DataRow2(cells: <DataCell>[DataCell(Text('1'))]),
+          rows: const <DataRowPlus>[
+            DataRowPlus(cells: <DataCell>[DataCell(Text('1'))]),
           ],
         ),
       ),

@@ -2,11 +2,11 @@
 
 ## 2.0.3
 
-Added DataTable2.scrollController and PaginatedDataTable2.scrollController property, added scroll-up example
+Added DataTablePlus.scrollController and PaginatedDataTablePlus.scrollController property, added scroll-up example
 
 ## 2.0.2
 
-Added DataTable2.bottomMargin property
+Added DataTablePlus.bottomMargin property
 
 ## 2.0.1
 
