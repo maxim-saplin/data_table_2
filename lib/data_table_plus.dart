@@ -236,10 +236,12 @@ class DataTablePlus extends DataTable {
   }) {
     final ThemeData themeData = Theme.of(context);
     label = Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       textDirection: numeric ? TextDirection.rtl : null,
       children: <Widget>[
         Flexible(child: label),
         if (onSort != null) ...<Widget>[
+          const SizedBox(width: _sortArrowPadding),
           _SortArrow(
             visible: sorted,
             up: sorted ? ascending : null,
