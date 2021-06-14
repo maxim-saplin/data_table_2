@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:data_table_2/paginated_data_table_2.dart';
 
 import 'data_source.dart';
+import 'isEmptyArg.dart';
 
 // Copyright 2019 The Flutter team. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -62,7 +63,7 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
       wrapInCard: false,
       header: Text('PaginatedDataTable2'),
       rowsPerPage: _rowsPerPage,
-      minWidth: 400,
+      minWidth: 800,
       fit: FlexFit.tight,
       onRowsPerPageChanged: (value) {
         setState(() {
@@ -127,7 +128,14 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
               sort<num>((d) => d.iron, columnIndex, ascending),
         ),
       ],
-      source: _dessertsDataSource,
+      empty: Center(
+          child: Container(
+              padding: EdgeInsets.all(20),
+              color: Colors.grey[200],
+              child: Text('No data'))),
+      source: getIsEmpty(context)
+          ? DessertDataSource.empty(context)
+          : _dessertsDataSource,
     );
   }
 }

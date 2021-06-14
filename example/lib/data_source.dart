@@ -73,6 +73,10 @@ class Dessert {
 }
 
 class DessertDataSource extends DataTableSource {
+  DessertDataSource.empty(this.context) {
+    desserts = [];
+  }
+
   DessertDataSource(this.context) {
     desserts = <Dessert>[
       Dessert(

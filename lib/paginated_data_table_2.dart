@@ -57,7 +57,8 @@ class PaginatedDataTable2 extends StatefulWidget {
       this.wrapInCard = true,
       this.minWidth,
       this.fit = FlexFit.loose,
-      this.scrollController})
+      this.scrollController,
+      this.empty})
       : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
@@ -214,6 +215,10 @@ class PaginatedDataTable2 extends StatefulWidget {
   // TODO add test
   final FlexFit fit;
 
+  /// Placeholder widget which is displayed whenever the data rows are empty.
+  /// The widget will be displayed below column
+  final Widget? empty;
+
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   // TODO add test
   final ScrollController? scrollController;
@@ -309,8 +314,13 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
 
   List<DataRow> _getRows(int firstRowIndex, int rowsPerPage) {
     final List<DataRow> result = <DataRow>[];
+
+    if (widget.empty != null && widget.source.rowCount < 1)
+      return result; // If empty placeholder is provided - don't create blank rows
+
     final int nextPageFirstRowIndex = firstRowIndex + rowsPerPage;
     bool haveProgressIndicator = false;
+
     for (int index = firstRowIndex; index < nextPageFirstRowIndex; index += 1) {
       DataRow? row;
       if (index < _rowCount || _rowCountApproximate) {
@@ -521,6 +531,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                   rows: _getRows(_firstRowIndex, widget.rowsPerPage),
                   minWidth: widget.minWidth,
                   scrollController: widget.scrollController,
+                  empty: widget.empty,
                 ),
               ),
             ),

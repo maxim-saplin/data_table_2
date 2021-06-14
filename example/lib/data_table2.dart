@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import 'data_source.dart';
+import 'isEmptyArg.dart';
 
 // Copyright 2019 The Flutter team. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -59,73 +60,81 @@ class _DataTable2DemoState extends State<DataTable2Demo> {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: DataTable2(
-          columnSpacing: 0,
-          horizontalMargin: 12,
-          bottomMargin: 10,
-          minWidth: 600,
-          sortColumnIndex: _sortColumnIndex,
-          sortAscending: _sortAscending,
-          onSelectAll: (val) =>
-              setState(() => _dessertsDataSource.selectAll(val)),
-          columns: [
-            DataColumn2(
-              label: Text('Desert'),
-              size: ColumnSize.S,
-              onSort: (columnIndex, ascending) =>
-                  _sort<String>((d) => d.name, columnIndex, ascending),
-            ),
-            DataColumn2(
-              label: Text('Calories'),
-              size: ColumnSize.S,
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  _sort<num>((d) => d.calories, columnIndex, ascending),
-            ),
-            DataColumn2(
-              label: Text('Fat (gm)'),
-              size: ColumnSize.S,
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  _sort<num>((d) => d.fat, columnIndex, ascending),
-            ),
-            DataColumn2(
-              label: Text('Carbs (gm)'),
-              size: ColumnSize.S,
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  _sort<num>((d) => d.carbs, columnIndex, ascending),
-            ),
-            DataColumn2(
-              label: Text('Protein (gm)'),
-              size: ColumnSize.S,
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  _sort<num>((d) => d.protein, columnIndex, ascending),
-            ),
-            DataColumn2(
-              label: Text('Sodium (mg)'),
-              size: ColumnSize.S,
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  _sort<num>((d) => d.sodium, columnIndex, ascending),
-            ),
-            DataColumn2(
-              label: Text('Calcium (%)'),
-              size: ColumnSize.S,
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  _sort<num>((d) => d.calcium, columnIndex, ascending),
-            ),
-            DataColumn2(
-              label: Text('Iron (%)'),
-              size: ColumnSize.S,
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  _sort<num>((d) => d.iron, columnIndex, ascending),
-            ),
-          ],
-          rows: List<DataRow>.generate(_dessertsDataSource.rowCount,
-              (index) => _dessertsDataSource.getRow(index))),
+        columnSpacing: 0,
+        horizontalMargin: 12,
+        bottomMargin: 10,
+        minWidth: 600,
+        sortColumnIndex: _sortColumnIndex,
+        sortAscending: _sortAscending,
+        onSelectAll: (val) =>
+            setState(() => _dessertsDataSource.selectAll(val)),
+        columns: [
+          DataColumn2(
+            label: Text('Desert'),
+            size: ColumnSize.S,
+            onSort: (columnIndex, ascending) =>
+                _sort<String>((d) => d.name, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: Text('Calories'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.calories, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: Text('Fat (gm)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.fat, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: Text('Carbs (gm)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.carbs, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: Text('Protein (gm)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.protein, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: Text('Sodium (mg)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.sodium, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: Text('Calcium (%)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.calcium, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: Text('Iron (%)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.iron, columnIndex, ascending),
+          ),
+        ],
+        empty: Center(
+            child: Container(
+                padding: EdgeInsets.all(20),
+                color: Colors.grey[200],
+                child: Text('No data'))),
+        rows: getIsEmpty(context)
+            ? []
+            : List<DataRow>.generate(_dessertsDataSource.rowCount,
+                (index) => _dessertsDataSource.getRow(index)),
+      ),
     );
   }
 }

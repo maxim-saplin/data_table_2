@@ -1,8 +1,10 @@
 import 'package:example/data_table2_scrollup.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'data_table2.dart';
 import 'data_table2_simple.dart';
+import 'isEmptyArg.dart';
 import 'paginated_data_table2.dart';
 import 'data_table.dart';
 import 'paginated_data_table.dart';
@@ -11,12 +13,16 @@ void main() {
   runApp(MyApp());
 }
 
-Scaffold _getScaffold(BuildContext context, Widget body) {
+const String initialRoute = '/datatable2';
+
+Scaffold _getScaffold(BuildContext context, Widget body,
+    [bool isAllowEmpty = false]) {
+  var isEmpty = getIsEmpty(context);
   return Scaffold(
     appBar: AppBar(
       shadowColor: Colors.transparent,
       automaticallyImplyLeading: false,
-      title: Row(children: [
+      title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Container(
             padding: EdgeInsets.fromLTRB(12, 4, 12, 4),
             color: Colors.grey[850],
@@ -27,7 +33,7 @@ Scaffold _getScaffold(BuildContext context, Widget body) {
                   .textTheme
                   .subtitle1!
                   .copyWith(color: Colors.white),
-              value: ModalRoute.of(context)!.settings.name,
+              value: _getCurrentRoute(context),
               onChanged: (v) {
                 switch (v) {
                   case '/datatable2':
@@ -77,10 +83,48 @@ Scaffold _getScaffold(BuildContext context, Widget body) {
                 ),
               ],
             )),
+        isAllowEmpty
+            ? Container(
+                padding: EdgeInsets.fromLTRB(12, 4, 12, 4),
+                child: DropdownButton<bool>(
+                    icon: SizedBox(),
+                    dropdownColor: Colors.grey[300],
+                    style: Theme.of(context)
+                        .textTheme
+                        .subtitle1!
+                        .copyWith(color: Colors.black),
+                    value: isEmpty,
+                    onChanged: (v) {
+                      var r = _getCurrentRoute(context);
+                      var flag = v ?? false;
+                      if (flag) {
+                        Navigator.of(context).pushNamed(r, arguments: true);
+                      } else {
+                        Navigator.of(context).pushNamed(r, arguments: false);
+                      }
+                    },
+                    items: [
+                      DropdownMenuItem(
+                        child: Text('With data'),
+                        value: false,
+                      ),
+                      DropdownMenuItem(
+                        child: Text('No data'),
+                        value: true,
+                      )
+                    ]))
+            : SizedBox()
       ]),
     ),
     body: body,
   );
+}
+
+String _getCurrentRoute(BuildContext context) {
+  return ModalRoute.of(context) != null &&
+          ModalRoute.of(context)!.settings.name != null
+      ? ModalRoute.of(context)!.settings.name!
+      : initialRoute;
 }
 
 class MyApp extends StatelessWidget {
@@ -92,15 +136,16 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.grey[300],
       ),
-      initialRoute: '/datatable2',
+      initialRoute: initialRoute,
       routes: {
-        '/datatable2': (context) => _getScaffold(context, DataTable2Demo()),
+        '/datatable2': (context) =>
+            _getScaffold(context, DataTable2Demo(), true),
         '/datatable2simple': (context) =>
             _getScaffold(context, DataTable2SimpleDemo()),
         '/datatable2scrollup': (context) =>
             _getScaffold(context, DataTable2ScrollupDemo()),
         '/paginated2': (context) =>
-            _getScaffold(context, PaginatedDataTable2Demo()),
+            _getScaffold(context, PaginatedDataTable2Demo(), true),
         '/datatable': (context) => _getScaffold(context, DataTableDemo()),
         '/paginated': (context) =>
             _getScaffold(context, PaginatedDataTableDemo()),

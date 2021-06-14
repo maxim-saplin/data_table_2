@@ -136,6 +136,7 @@ class DataTable2 extends DataTable {
     double? dividerThickness,
     this.minWidth,
     this.scrollController,
+    this.empty,
     required List<DataRow> rows,
   }) : super(
             key: key,
@@ -205,6 +206,10 @@ class DataTable2 extends DataTable {
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? scrollController;
+
+  /// Placeholder widget which is displayed whenever the data rows are empty.
+  /// The widget will be displayed below column
+  final Widget? empty;
 
   Widget _buildCheckbox({
     required BuildContext context,
@@ -631,18 +636,16 @@ class DataTable2 extends DataTable {
 
       var widthsAsMap = tableColumns.asMap();
 
-      var marginedT = bottomMargin != null && bottomMargin! > 0
-          ? Column(mainAxisSize: MainAxisSize.min, children: [
-              Table(
-                columnWidths: widthsAsMap,
-                children: tableRows,
-              ),
-              SizedBox(height: bottomMargin!)
-            ])
-          : Table(
-              columnWidths: widthsAsMap,
-              children: tableRows,
-            );
+      var dataRows = Table(
+        columnWidths: widthsAsMap,
+        children: tableRows,
+      );
+
+      var marginedTable = bottomMargin != null && bottomMargin! > 0
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [dataRows, SizedBox(height: bottomMargin!)])
+          : dataRows;
 
       var t = Column(
         mainAxisSize: MainAxisSize.min,
@@ -653,8 +656,10 @@ class DataTable2 extends DataTable {
           ),
           Flexible(
               fit: FlexFit.loose,
-              child: SingleChildScrollView(
-                  child: marginedT, controller: scrollController))
+              child: tableRows.isEmpty
+                  ? empty ?? SizedBox()
+                  : SingleChildScrollView(
+                      child: marginedTable, controller: scrollController))
         ],
       );
 
