@@ -96,6 +96,29 @@ class DataRowPlus extends DataRow {
   final GestureTapDownCallback? onSecondaryTapDown;
 }
 
+enum TypeCustomRow { ADD, REPLACE }
+
+class CustomRow {
+  int index;
+  List<Widget> cells;
+  TypeCustomRow typeCustomRow;
+
+  /// A [Key] that uniquely identifies this row. This is used to
+  /// ensure that if a row is added or removed, any stateful widgets
+  /// related to this row (e.g. an in-progress checkbox animation)
+  /// remain on the right row visually.
+  ///
+  /// If the table never changes once created, no key is necessary.
+  final LocalKey? key;
+
+  CustomRow(
+      {required this.index,
+      required this.cells,
+      this.typeCustomRow = TypeCustomRow.REPLACE,
+      this.key})
+      : assert(index >= 0 || typeCustomRow != TypeCustomRow.REPLACE);
+}
+
 /// In-place replacement of standard [DataTable] widget, mimics it API.
 /// Has the header row always fixed and core of the table (with data rows)
 /// scrollable and stretching to max width/height of it's container.
@@ -124,7 +147,9 @@ class DataTablePlus extends DataTable {
       double? dividerThickness,
       this.scrollController,
       required List<DataRow> rows,
-      this.tableColumnsWidth})
+      this.tableColumnsWidth,
+      this.customRows,
+      this.showCheckboxSelectAll = true})
       : super(
             key: key,
             columns: columns,
@@ -189,6 +214,10 @@ class DataTablePlus extends DataTable {
   final ScrollController? scrollController;
 
   final Map<int, TableColumnWidth>? tableColumnsWidth;
+
+  final List<CustomRow>? customRows;
+
+  final bool showCheckboxSelectAll;
 
   Widget _buildCheckbox({
     required BuildContext context,
@@ -408,25 +437,103 @@ class DataTablePlus extends DataTable {
         effectiveTableColumns.add(const _NullTableColumnWidth());
       }
     });
+    List<TableRow> tableRows = [];
+    bool useDefaultHeader = true;
 
-    final List<TableRow> tableRows = List<TableRow>.generate(
-      rows.length + 1, // the +1 is for the header row
-      (int index) {
-        final bool isSelected = index > 0 && rows[index - 1].selected;
-        final bool isDisabled = index > 0 &&
-            anyRowSelectable &&
-            rows[index - 1].onSelectChanged == null;
+    /// Add custom lines pre-header
+    if (customRows != null) {
+      customRows!.forEach((element) {
+        if (element.index < 0 ||
+            (element.index == 0 &&
+                element.typeCustomRow == TypeCustomRow.REPLACE)) {
+          tableRows.add(TableRow(
+              children:
+                  List<Widget>.generate(effectiveTableColumns.length, (index) {
+            if (index == 0 && displayCheckboxColumn) {
+              return SizedBox();
+            }
+            return const _NullWidget();
+          })));
+        }
+        if (element.index == 0 &&
+            element.typeCustomRow == TypeCustomRow.REPLACE) {
+          /// Header
+          useDefaultHeader = false;
+        }
+      });
+    }
+
+    int currentQtdCustomLines = 0;
+    for (int rowIndex = 0;
+        rowIndex <
+
+            /// Add +1 Header
+            (rows.length + (useDefaultHeader ? 1 : 0)) +
+                (customRows
+                        ?.where((element) =>
+                            element.index > 0 &&
+                            element.typeCustomRow == TypeCustomRow.ADD)
+                        .length ??
+                    0);
+        rowIndex++) {
+      int indexCustomRow =
+          customRows?.indexWhere((element) => element.index == rowIndex) ?? -1;
+      if (indexCustomRow > -1) {
+        tableRows.add(TableRow(
+            key: customRows![indexCustomRow].key,
+            children:
+                List<Widget>.generate(effectiveTableColumns.length, (index) {
+              if (index == 0 && displayCheckboxColumn) {
+                return SizedBox();
+              }
+              return const _NullWidget();
+            })));
+        if (customRows![indexCustomRow].typeCustomRow ==
+            TypeCustomRow.REPLACE) {
+          continue;
+        } else {
+          //currentQtdCustomLines++;
+        }
+      }
+      int index = rowIndex - (currentQtdCustomLines) - 1;
+      if (index == -1) {
+        /// Header
+
+        final Color? resolvedHeadingRowColor =
+            effectiveHeadingRowColor?.resolve(<MaterialState>{});
+        final Color? rowColor = resolvedHeadingRowColor;
+
+        final BorderSide borderSide = Divider.createBorderSide(
+          context,
+          width: dividerThickness ??
+              theme.dataTableTheme.dividerThickness ??
+              _dividerThickness,
+        );
+        final Border? border =
+            showBottomBorder ? Border(bottom: borderSide) : null;
+
+        tableRows.add(
+          TableRow(
+              key: _headingRowKey,
+              decoration: BoxDecoration(
+                border: border,
+                color: rowColor,
+              ),
+              children: List<Widget>.filled(
+                  effectiveTableColumns.length, const _NullWidget())),
+        );
+      } else if (index < rows.length) {
+        final bool isSelected = rows[index].selected;
+        final bool isDisabled =
+            anyRowSelectable && rows[index].onSelectChanged == null;
         final Set<MaterialState> states = <MaterialState>{
           if (isSelected) MaterialState.selected,
           if (isDisabled) MaterialState.disabled,
         };
-        final Color? resolvedDataRowColor = index > 0
-            ? (rows[index - 1].color ?? effectiveDataRowColor)?.resolve(states)
-            : null;
-        final Color? resolvedHeadingRowColor =
-            effectiveHeadingRowColor?.resolve(<MaterialState>{});
-        final Color? rowColor =
-            index > 0 ? resolvedDataRowColor : resolvedHeadingRowColor;
+        final Color? resolvedDataRowColor =
+            (rows[index].color ?? effectiveDataRowColor)?.resolve(states);
+
+        final Color? rowColor = resolvedDataRowColor;
         final BorderSide borderSide = Divider.createBorderSide(
           context,
           width: dividerThickness ??
@@ -438,17 +545,30 @@ class DataTablePlus extends DataTable {
             : index == 0
                 ? null
                 : Border(top: borderSide);
-        return TableRow(
-          key: index == 0 ? _headingRowKey : rows[index - 1].key,
-          decoration: BoxDecoration(
-            border: border,
-            color: rowColor ?? defaultRowColor.resolve(states),
-          ),
-          children: List<Widget>.filled(
-              effectiveTableColumns.length, const _NullWidget()),
+
+        tableRows.add(
+          TableRow(
+              key: rows[index].key,
+              decoration: BoxDecoration(
+                border: border,
+                color: rowColor ?? defaultRowColor.resolve(states),
+              ),
+              children: List<Widget>.filled(
+                  effectiveTableColumns.length, const _NullWidget())),
         );
-      },
-    );
+        if (displayCheckboxColumn) {
+          tableRows.last.children![0] = _buildCheckbox(
+            context: context,
+            checked: rows[index].selected,
+            onRowTap: () =>
+                rows[index].onSelectChanged?.call(!rows[index].selected),
+            onCheckboxChanged: rows[index].onSelectChanged,
+            overlayColor: rows[index].color ?? effectiveDataRowColor,
+            tristate: false,
+          );
+        }
+      }
+    }
 
     int rowIndex;
 
@@ -458,26 +578,26 @@ class DataTablePlus extends DataTable {
           effectiveCheckboxHorizontalMarginStart +
               Checkbox.width +
               effectiveCheckboxHorizontalMarginEnd);
-      tableRows[0].children![0] = _buildCheckbox(
-        context: context,
-        checked: someChecked ? null : allChecked,
-        onRowTap: null,
-        onCheckboxChanged: (bool? checked) =>
-            _handleSelectAll(checked, someChecked),
-        overlayColor: null,
-        tristate: true,
-      );
-      rowIndex = 1;
-      for (final DataRow row in rows) {
-        tableRows[rowIndex].children![0] = _buildCheckbox(
+      int headerIndex = 0;
+      if (customRows != null) {
+        headerIndex = customRows!
+            .where((element) =>
+                element.index <= 0 &&
+                element.typeCustomRow == TypeCustomRow.ADD)
+            .length;
+      }
+      if (showCheckboxSelectAll) {
+        tableRows[headerIndex].children![0] = _buildCheckbox(
           context: context,
-          checked: row.selected,
-          onRowTap: () => row.onSelectChanged?.call(!row.selected),
-          onCheckboxChanged: row.onSelectChanged,
-          overlayColor: row.color ?? effectiveDataRowColor,
-          tristate: false,
+          checked: someChecked ? null : allChecked,
+          onRowTap: null,
+          onCheckboxChanged: (bool? checked) =>
+              _handleSelectAll(checked, someChecked),
+          overlayColor: null,
+          tristate: true,
         );
-        rowIndex += 1;
+      } else {
+        tableRows[headerIndex].children![0] = SizedBox();
       }
       displayColumnIndex += 1;
     }
@@ -521,41 +641,92 @@ class DataTablePlus extends DataTable {
               (const IntrinsicColumnWidth());
         }
       }
-      tableRows[0].children![displayColumnIndex] = _buildHeadingCell(
-        context: context,
-        padding: padding,
-        label: column.label,
-        tooltip: column.tooltip,
-        numeric: column.numeric,
-        onSort: column.onSort != null
-            ? () => column.onSort!(dataColumnIndex,
-                sortColumnIndex != dataColumnIndex || !sortAscending)
-            : null,
-        sorted: dataColumnIndex == sortColumnIndex,
-        ascending: sortAscending,
-        overlayColor: effectiveHeadingRowColor,
-      );
-      rowIndex = 1;
-      for (final DataRow row in rows) {
-        final DataCell cell = row.cells[dataColumnIndex];
-        tableRows[rowIndex].children![displayColumnIndex] = _buildDataCell(
-          onRowTap: row is DataRowPlus ? row.onTap : null,
-          onRowSecondaryTap: row is DataRowPlus ? row.onSecondaryTap : null,
-          onRowSecondaryTapDown:
-              row is DataRowPlus ? row.onSecondaryTapDown : null,
-          onSelectChanged: () => row.onSelectChanged != null
-              ? row.onSelectChanged!(!row.selected)
-              : null,
+      currentQtdCustomLines = 0;
+      rowIndex = 0;
+
+      int qtdPreHeaderCustomLines = 0;
+      if (customRows != null) {
+        for (CustomRow customRow
+            in customRows!.where((element) => element.index <= 0)) {
+          tableRows[rowIndex].children![displayColumnIndex] =
+              customRow.cells[displayColumnIndex];
+          if (customRow.index < 0 ||
+              customRow.typeCustomRow == TypeCustomRow.ADD) {
+            qtdPreHeaderCustomLines++;
+          }
+          //currentQtdCustomLines++;
+
+          rowIndex++;
+        }
+      }
+      if (useDefaultHeader) {
+        tableRows[rowIndex].children![displayColumnIndex] = _buildHeadingCell(
           context: context,
           padding: padding,
-          label: cell.child,
+          label: column.label,
+          tooltip: column.tooltip,
           numeric: column.numeric,
-          placeholder: cell.placeholder,
-          showEditIcon: cell.showEditIcon,
-          onTap: cell.onTap,
-          overlayColor: row.color ?? effectiveDataRowColor,
+          onSort: column.onSort != null
+              ? () => column.onSort!(dataColumnIndex,
+                  sortColumnIndex != dataColumnIndex || !sortAscending)
+              : null,
+          sorted: dataColumnIndex == sortColumnIndex,
+          ascending: sortAscending,
+          overlayColor: effectiveHeadingRowColor,
         );
-        rowIndex += 1;
+        rowIndex++;
+      }
+
+      for (;
+          rowIndex <
+              (rows.length + 1) +
+                  (customRows
+                          ?.where((element) =>
+                              element.typeCustomRow == TypeCustomRow.ADD)
+                          .length ??
+                      0);
+          rowIndex++) {
+        int indexCustomRow =
+            customRows?.indexWhere((element) => element.index == rowIndex) ??
+                -1;
+        if (indexCustomRow > -1) {
+          tableRows[rowIndex + currentQtdCustomLines]
+                  .children![displayColumnIndex] =
+              customRows![indexCustomRow].cells[dataColumnIndex];
+          if (customRows![indexCustomRow].typeCustomRow ==
+              TypeCustomRow.REPLACE) {
+            continue;
+          } else {
+            currentQtdCustomLines++;
+          }
+        }
+
+        /// Checks if the index exists in the list of lines.
+        /// It may not exist as the for cycles through the sum of the lines with the custom ones.
+        if (rows.length > ((rowIndex - 1) - qtdPreHeaderCustomLines)) {
+          final row = rows[(rowIndex - 1) - qtdPreHeaderCustomLines];
+
+          final DataCell cell = row.cells[dataColumnIndex];
+
+          tableRows[rowIndex + currentQtdCustomLines]
+              .children![displayColumnIndex] = _buildDataCell(
+            onRowTap: row is DataRowPlus ? row.onTap : null,
+            onRowSecondaryTap: row is DataRowPlus ? row.onSecondaryTap : null,
+            onRowSecondaryTapDown:
+                row is DataRowPlus ? row.onSecondaryTapDown : null,
+            onSelectChanged: () => row.onSelectChanged != null
+                ? row.onSelectChanged!(!row.selected)
+                : null,
+            context: context,
+            padding: padding,
+            label: cell.child,
+            numeric: column.numeric,
+            placeholder: cell.placeholder,
+            showEditIcon: cell.showEditIcon,
+            onTap: cell.onTap,
+            overlayColor: row.color ?? effectiveDataRowColor,
+          );
+        }
       }
       displayColumnIndex += 1;
     }
