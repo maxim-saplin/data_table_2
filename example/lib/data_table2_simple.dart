@@ -8,15 +8,18 @@ class DataTable2SimpleDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //setColumnSizeRatios(1, 2);
     return Padding(
       padding: const EdgeInsets.all(16),
       child: DataTable2(
           columnSpacing: 12,
           horizontalMargin: 12,
           minWidth: 600,
+          smRatio: 0.75,
+          lmRatio: 1.5,
           columns: [
             DataColumn2(
-              size: ColumnSize.L,
+              size: ColumnSize.S,
               label: Text('Column A'),
             ),
             DataColumn(
@@ -28,9 +31,10 @@ class DataTable2SimpleDemo extends StatelessWidget {
             DataColumn(
               label: Text('Column D'),
             ),
-            DataColumn(
+            DataColumn2(
               label: Text('Column NUMBERS'),
               numeric: true,
+              size: ColumnSize.L,
             ),
           ],
           rows: List<DataRow>.generate(

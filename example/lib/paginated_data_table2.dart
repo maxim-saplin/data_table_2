@@ -65,6 +65,13 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
       rowsPerPage: _rowsPerPage,
       minWidth: 800,
       fit: FlexFit.tight,
+      border: TableBorder(
+          top: BorderSide(color: Colors.black),
+          bottom: BorderSide(color: Colors.grey[300]!),
+          left: BorderSide(color: Colors.grey[300]!),
+          right: BorderSide(color: Colors.grey[300]!),
+          verticalInside: BorderSide(color: Colors.grey[300]!),
+          horizontalInside: BorderSide(color: Colors.grey, width: 1)),
       onRowsPerPageChanged: (value) {
         setState(() {
           _rowsPerPage = value!;

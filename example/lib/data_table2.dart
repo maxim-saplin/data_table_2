@@ -30,6 +30,10 @@ class _DataTable2DemoState extends State<DataTable2Demo> {
     super.didChangeDependencies();
     if (!_initialized) {
       _dessertsDataSource = DessertDataSource(context);
+      // Default sorting sample. Set __sortColumnIndex to 0 and uncoment the lines below
+      // if (_sortColumnIndex == 0) {
+      //   _sort<String>((d) => d.name, _sortColumnIndex!, _sortAscending);
+      // }
       _initialized = true;
       _dessertsDataSource.addListener(() {
         setState(() {});
@@ -60,10 +64,18 @@ class _DataTable2DemoState extends State<DataTable2Demo> {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: DataTable2(
-        columnSpacing: 0,
+        columnSpacing: 12,
         horizontalMargin: 12,
+        border: TableBorder(
+            top: BorderSide(color: Colors.black),
+            bottom: BorderSide(color: Colors.grey[300]!),
+            left: BorderSide(color: Colors.grey[300]!),
+            right: BorderSide(color: Colors.grey[300]!),
+            verticalInside: BorderSide(color: Colors.grey[300]!),
+            horizontalInside: BorderSide(color: Colors.grey, width: 1)),
+        dividerThickness: 10, // this one is ignored since [border] is set above
         bottomMargin: 10,
-        minWidth: 600,
+        minWidth: 900,
         sortColumnIndex: _sortColumnIndex,
         sortAscending: _sortAscending,
         onSelectAll: (val) =>

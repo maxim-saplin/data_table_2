@@ -27,39 +27,42 @@ import 'data_table_2.dart';
 class PaginatedDataTable2 extends StatefulWidget {
   /// Check out [PaginatedDataTable] for the API decription.
   /// Key differences are [minWidth] and [fit] properties.
-  PaginatedDataTable2(
-      {Key? key,
-      this.header,
-      this.actions,
-      required this.columns,
-      this.sortColumnIndex,
-      this.sortAscending = true,
-      this.onSelectAll,
-      this.dataRowHeight = kMinInteractiveDimension,
-      this.headingRowHeight = 56.0,
-      this.horizontalMargin = 24.0,
-      this.columnSpacing = 56.0,
-      this.showCheckboxColumn = true,
-      this.showFirstLastButtons = false,
-      this.initialFirstRowIndex = 0,
-      this.onPageChanged,
-      this.rowsPerPage = defaultRowsPerPage,
-      this.availableRowsPerPage = const <int>[
-        defaultRowsPerPage,
-        defaultRowsPerPage * 2,
-        defaultRowsPerPage * 5,
-        defaultRowsPerPage * 10
-      ],
-      this.onRowsPerPageChanged,
-      this.dragStartBehavior = DragStartBehavior.start,
-      required this.source,
-      this.checkboxHorizontalMargin,
-      this.wrapInCard = true,
-      this.minWidth,
-      this.fit = FlexFit.loose,
-      this.scrollController,
-      this.empty})
-      : assert(actions == null || (header != null)),
+  PaginatedDataTable2({
+    Key? key,
+    this.header,
+    this.actions,
+    required this.columns,
+    this.sortColumnIndex,
+    this.sortAscending = true,
+    this.onSelectAll,
+    this.dataRowHeight = kMinInteractiveDimension,
+    this.headingRowHeight = 56.0,
+    this.horizontalMargin = 24.0,
+    this.columnSpacing = 56.0,
+    this.showCheckboxColumn = true,
+    this.showFirstLastButtons = false,
+    this.initialFirstRowIndex = 0,
+    this.onPageChanged,
+    this.rowsPerPage = defaultRowsPerPage,
+    this.availableRowsPerPage = const <int>[
+      defaultRowsPerPage,
+      defaultRowsPerPage * 2,
+      defaultRowsPerPage * 5,
+      defaultRowsPerPage * 10
+    ],
+    this.onRowsPerPageChanged,
+    this.dragStartBehavior = DragStartBehavior.start,
+    required this.source,
+    this.checkboxHorizontalMargin,
+    this.wrapInCard = true,
+    this.minWidth,
+    this.fit = FlexFit.loose,
+    this.scrollController,
+    this.empty,
+    this.border,
+    this.smRatio = 0.67,
+    this.lmRatio = 1.2,
+  })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
             (sortColumnIndex >= 0 && sortColumnIndex < columns.length)),
@@ -215,9 +218,25 @@ class PaginatedDataTable2 extends StatefulWidget {
   // TODO add test
   final FlexFit fit;
 
+  // TODO: Add test
+  /// Set vertical and horizontal borders between cells, as well as outside borders around table.
+  /// NOTE: setting this field will disable standard horizontal dividers which are controlled by
+  /// themes and [dividerThickness] property
+  final TableBorder? border;
+
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
   final Widget? empty;
+
+  // TODO: Add test
+  /// Determines ratio of Small column's width to Medium column's width.
+  /// I.e. 0.5 means that Small column is twice narower than Medium column.
+  final double smRatio;
+
+  // TODO: Add test
+  /// Determines ratio of Large column's width to Medium column's width.
+  /// I.e. 2.0 means that Large column is twice wider than Medium column.
+  final double lmRatio;
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   // TODO add test
@@ -532,6 +551,9 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                   minWidth: widget.minWidth,
                   scrollController: widget.scrollController,
                   empty: widget.empty,
+                  border: widget.border,
+                  smRatio: widget.smRatio,
+                  lmRatio: widget.lmRatio,
                 ),
               ),
             ),

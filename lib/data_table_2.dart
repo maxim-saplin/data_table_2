@@ -13,25 +13,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-double _smRatio = 0.67;
-double _lmRatio = 1.2;
-
 /// Relative size of a column determines the share of total table width allocated
 /// to each individual column. When determining column widths ratios between S, M and L
 /// columns are kept (i.e. Large columns are set to 1.2x width of Medium ones)
-/// - see [smRatio], [lmRatio] and [setColumnSizeRatios].
+/// - see [DataTable2.smRatio], [DataTable2.lmRatio] and same properties on [PaginatedDataTable2].
 enum ColumnSize { S, M, L }
 
-/// Small to Medium column width ratio, 0.67 default
-double get smRatio => _smRatio;
+/// Deprecated, use [DataTable2.smRatio] instead
+@deprecated
+double get smRatio {
+  return -1.0;
+}
 
-/// Large to Medium column width ratio, 1.2 default
-double get lmRatio => _lmRatio;
+/// Deprecated, use [DataTable2.lmRatio] instead
+@deprecated
+double get lmRatio {
+  return -1.0;
+}
 
-/// Use this method to change the default ratios of columns sizes/widths (see [ColumnSize])
+/// Deprecated, will be removed in the next version
+@deprecated
 void setColumnSizeRatios(double sm, double lm) {
-  _smRatio = sm;
-  _lmRatio = lm;
+  assert(false,
+      'The method is deprecated and takes no effect. Use smRatio and lmRatio constructor params in DataTable2 and PaginatedDataTable2');
+  // _smRatio = sm;
+  // _lmRatio = lm;
 }
 
 /// Extension of stock [DataColumn], adds the capability to set relative column
@@ -137,6 +143,9 @@ class DataTable2 extends DataTable {
     this.minWidth,
     this.scrollController,
     this.empty,
+    this.border,
+    this.smRatio = 0.67,
+    this.lmRatio = 1.2,
     required List<DataRow> rows,
   }) : super(
             key: key,
@@ -196,7 +205,7 @@ class DataTable2 extends DataTable {
   /// If set, the table will stop shrinking below the threshold and provide
   /// horizontal scrolling. Useful for the cases with narrow screens (e.g. portrait phone orientation)
   /// and lots of columns (that get messed with little space)
-  // TODO add test
+  // TODO: Add test
   final double? minWidth;
 
   /// If set the table will have empty space added after the the last row and allow scroll the
@@ -204,12 +213,30 @@ class DataTable2 extends DataTable {
   /// have the ability to slightly scroll up the bototm row to avoid the obstruction)
   final double? bottomMargin;
 
+  // TODO: Add test
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? scrollController;
 
+  // TODO: Add test
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
   final Widget? empty;
+
+  // TODO: Add test
+  /// Set vertical and horizontal borders between cells, as well as outside borders around table.
+  /// NOTE: setting this field will disable standard horizontal dividers which are controlled by
+  /// themes and [dividerThickness] property
+  final TableBorder? border;
+
+  // TODO: Add test
+  /// Determines ratio of Small column's width to Medium column's width.
+  /// I.e. 0.5 means that Small column is twice narower than Medium column.
+  final double smRatio;
+
+  // TODO: Add test
+  /// Determines ratio of Large column's width to Medium column's width.
+  /// I.e. 2.0 means that Large column is twice wider than Medium column.
+  final double lmRatio;
 
   Widget _buildCheckbox({
     required BuildContext context,
@@ -427,7 +454,7 @@ class DataTable2 extends DataTable {
     var headingRow = TableRow(
       key: _headingRowKey,
       decoration: BoxDecoration(
-        border: showBottomBorder
+        border: showBottomBorder && border == null
             ? Border(
                 bottom: Divider.createBorderSide(
                 context,
@@ -460,15 +487,17 @@ class DataTable2 extends DataTable {
               theme.dataTableTheme.dividerThickness ??
               _dividerThickness,
         );
-        final Border? border = showBottomBorder
+        final Border? _border = showBottomBorder
             ? Border(bottom: borderSide)
             : Border(top: borderSide);
         return TableRow(
           key: rows[index].key,
-          decoration: BoxDecoration(
-            border: border,
-            color: rowColor ?? defaultRowColor.resolve(states),
-          ),
+          decoration: border == null
+              ? BoxDecoration(
+                  border: _border,
+                  color: rowColor ?? defaultRowColor.resolve(states),
+                )
+              : null,
           children:
               List<Widget>.filled(tableColumns.length, const _NullWidget()),
         );
@@ -531,9 +560,9 @@ class DataTable2 extends DataTable {
         var column = columns[i];
         if (column is DataColumn2) {
           if (column.size == ColumnSize.S) {
-            w *= _smRatio;
+            w *= smRatio;
           } else if (column.size == ColumnSize.L) {
-            w *= _lmRatio;
+            w *= lmRatio;
           }
         }
         totalWidth += w;
@@ -636,9 +665,28 @@ class DataTable2 extends DataTable {
 
       var widthsAsMap = tableColumns.asMap();
 
+      TableBorder? headingBorder;
+      TableBorder? dataRowsBorder;
+
+      if (border != null) {
+        headingBorder = TableBorder(
+            top: border!.top,
+            left: border!.left,
+            right: border!.right,
+            bottom: border!.horizontalInside,
+            verticalInside: border!.verticalInside);
+        dataRowsBorder = TableBorder(
+            left: border!.left,
+            right: border!.right,
+            bottom: border!.bottom,
+            verticalInside: border!.verticalInside,
+            horizontalInside: border!.horizontalInside);
+      }
+
       var dataRows = Table(
         columnWidths: widthsAsMap,
         children: tableRows,
+        border: dataRowsBorder,
       );
 
       var marginedTable = bottomMargin != null && bottomMargin! > 0
@@ -651,9 +699,9 @@ class DataTable2 extends DataTable {
         mainAxisSize: MainAxisSize.min,
         children: [
           Table(
-            columnWidths: widthsAsMap,
-            children: [headingRow],
-          ),
+              columnWidths: widthsAsMap,
+              children: [headingRow],
+              border: headingBorder),
           Flexible(
               fit: FlexFit.loose,
               child: tableRows.isEmpty

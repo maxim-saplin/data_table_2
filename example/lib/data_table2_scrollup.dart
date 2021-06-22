@@ -159,6 +159,13 @@ class _ScrollUpButtonState extends State<_ScrollUpButton> {
           _showScrollUp = false;
         });
       }
+      // On GitHub there was a question on how to determine the event
+      // of widget being scrolled to the bottom. Here's the sample
+      // if (widget.controller.position.hasViewportDimension &&
+      //     widget.controller.position.pixels >=
+      //         widget.controller.position.maxScrollExtent - 0.01) {
+      //   print('Scrolled to bottom');
+      //}
     });
   }
 
