@@ -1,6 +1,6 @@
 In-place substitute for Flutter's stock **DataTable** and **PaginatedDataTable** widgets with fixed/sticky header/top row (and footer/paginator for **PaginatedDataTable**) and a few extra features. **DataTable2** and **PaginatedDataTable2** widgets are based on the sources of Flutter's originals, mimic the API and provide seamless integration.
 
-If you've been using (or considered using) standard Flutter's widgets for displaying tables/data grids and missed the sticky headers - you've come to the right place. No need to learn yet another API of a new control, just stick to well described DataTable/PaginatedDataTable.
+If you've been using (or considered using) standard Flutter's widgets for displaying tables/data grids and missed the sticky headers (or vertical border, no data placeholder) - you've come to the right place. No need to learn yet another API of a new control, just stick to well described DataTable/PaginatedDataTable.
 
 # [LIVE DEMO](https://maxim-saplin.github.io/data_table_2/)
 
@@ -10,16 +10,20 @@ If you've been using (or considered using) standard Flutter's widgets for displa
 
 ## Differences
 The differences/distrinctions from stock widgets:
-- Sticky headers (both widgets) and paginator (PabinatedDataTable2 only)
+- Sticky headers and paginator (when using `PabinatedDataTable2`)
 - Vertiacally scrollable main area (with data rows)
-- All columns are fixed width, table automatically stretches horizontaly, individual column width is determined as **(Width)/(Number of Columns)**
-  - Should you want to adjust sizes of columns, you can replace  **DataColumn** definitions with **DataColumn2** (which is a decendant of DataColumn). The class provides **size** property which can be set to one of 3 relative sizes (S, M and L)
-  - You can limit the minimal width of the control and scroll it horizontaly if the viewport is narrow (by setting **minWidth** property) which is useful in portrait orientations with multiple columns
-  - You can add bottom margin (by setting **bottomMargin** property) to allow slight overscroll
+- All columns are fixed width, table automatically stretches horizontaly, individual column's width is determined as **(Width)/(Number of Columns)**
+  - Should you want to adjust sizes of columns, you can replace `DataColumn` definitions with `DataColumn2` (which is a decendant of DataColumn). The class provides `size` property which can be set to one of 3 relative sizes (S, M and L)
+  - WIdth ratios between Small and Medium, Large and Medium columns are defined by `smRatio` and `lmRatio` params
+  - You can limit the minimal width of the control and scroll it horizontaly if the viewport is narrow (by setting `minWidth` property) which is useful in portrait orientations with multiple columns
+  - You can add bottom margin (by setting `bottomMargin` property) to allow slight overscroll
   - Fixed width columns are faster than default implementation of DataTable which does 2 passes to determine contents size and justify column widths
-- Data rows are wrapped with Flexible and SingleScrollView widgets to allow widget fill parent container and scroll
-  - Vertical scroller is exposed via table's **scrollController** property. See example 'DataTable2 - Scroll-up' which shows 'up' button when scrolling down and allows to jump to the top of the table
-- There's **DataRow2** alternative to stock **DataRow** which provide row level tap events (including right clicks)
+- Data rows are wrapped with `Flexible` and `SingleScrollView` widgets to allow widget fill parent container and be scrollable
+  - Vertical scroller is exposed via table's `scrollController` property. See example 'DataTable2 - Scroll-up' which shows 'up' button when scrolling down and allows to jump to the top of the table
+- There's `DataRow2` alternative to stock `DataRow` which provide row level tap events (including right clicks)
+- `empty` property which allows defining widget to be displayed when data source is empty
+- `border` allows draeing inner and outer vertical and horizontal border (e.g. outlining individual cells) - stock widgets only allow drawing horizontal row splitters
+
 
 ## Usage
 
