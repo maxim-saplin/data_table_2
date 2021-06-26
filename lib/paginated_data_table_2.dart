@@ -61,12 +61,12 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.minWidth,
     this.fit = FlexFit.loose,
     this.scrollController,
-    this.emptyBuilder,
     this.border,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
-    required this.loadingBuilder,
-    required this.errorBuilder,
+    this.emptyBuilder,
+    this.loadingBuilder,
+    this.errorBuilder,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
@@ -79,11 +79,13 @@ class PaginatedDataTable2 extends StatefulWidget {
         }()),
         super(key: key);
 
-  final Widget Function(BuildContext context, Object? error) errorBuilder;
+  /// Displayed in case an error occurs in the [AsyncDataTableSource].
+  /// The fallback is an empty [SizedBox].
+  final Widget Function(BuildContext context, Object? error)? errorBuilder;
 
-  /// When the page is being loaded,
-  /// this widget is displayed except of the content.
-  final WidgetBuilder loadingBuilder;
+  /// Displayed in case the [AsyncDataTableSource.getRows] is loading data.
+  /// The fallback is an empty [SizedBox].
+  final WidgetBuilder? loadingBuilder;
 
   final bool wrapInCard;
 
@@ -197,7 +199,7 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// and no affordance will be provided to change the value.
   final ValueChanged<int?>? onRowsPerPageChanged;
 
-  /// The data source which provides data to show in each row. Must be non-null.
+  /// The data source which provides data to show in each row.
   ///
   /// This object should generally have a lifetime longer than the
   /// [PaginatedDataTable2] widget itself; it should be reused each time the
@@ -544,7 +546,8 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                       rows: snapshot.data ?? [],
                       loadingBuilder: widget.loadingBuilder,
                       errorBuilder: (context) =>
-                          widget.errorBuilder(context, snapshot.error),
+                          widget.errorBuilder?.call(context, snapshot.error) ??
+                          SizedBox(),
                       dataState: state,
                     );
                   },

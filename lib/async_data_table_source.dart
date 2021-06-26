@@ -1,7 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+/// DataTable source that enables asynchronous loading of pages.
 abstract class AsyncDataTableSource extends ChangeNotifier {
-  /// Called to obtain the data about a particular row.
+  /// Called to obtain the data about a particular range of rows.
+  ///
+  /// CAUTION: [start] and [end] indices need to be included in the resulting rows.
+  ///
+  /// In case an immediate result is available (the data is already loaded)
+  /// you can use the [SynchronousFuture] to return the result in the current frame,
+  /// to prevent skipping frame by using [Future.value] and unnecessarily
+  /// slowing down the table.
+  /// Otherwise, classical [Future] is used.
   ///
   /// The [new DataRow.byIndex] constructor provides a convenient way to construct
   /// [DataRow] objects for this callback's purposes without having to worry about

@@ -144,12 +144,12 @@ class DataTable2 extends DataTable {
     double? dividerThickness,
     this.minWidth,
     this.scrollController,
-    this.emptyBuilder,
     this.border,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
     required List<DataRow> rows,
     this.dataState = DataState.done,
+    this.emptyBuilder,
     this.loadingBuilder,
     this.errorBuilder,
   }) : super(
