@@ -135,16 +135,21 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
               sort<num>((d) => d.iron, columnIndex, ascending),
         ),
       ],
-      empty: Center(
-          child: Container(
-              padding: EdgeInsets.all(20),
-              color: Colors.grey[200],
-              child: Text('No data'))),
+      emptyBuilder: (_) => Center(
+        child: Container(
+          padding: EdgeInsets.all(20),
+          color: Colors.grey[200],
+          child: Text('No data'),
+        ),
+      ),
       source: getIsEmpty(context)
           ? AsyncDessertDataSource.empty(context)
           : _dessertsDataSource,
       errorBuilder: (context, error) => Center(
-        child: Text(error.toString()),
+        child: Text(
+          error.toString(),
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
       loadingBuilder: (context) => Center(
         child: CircularProgressIndicator(),

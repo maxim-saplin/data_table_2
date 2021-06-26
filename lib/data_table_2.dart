@@ -8,6 +8,7 @@ library data_table_2;
 
 import 'dart:math' as math;
 
+import 'package:data_table_2/data_state_enum.dart';
 import 'package:data_table_2/paginated_data_table_2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -143,7 +144,7 @@ class DataTable2 extends DataTable {
     double? dividerThickness,
     this.minWidth,
     this.scrollController,
-    this.empty,
+    this.emptyBuilder,
     this.border,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
@@ -220,7 +221,7 @@ class DataTable2 extends DataTable {
 
   /// Is build when the [dataState] is [DataState.error].
   /// Fallback is just [SizedBox].
-  final Widget Function(BuildContext context, Object error)? errorBuilder;
+  final WidgetBuilder? errorBuilder;
 
   /// If set, the table will stop shrinking below the threshold and provide
   /// horizontal scrolling. Useful for the cases with narrow screens (e.g. portrait phone orientation)
@@ -238,9 +239,10 @@ class DataTable2 extends DataTable {
   final ScrollController? scrollController;
 
   // TODO: Add test
-  /// Placeholder widget which is displayed whenever the data rows are empty.
-  /// The widget will be displayed below column
-  final Widget? empty;
+  /// Placeholder widget builder which is displayed whenever the data rows are empty.
+  /// The widget will be displayed below column.
+  /// Fallback is the [SizedBox].
+  final WidgetBuilder? emptyBuilder;
 
   // TODO: Add test
   /// Set vertical and horizontal borders between cells, as well as outside borders around table.
@@ -730,10 +732,10 @@ class DataTable2 extends DataTable {
                 case DataState.loading:
                   return loadingBuilder?.call(context) ?? SizedBox();
                 case DataState.error:
-                  return empty ?? SizedBox();
+                  return errorBuilder?.call(context) ?? SizedBox();
                 case DataState.done:
                   if (tableRows.isEmpty) {
-                    return empty ?? SizedBox();
+                    return emptyBuilder?.call(context) ?? SizedBox();
                   } else {
                     return SingleChildScrollView(
                       child: marginedTable,

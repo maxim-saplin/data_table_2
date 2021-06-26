@@ -7,6 +7,7 @@
 import 'dart:math' as math;
 
 import 'package:data_table_2/async_data_table_source.dart';
+import 'package:data_table_2/data_state_enum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/material.dart';
@@ -60,7 +61,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.minWidth,
     this.fit = FlexFit.loose,
     this.scrollController,
-    this.empty,
+    this.emptyBuilder,
     this.border,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
@@ -78,7 +79,7 @@ class PaginatedDataTable2 extends StatefulWidget {
         }()),
         super(key: key);
 
-  final Widget Function(BuildContext context, Object error) errorBuilder;
+  final Widget Function(BuildContext context, Object? error) errorBuilder;
 
   /// When the page is being loaded,
   /// this widget is displayed except of the content.
@@ -236,7 +237,8 @@ class PaginatedDataTable2 extends StatefulWidget {
 
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
-  final Widget? empty;
+  /// Fallback is the [SizedBox].
+  final WidgetBuilder? emptyBuilder;
 
   // TODO: Add test
   /// Determines ratio of Small column's width to Medium column's width.
@@ -312,60 +314,15 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       widget.onPageChanged!(_firstRowIndex);
   }
 
-  // DataRow _getBlankRowFor(int index) {
-  //   return DataRow.byIndex(
-  //     index: index,
-  //     cells: widget.columns
-  //         .map<DataCell>((DataColumn column) => DataCell.empty)
-  //         .toList(),
-  //   );
-  // }
-
-  // DataRow _getProgressIndicatorRowFor(int index) {
-  //   bool haveProgressIndicator = false;
-  //   final List<DataCell> cells =
-  //       widget.columns.map<DataCell>((DataColumn column) {
-  //     if (!column.numeric) {
-  //       haveProgressIndicator = true;
-  //       return const DataCell(CircularProgressIndicator());
-  //     }
-  //     return DataCell.empty;
-  //   }).toList();
-  //   if (!haveProgressIndicator) {
-  //     haveProgressIndicator = true;
-  //     cells[0] = const DataCell(CircularProgressIndicator());
-  //   }
-  //   return DataRow.byIndex(
-  //     index: index,
-  //     cells: cells,
-  //   );
-  // }
-
   Future<List<DataRow>> _getRows(int firstRowIndex, int rowsPerPage) {
     final List<DataRow> result = <DataRow>[];
 
-    if (widget.empty != null && widget.source.rowCount < 1)
-      return SynchronousFuture(
-          result); // If empty placeholder is provided - don't create blank rows
+    if (widget.emptyBuilder != null && widget.source.rowCount < 1)
+      return SynchronousFuture(result);
 
     final int nextPageFirstRowIndex = firstRowIndex + rowsPerPage;
-    // bool haveProgressIndicator = false;
 
     return widget.source.getRows(firstRowIndex, nextPageFirstRowIndex - 1);
-
-    // for (int index = firstRowIndex; index < nextPageFirstRowIndex; index += 1) {
-    //   DataRow? row;
-    //   if (index < _rowCount || _rowCountApproximate) {
-    //     row = _rows.putIfAbsent(index, () => widget.source.getRow(index));
-    //     if (row == null && !haveProgressIndicator) {
-    //       row ??= _getProgressIndicatorRowFor(index);
-    //       haveProgressIndicator = true;
-    //     }
-    //   }
-    // row ??= _getBlankRowFor(index);
-    // result.add(row);
-    // }
-    // return result;
   }
 
   void _handleFirst() {
@@ -551,18 +508,13 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                   ) {
                     DataState state = () {
                       switch (snapshot.connectionState) {
-                        case ConnectionState.done:
-                          if (snapshot.hasData) {
-                            return DataState.done;
-                          } else if (snapshot.hasError) {
-                            return DataState.done;
-                          } else {
-                            return DataState.loading;
-                          }
-                        case ConnectionState.none:
                         case ConnectionState.waiting:
-                        case ConnectionState.active:
                           return DataState.loading;
+                        default:
+                          if (snapshot.hasError)
+                            return DataState.error;
+                          else
+                            return DataState.done;
                       }
                     }();
 
@@ -585,13 +537,14 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                       showBottomBorder: true,
                       minWidth: widget.minWidth,
                       scrollController: widget.scrollController,
-                      empty: widget.empty,
+                      emptyBuilder: widget.emptyBuilder,
                       border: widget.border,
                       smRatio: widget.smRatio,
                       lmRatio: widget.lmRatio,
                       rows: snapshot.data ?? [],
                       loadingBuilder: widget.loadingBuilder,
-                      errorBuilder: widget.errorBuilder,
+                      errorBuilder: (context) =>
+                          widget.errorBuilder(context, snapshot.error),
                       dataState: state,
                     );
                   },
@@ -627,5 +580,3 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     );
   }
 }
-
-enum DataState { done, loading, error }

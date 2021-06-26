@@ -137,11 +137,13 @@ class _DataTable2DemoState extends State<DataTable2Demo> {
                 _sort<num>((d) => d.iron, columnIndex, ascending),
           ),
         ],
-        empty: Center(
-            child: Container(
-                padding: EdgeInsets.all(20),
-                color: Colors.grey[200],
-                child: Text('No data'))),
+        emptyBuilder: (_) => Center(
+          child: Container(
+            padding: EdgeInsets.all(20),
+            color: Colors.grey[200],
+            child: Text('No data'),
+          ),
+        ),
         rows: getIsEmpty(context)
             ? []
             : List<DataRow>.generate(_dessertsDataSource.rowCount,

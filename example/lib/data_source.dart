@@ -568,13 +568,16 @@ class AsyncDessertDataSource extends AsyncDataTableSource {
   Future<List<DataRow>> getRows(int start, int end) {
     return Future.delayed(Duration(seconds: 3)).then(
       (_) {
+        if (start > 0) {
+          throw Exception(
+              'An error occured while loading data. This is wanted behaviour to test errorBuilder :)');
+        }
+
         final format = NumberFormat.decimalPercentPattern(
           locale: 'en',
           decimalDigits: 0,
         );
-        // assert(index >= 0);
-        // if (index >= desserts.length) throw 'index > _desserts.length';
-        // final dessert = desserts[index];
+
         return List.generate(end - start, (index) => index + start)
             .where((element) => element < desserts.length)
             .map(
