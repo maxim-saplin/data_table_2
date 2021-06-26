@@ -6,6 +6,8 @@
 
 import 'dart:math' as math;
 
+import 'package:data_table_2/async_data_table_source.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -62,6 +64,8 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.border,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
+    required this.loadingBuilder,
+    required this.errorBuilder,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
@@ -73,6 +77,12 @@ class PaginatedDataTable2 extends StatefulWidget {
           return true;
         }()),
         super(key: key);
+
+  final Widget Function(BuildContext context, Object error) errorBuilder;
+
+  /// When the page is being loaded,
+  /// this widget is displayed except of the content.
+  final WidgetBuilder loadingBuilder;
 
   final bool wrapInCard;
 
@@ -191,7 +201,7 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// This object should generally have a lifetime longer than the
   /// [PaginatedDataTable2] widget itself; it should be reused each time the
   /// [PaginatedDataTable2] constructor is called.
-  final DataTableSource source;
+  final AsyncDataTableSource source;
 
   /// {@macro flutter.widgets.scrollable.dragStartBehavior}
   final DragStartBehavior dragStartBehavior;
@@ -302,57 +312,60 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       widget.onPageChanged!(_firstRowIndex);
   }
 
-  DataRow _getBlankRowFor(int index) {
-    return DataRow.byIndex(
-      index: index,
-      cells: widget.columns
-          .map<DataCell>((DataColumn column) => DataCell.empty)
-          .toList(),
-    );
-  }
+  // DataRow _getBlankRowFor(int index) {
+  //   return DataRow.byIndex(
+  //     index: index,
+  //     cells: widget.columns
+  //         .map<DataCell>((DataColumn column) => DataCell.empty)
+  //         .toList(),
+  //   );
+  // }
 
-  DataRow _getProgressIndicatorRowFor(int index) {
-    bool haveProgressIndicator = false;
-    final List<DataCell> cells =
-        widget.columns.map<DataCell>((DataColumn column) {
-      if (!column.numeric) {
-        haveProgressIndicator = true;
-        return const DataCell(CircularProgressIndicator());
-      }
-      return DataCell.empty;
-    }).toList();
-    if (!haveProgressIndicator) {
-      haveProgressIndicator = true;
-      cells[0] = const DataCell(CircularProgressIndicator());
-    }
-    return DataRow.byIndex(
-      index: index,
-      cells: cells,
-    );
-  }
+  // DataRow _getProgressIndicatorRowFor(int index) {
+  //   bool haveProgressIndicator = false;
+  //   final List<DataCell> cells =
+  //       widget.columns.map<DataCell>((DataColumn column) {
+  //     if (!column.numeric) {
+  //       haveProgressIndicator = true;
+  //       return const DataCell(CircularProgressIndicator());
+  //     }
+  //     return DataCell.empty;
+  //   }).toList();
+  //   if (!haveProgressIndicator) {
+  //     haveProgressIndicator = true;
+  //     cells[0] = const DataCell(CircularProgressIndicator());
+  //   }
+  //   return DataRow.byIndex(
+  //     index: index,
+  //     cells: cells,
+  //   );
+  // }
 
-  List<DataRow> _getRows(int firstRowIndex, int rowsPerPage) {
+  Future<List<DataRow>> _getRows(int firstRowIndex, int rowsPerPage) {
     final List<DataRow> result = <DataRow>[];
 
     if (widget.empty != null && widget.source.rowCount < 1)
-      return result; // If empty placeholder is provided - don't create blank rows
+      return SynchronousFuture(
+          result); // If empty placeholder is provided - don't create blank rows
 
     final int nextPageFirstRowIndex = firstRowIndex + rowsPerPage;
-    bool haveProgressIndicator = false;
+    // bool haveProgressIndicator = false;
 
-    for (int index = firstRowIndex; index < nextPageFirstRowIndex; index += 1) {
-      DataRow? row;
-      if (index < _rowCount || _rowCountApproximate) {
-        row = _rows.putIfAbsent(index, () => widget.source.getRow(index));
-        if (row == null && !haveProgressIndicator) {
-          row ??= _getProgressIndicatorRowFor(index);
-          haveProgressIndicator = true;
-        }
-      }
-      row ??= _getBlankRowFor(index);
-      result.add(row);
-    }
-    return result;
+    return widget.source.getRows(firstRowIndex, nextPageFirstRowIndex - 1);
+
+    // for (int index = firstRowIndex; index < nextPageFirstRowIndex; index += 1) {
+    //   DataRow? row;
+    //   if (index < _rowCount || _rowCountApproximate) {
+    //     row = _rows.putIfAbsent(index, () => widget.source.getRow(index));
+    //     if (row == null && !haveProgressIndicator) {
+    //       row ??= _getProgressIndicatorRowFor(index);
+    //       haveProgressIndicator = true;
+    //     }
+    //   }
+    // row ??= _getBlankRowFor(index);
+    // result.add(row);
+    // }
+    // return result;
   }
 
   void _handleFirst() {
@@ -530,30 +543,58 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
               fit: widget.fit,
               child: ConstrainedBox(
                 constraints: BoxConstraints(minWidth: constraints.minWidth),
-                child: DataTable2(
-                  key: _tableKey,
-                  columns: widget.columns,
-                  sortColumnIndex: widget.sortColumnIndex,
-                  sortAscending: widget.sortAscending,
-                  onSelectAll: widget.onSelectAll,
-                  // Make sure no decoration is set on the DataTable
-                  // from the theme, as its already wrapped in a Card.
-                  decoration: const BoxDecoration(),
-                  dataRowHeight: widget.dataRowHeight,
-                  headingRowHeight: widget.headingRowHeight,
-                  horizontalMargin: widget.horizontalMargin,
-                  //TODO - fix when Flutter 2.1.0 goes stable
-                  //checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
-                  columnSpacing: widget.columnSpacing,
-                  showCheckboxColumn: widget.showCheckboxColumn,
-                  showBottomBorder: true,
-                  rows: _getRows(_firstRowIndex, widget.rowsPerPage),
-                  minWidth: widget.minWidth,
-                  scrollController: widget.scrollController,
-                  empty: widget.empty,
-                  border: widget.border,
-                  smRatio: widget.smRatio,
-                  lmRatio: widget.lmRatio,
+                child: FutureBuilder<List<DataRow>>(
+                  future: _getRows(_firstRowIndex, widget.rowsPerPage),
+                  builder: (
+                    BuildContext context,
+                    AsyncSnapshot<List<DataRow>> snapshot,
+                  ) {
+                    DataState state = () {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.done:
+                          if (snapshot.hasData) {
+                            return DataState.done;
+                          } else if (snapshot.hasError) {
+                            return DataState.done;
+                          } else {
+                            return DataState.loading;
+                          }
+                        case ConnectionState.none:
+                        case ConnectionState.waiting:
+                        case ConnectionState.active:
+                          return DataState.loading;
+                      }
+                    }();
+
+                    return DataTable2(
+                      key: _tableKey,
+                      columns: widget.columns,
+                      sortColumnIndex: widget.sortColumnIndex,
+                      sortAscending: widget.sortAscending,
+                      onSelectAll: widget.onSelectAll,
+                      // Make sure no decoration is set on the DataTable
+                      // from the theme, as its already wrapped in a Card.
+                      decoration: const BoxDecoration(),
+                      dataRowHeight: widget.dataRowHeight,
+                      headingRowHeight: widget.headingRowHeight,
+                      horizontalMargin: widget.horizontalMargin,
+                      //TODO - fix when Flutter 2.1.0 goes stable
+                      //checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
+                      columnSpacing: widget.columnSpacing,
+                      showCheckboxColumn: widget.showCheckboxColumn,
+                      showBottomBorder: true,
+                      minWidth: widget.minWidth,
+                      scrollController: widget.scrollController,
+                      empty: widget.empty,
+                      border: widget.border,
+                      smRatio: widget.smRatio,
+                      lmRatio: widget.lmRatio,
+                      rows: snapshot.data ?? [],
+                      loadingBuilder: widget.loadingBuilder,
+                      errorBuilder: widget.errorBuilder,
+                      dataState: state,
+                    );
+                  },
                 ),
               ),
             ),
@@ -586,3 +627,5 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     );
   }
 }
+
+enum DataState { done, loading, error }

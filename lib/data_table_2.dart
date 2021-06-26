@@ -8,6 +8,7 @@ library data_table_2;
 
 import 'dart:math' as math;
 
+import 'package:data_table_2/paginated_data_table_2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -147,25 +148,29 @@ class DataTable2 extends DataTable {
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
     required List<DataRow> rows,
+    this.dataState = DataState.done,
+    this.loadingBuilder,
+    this.errorBuilder,
   }) : super(
-            key: key,
-            columns: columns,
-            sortColumnIndex: sortColumnIndex,
-            sortAscending: sortAscending,
-            onSelectAll: onSelectAll,
-            decoration: decoration,
-            dataRowColor: dataRowColor,
-            dataRowHeight: dataRowHeight,
-            dataTextStyle: dataTextStyle,
-            headingRowColor: headingRowColor,
-            headingRowHeight: headingRowHeight,
-            headingTextStyle: headingTextStyle,
-            horizontalMargin: horizontalMargin,
-            columnSpacing: columnSpacing,
-            showCheckboxColumn: showCheckboxColumn,
-            showBottomBorder: showBottomBorder,
-            dividerThickness: dividerThickness,
-            rows: rows);
+          key: key,
+          columns: columns,
+          sortColumnIndex: sortColumnIndex,
+          sortAscending: sortAscending,
+          onSelectAll: onSelectAll,
+          decoration: decoration,
+          dataRowColor: dataRowColor,
+          dataRowHeight: dataRowHeight,
+          dataTextStyle: dataTextStyle,
+          headingRowColor: headingRowColor,
+          headingRowHeight: headingRowHeight,
+          headingTextStyle: headingTextStyle,
+          horizontalMargin: horizontalMargin,
+          columnSpacing: columnSpacing,
+          showCheckboxColumn: showCheckboxColumn,
+          showBottomBorder: showBottomBorder,
+          dividerThickness: dividerThickness,
+          rows: rows,
+        );
 
   static final LocalKey _headingRowKey = UniqueKey();
 
@@ -201,6 +206,21 @@ class DataTable2 extends DataTable {
 
   static const Duration _sortArrowAnimationDuration =
       Duration(milliseconds: 150);
+
+  /// When [DataState.done] the table rows are displayed.
+  /// Otherwise the rows are ignored and can be set to empty list.
+  /// When [DataState.loading] the [loadingBuilder] is displayed.
+  /// When [DataState.error] the [errorBuilder] is displayed.
+  /// In that case you can pass an empty array to [rows].
+  final DataState dataState;
+
+  /// Is build when the [isLoading] is true.
+  /// Fallback is just [SizedBox].
+  final WidgetBuilder? loadingBuilder;
+
+  /// Is build when the [dataState] is [DataState.error].
+  /// Fallback is just [SizedBox].
+  final Widget Function(BuildContext context, Object error)? errorBuilder;
 
   /// If set, the table will stop shrinking below the threshold and provide
   /// horizontal scrolling. Useful for the cases with narrow screens (e.g. portrait phone orientation)
@@ -699,26 +719,45 @@ class DataTable2 extends DataTable {
         mainAxisSize: MainAxisSize.min,
         children: [
           Table(
-              columnWidths: widthsAsMap,
-              children: [headingRow],
-              border: headingBorder),
+            columnWidths: widthsAsMap,
+            children: [headingRow],
+            border: headingBorder,
+          ),
           Flexible(
-              fit: FlexFit.loose,
-              child: tableRows.isEmpty
-                  ? empty ?? SizedBox()
-                  : SingleChildScrollView(
-                      child: marginedTable, controller: scrollController))
+            fit: FlexFit.loose,
+            child: () {
+              switch (dataState) {
+                case DataState.loading:
+                  return loadingBuilder?.call(context) ?? SizedBox();
+                case DataState.error:
+                  return empty ?? SizedBox();
+                case DataState.done:
+                  if (tableRows.isEmpty) {
+                    return empty ?? SizedBox();
+                  } else {
+                    return SingleChildScrollView(
+                      child: marginedTable,
+                      controller: scrollController,
+                    );
+                  }
+              }
+            }(),
+          )
         ],
       );
 
       var w = Container(
-          decoration: decoration ?? theme.dataTableTheme.decoration,
-          child: Material(
-              type: MaterialType.transparency,
-              child: availableWidth > constraints.maxWidth
-                  ? SingleChildScrollView(
-                      scrollDirection: Axis.horizontal, child: t)
-                  : t));
+        decoration: decoration ?? theme.dataTableTheme.decoration,
+        child: Material(
+          type: MaterialType.transparency,
+          child: availableWidth > constraints.maxWidth
+              ? SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: t,
+                )
+              : t,
+        ),
+      );
 
       return w;
     });

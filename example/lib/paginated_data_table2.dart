@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:data_table_2/paginated_data_table_2.dart';
+import 'package:flutter/material.dart';
 
 import 'data_source.dart';
 import 'isEmptyArg.dart';
@@ -24,14 +24,14 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   bool _sortAscending = true;
   int? _sortColumnIndex;
-  late DessertDataSource _dessertsDataSource;
+  late AsyncDessertDataSource _dessertsDataSource;
   bool _initialized = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialized) {
-      _dessertsDataSource = DessertDataSource(context);
+      _dessertsDataSource = AsyncDessertDataSource(context);
       _initialized = true;
     }
   }
@@ -141,8 +141,14 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
               color: Colors.grey[200],
               child: Text('No data'))),
       source: getIsEmpty(context)
-          ? DessertDataSource.empty(context)
+          ? AsyncDessertDataSource.empty(context)
           : _dessertsDataSource,
+      errorBuilder: (context, error) => Center(
+        child: Text(error.toString()),
+      ),
+      loadingBuilder: (context) => Center(
+        child: CircularProgressIndicator(),
+      ),
     );
   }
 }
