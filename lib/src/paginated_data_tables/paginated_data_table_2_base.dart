@@ -41,7 +41,7 @@ abstract class PaginatedDataTable2Base<T extends ChangeNotifier>
     ],
     this.onRowsPerPageChanged,
     this.dragStartBehavior = DragStartBehavior.start,
-    required this.dataSource,
+    required this.source,
     this.checkboxHorizontalMargin,
     this.wrapInCard = true,
     this.minWidth,
@@ -214,7 +214,7 @@ abstract class PaginatedDataTable2Base<T extends ChangeNotifier>
   /// widget itself; it should be reused each time the
   /// constructor is called.
   /// {@endtemplate}
-  final T dataSource;
+  final T source;
 
   /// {@macro flutter.widgets.scrollable.dragStartBehavior}
   final DragStartBehavior dragStartBehavior;
@@ -307,15 +307,15 @@ abstract class PaginatedDataTable2BaseState<
   @protected
   final GlobalKey tableKey = GlobalKey();
 
-  /// Actual value of row count from [widget.dataSource].
+  /// Actual value of row count from [widget.source].
   @protected
   int get dataSourceRowCount;
 
-  /// Is row count approximate value of [widget.dataSource].
+  /// Is row count approximate value of [widget.source].
   @protected
   bool get dataSourceIsRowCountApproximate;
 
-  /// Actual value of selected row count value from [widget.dataSource].
+  /// Actual value of selected row count value from [widget.source].
   @protected
   int get dataSourceSelectedRowCount;
 
@@ -367,23 +367,23 @@ abstract class PaginatedDataTable2BaseState<
     firstRowIndex = PageStorage.of(context)?.readState(context) as int? ??
         widget.initialFirstRowIndex ??
         0;
-    widget.dataSource.addListener(_handleDataSourceChanged);
+    widget.source.addListener(_handleDataSourceChanged);
     _handleDataSourceChanged();
   }
 
   @override
   void didUpdateWidget(DataTableStatefulWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.dataSource != widget.dataSource) {
-      oldWidget.dataSource.removeListener(_handleDataSourceChanged);
-      widget.dataSource.addListener(_handleDataSourceChanged);
+    if (oldWidget.source != widget.source) {
+      oldWidget.source.removeListener(_handleDataSourceChanged);
+      widget.source.addListener(_handleDataSourceChanged);
       _handleDataSourceChanged();
     }
   }
 
   @override
   void dispose() {
-    widget.dataSource.removeListener(_handleDataSourceChanged);
+    widget.source.removeListener(_handleDataSourceChanged);
     super.dispose();
   }
 

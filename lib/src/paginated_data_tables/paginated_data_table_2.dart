@@ -83,7 +83,7 @@ class PaginatedDataTable2 extends PaginatedDataTable2Base<DataTableSource> {
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
 
     /// {@macro dataTable2.paginatedDataTable2Base.dataSource}
-    required DataTableSource dataSource,
+    required DataTableSource source,
 
     /// {@macro dataTable2.paginatedDataTable2Base.checkboxHorizontalMargin}
     double? checkboxHorizontalMargin,
@@ -128,7 +128,7 @@ class PaginatedDataTable2 extends PaginatedDataTable2Base<DataTableSource> {
           availableRowsPerPage: availableRowsPerPage,
           onRowsPerPageChanged: onRowsPerPageChanged,
           dragStartBehavior: dragStartBehavior,
-          dataSource: dataSource,
+          source: source,
           checkboxHorizontalMargin: checkboxHorizontalMargin,
           wrapInCard: wrapInCard,
           minWidth: minWidth,
@@ -148,13 +148,13 @@ class PaginatedDataTable2State
     extends PaginatedDataTable2BaseState<PaginatedDataTable2> {
   @override
   bool get dataSourceIsRowCountApproximate =>
-      widget.dataSource.isRowCountApproximate;
+      widget.source.isRowCountApproximate;
 
   @override
-  int get dataSourceRowCount => widget.dataSource.rowCount;
+  int get dataSourceRowCount => widget.source.rowCount;
 
   @override
-  int get dataSourceSelectedRowCount => widget.dataSource.selectedRowCount;
+  int get dataSourceSelectedRowCount => widget.source.selectedRowCount;
 
   DataRow _getProgressIndicatorRowFor(int index) {
     bool haveProgressIndicator = false;
@@ -188,7 +188,7 @@ class PaginatedDataTable2State
   List<DataRow> _getRows(int firstRowIndex, int rowsPerPage) {
     final List<DataRow> result = <DataRow>[];
 
-    if (widget.empty != null && widget.dataSource.rowCount < 1)
+    if (widget.empty != null && widget.source.rowCount < 1)
       return result; // If empty placeholder is provided - don't create blank rows
 
     final int nextPageFirstRowIndex = firstRowIndex + rowsPerPage;
@@ -197,7 +197,7 @@ class PaginatedDataTable2State
     for (int index = firstRowIndex; index < nextPageFirstRowIndex; index += 1) {
       DataRow? row;
       if (index < rowCount || rowCountApproximate) {
-        row = rows.putIfAbsent(index, () => widget.dataSource.getRow(index));
+        row = rows.putIfAbsent(index, () => widget.source.getRow(index));
         if (row == null && !haveProgressIndicator) {
           row ??= _getProgressIndicatorRowFor(index);
           haveProgressIndicator = true;

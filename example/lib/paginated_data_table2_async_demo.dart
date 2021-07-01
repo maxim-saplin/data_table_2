@@ -143,7 +143,7 @@ class _PaginatedDataTable2AsyncDemoState
           child: Text('No data'),
         ),
       ),
-      dataSource: getIsEmpty(context)
+      source: getIsEmpty(context)
           ? AsyncDessertDataSource.empty(context)
           : _dessertsDataSource,
       errorBuilder: (context, error) => Center(

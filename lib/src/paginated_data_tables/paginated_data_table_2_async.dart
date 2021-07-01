@@ -75,7 +75,7 @@ class PaginatedDataTable2Async
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
 
     /// {@macro dataTable2.paginatedDataTable2Base.dataSource}
-    required AsyncDataTableSource dataSource,
+    required AsyncDataTableSource source,
 
     /// {@macro dataTable2.paginatedDataTable2Base.checkboxHorizontalMargin}
     double? checkboxHorizontalMargin,
@@ -121,7 +121,7 @@ class PaginatedDataTable2Async
           availableRowsPerPage: availableRowsPerPage,
           onRowsPerPageChanged: onRowsPerPageChanged,
           dragStartBehavior: dragStartBehavior,
-          dataSource: dataSource,
+          source: source,
           checkboxHorizontalMargin: checkboxHorizontalMargin,
           wrapInCard: wrapInCard,
           minWidth: minWidth,
@@ -149,23 +149,23 @@ class PaginatedDataTable2AsyncState
     extends PaginatedDataTable2BaseState<PaginatedDataTable2Async> {
   @override
   bool get dataSourceIsRowCountApproximate =>
-      widget.dataSource.isRowCountApproximate;
+      widget.source.isRowCountApproximate;
 
   @override
-  int get dataSourceRowCount => widget.dataSource.rowCount;
+  int get dataSourceRowCount => widget.source.rowCount;
 
   @override
-  int get dataSourceSelectedRowCount => widget.dataSource.selectedRowCount;
+  int get dataSourceSelectedRowCount => widget.source.selectedRowCount;
 
   Future<List<DataRow>> _getRows(int firstRowIndex, int rowsPerPage) {
     final List<DataRow> result = <DataRow>[];
 
-    if (widget.empty != null && widget.dataSource.rowCount < 1)
+    if (widget.empty != null && widget.source.rowCount < 1)
       return SynchronousFuture(result);
 
     final int nextPageFirstRowIndex = firstRowIndex + rowsPerPage;
 
-    return widget.dataSource.getRows(firstRowIndex, nextPageFirstRowIndex - 1);
+    return widget.source.getRows(firstRowIndex, nextPageFirstRowIndex - 1);
   }
 
   @override

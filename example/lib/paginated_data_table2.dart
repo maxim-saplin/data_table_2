@@ -141,7 +141,7 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
               padding: EdgeInsets.all(20),
               color: Colors.grey[200],
               child: Text('No data'))),
-      dataSource: getIsEmpty(context)
+      source: getIsEmpty(context)
           ? DessertDataSource.empty(context)
           : _dessertsDataSource,
     );
