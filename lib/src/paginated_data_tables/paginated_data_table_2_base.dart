@@ -65,6 +65,7 @@ abstract class PaginatedDataTable2Base<T extends ChangeNotifier>
 
   final bool wrapInCard;
 
+  /// {@template dataTable2.paginatedDataTable2Base.header}
   /// The table card's optional header.
   ///
   /// This is typically a [Text] widget, but can also be a [Row] of
@@ -74,8 +75,10 @@ abstract class PaginatedDataTable2Base<T extends ChangeNotifier>
   /// If items in the table are selectable, then, when the selection is not
   /// empty, the header is replaced by a count of the selected items. The
   /// [actions] are still visible when items are selected.
+  /// {@endtemplate}
   final Widget? header;
 
+  /// {@template dataTable2.paginatedDataTable2Base.actions}
   /// Icon buttons to show at the top end side of the table. The [header] must
   /// not be null to show the actions.
   ///
@@ -83,39 +86,53 @@ abstract class PaginatedDataTable2Base<T extends ChangeNotifier>
   /// whether any rows are selected or not.
   ///
   /// These should be size 24.0 with default padding (8.0).
+  /// {@endtemplate}
   final List<Widget>? actions;
 
+  /// {@template dataTable2.paginatedDataTable2Base.columns}
   /// The configuration and labels for the columns in the table.
+  /// {@endtemplate}
   final List<DataColumn> columns;
 
+  /// {@template dataTable2.paginatedDataTable2Base.sortColumnIndex}
   /// The current primary sort key's column.
   ///
   /// See [DataTable.sortColumnIndex].
+  /// {@endtemplate}
   final int? sortColumnIndex;
 
+  /// {@template dataTable2.paginatedDataTable2Base.sortAscending}
   /// Whether the column mentioned in [sortColumnIndex], if any, is sorted
   /// in ascending order.
   ///
   /// See [DataTable.sortAscending].
+  /// {@endtemplate}
   final bool sortAscending;
 
+  /// {@template dataTable2.paginatedDataTable2Base.onSelectAll}
   /// Invoked when the user selects or unselects every row, using the
   /// checkbox in the heading row.
   ///
   /// See [DataTable.onSelectAll].
+  /// {@endtemplate}
   final ValueSetter<bool?>? onSelectAll;
 
+  /// {@template dataTable2.paginatedDataTable2Base.dataRowHeight}
   /// The height of each row (excluding the row that contains column headings).
   ///
   /// This value is optional and defaults to kMinInteractiveDimension if not
   /// specified.
+  /// {@endtemplate}
   final double dataRowHeight;
 
+  /// {@template dataTable2.paginatedDataTable2Base.dataRowHeight}
   /// The height of the heading row.
   ///
   /// This value is optional and defaults to 56.0 if not specified.
+  /// {@endtemplate}
   final double headingRowHeight;
 
+  /// {@template dataTable2.paginatedDataTable2Base.horizontalMargin}
   /// The horizontal margin between the edges of the table and the content
   /// in the first and last cells of each row.
   ///
@@ -127,33 +144,44 @@ abstract class PaginatedDataTable2Base<T extends ChangeNotifier>
   /// If [checkboxHorizontalMargin] is null, then [horizontalMargin] is also the
   /// margin between the edge of the table and the checkbox, as well as the
   /// margin between the checkbox and the content in the first data column.
+  /// {@endtemplate}
   final double horizontalMargin;
 
+  /// {@template dataTable2.paginatedDataTable2Base.columnSpacing}
   /// The horizontal margin between the contents of each data column.
   ///
   /// This value defaults to 56.0 to adhere to the Material Design specifications.
+  /// {@endtemplate}
   final double columnSpacing;
 
   /// {@macro flutter.material.dataTable.showCheckboxColumn}
   final bool showCheckboxColumn;
 
+  /// {@template dataTable2.paginatedDataTable2Base.showFirstLastButtons}
   /// Flag to display the pagination buttons to go to the first and last pages.
+  /// {@endtemplate}
   final bool showFirstLastButtons;
 
+  /// {@template dataTable2.paginatedDataTable2Base.initialFirstRowIndex}
   /// The index of the first row to display when the widget is first created.
+  /// {@endtemplate}
   final int? initialFirstRowIndex;
 
+  /// {@template dataTable2.paginatedDataTable2Base.onPageChanged}
   /// Invoked when the user switches to another page.
   ///
   /// The value is the index of the first row on the currently displayed page.
+  /// {@endtemplate}
   final ValueChanged<int>? onPageChanged;
 
+  /// {@template dataTable2.paginatedDataTable2Base.rowsPerPage}
   /// The number of rows to show on each page.
   ///
   /// See also:
   ///
   ///  * [onRowsPerPageChanged]
   ///  * [defaultRowsPerPage]
+  ///  {@endtemplate}
   final int rowsPerPage;
 
   /// The default value for [rowsPerPage].
@@ -162,73 +190,95 @@ abstract class PaginatedDataTable2Base<T extends ChangeNotifier>
   /// [rowsPerPage], when implemented [onRowsPerPageChanged].
   static const int defaultRowsPerPage = 10;
 
+  /// {@template dataTable2.paginatedDataTable2Base.availableRowsPerPage}
   /// The options to offer for the rowsPerPage.
   ///
   /// The current [rowsPerPage] must be a value in this list.
   ///
   /// The values in this list should be sorted in ascending order.
+  /// {@endtemplate}
   final List<int> availableRowsPerPage;
 
+  /// {@template dataTable2.paginatedDataTable2Base.onRowsPerPageChanged}
   /// Invoked when the user selects a different number of rows per page.
   ///
   /// If this is null, then the value given by [rowsPerPage] will be used
   /// and no affordance will be provided to change the value.
+  /// {@endtemplate}
   final ValueChanged<int?>? onRowsPerPageChanged;
 
+  /// {@template dataTable2.paginatedDataTable2Base.dataSource}
   /// The data source which provides data to show in each row.
   ///
   /// This object should generally have a lifetime longer than the
   /// widget itself; it should be reused each time the
   /// constructor is called.
+  /// {@endtemplate}
   final T dataSource;
 
   /// {@macro flutter.widgets.scrollable.dragStartBehavior}
   final DragStartBehavior dragStartBehavior;
 
+  /// {@template dataTable2.paginatedDataTable2Base.checkboxHorizontalMargin}
   /// Horizontal margin around the checkbox, if it is displayed.
   ///
   /// If null, then [horizontalMargin] is used as the margin between the edge
   /// of the table and the checkbox, as well as the margin between the checkbox
   /// and the content in the first data column. This value defaults to 24.0.
+  /// {@endtemplate}
   final double? checkboxHorizontalMargin;
 
+  /// {@template dataTable2.paginatedDataTable2Base.minWidth}
   /// If set, the table will stop shrinking below the threshold and provide
   /// horizontal scrolling. Useful for the cases with narrow screens (e.g. portrait phone orientation)
   /// and lots of columns (that get messed with little space)
+  /// {@endtemplate}
   // TODO add test
   final double? minWidth;
 
+  /// {@template dataTable2.paginatedDataTable2Base.fit}
   /// Data rows are wrapped in Flexible widget, this property sets its' fit property.
   /// When ther're few rows it determines if the core
   /// of the table must grow and fill the contrainer (FlexFit.tight - useful if
   /// you want the paginator to stick to the bottom when there're few rows) or
   /// of you want to have the table to take minimal space and do not have bottom
   /// pager stick to the bottom (FlexFit.loose)
+  /// {@endtemplate}
   // TODO add test
   final FlexFit fit;
 
+  /// {@template dataTable2.paginatedDataTable2Base.border}
   // TODO: Add test
   /// Set vertical and horizontal borders between cells, as well as outside borders around table.
   /// NOTE: setting this field will disable standard horizontal dividers which are controlled by
   /// themes and [dividerThickness] property
+  /// {@endtemplate}
   final TableBorder? border;
 
+  /// {@template dataTable2.paginatedDataTable2Base.empty}
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
   /// Fallback is the [SizedBox].
+  /// {@endtemplate}
   final Widget? empty;
 
+  /// {@template dataTable2.paginatedDataTable2Base.smRatio}
   // TODO: Add test
   /// Determines ratio of Small column's width to Medium column's width.
   /// I.e. 0.5 means that Small column is twice narower than Medium column.
+  /// {@endtemplate}
   final double smRatio;
 
+  /// {@template dataTable2.paginatedDataTable2Base.lmRatio}
   // TODO: Add test
   /// Determines ratio of Large column's width to Medium column's width.
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
+  /// {@endtemplate}
   final double lmRatio;
 
+  /// {@template dataTable2.paginatedDataTable2Base.scrollController}
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
+  /// {@endtemplate}
   // TODO add test
   final ScrollController? scrollController;
 }
