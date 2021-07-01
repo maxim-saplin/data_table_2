@@ -137,7 +137,7 @@ class _DataTable2DemoState extends State<DataTable2Demo> {
                 _sort<num>((d) => d.iron, columnIndex, ascending),
           ),
         ],
-        emptyBuilder: (_) => Center(
+        empty: (_) => Center(
           child: Container(
             padding: EdgeInsets.all(20),
             color: Colors.grey[200],

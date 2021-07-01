@@ -4,7 +4,7 @@ library data_table_2;
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// Copyright 2021 Maxim Saplin - changes and modifications to original Flutter implementation of DataTable
+// Copyright 2021 Maxim Saplin, Kristián Balaj - changes and modifications to original Flutter implementation of DataTable
 
 import 'dart:math' as math;
 
@@ -149,8 +149,8 @@ class DataTable2 extends DataTable {
     this.lmRatio = 1.2,
     required List<DataRow> rows,
     this.dataState = DataState.done,
-    this.emptyBuilder,
-    this.loadingBuilder,
+    this.empty,
+    this.loadingWidget,
     this.errorBuilder,
   }) : super(
           key: key,
@@ -210,14 +210,14 @@ class DataTable2 extends DataTable {
 
   /// When [DataState.done] the table rows are displayed.
   /// Otherwise the rows are ignored and can be set to empty list.
-  /// When [DataState.loading] the [loadingBuilder] is displayed.
+  /// When [DataState.loading] the [loadingWidget] is displayed.
   /// When [DataState.error] the [errorBuilder] is displayed.
   /// In that case you can pass an empty array to [rows].
   final DataState dataState;
 
   /// Is build when the [isLoading] is true.
   /// Fallback is just [SizedBox].
-  final WidgetBuilder? loadingBuilder;
+  final Widget? loadingWidget;
 
   /// Is build when the [dataState] is [DataState.error].
   /// Fallback is just [SizedBox].
@@ -239,10 +239,10 @@ class DataTable2 extends DataTable {
   final ScrollController? scrollController;
 
   // TODO: Add test
-  /// Placeholder widget builder which is displayed whenever the data rows are empty.
+  /// Placeholder widget that is displayed whenever the data rows are empty.
   /// The widget will be displayed below column.
   /// Fallback is the [SizedBox].
-  final WidgetBuilder? emptyBuilder;
+  final Widget? empty;
 
   // TODO: Add test
   /// Set vertical and horizontal borders between cells, as well as outside borders around table.
@@ -730,12 +730,12 @@ class DataTable2 extends DataTable {
             child: () {
               switch (dataState) {
                 case DataState.loading:
-                  return loadingBuilder?.call(context) ?? SizedBox();
+                  return loadingWidget ?? const SizedBox();
                 case DataState.error:
-                  return errorBuilder?.call(context) ?? SizedBox();
+                  return errorBuilder?.call(context) ?? const SizedBox();
                 case DataState.done:
                   if (tableRows.isEmpty) {
-                    return emptyBuilder?.call(context) ?? SizedBox();
+                    return empty ?? const SizedBox();
                   } else {
                     return SingleChildScrollView(
                       child: marginedTable,

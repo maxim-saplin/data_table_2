@@ -2,35 +2,20 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// Copyright 2021 Maxim Saplin, Kristián Balaj - chnages and modifications to original Flutter implementation of PaginatedDataTable
+// Copyright 2021 Maxim Saplin, Kristián Balaj - changes and modifications to original Flutter implementation of PaginatedDataTable
 
-import 'dart:math' as math;
+import 'dart:math';
 
-import 'package:data_table_2/async_data_table_source.dart';
-import 'package:data_table_2/data_state_enum.dart';
+import 'package:data_table_2/paginated_data_table_2.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart' show DragStartBehavior;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 
-import 'data_table_2.dart';
-
-/// In-place replacement of standard [PaginatedDataTable] widget, mimics it API.
-/// Has the header row and paginatior always fixed to top and bottom (correspondingly).
-/// Core of the table (with data rows) is scrollable and stretching to max width/height of it's container.
-/// You can set minimal width of the table via [minWidth] property and Flex behavior of
-/// table core via [fit] property.
-/// By using [DataColumn2] instead of [DataColumn] it is possible to control
-/// relative column sizes (setting them to S, M and L). [DataRow2] provides
-/// row-level tap event handlers.
-/// See also:
-///
-///  * [DataTable2], which is not paginated.
-class PaginatedDataTable2 extends StatefulWidget {
+abstract class PagedDataTable2Base<T extends ChangeNotifier>
+    extends StatefulWidget {
   /// Check out [PaginatedDataTable] for the API decription.
   /// Key differences are [minWidth] and [fit] properties.
-  PaginatedDataTable2({
+  PagedDataTable2Base({
     Key? key,
     this.header,
     this.actions,
@@ -55,7 +40,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     ],
     this.onRowsPerPageChanged,
     this.dragStartBehavior = DragStartBehavior.start,
-    required this.source,
+    required this.dataSource,
     this.checkboxHorizontalMargin,
     this.wrapInCard = true,
     this.minWidth,
@@ -65,8 +50,6 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
     this.empty,
-    this.loadingWidget,
-    this.errorBuilder,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
@@ -78,14 +61,6 @@ class PaginatedDataTable2 extends StatefulWidget {
           return true;
         }()),
         super(key: key);
-
-  /// Displayed in case an error occurs in the [AsyncDataTableSource].
-  /// The fallback is an empty [SizedBox].
-  final Widget Function(BuildContext context, Object? error)? errorBuilder;
-
-  /// Displayed in case the [AsyncDataTableSource.getRows] is loading data.
-  /// The fallback is an empty [SizedBox].
-  final Widget? loadingWidget;
 
   final bool wrapInCard;
 
@@ -202,9 +177,9 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// The data source which provides data to show in each row.
   ///
   /// This object should generally have a lifetime longer than the
-  /// [PaginatedDataTable2] widget itself; it should be reused each time the
-  /// [PaginatedDataTable2] constructor is called.
-  final AsyncDataTableSource source;
+  /// widget itself; it should be reused each time the
+  /// constructor is called.
+  final T dataSource;
 
   /// {@macro flutter.widgets.scrollable.dragStartBehavior}
   final DragStartBehavior dragStartBehavior;
@@ -255,76 +230,82 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   // TODO add test
   final ScrollController? scrollController;
-
-  @override
-  PaginatedDataTable2State createState() => PaginatedDataTable2State();
 }
 
 /// Holds the state of a [PaginatedDataTable2].
 ///
 /// The table can be programmatically paged using the [pageTo] method.
-class PaginatedDataTable2State extends State<PaginatedDataTable2> {
-  late int _firstRowIndex;
+abstract class PagedDataTable2BaseState<
+        DataTableStatefulWidget extends PagedDataTable2Base>
+    extends State<DataTableStatefulWidget> {
+  @protected
+  late int firstRowIndex;
+
   late int _rowCount;
   late bool _rowCountApproximate;
   int _selectedRowCount = 0;
   final Map<int, DataRow?> _rows = <int, DataRow?>{};
 
+  /// Actual value of row count from [widget.dataSource].
+  @protected
+  int get dataSourceRowCount;
+
+  /// Is row count approximate value of [widget.dataSource].
+  @protected
+  bool get dataSourceIsRowCountApproximate;
+
+  /// Actual value of selected row count value from [widget.dataSource].
+  @protected
+  int get dataSourceSelectedRowCount;
+
+  /// Create DataTable widget.
+  @protected
+  Widget createDataTableWidget();
+
   @override
   void initState() {
     super.initState();
-    _firstRowIndex = PageStorage.of(context)?.readState(context) as int? ??
+    firstRowIndex = PageStorage.of(context)?.readState(context) as int? ??
         widget.initialFirstRowIndex ??
         0;
-    widget.source.addListener(_handleDataSourceChanged);
+    widget.dataSource.addListener(_handleDataSourceChanged);
     _handleDataSourceChanged();
   }
 
   @override
-  void didUpdateWidget(PaginatedDataTable2 oldWidget) {
+  void didUpdateWidget(DataTableStatefulWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.source != widget.source) {
-      oldWidget.source.removeListener(_handleDataSourceChanged);
-      widget.source.addListener(_handleDataSourceChanged);
+    if (oldWidget.dataSource != widget.dataSource) {
+      oldWidget.dataSource.removeListener(_handleDataSourceChanged);
+      widget.dataSource.addListener(_handleDataSourceChanged);
       _handleDataSourceChanged();
     }
   }
 
   @override
   void dispose() {
-    widget.source.removeListener(_handleDataSourceChanged);
+    widget.dataSource.removeListener(_handleDataSourceChanged);
     super.dispose();
   }
 
   void _handleDataSourceChanged() {
     setState(() {
-      _rowCount = widget.source.rowCount;
-      _rowCountApproximate = widget.source.isRowCountApproximate;
-      _selectedRowCount = widget.source.selectedRowCount;
+      _rowCount = dataSourceRowCount;
+      _rowCountApproximate = dataSourceIsRowCountApproximate;
+      _selectedRowCount = dataSourceSelectedRowCount;
       _rows.clear();
     });
   }
 
   /// Ensures that the given row is visible.
   void pageTo(int rowIndex) {
-    final int oldFirstRowIndex = _firstRowIndex;
+    final int oldFirstRowIndex = firstRowIndex;
     setState(() {
       final int rowsPerPage = widget.rowsPerPage;
-      _firstRowIndex = (rowIndex ~/ rowsPerPage) * rowsPerPage;
+      firstRowIndex = (rowIndex ~/ rowsPerPage) * rowsPerPage;
     });
-    if ((widget.onPageChanged != null) && (oldFirstRowIndex != _firstRowIndex))
-      widget.onPageChanged!(_firstRowIndex);
-  }
-
-  Future<List<DataRow>> _getRows(int firstRowIndex, int rowsPerPage) {
-    final List<DataRow> result = <DataRow>[];
-
-    if (widget.empty != null && widget.source.rowCount < 1)
-      return SynchronousFuture(result);
-
-    final int nextPageFirstRowIndex = firstRowIndex + rowsPerPage;
-
-    return widget.source.getRows(firstRowIndex, nextPageFirstRowIndex - 1);
+    if ((widget.onPageChanged != null) && (oldFirstRowIndex != firstRowIndex))
+      widget.onPageChanged!(firstRowIndex);
   }
 
   void _handleFirst() {
@@ -332,11 +313,11 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   }
 
   void _handlePrevious() {
-    pageTo(math.max(_firstRowIndex - widget.rowsPerPage, 0));
+    pageTo(max(firstRowIndex - widget.rowsPerPage, 0));
   }
 
   void _handleNext() {
-    pageTo(_firstRowIndex + widget.rowsPerPage);
+    pageTo(firstRowIndex + widget.rowsPerPage);
   }
 
   void _handleLast() {
@@ -345,9 +326,10 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
 
   bool _isNextPageUnavailable() =>
       !_rowCountApproximate &&
-      (_firstRowIndex + widget.rowsPerPage >= _rowCount);
+      (firstRowIndex + widget.rowsPerPage >= _rowCount);
 
-  final GlobalKey _tableKey = GlobalKey();
+  @protected
+  final GlobalKey tableKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -424,8 +406,8 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       Container(width: 32.0),
       Text(
         localizations.pageRowsInfoTitle(
-          _firstRowIndex + 1,
-          _firstRowIndex + widget.rowsPerPage,
+          firstRowIndex + 1,
+          firstRowIndex + widget.rowsPerPage,
           _rowCount,
           _rowCountApproximate,
         ),
@@ -436,13 +418,13 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           icon: const Icon(Icons.skip_previous),
           padding: EdgeInsets.zero,
           //tooltip: localizations.firstPageTooltip,
-          onPressed: _firstRowIndex <= 0 ? null : _handleFirst,
+          onPressed: firstRowIndex <= 0 ? null : _handleFirst,
         ),
       IconButton(
         icon: const Icon(Icons.chevron_left),
         padding: EdgeInsets.zero,
         tooltip: localizations.previousPageTooltip,
-        onPressed: _firstRowIndex <= 0 ? null : _handlePrevious,
+        onPressed: firstRowIndex <= 0 ? null : _handlePrevious,
       ),
       Container(width: 24.0),
       IconButton(
@@ -502,56 +484,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
               fit: widget.fit,
               child: ConstrainedBox(
                 constraints: BoxConstraints(minWidth: constraints.minWidth),
-                child: FutureBuilder<List<DataRow>>(
-                  future: _getRows(_firstRowIndex, widget.rowsPerPage),
-                  builder: (
-                    BuildContext context,
-                    AsyncSnapshot<List<DataRow>> snapshot,
-                  ) {
-                    DataState state = () {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.waiting:
-                          return DataState.loading;
-                        default:
-                          if (snapshot.hasError)
-                            return DataState.error;
-                          else
-                            return DataState.done;
-                      }
-                    }();
-
-                    return DataTable2(
-                      key: _tableKey,
-                      columns: widget.columns,
-                      sortColumnIndex: widget.sortColumnIndex,
-                      sortAscending: widget.sortAscending,
-                      onSelectAll: widget.onSelectAll,
-                      // Make sure no decoration is set on the DataTable
-                      // from the theme, as its already wrapped in a Card.
-                      decoration: const BoxDecoration(),
-                      dataRowHeight: widget.dataRowHeight,
-                      headingRowHeight: widget.headingRowHeight,
-                      horizontalMargin: widget.horizontalMargin,
-                      //TODO - fix when Flutter 2.1.0 goes stable
-                      //checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
-                      columnSpacing: widget.columnSpacing,
-                      showCheckboxColumn: widget.showCheckboxColumn,
-                      showBottomBorder: true,
-                      minWidth: widget.minWidth,
-                      scrollController: widget.scrollController,
-                      empty: widget.empty,
-                      border: widget.border,
-                      smRatio: widget.smRatio,
-                      lmRatio: widget.lmRatio,
-                      rows: snapshot.data ?? [],
-                      loadingWidget: widget.loadingWidget,
-                      errorBuilder: (context) =>
-                          widget.errorBuilder?.call(context, snapshot.error) ??
-                          SizedBox(),
-                      dataState: state,
-                    );
-                  },
-                ),
+                child: createDataTableWidget(),
               ),
             ),
             DefaultTextStyle(
