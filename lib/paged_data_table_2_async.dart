@@ -6,7 +6,6 @@
 
 import 'package:data_table_2/async_data_table_source.dart';
 import 'package:data_table_2/data_state_enum.dart';
-import 'package:data_table_2/data_table_2.dart';
 import 'package:data_table_2/paged_data_table_2.dart';
 import 'package:data_table_2/paged_data_table_2_base.dart';
 import 'package:flutter/foundation.dart';
@@ -49,6 +48,7 @@ class PagedDataTable2Async extends PagedDataTable2Base<AsyncDataTableSource> {
     double smRatio = 0.67,
     double lmRatio = 1.2,
     Widget? empty,
+    this.loadingWidget,
     this.errorBuilder,
   }) : super(
           header: header,
@@ -84,6 +84,10 @@ class PagedDataTable2Async extends PagedDataTable2Base<AsyncDataTableSource> {
   /// The fallback is an empty [SizedBox].
   final Widget Function(BuildContext context, Object? error)? errorBuilder;
 
+  /// Widget that is displayed in case the data rows are being loaded.
+  /// The fallback is an empty [SizedBox].
+  final Widget? loadingWidget;
+
   @override
   PagedDataTable2BaseState createState() => PagedDataTable2State();
 }
@@ -112,7 +116,7 @@ class PagedDataTable2AsyncState
   }
 
   @override
-  Widget createDataTableWidget() {
+  Widget createDataTableContextWidget() {
     return FutureBuilder<List<DataRow>>(
       future: _getRows(firstRowIndex, widget.rowsPerPage),
       builder: (
@@ -131,34 +135,13 @@ class PagedDataTable2AsyncState
           }
         }();
 
-        return DataTable2(
-          key: tableKey,
-          columns: widget.columns,
-          sortColumnIndex: widget.sortColumnIndex,
-          sortAscending: widget.sortAscending,
-          onSelectAll: widget.onSelectAll,
-          // Make sure no decoration is set on the DataTable
-          // from the theme, as its already wrapped in a Card.
-          decoration: const BoxDecoration(),
-          dataRowHeight: widget.dataRowHeight,
-          headingRowHeight: widget.headingRowHeight,
-          horizontalMargin: widget.horizontalMargin,
-          //TODO - fix when Flutter 2.1.0 goes stable
-          //checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
-          columnSpacing: widget.columnSpacing,
-          showCheckboxColumn: widget.showCheckboxColumn,
-          showBottomBorder: true,
-          minWidth: widget.minWidth,
-          scrollController: widget.scrollController,
-          empty: widget.empty,
-          border: widget.border,
-          smRatio: widget.smRatio,
-          lmRatio: widget.lmRatio,
+        return createDataTableWidget(
           rows: snapshot.data ?? [],
           errorBuilder: (context) =>
               widget.errorBuilder?.call(context, snapshot.error) ??
               const SizedBox(),
-          dataState: state,
+          state: state,
+          loadingWidget: widget.loadingWidget ?? const SizedBox(),
         );
       },
     );

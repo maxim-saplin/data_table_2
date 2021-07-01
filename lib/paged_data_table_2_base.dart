@@ -6,6 +6,8 @@
 
 import 'dart:math';
 
+import 'package:data_table_2/data_state_enum.dart';
+import 'package:data_table_2/data_table_2.dart';
 import 'package:data_table_2/paginated_data_table_2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -258,9 +260,47 @@ abstract class PagedDataTable2BaseState<
   @protected
   int get dataSourceSelectedRowCount;
 
-  /// Create DataTable widget.
+  /// Create DataTable context widget.
+  /// It is the widget that creates the parent widgets of the data table.
   @protected
-  Widget createDataTableWidget();
+  Widget createDataTableContextWidget();
+
+  @protected
+  Widget createDataTableWidget({
+    required List<DataRow> rows,
+    required WidgetBuilder errorBuilder,
+    required DataState state,
+    required Widget loadingWidget,
+  }) {
+    return DataTable2(
+      key: tableKey,
+      columns: widget.columns,
+      sortColumnIndex: widget.sortColumnIndex,
+      sortAscending: widget.sortAscending,
+      onSelectAll: widget.onSelectAll,
+      // Make sure no decoration is set on the DataTable
+      // from the theme, as its already wrapped in a Card.
+      decoration: const BoxDecoration(),
+      dataRowHeight: widget.dataRowHeight,
+      headingRowHeight: widget.headingRowHeight,
+      horizontalMargin: widget.horizontalMargin,
+      //TODO - fix when Flutter 2.1.0 goes stable
+      //checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
+      columnSpacing: widget.columnSpacing,
+      showCheckboxColumn: widget.showCheckboxColumn,
+      showBottomBorder: true,
+      minWidth: widget.minWidth,
+      scrollController: widget.scrollController,
+      empty: widget.empty,
+      border: widget.border,
+      smRatio: widget.smRatio,
+      lmRatio: widget.lmRatio,
+      rows: rows,
+      errorBuilder: errorBuilder,
+      loadingWidget: loadingWidget,
+      dataState: state,
+    );
+  }
 
   @override
   void initState() {
@@ -484,7 +524,7 @@ abstract class PagedDataTable2BaseState<
               fit: widget.fit,
               child: ConstrainedBox(
                 constraints: BoxConstraints(minWidth: constraints.minWidth),
-                child: createDataTableWidget(),
+                child: createDataTableContextWidget(),
               ),
             ),
             DefaultTextStyle(

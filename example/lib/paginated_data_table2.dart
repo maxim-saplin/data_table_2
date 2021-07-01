@@ -135,7 +135,7 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
               sort<num>((d) => d.iron, columnIndex, ascending),
         ),
       ],
-      empty: (_) => Center(
+      empty: Center(
         child: Container(
           padding: EdgeInsets.all(20),
           color: Colors.grey[200],
@@ -151,7 +151,7 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
           overflow: TextOverflow.ellipsis,
         ),
       ),
-      loadingWidget: (context) => Center(
+      loadingWidget: Center(
         child: CircularProgressIndicator(),
       ),
     );

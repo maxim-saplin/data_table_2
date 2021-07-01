@@ -90,7 +90,7 @@ class PagedDataTable2State extends PagedDataTable2BaseState<PagedDataTable2> {
   int get dataSourceSelectedRowCount => widget.dataSource.selectedRowCount;
 
   @override
-  Widget createDataTableWidget() {
+  Widget createDataTableContextWidget() {
     return Container();
   }
 }
