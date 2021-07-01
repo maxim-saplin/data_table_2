@@ -242,10 +242,20 @@ abstract class PaginatedDataTable2BaseState<
   @protected
   late int firstRowIndex;
 
-  late int _rowCount;
-  late bool _rowCountApproximate;
-  int _selectedRowCount = 0;
-  final Map<int, DataRow?> _rows = <int, DataRow?>{};
+  @protected
+  late int rowCount;
+
+  @protected
+  late bool rowCountApproximate;
+
+  @protected
+  int selectedRowCount = 0;
+
+  @protected
+  final Map<int, DataRow?> rows = <int, DataRow?>{};
+
+  @protected
+  final GlobalKey tableKey = GlobalKey();
 
   /// Actual value of row count from [widget.dataSource].
   @protected
@@ -267,9 +277,9 @@ abstract class PaginatedDataTable2BaseState<
   @protected
   Widget createDataTableWidget({
     required List<DataRow> rows,
-    required WidgetBuilder errorBuilder,
     required DataState state,
-    required Widget loadingWidget,
+    required WidgetBuilder? errorBuilder,
+    required Widget? loadingWidget,
   }) {
     return DataTable2(
       key: tableKey,
@@ -329,10 +339,10 @@ abstract class PaginatedDataTable2BaseState<
 
   void _handleDataSourceChanged() {
     setState(() {
-      _rowCount = dataSourceRowCount;
-      _rowCountApproximate = dataSourceIsRowCountApproximate;
-      _selectedRowCount = dataSourceSelectedRowCount;
-      _rows.clear();
+      rowCount = dataSourceRowCount;
+      rowCountApproximate = dataSourceIsRowCountApproximate;
+      selectedRowCount = dataSourceSelectedRowCount;
+      rows.clear();
     });
   }
 
@@ -360,15 +370,11 @@ abstract class PaginatedDataTable2BaseState<
   }
 
   void _handleLast() {
-    pageTo(((_rowCount - 1) / widget.rowsPerPage).floor() * widget.rowsPerPage);
+    pageTo(((rowCount - 1) / widget.rowsPerPage).floor() * widget.rowsPerPage);
   }
 
   bool _isNextPageUnavailable() =>
-      !_rowCountApproximate &&
-      (firstRowIndex + widget.rowsPerPage >= _rowCount);
-
-  @protected
-  final GlobalKey tableKey = GlobalKey();
+      !rowCountApproximate && (firstRowIndex + widget.rowsPerPage >= rowCount);
 
   @override
   Widget build(BuildContext context) {
@@ -380,7 +386,7 @@ abstract class PaginatedDataTable2BaseState<
     // HEADER
     final List<Widget> headerWidgets = <Widget>[];
     double startPadding = widget.horizontalMargin;
-    if (_selectedRowCount == 0 && widget.header != null) {
+    if (selectedRowCount == 0 && widget.header != null) {
       headerWidgets.add(Expanded(child: widget.header!));
       if (widget.header is ButtonBar) {
         // We adjust the padding when a button bar is present, because the
@@ -392,7 +398,7 @@ abstract class PaginatedDataTable2BaseState<
       }
     } else if (widget.header != null) {
       headerWidgets.add(Expanded(
-        child: Text(localizations.selectedRowCountTitle(_selectedRowCount)),
+        child: Text(localizations.selectedRowCountTitle(selectedRowCount)),
       ));
     }
     if (widget.actions != null) {
@@ -411,7 +417,7 @@ abstract class PaginatedDataTable2BaseState<
     if (widget.onRowsPerPageChanged != null) {
       final List<Widget> availableRowsPerPage = widget.availableRowsPerPage
           .where(
-              (int value) => value <= _rowCount || value == widget.rowsPerPage)
+              (int value) => value <= rowCount || value == widget.rowsPerPage)
           .map<DropdownMenuItem<int>>((int value) {
         return DropdownMenuItem<int>(
           value: value,
@@ -447,8 +453,8 @@ abstract class PaginatedDataTable2BaseState<
         localizations.pageRowsInfoTitle(
           firstRowIndex + 1,
           firstRowIndex + widget.rowsPerPage,
-          _rowCount,
-          _rowCountApproximate,
+          rowCount,
+          rowCountApproximate,
         ),
       ),
       Container(width: 32.0),
@@ -495,7 +501,7 @@ abstract class PaginatedDataTable2BaseState<
                   // These typographic styles aren't quite the regular ones. We pick the closest ones from the regular
                   // list and then tweak them appropriately.
                   // See https://material.io/design/components/data-tables.html#tables-within-cards
-                  style: _selectedRowCount > 0
+                  style: selectedRowCount > 0
                       ? themeData.textTheme.subtitle1!
                           .copyWith(color: themeData.accentColor)
                       : themeData.textTheme.headline6!
@@ -504,7 +510,7 @@ abstract class PaginatedDataTable2BaseState<
                     data: const IconThemeData(opacity: 0.54),
                     child: Ink(
                       height: 64.0,
-                      color: _selectedRowCount > 0
+                      color: selectedRowCount > 0
                           ? themeData.secondaryHeaderColor
                           : null,
                       child: Padding(

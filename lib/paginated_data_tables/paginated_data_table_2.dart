@@ -4,6 +4,7 @@
 
 // Copyright 2021 Maxim Saplin, Kristián Balaj - changes and modifications to original Flutter implementation of PaginatedDataTable
 
+import 'package:data_table_2/data_state_enum.dart';
 import 'package:data_table_2/paginated_data_tables/paginated_data_table_2_base.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -103,8 +104,66 @@ class PaginatedDataTable2State
   @override
   int get dataSourceSelectedRowCount => widget.dataSource.selectedRowCount;
 
+  DataRow _getProgressIndicatorRowFor(int index) {
+    bool haveProgressIndicator = false;
+    final List<DataCell> cells =
+        widget.columns.map<DataCell>((DataColumn column) {
+      if (!column.numeric) {
+        haveProgressIndicator = true;
+        return const DataCell(CircularProgressIndicator());
+      }
+      return DataCell.empty;
+    }).toList();
+    if (!haveProgressIndicator) {
+      haveProgressIndicator = true;
+      cells[0] = const DataCell(CircularProgressIndicator());
+    }
+    return DataRow.byIndex(
+      index: index,
+      cells: cells,
+    );
+  }
+
+  DataRow _getBlankRowFor(int index) {
+    return DataRow.byIndex(
+      index: index,
+      cells: widget.columns
+          .map<DataCell>((DataColumn column) => DataCell.empty)
+          .toList(),
+    );
+  }
+
+  List<DataRow> _getRows(int firstRowIndex, int rowsPerPage) {
+    final List<DataRow> result = <DataRow>[];
+
+    if (widget.empty != null && widget.dataSource.rowCount < 1)
+      return result; // If empty placeholder is provided - don't create blank rows
+
+    final int nextPageFirstRowIndex = firstRowIndex + rowsPerPage;
+    bool haveProgressIndicator = false;
+
+    for (int index = firstRowIndex; index < nextPageFirstRowIndex; index += 1) {
+      DataRow? row;
+      if (index < rowCount || rowCountApproximate) {
+        row = rows.putIfAbsent(index, () => widget.dataSource.getRow(index));
+        if (row == null && !haveProgressIndicator) {
+          row ??= _getProgressIndicatorRowFor(index);
+          haveProgressIndicator = true;
+        }
+      }
+      row ??= _getBlankRowFor(index);
+      result.add(row);
+    }
+    return result;
+  }
+
   @override
   Widget createDataTableContextWidget() {
-    return Container();
+    return createDataTableWidget(
+      rows: _getRows(firstRowIndex, widget.rowsPerPage),
+      errorBuilder: null,
+      state: DataState.done,
+      loadingWidget: null,
+    );
   }
 }
