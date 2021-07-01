@@ -1,3 +1,10 @@
+// Copyright 2019 The Flutter team. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+// The file was extracted from GitHub: https://github.com/flutter/gallery
+// Changes and modifications by Maxim Saplin, Kristián Balaj, 2021
+
 import 'package:data_table_2/data_table_2.dart';
 import 'package:example/data/data_sources/restorable_dessert_selections.dart';
 import 'package:example/data/models/dessert.dart';
@@ -5,6 +12,8 @@ import 'package:example/data/res/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+/// Loading desserts with 3s delay on every page.
+/// Other pages than the first one will return Future error to show the error builder.
 class AsyncDessertDataSource extends AsyncDataTableSource {
   AsyncDessertDataSource.empty(this.context) {
     desserts = [];

@@ -1,13 +1,14 @@
 import 'package:example/data_table2_scrollup.dart';
+import 'package:example/paginated_data_table2_async_demo.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'data_table.dart';
 import 'data_table2.dart';
 import 'data_table2_simple.dart';
 import 'isEmptyArg.dart';
-import 'paginated_data_table2.dart';
-import 'data_table.dart';
 import 'paginated_data_table.dart';
+import 'paginated_data_table2.dart';
 
 void main() {
   runApp(MyApp());
@@ -34,28 +35,8 @@ Scaffold _getScaffold(BuildContext context, Widget body,
                   .subtitle1!
                   .copyWith(color: Colors.white),
               value: _getCurrentRoute(context),
-              onChanged: (v) {
-                switch (v) {
-                  case '/datatable2':
-                    Navigator.of(context).pushNamed('/datatable2');
-                    break;
-                  case '/datatable2simple':
-                    Navigator.of(context).pushNamed('/datatable2simple');
-                    break;
-                  case '/datatable2scrollup':
-                    Navigator.of(context).pushNamed('/datatable2scrollup');
-                    break;
-                  case '/paginated2':
-                    Navigator.of(context).pushNamed('/paginated2');
-                    break;
-                  case '/datatable':
-                    Navigator.of(context).pushNamed('/datatable');
-                    break;
-                  case '/paginated':
-                    Navigator.of(context).pushNamed('/paginated');
-                    break;
-                }
-              },
+              onChanged: (v) =>
+                  Navigator.of(context).pushNamed(v ?? initialRoute),
               items: [
                 DropdownMenuItem(
                   child: Text('DataTable2'),
@@ -80,6 +61,10 @@ Scaffold _getScaffold(BuildContext context, Widget body,
                 DropdownMenuItem(
                   child: Text('PaginatedDataTable'),
                   value: '/paginated',
+                ),
+                DropdownMenuItem(
+                  child: Text('PaginatedDataTable2Async'),
+                  value: '/paginated2async',
                 ),
               ],
             )),
@@ -149,6 +134,8 @@ class MyApp extends StatelessWidget {
         '/datatable': (context) => _getScaffold(context, DataTableDemo()),
         '/paginated': (context) =>
             _getScaffold(context, PaginatedDataTableDemo()),
+        '/paginated2async': (context) =>
+            _getScaffold(context, PaginatedDataTable2AsyncDemo()),
       },
     );
   }
