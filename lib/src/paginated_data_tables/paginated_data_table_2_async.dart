@@ -6,7 +6,6 @@
 
 import 'package:data_table_2/src/async_data_table_source.dart';
 import 'package:data_table_2/src/data_state_enum.dart';
-import 'package:data_table_2/src/paginated_data_tables/paginated_data_table_2.dart';
 import 'package:data_table_2/src/paginated_data_tables/paginated_data_table_2_base.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -90,7 +89,7 @@ class PaginatedDataTable2Async
   final Widget? loadingWidget;
 
   @override
-  PaginatedDataTable2BaseState createState() => PaginatedDataTable2State();
+  PaginatedDataTable2BaseState createState() => PaginatedDataTable2AsyncState();
 }
 
 class PaginatedDataTable2AsyncState
