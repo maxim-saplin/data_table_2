@@ -6,8 +6,8 @@
 
 import 'dart:math';
 
-import 'package:data_table_2/data_state_enum.dart';
-import 'package:data_table_2/data_table_2.dart';
+import 'package:data_table_2/src/data_state_enum.dart';
+import 'package:data_table_2/src/data_table_2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
