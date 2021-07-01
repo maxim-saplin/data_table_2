@@ -1,15 +1,16 @@
-import 'package:data_table_2/paginated_data_table_2.dart';
-import 'package:flutter/material.dart';
-
-import 'data_source.dart';
-import 'isEmptyArg.dart';
-
 // Copyright 2019 The Flutter team. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 // The file was extracted from GitHub: https://github.com/flutter/gallery
 // Changes and modifications by Maxim Saplin, 2021
+
+import 'package:data_table_2/data_table_2.dart';
+import 'package:example/data/data_sources/dessert_data_source.dart';
+import 'package:example/data/models/dessert.dart';
+import 'package:flutter/material.dart';
+
+import 'isEmptyArg.dart';
 
 class PaginatedDataTable2Demo extends StatefulWidget {
   const PaginatedDataTable2Demo();
@@ -24,14 +25,14 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   bool _sortAscending = true;
   int? _sortColumnIndex;
-  late AsyncDessertDataSource _dessertsDataSource;
+  late DessertDataSource _dessertsDataSource;
   bool _initialized = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialized) {
-      _dessertsDataSource = AsyncDessertDataSource(context);
+      _dessertsDataSource = DessertDataSource(context);
       _initialized = true;
     }
   }
@@ -136,24 +137,13 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
         ),
       ],
       empty: Center(
-        child: Container(
-          padding: EdgeInsets.all(20),
-          color: Colors.grey[200],
-          child: Text('No data'),
-        ),
-      ),
-      source: getIsEmpty(context)
-          ? AsyncDessertDataSource.empty(context)
+          child: Container(
+              padding: EdgeInsets.all(20),
+              color: Colors.grey[200],
+              child: Text('No data'))),
+      dataSource: getIsEmpty(context)
+          ? DessertDataSource.empty(context)
           : _dessertsDataSource,
-      errorBuilder: (context, error) => Center(
-        child: Text(
-          error.toString(),
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-      loadingWidget: Center(
-        child: CircularProgressIndicator(),
-      ),
     );
   }
 }
