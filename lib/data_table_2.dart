@@ -9,7 +9,6 @@ library data_table_2;
 import 'dart:math' as math;
 
 import 'package:data_table_2/data_state_enum.dart';
-import 'package:data_table_2/paginated_data_table_2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';

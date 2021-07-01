@@ -8,16 +8,15 @@ import 'dart:math';
 
 import 'package:data_table_2/data_state_enum.dart';
 import 'package:data_table_2/data_table_2.dart';
-import 'package:data_table_2/paginated_data_table_2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-abstract class PagedDataTable2Base<T extends ChangeNotifier>
+abstract class PaginatedDataTable2Base<T extends ChangeNotifier>
     extends StatefulWidget {
   /// Check out [PaginatedDataTable] for the API decription.
   /// Key differences are [minWidth] and [fit] properties.
-  PagedDataTable2Base({
+  PaginatedDataTable2Base({
     Key? key,
     this.header,
     this.actions,
@@ -237,8 +236,8 @@ abstract class PagedDataTable2Base<T extends ChangeNotifier>
 /// Holds the state of a [PaginatedDataTable2].
 ///
 /// The table can be programmatically paged using the [pageTo] method.
-abstract class PagedDataTable2BaseState<
-        DataTableStatefulWidget extends PagedDataTable2Base>
+abstract class PaginatedDataTable2BaseState<
+        DataTableStatefulWidget extends PaginatedDataTable2Base>
     extends State<DataTableStatefulWidget> {
   @protected
   late int firstRowIndex;

@@ -4,12 +4,17 @@
 
 // Copyright 2021 Maxim Saplin, Kristián Balaj - changes and modifications to original Flutter implementation of PaginatedDataTable
 
-import 'package:data_table_2/paged_data_table_2_base.dart';
+import 'package:data_table_2/async_data_table_source.dart';
+import 'package:data_table_2/data_state_enum.dart';
+import 'package:data_table_2/paginated_data_tables/paginated_data_table_2.dart';
+import 'package:data_table_2/paginated_data_tables/paginated_data_table_2_base.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-class PagedDataTable2 extends PagedDataTable2Base<DataTableSource> {
-  PagedDataTable2({
+class PaginatedDataTable2Async
+    extends PaginatedDataTable2Base<AsyncDataTableSource> {
+  PaginatedDataTable2Async({
     Key? key,
     Widget? header,
     List<Widget>? actions,
@@ -25,16 +30,16 @@ class PagedDataTable2 extends PagedDataTable2Base<DataTableSource> {
     bool showFirstLastButtons = false,
     int? initialFirstRowIndex = 0,
     ValueChanged<int>? onPageChanged,
-    int rowsPerPage = PagedDataTable2Base.defaultRowsPerPage,
+    int rowsPerPage = PaginatedDataTable2Base.defaultRowsPerPage,
     List<int> availableRowsPerPage = const <int>[
-      PagedDataTable2Base.defaultRowsPerPage,
-      PagedDataTable2Base.defaultRowsPerPage * 2,
-      PagedDataTable2Base.defaultRowsPerPage * 5,
-      PagedDataTable2Base.defaultRowsPerPage * 10
+      PaginatedDataTable2Base.defaultRowsPerPage,
+      PaginatedDataTable2Base.defaultRowsPerPage * 2,
+      PaginatedDataTable2Base.defaultRowsPerPage * 5,
+      PaginatedDataTable2Base.defaultRowsPerPage * 10
     ],
     ValueChanged<int?>? onRowsPerPageChanged,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
-    required DataTableSource dataSource,
+    required AsyncDataTableSource dataSource,
     double? checkboxHorizontalMargin,
     bool wrapInCard = true,
     double? minWidth,
@@ -44,6 +49,8 @@ class PagedDataTable2 extends PagedDataTable2Base<DataTableSource> {
     double smRatio = 0.67,
     double lmRatio = 1.2,
     Widget? empty,
+    this.loadingWidget,
+    this.errorBuilder,
   }) : super(
           header: header,
           actions: actions,
@@ -74,11 +81,20 @@ class PagedDataTable2 extends PagedDataTable2Base<DataTableSource> {
           empty: empty,
         );
 
+  /// Displayed in case an error occurs in the [AsyncDataTableSource].
+  /// The fallback is an empty [SizedBox].
+  final Widget Function(BuildContext context, Object? error)? errorBuilder;
+
+  /// Widget that is displayed in case the data rows are being loaded.
+  /// The fallback is an empty [SizedBox].
+  final Widget? loadingWidget;
+
   @override
-  PagedDataTable2BaseState createState() => PagedDataTable2State();
+  PaginatedDataTable2BaseState createState() => PaginatedDataTable2State();
 }
 
-class PagedDataTable2State extends PagedDataTable2BaseState<PagedDataTable2> {
+class PaginatedDataTable2AsyncState
+    extends PaginatedDataTable2BaseState<PaginatedDataTable2Async> {
   @override
   bool get dataSourceIsRowCountApproximate =>
       widget.dataSource.isRowCountApproximate;
@@ -89,8 +105,46 @@ class PagedDataTable2State extends PagedDataTable2BaseState<PagedDataTable2> {
   @override
   int get dataSourceSelectedRowCount => widget.dataSource.selectedRowCount;
 
+  Future<List<DataRow>> _getRows(int firstRowIndex, int rowsPerPage) {
+    final List<DataRow> result = <DataRow>[];
+
+    if (widget.empty != null && widget.dataSource.rowCount < 1)
+      return SynchronousFuture(result);
+
+    final int nextPageFirstRowIndex = firstRowIndex + rowsPerPage;
+
+    return widget.dataSource.getRows(firstRowIndex, nextPageFirstRowIndex - 1);
+  }
+
   @override
   Widget createDataTableContextWidget() {
-    return Container();
+    return FutureBuilder<List<DataRow>>(
+      future: _getRows(firstRowIndex, widget.rowsPerPage),
+      builder: (
+        BuildContext context,
+        AsyncSnapshot<List<DataRow>> snapshot,
+      ) {
+        DataState state = () {
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return DataState.loading;
+            default:
+              if (snapshot.hasError)
+                return DataState.error;
+              else
+                return DataState.done;
+          }
+        }();
+
+        return createDataTableWidget(
+          rows: snapshot.data ?? [],
+          errorBuilder: (context) =>
+              widget.errorBuilder?.call(context, snapshot.error) ??
+              const SizedBox(),
+          state: state,
+          loadingWidget: widget.loadingWidget ?? const SizedBox(),
+        );
+      },
+    );
   }
 }
