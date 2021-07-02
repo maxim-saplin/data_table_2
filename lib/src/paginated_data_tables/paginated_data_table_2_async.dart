@@ -4,6 +4,8 @@
 
 // Copyright 2021 Maxim Saplin, Kristián Balaj - changes and modifications to original Flutter implementation of PaginatedDataTable
 
+import 'dart:developer';
+
 import 'package:data_table_2/src/async_data_table_source.dart';
 import 'package:data_table_2/src/data_state_enum.dart';
 import 'package:data_table_2/src/paginated_data_tables/paginated_data_table_2_base.dart';
@@ -179,11 +181,13 @@ class PaginatedDataTable2AsyncState
         DataState state = () {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
+              log('PaginatedDataTable2Async loading dataSource');
               return DataState.loading;
             default:
-              if (snapshot.hasError)
+              if (snapshot.hasError) {
+                log('PaginatedDataTable2Async error in dataSource: ${snapshot.error}');
                 return DataState.error;
-              else
+              } else
                 return DataState.done;
           }
         }();

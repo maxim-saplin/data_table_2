@@ -4,6 +4,7 @@
 
 // Copyright 2021 Maxim Saplin, Kristián Balaj - changes and modifications to original Flutter implementation of DataTable
 
+import 'dart:developer';
 import 'dart:math' as math;
 
 import 'package:data_table_2/src/data_state_enum.dart';
@@ -727,11 +728,14 @@ class DataTable2 extends DataTable {
             child: () {
               switch (dataState) {
                 case DataState.loading:
+                  log('DataTable2 loading state');
                   return loadingWidget ?? const SizedBox();
                 case DataState.error:
+                  log('DataTable2 error state');
                   return errorBuilder?.call(context) ?? const SizedBox();
                 case DataState.done:
                   if (tableRows.isEmpty) {
+                    log('DataTable2 empty state');
                     return empty ?? const SizedBox();
                   } else {
                     return SingleChildScrollView(
