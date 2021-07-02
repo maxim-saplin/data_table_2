@@ -181,11 +181,14 @@ class PaginatedDataTable2AsyncState
         DataState state = () {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
-              log('PaginatedDataTable2Async loading dataSource');
+              log('Loading dataSource', name: 'PaginatedDataTable2Async');
               return DataState.loading;
             default:
               if (snapshot.hasError) {
-                log('PaginatedDataTable2Async error in dataSource: ${snapshot.error}');
+                log(
+                  'Error in dataSource: ${snapshot.error}',
+                  name: 'PaginatedDataTable2Async',
+                );
                 return DataState.error;
               } else
                 return DataState.done;

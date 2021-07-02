@@ -728,14 +728,14 @@ class DataTable2 extends DataTable {
             child: () {
               switch (dataState) {
                 case DataState.loading:
-                  log('DataTable2 loading state');
+                  log('Loading state', name: 'DataTable2');
                   return loadingWidget ?? const SizedBox();
                 case DataState.error:
-                  log('DataTable2 error state');
+                  log('Error state', name: 'DataTable2');
                   return errorBuilder?.call(context) ?? const SizedBox();
                 case DataState.done:
                   if (tableRows.isEmpty) {
-                    log('DataTable2 empty state');
+                    log('Empty state', name: 'DataTable2');
                     return empty ?? const SizedBox();
                   } else {
                     return SingleChildScrollView(
