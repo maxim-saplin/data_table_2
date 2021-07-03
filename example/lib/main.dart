@@ -1,6 +1,8 @@
 import 'package:example/data_table2_scrollup.dart';
+import 'package:example/data_table2_tests.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'data_table2.dart';
 import 'data_table2_simple.dart';
@@ -35,26 +37,7 @@ Scaffold _getScaffold(BuildContext context, Widget body,
                   .copyWith(color: Colors.white),
               value: _getCurrentRoute(context),
               onChanged: (v) {
-                switch (v) {
-                  case '/datatable2':
-                    Navigator.of(context).pushNamed('/datatable2');
-                    break;
-                  case '/datatable2simple':
-                    Navigator.of(context).pushNamed('/datatable2simple');
-                    break;
-                  case '/datatable2scrollup':
-                    Navigator.of(context).pushNamed('/datatable2scrollup');
-                    break;
-                  case '/paginated2':
-                    Navigator.of(context).pushNamed('/paginated2');
-                    break;
-                  case '/datatable':
-                    Navigator.of(context).pushNamed('/datatable');
-                    break;
-                  case '/paginated':
-                    Navigator.of(context).pushNamed('/paginated');
-                    break;
-                }
+                Navigator.of(context).pushNamed(v!);
               },
               items: [
                 DropdownMenuItem(
@@ -80,6 +63,10 @@ Scaffold _getScaffold(BuildContext context, Widget body,
                 DropdownMenuItem(
                   child: Text('PaginatedDataTable'),
                   value: '/paginated',
+                ),
+                DropdownMenuItem(
+                  child: Text('Unit Tests Preview'),
+                  value: '/datatable2tests',
                 ),
               ],
             )),
@@ -149,7 +136,21 @@ class MyApp extends StatelessWidget {
         '/datatable': (context) => _getScaffold(context, DataTableDemo()),
         '/paginated': (context) =>
             _getScaffold(context, PaginatedDataTableDemo()),
+        '/datatable2tests': (context) =>
+            _getScaffold(context, DataTable2Tests()),
       },
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en', ''),
+        const Locale('be', ''),
+        const Locale('ru', ''),
+      ],
+      // change to see how PaginatedDataTable2 controls (e.g. Rows per page) get translated
+      locale: Locale('en', ''),
     );
   }
 }

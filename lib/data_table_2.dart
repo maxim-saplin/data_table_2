@@ -17,28 +17,8 @@ import 'package:flutter/widgets.dart';
 /// to each individual column. When determining column widths ratios between S, M and L
 /// columns are kept (i.e. Large columns are set to 1.2x width of Medium ones)
 /// - see [DataTable2.smRatio], [DataTable2.lmRatio] and same properties on [PaginatedDataTable2].
+/// Default S/M ratio is 0.67,L/M ratio is 1.2
 enum ColumnSize { S, M, L }
-
-/// Deprecated, use [DataTable2.smRatio] instead
-@deprecated
-double get smRatio {
-  return -1.0;
-}
-
-/// Deprecated, use [DataTable2.lmRatio] instead
-@deprecated
-double get lmRatio {
-  return -1.0;
-}
-
-/// Deprecated, will be removed in the next version
-@deprecated
-void setColumnSizeRatios(double sm, double lm) {
-  assert(false,
-      'The method is deprecated and takes no effect. Use smRatio and lmRatio constructor params in DataTable2 and PaginatedDataTable2');
-  // _smRatio = sm;
-  // _lmRatio = lm;
-}
 
 /// Extension of stock [DataColumn], adds the capability to set relative column
 /// size via [size] property
@@ -57,7 +37,6 @@ class DataColumn2 extends DataColumn {
 
   /// Column sizes are determined based on available width by distributing it
   /// to individual columns accounting for their relative sizes (see [ColumnSize])
-  // TODO add tests
   final ColumnSize size;
 }
 
@@ -135,6 +114,7 @@ class DataTable2 extends DataTable {
     double? headingRowHeight,
     TextStyle? headingTextStyle,
     double? horizontalMargin,
+    double? checkboxHorizontalMargin,
     this.bottomMargin,
     double? columnSpacing,
     bool showCheckboxColumn = true,
@@ -161,6 +141,7 @@ class DataTable2 extends DataTable {
             headingRowHeight: headingRowHeight,
             headingTextStyle: headingTextStyle,
             horizontalMargin: horizontalMargin,
+            checkboxHorizontalMargin: checkboxHorizontalMargin,
             columnSpacing: columnSpacing,
             showCheckboxColumn: showCheckboxColumn,
             showBottomBorder: showBottomBorder,
@@ -228,12 +209,10 @@ class DataTable2 extends DataTable {
   /// themes and [dividerThickness] property
   final TableBorder? border;
 
-  // TODO: Add test
   /// Determines ratio of Small column's width to Medium column's width.
   /// I.e. 0.5 means that Small column is twice narower than Medium column.
   final double smRatio;
 
-  // TODO: Add test
   /// Determines ratio of Large column's width to Medium column's width.
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
@@ -254,8 +233,8 @@ class DataTable2 extends DataTable {
       container: true,
       child: Padding(
         padding: EdgeInsetsDirectional.only(
-          start: effectiveHorizontalMargin,
-          end: effectiveHorizontalMargin / 2.0,
+          start: checkboxHorizontalMargin ?? effectiveHorizontalMargin,
+          end: (checkboxHorizontalMargin ?? effectiveHorizontalMargin) / 2.0,
         ),
         child: Center(
           child: Checkbox(
@@ -509,6 +488,7 @@ class DataTable2 extends DataTable {
 
       int displayColumnIndex = 0;
       double checkBoxWidth = 0;
+      // size & build checkboxes in heading and leftmost column
       if (displayCheckboxColumn) {
         checkBoxWidth = effectiveHorizontalMargin +
             Checkbox.width +
@@ -540,11 +520,15 @@ class DataTable2 extends DataTable {
         displayColumnIndex += 1;
       }
 
+      // size data columns
       var availableWidth = constraints.maxWidth;
       if (minWidth != null && availableWidth < minWidth!) {
         availableWidth = minWidth!;
       }
 
+      // full margins are added to side column widths when no check box column is
+      // present, half-margin added to first data column width is check box column
+      // is present and full margin added to the right
       availableWidth -= checkBoxWidth;
       var totalColWidth = availableWidth -
           effectiveHorizontalMargin -

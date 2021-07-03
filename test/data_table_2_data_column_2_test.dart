@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// Copyright 2021 Maxim Saplin - changes and modifications to original Flutter implementation of DataTable
+
 @TestOn('!chrome')
 import 'dart:math' as math;
 

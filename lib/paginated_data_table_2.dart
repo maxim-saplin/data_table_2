@@ -228,12 +228,10 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// The widget will be displayed below column
   final Widget? empty;
 
-  // TODO: Add test
   /// Determines ratio of Small column's width to Medium column's width.
   /// I.e. 0.5 means that Small column is twice narower than Medium column.
   final double smRatio;
 
-  // TODO: Add test
   /// Determines ratio of Large column's width to Medium column's width.
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
@@ -463,7 +461,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
         IconButton(
           icon: const Icon(Icons.skip_previous),
           padding: EdgeInsets.zero,
-          //tooltip: localizations.firstPageTooltip,
+          tooltip: localizations.firstPageTooltip,
           onPressed: _firstRowIndex <= 0 ? null : _handleFirst,
         ),
       IconButton(
@@ -483,7 +481,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
         IconButton(
           icon: const Icon(Icons.skip_next),
           padding: EdgeInsets.zero,
-          //tooltip: localizations.lastPageTooltip,
+          tooltip: localizations.lastPageTooltip,
           onPressed: _isNextPageUnavailable() ? null : _handleLast,
         ),
       Container(width: 14.0),
@@ -542,8 +540,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                   dataRowHeight: widget.dataRowHeight,
                   headingRowHeight: widget.headingRowHeight,
                   horizontalMargin: widget.horizontalMargin,
-                  //TODO - fix when Flutter 2.1.0 goes stable
-                  //checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
+                  checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
                   columnSpacing: widget.columnSpacing,
                   showCheckboxColumn: widget.showCheckboxColumn,
                   showBottomBorder: true,
