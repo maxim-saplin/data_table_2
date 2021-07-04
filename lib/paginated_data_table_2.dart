@@ -249,6 +249,7 @@ class PaginatedDataTable2 extends StatefulWidget {
 /// The table can be programmatically paged using the [pageTo] method.
 class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   late int _firstRowIndex;
+  int get firstRowIndex => _firstRowIndex;
   late int _rowCount;
   late bool _rowCountApproximate;
   int _selectedRowCount = 0;

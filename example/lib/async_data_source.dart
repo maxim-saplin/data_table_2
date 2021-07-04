@@ -1,5 +1,7 @@
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:data_table_2/async_paginated_data_table_2.dart';
 
 // Copyright 2019 The Flutter team. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -72,12 +74,12 @@ class Dessert {
   bool selected = false;
 }
 
-class DessertDataSource extends DataTableSource {
-  DessertDataSource.empty(this.context) {
+class AsyncDessertDataSource extends AsyncDataTableSource {
+  AsyncDessertDataSource.empty(this.context) {
     desserts = [];
   }
 
-  DessertDataSource(this.context) {
+  AsyncDessertDataSource(this.context) {
     desserts = <Dessert>[
       Dessert(
         'Frozen Yogurt',
@@ -432,30 +434,32 @@ class DessertDataSource extends DataTableSource {
       decimalDigits: 0,
     );
     assert(index >= 0);
-    if (index >= desserts.length) throw 'index > _desserts.length';
-    final dessert = desserts[index];
-    return DataRow.byIndex(
-      index: index,
-      selected: dessert.selected,
-      onSelectChanged: (value) {
-        if (dessert.selected != value) {
-          _selectedCount += value! ? 1 : -1;
-          assert(_selectedCount >= 0);
-          dessert.selected = value;
-          notifyListeners();
-        }
-      },
-      cells: [
-        DataCell(Text(dessert.name)),
-        DataCell(Text('${dessert.calories}')),
-        DataCell(Text(dessert.fat.toStringAsFixed(1))),
-        DataCell(Text('${dessert.carbs}')),
-        DataCell(Text(dessert.protein.toStringAsFixed(1))),
-        DataCell(Text('${dessert.sodium}')),
-        DataCell(Text('${format.format(dessert.calcium / 100)}')),
-        DataCell(Text('${format.format(dessert.iron / 100)}')),
-      ],
-    );
+    if (index >= rows.length) throw 'index > _desserts.length';
+    //final dessert = rows[index];
+    return rows[index];
+
+    // DataRow.byIndex(
+    //   index: index,
+    //   selected: dessert.selected,
+    //   onSelectChanged: (value) {
+    //     if (dessert.selected != value) {
+    //       _selectedCount += value! ? 1 : -1;
+    //       assert(_selectedCount >= 0);
+    //       dessert.selected = value;
+    //       notifyListeners();
+    //     }
+    //   },
+    //   cells: [
+    //     DataCell(Text(dessert.name)),
+    //     DataCell(Text('${dessert.calories}')),
+    //     DataCell(Text(dessert.fat.toStringAsFixed(1))),
+    //     DataCell(Text('${dessert.carbs}')),
+    //     DataCell(Text(dessert.protein.toStringAsFixed(1))),
+    //     DataCell(Text('${dessert.sodium}')),
+    //     DataCell(Text('${format.format(dessert.calcium / 100)}')),
+    //     DataCell(Text('${format.format(dessert.iron / 100)}')),
+    //   ],
+    // );
   }
 
   @override
@@ -473,6 +477,53 @@ class DessertDataSource extends DataTableSource {
     }
     _selectedCount = (checked ?? false) ? desserts.length : 0;
     notifyListeners();
+  }
+
+  @override
+  Future<List<DataRow>> getRows(int start, int end) {
+    return Future.delayed(Duration(seconds: 3)).then(
+      (_) {
+        if (start > 0) {
+          throw Exception(
+              'An error occured while loading data. This is wanted behaviour to test errorBuilder :)');
+        }
+
+        final format = NumberFormat.decimalPercentPattern(
+          locale: 'en',
+          decimalDigits: 0,
+        );
+
+        return List.generate(end - start, (index) => index + start)
+            .where((element) => element < desserts.length)
+            .map(
+              (index) => DataRow.byIndex(
+                index: index,
+                selected: desserts[index].selected,
+                onSelectChanged: (value) {
+                  if (desserts[index].selected != value) {
+                    _selectedCount += value! ? 1 : -1;
+                    assert(_selectedCount >= 0);
+                    desserts[index].selected = value;
+                    notifyListeners();
+                  }
+                },
+                cells: [
+                  DataCell(Text(desserts[index].name)),
+                  DataCell(Text('${desserts[index].calories}')),
+                  DataCell(Text(desserts[index].fat.toStringAsFixed(1))),
+                  DataCell(Text('${desserts[index].carbs}')),
+                  DataCell(Text(desserts[index].protein.toStringAsFixed(1))),
+                  DataCell(Text('${desserts[index].sodium}')),
+                  DataCell(
+                      Text('${format.format(desserts[index].calcium / 100)}')),
+                  DataCell(
+                      Text('${format.format(desserts[index].iron / 100)}')),
+                ],
+              ),
+            )
+            .toList();
+      },
+    );
   }
 }
 

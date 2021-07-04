@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'async_paginated_data_table2.dart';
 import 'data_table2.dart';
 import 'data_table2_simple.dart';
 import 'isEmptyArg.dart';
@@ -55,6 +56,10 @@ Scaffold _getScaffold(BuildContext context, Widget body,
                 DropdownMenuItem(
                   child: Text('PaginatedDataTable2'),
                   value: '/paginated2',
+                ),
+                DropdownMenuItem(
+                  child: Text('AsyncPaginatedDataTable2'),
+                  value: '/asyncpaginated2',
                 ),
                 DropdownMenuItem(
                   child: Text('DataTable'),
@@ -133,6 +138,8 @@ class MyApp extends StatelessWidget {
             _getScaffold(context, DataTable2ScrollupDemo()),
         '/paginated2': (context) =>
             _getScaffold(context, PaginatedDataTable2Demo(), true),
+        '/asyncpaginated2': (context) =>
+            _getScaffold(context, AsyncPaginatedDataTable2Demo(), true),
         '/datatable': (context) => _getScaffold(context, DataTableDemo()),
         '/paginated': (context) =>
             _getScaffold(context, PaginatedDataTableDemo()),
