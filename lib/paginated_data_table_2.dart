@@ -60,6 +60,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.scrollController,
     this.empty,
     this.border,
+    this.autoRowsToHeight = false,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
   })  : assert(actions == null || (header != null)),
@@ -224,6 +225,10 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// themes and [dividerThickness] property
   final TableBorder? border;
 
+  // TODO: Add test
+  ///If true rows per page is set to fill available height so that no scroll bar is ever displayed
+  final bool autoRowsToHeight;
+
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
   final Widget? empty;
@@ -253,6 +258,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   late bool _rowCountApproximate;
   int _selectedRowCount = 0;
   final Map<int, DataRow?> _rows = <int, DataRow?>{};
+  int effectiveRowsPerPage = -1;
 
   @override
   void initState() {
@@ -261,6 +267,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
         widget.initialFirstRowIndex ??
         0;
     widget.source.addListener(_handleDataSourceChanged);
+    effectiveRowsPerPage = widget.rowsPerPage;
     _handleDataSourceChanged();
   }
 
@@ -293,7 +300,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   void pageTo(int rowIndex) {
     final int oldFirstRowIndex = _firstRowIndex;
     setState(() {
-      final int rowsPerPage = widget.rowsPerPage;
+      final int rowsPerPage = effectiveRowsPerPage;
       _firstRowIndex = (rowIndex ~/ rowsPerPage) * rowsPerPage;
     });
     if ((widget.onPageChanged != null) && (oldFirstRowIndex != _firstRowIndex))
@@ -358,138 +365,155 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   }
 
   void _handlePrevious() {
-    pageTo(math.max(_firstRowIndex - widget.rowsPerPage, 0));
+    pageTo(math.max(_firstRowIndex - effectiveRowsPerPage, 0));
   }
 
   void _handleNext() {
-    pageTo(_firstRowIndex + widget.rowsPerPage);
+    pageTo(_firstRowIndex + effectiveRowsPerPage);
   }
 
   void _handleLast() {
-    pageTo(((_rowCount - 1) / widget.rowsPerPage).floor() * widget.rowsPerPage);
+    pageTo(((_rowCount - 1) / effectiveRowsPerPage).floor() *
+        effectiveRowsPerPage);
   }
 
   bool _isNextPageUnavailable() =>
       !_rowCountApproximate &&
-      (_firstRowIndex + widget.rowsPerPage >= _rowCount);
+      (_firstRowIndex + effectiveRowsPerPage >= _rowCount);
 
   final GlobalKey _tableKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     // TODO(ianh): This whole build function doesn't handle RTL yet.
-    assert(debugCheckHasMaterialLocalizations(context));
-    final ThemeData themeData = Theme.of(context);
-    final MaterialLocalizations localizations =
-        MaterialLocalizations.of(context);
-    // HEADER
-    final List<Widget> headerWidgets = <Widget>[];
-    double startPadding = widget.horizontalMargin;
-    if (_selectedRowCount == 0 && widget.header != null) {
-      headerWidgets.add(Expanded(child: widget.header!));
-      if (widget.header is ButtonBar) {
-        // We adjust the padding when a button bar is present, because the
-        // ButtonBar introduces 2 pixels of outside padding, plus 2 pixels
-        // around each button on each side, and the button itself will have 8
-        // pixels internally on each side, yet we want the left edge of the
-        // inside of the button to line up with the 24.0 left inset.
-        startPadding = 12.0;
-      }
-    } else if (widget.header != null) {
-      headerWidgets.add(Expanded(
-        child: Text(localizations.selectedRowCountTitle(_selectedRowCount)),
-      ));
-    }
-    if (widget.actions != null) {
-      headerWidgets.addAll(widget.actions!.map<Widget>((Widget action) {
-        return Padding(
-          // 8.0 is the default padding of an icon button
-          padding: const EdgeInsetsDirectional.only(start: 24.0 - 8.0 * 2.0),
-          child: action,
-        );
-      }).toList());
-    }
-
-    // FOOTER
-    final TextStyle? footerTextStyle = themeData.textTheme.caption;
-    final List<Widget> footerWidgets = <Widget>[];
-    if (widget.onRowsPerPageChanged != null) {
-      final List<Widget> availableRowsPerPage = widget.availableRowsPerPage
-          .where(
-              (int value) => value <= _rowCount || value == widget.rowsPerPage)
-          .map<DropdownMenuItem<int>>((int value) {
-        return DropdownMenuItem<int>(
-          value: value,
-          child: Text('$value'),
-        );
-      }).toList();
-      footerWidgets.addAll(<Widget>[
-        Container(
-            width:
-                14.0), // to match trailing padding in case we overflow and end up scrolling
-        Text(localizations.rowsPerPageTitle),
-        ConstrainedBox(
-          constraints: const BoxConstraints(
-              minWidth: 64.0), // 40.0 for the text, 24.0 for the icon
-          child: Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<int>(
-                items: availableRowsPerPage.cast<DropdownMenuItem<int>>(),
-                value: widget.rowsPerPage,
-                onChanged: widget.onRowsPerPageChanged,
-                style: footerTextStyle,
-                iconSize: 24.0,
-              ),
-            ),
-          ),
-        ),
-      ]);
-    }
-    footerWidgets.addAll(<Widget>[
-      Container(width: 32.0),
-      Text(
-        localizations.pageRowsInfoTitle(
-          _firstRowIndex + 1,
-          _firstRowIndex + widget.rowsPerPage,
-          _rowCount,
-          _rowCountApproximate,
-        ),
-      ),
-      Container(width: 32.0),
-      if (widget.showFirstLastButtons)
-        IconButton(
-          icon: const Icon(Icons.skip_previous),
-          padding: EdgeInsets.zero,
-          tooltip: localizations.firstPageTooltip,
-          onPressed: _firstRowIndex <= 0 ? null : _handleFirst,
-        ),
-      IconButton(
-        icon: const Icon(Icons.chevron_left),
-        padding: EdgeInsets.zero,
-        tooltip: localizations.previousPageTooltip,
-        onPressed: _firstRowIndex <= 0 ? null : _handlePrevious,
-      ),
-      Container(width: 24.0),
-      IconButton(
-        icon: const Icon(Icons.chevron_right),
-        padding: EdgeInsets.zero,
-        tooltip: localizations.nextPageTooltip,
-        onPressed: _isNextPageUnavailable() ? null : _handleNext,
-      ),
-      if (widget.showFirstLastButtons)
-        IconButton(
-          icon: const Icon(Icons.skip_next),
-          padding: EdgeInsets.zero,
-          tooltip: localizations.lastPageTooltip,
-          onPressed: _isNextPageUnavailable() ? null : _handleLast,
-        ),
-      Container(width: 14.0),
-    ]);
-
-    // CARD
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
+        if (widget.autoRowsToHeight) {
+          effectiveRowsPerPage = math.max(
+              ((constraints.maxHeight -
+                          widget.headingRowHeight -
+                          72 //header
+                          -
+                          72 // footer
+                      ) /
+                      widget.dataRowHeight)
+                  .round(),
+              1);
+        }
+        assert(debugCheckHasMaterialLocalizations(context));
+        final ThemeData themeData = Theme.of(context);
+        final MaterialLocalizations localizations =
+            MaterialLocalizations.of(context);
+        // HEADER
+        final List<Widget> headerWidgets = <Widget>[];
+        double startPadding = widget.horizontalMargin;
+        if (_selectedRowCount == 0 && widget.header != null) {
+          headerWidgets.add(Expanded(child: widget.header!));
+          if (widget.header is ButtonBar) {
+            // We adjust the padding when a button bar is present, because the
+            // ButtonBar introduces 2 pixels of outside padding, plus 2 pixels
+            // around each button on each side, and the button itself will have 8
+            // pixels internally on each side, yet we want the left edge of the
+            // inside of the button to line up with the 24.0 left inset.
+            startPadding = 12.0;
+          }
+        } else if (widget.header != null) {
+          headerWidgets.add(Expanded(
+            child: Text(localizations.selectedRowCountTitle(_selectedRowCount)),
+          ));
+        }
+        if (widget.actions != null) {
+          headerWidgets.addAll(widget.actions!.map<Widget>((Widget action) {
+            return Padding(
+              // 8.0 is the default padding of an icon button
+              padding:
+                  const EdgeInsetsDirectional.only(start: 24.0 - 8.0 * 2.0),
+              child: action,
+            );
+          }).toList());
+        }
+
+        // FOOTER
+        final TextStyle? footerTextStyle = themeData.textTheme.caption;
+        final List<Widget> footerWidgets = <Widget>[];
+        if (widget.onRowsPerPageChanged != null) {
+          final List<Widget> availableRowsPerPage = widget.availableRowsPerPage
+              .where((int value) =>
+                  value <= _rowCount || value == effectiveRowsPerPage)
+              .map<DropdownMenuItem<int>>((int value) {
+            return DropdownMenuItem<int>(
+              value: value,
+              child: Text('$value'),
+            );
+          }).toList();
+          if (!widget.autoRowsToHeight) {
+            footerWidgets.addAll(<Widget>[
+              Container(
+                  width:
+                      14.0), // to match trailing padding in case we overflow and end up scrolling
+              Text(localizations.rowsPerPageTitle),
+              ConstrainedBox(
+                constraints: const BoxConstraints(
+                    minWidth: 64.0), // 40.0 for the text, 24.0 for the icon
+                child: Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<int>(
+                      items: availableRowsPerPage.cast<DropdownMenuItem<int>>(),
+                      value: effectiveRowsPerPage,
+                      onChanged: widget.onRowsPerPageChanged,
+                      style: footerTextStyle,
+                      iconSize: 24.0,
+                    ),
+                  ),
+                ),
+              ),
+            ]);
+          }
+        }
+        footerWidgets.addAll(<Widget>[
+          Container(width: 32.0),
+          Text(
+            localizations.pageRowsInfoTitle(
+              _firstRowIndex + 1,
+              _firstRowIndex + effectiveRowsPerPage,
+              _rowCount,
+              _rowCountApproximate,
+            ),
+          ),
+          Container(width: 32.0),
+          if (widget.showFirstLastButtons)
+            IconButton(
+              icon: const Icon(Icons.skip_previous),
+              padding: EdgeInsets.zero,
+              tooltip: localizations.firstPageTooltip,
+              onPressed: _firstRowIndex <= 0 ? null : _handleFirst,
+            ),
+          IconButton(
+            icon: const Icon(Icons.chevron_left),
+            padding: EdgeInsets.zero,
+            tooltip: localizations.previousPageTooltip,
+            onPressed: _firstRowIndex <= 0 ? null : _handlePrevious,
+          ),
+          Container(width: 24.0),
+          IconButton(
+            icon: const Icon(Icons.chevron_right),
+            padding: EdgeInsets.zero,
+            tooltip: localizations.nextPageTooltip,
+            onPressed: _isNextPageUnavailable() ? null : _handleNext,
+          ),
+          if (widget.showFirstLastButtons)
+            IconButton(
+              icon: const Icon(Icons.skip_next),
+              padding: EdgeInsets.zero,
+              tooltip: localizations.lastPageTooltip,
+              onPressed: _isNextPageUnavailable() ? null : _handleLast,
+            ),
+          Container(width: 14.0),
+        ]);
+
+        // CARD
+
         Widget t = Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -544,7 +568,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                   columnSpacing: widget.columnSpacing,
                   showCheckboxColumn: widget.showCheckboxColumn,
                   showBottomBorder: true,
-                  rows: _getRows(_firstRowIndex, widget.rowsPerPage),
+                  rows: _getRows(_firstRowIndex, effectiveRowsPerPage),
                   minWidth: widget.minWidth,
                   scrollController: widget.scrollController,
                   empty: widget.empty,
