@@ -404,199 +404,218 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
         final ThemeData themeData = Theme.of(context);
         final MaterialLocalizations localizations =
             MaterialLocalizations.of(context);
-        // HEADER
-        final List<Widget> headerWidgets = <Widget>[];
-        double startPadding = widget.horizontalMargin;
-        if (_selectedRowCount == 0 && widget.header != null) {
-          headerWidgets.add(Expanded(child: widget.header!));
-          if (widget.header is ButtonBar) {
-            // We adjust the padding when a button bar is present, because the
-            // ButtonBar introduces 2 pixels of outside padding, plus 2 pixels
-            // around each button on each side, and the button itself will have 8
-            // pixels internally on each side, yet we want the left edge of the
-            // inside of the button to line up with the 24.0 left inset.
-            startPadding = 12.0;
-          }
-        } else if (widget.header != null) {
-          headerWidgets.add(Expanded(
-            child: Text(localizations.selectedRowCountTitle(_selectedRowCount)),
-          ));
-        }
-        if (widget.actions != null) {
-          headerWidgets.addAll(widget.actions!.map<Widget>((Widget action) {
-            return Padding(
-              // 8.0 is the default padding of an icon button
-              padding:
-                  const EdgeInsetsDirectional.only(start: 24.0 - 8.0 * 2.0),
-              child: action,
-            );
-          }).toList());
-        }
 
-        // FOOTER
-        final TextStyle? footerTextStyle = themeData.textTheme.caption;
-        final List<Widget> footerWidgets = <Widget>[];
-        if (widget.onRowsPerPageChanged != null) {
-          final List<Widget> availableRowsPerPage = widget.availableRowsPerPage
-              .where((int value) =>
-                  value <= _rowCount || value == effectiveRowsPerPage)
-              .map<DropdownMenuItem<int>>((int value) {
-            return DropdownMenuItem<int>(
-              value: value,
-              child: Text('$value'),
-            );
-          }).toList();
-          if (!widget.autoRowsToHeight) {
-            footerWidgets.addAll(<Widget>[
-              Container(
-                  width:
-                      14.0), // to match trailing padding in case we overflow and end up scrolling
-              Text(localizations.rowsPerPageTitle),
-              ConstrainedBox(
-                constraints: const BoxConstraints(
-                    minWidth: 64.0), // 40.0 for the text, 24.0 for the icon
-                child: Align(
-                  alignment: AlignmentDirectional.centerEnd,
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<int>(
-                      items: availableRowsPerPage.cast<DropdownMenuItem<int>>(),
-                      value: effectiveRowsPerPage,
-                      onChanged: widget.onRowsPerPageChanged,
-                      style: footerTextStyle,
-                      iconSize: 24.0,
+        double startPadding = widget.horizontalMargin;
+
+        bool isHeaderPresent =
+            (_selectedRowCount == 0 && widget.header != null) ||
+                widget.actions != null;
+
+        Widget getHeader() {
+          final List<Widget> headerWidgets = <Widget>[];
+          if (_selectedRowCount == 0 && widget.header != null) {
+            headerWidgets.add(Expanded(child: widget.header!));
+            if (widget.header is ButtonBar) {
+              // We adjust the padding when a button bar is present, because the
+              // ButtonBar introduces 2 pixels of outside padding, plus 2 pixels
+              // around each button on each side, and the button itself will have 8
+              // pixels internally on each side, yet we want the left edge of the
+              // inside of the button to line up with the 24.0 left inset.
+              startPadding = 12.0;
+            }
+          } else if (widget.header != null) {
+            headerWidgets.add(Expanded(
+              child:
+                  Text(localizations.selectedRowCountTitle(_selectedRowCount)),
+            ));
+          }
+          if (widget.actions != null) {
+            headerWidgets.addAll(widget.actions!.map<Widget>((Widget action) {
+              return Padding(
+                // 8.0 is the default padding of an icon button
+                padding:
+                    const EdgeInsetsDirectional.only(start: 24.0 - 8.0 * 2.0),
+                child: action,
+              );
+            }).toList());
+          }
+
+          return Semantics(
+            container: true,
+            child: DefaultTextStyle(
+              // These typographic styles aren't quite the regular ones. We pick the closest ones from the regular
+              // list and then tweak them appropriately.
+              // See https://material.io/design/components/data-tables.html#tables-within-cards
+              style: _selectedRowCount > 0
+                  ? themeData.textTheme.subtitle1!
+                      .copyWith(color: themeData.accentColor)
+                  : themeData.textTheme.headline6!
+                      .copyWith(fontWeight: FontWeight.w400),
+              child: IconTheme.merge(
+                data: const IconThemeData(opacity: 0.54),
+                child: Ink(
+                  height: 64.0,
+                  color: _selectedRowCount > 0
+                      ? themeData.secondaryHeaderColor
+                      : null,
+                  child: Padding(
+                    padding: EdgeInsetsDirectional.only(
+                        start: startPadding, end: 14.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: headerWidgets,
                     ),
                   ),
                 ),
               ),
-            ]);
-          }
+            ),
+          );
         }
-        footerWidgets.addAll(<Widget>[
-          Container(width: 32.0),
-          Text(
-            localizations.pageRowsInfoTitle(
-              _firstRowIndex + 1,
-              _firstRowIndex + effectiveRowsPerPage,
-              _rowCount,
-              _rowCountApproximate,
+
+        Widget getTable() {
+          return Flexible(
+            fit: widget.fit,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minWidth: constraints.minWidth),
+              child: DataTable2(
+                key: _tableKey,
+                columns: widget.columns,
+                sortColumnIndex: widget.sortColumnIndex,
+                sortAscending: widget.sortAscending,
+                onSelectAll: widget.onSelectAll,
+                // Make sure no decoration is set on the DataTable
+                // from the theme, as its already wrapped in a Card.
+                decoration: const BoxDecoration(),
+                dataRowHeight: widget.dataRowHeight,
+                headingRowHeight: widget.headingRowHeight,
+                horizontalMargin: widget.horizontalMargin,
+                checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
+                columnSpacing: widget.columnSpacing,
+                showCheckboxColumn: widget.showCheckboxColumn,
+                showBottomBorder: true,
+                rows: _getRows(_firstRowIndex, effectiveRowsPerPage),
+                minWidth: widget.minWidth,
+                scrollController: widget.scrollController,
+                empty: widget.empty,
+                border: widget.border,
+                smRatio: widget.smRatio,
+                lmRatio: widget.lmRatio,
+              ),
             ),
-          ),
-          Container(width: 32.0),
-          if (widget.showFirstLastButtons)
+          );
+        }
+
+        Widget getFooter() {
+          final TextStyle? footerTextStyle = themeData.textTheme.caption;
+          final List<Widget> footerWidgets = <Widget>[];
+          if (widget.onRowsPerPageChanged != null) {
+            final List<Widget> availableRowsPerPage = widget
+                .availableRowsPerPage
+                .where((int value) =>
+                    value <= _rowCount || value == effectiveRowsPerPage)
+                .map<DropdownMenuItem<int>>((int value) {
+              return DropdownMenuItem<int>(
+                value: value,
+                child: Text('$value'),
+              );
+            }).toList();
+            if (!widget.autoRowsToHeight) {
+              footerWidgets.addAll(<Widget>[
+                Container(
+                    width:
+                        14.0), // to match trailing padding in case we overflow and end up scrolling
+                Text(localizations.rowsPerPageTitle),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(
+                      minWidth: 64.0), // 40.0 for the text, 24.0 for the icon
+                  child: Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<int>(
+                        items:
+                            availableRowsPerPage.cast<DropdownMenuItem<int>>(),
+                        value: effectiveRowsPerPage,
+                        onChanged: widget.onRowsPerPageChanged,
+                        style: footerTextStyle,
+                        iconSize: 24.0,
+                      ),
+                    ),
+                  ),
+                ),
+              ]);
+            }
+          }
+
+          footerWidgets.addAll(<Widget>[
+            Container(width: 32.0),
+            Text(
+              localizations.pageRowsInfoTitle(
+                _firstRowIndex + 1,
+                _firstRowIndex + effectiveRowsPerPage,
+                _rowCount,
+                _rowCountApproximate,
+              ),
+            ),
+            Container(width: 32.0),
+            if (widget.showFirstLastButtons)
+              IconButton(
+                icon: const Icon(Icons.skip_previous),
+                padding: EdgeInsets.zero,
+                tooltip: localizations.firstPageTooltip,
+                onPressed: _firstRowIndex <= 0 ? null : _handleFirst,
+              ),
             IconButton(
-              icon: const Icon(Icons.skip_previous),
+              icon: const Icon(Icons.chevron_left),
               padding: EdgeInsets.zero,
-              tooltip: localizations.firstPageTooltip,
-              onPressed: _firstRowIndex <= 0 ? null : _handleFirst,
+              tooltip: localizations.previousPageTooltip,
+              onPressed: _firstRowIndex <= 0 ? null : _handlePrevious,
             ),
-          IconButton(
-            icon: const Icon(Icons.chevron_left),
-            padding: EdgeInsets.zero,
-            tooltip: localizations.previousPageTooltip,
-            onPressed: _firstRowIndex <= 0 ? null : _handlePrevious,
-          ),
-          Container(width: 24.0),
-          IconButton(
-            icon: const Icon(Icons.chevron_right),
-            padding: EdgeInsets.zero,
-            tooltip: localizations.nextPageTooltip,
-            onPressed: _isNextPageUnavailable() ? null : _handleNext,
-          ),
-          if (widget.showFirstLastButtons)
+            Container(width: 24.0),
             IconButton(
-              icon: const Icon(Icons.skip_next),
+              icon: const Icon(Icons.chevron_right),
               padding: EdgeInsets.zero,
-              tooltip: localizations.lastPageTooltip,
-              onPressed: _isNextPageUnavailable() ? null : _handleLast,
+              tooltip: localizations.nextPageTooltip,
+              onPressed: _isNextPageUnavailable() ? null : _handleNext,
             ),
-          Container(width: 14.0),
-        ]);
+            if (widget.showFirstLastButtons)
+              IconButton(
+                icon: const Icon(Icons.skip_next),
+                padding: EdgeInsets.zero,
+                tooltip: localizations.lastPageTooltip,
+                onPressed: _isNextPageUnavailable() ? null : _handleLast,
+              ),
+            Container(width: 14.0),
+          ]);
+
+          return DefaultTextStyle(
+            style: footerTextStyle!,
+            child: IconTheme.merge(
+              data: const IconThemeData(opacity: 0.54),
+              child: SizedBox(
+                // TODO(bkonyi): this won't handle text zoom correctly,
+                //  https://github.com/flutter/flutter/issues/48522
+                height: 56.0,
+                child: SingleChildScrollView(
+                  dragStartBehavior: widget.dragStartBehavior,
+                  scrollDirection: Axis.horizontal,
+                  reverse: true,
+                  child: Row(
+                    children: footerWidgets,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
 
         // CARD
 
         Widget t = Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            if (headerWidgets.isNotEmpty)
-              Semantics(
-                container: true,
-                child: DefaultTextStyle(
-                  // These typographic styles aren't quite the regular ones. We pick the closest ones from the regular
-                  // list and then tweak them appropriately.
-                  // See https://material.io/design/components/data-tables.html#tables-within-cards
-                  style: _selectedRowCount > 0
-                      ? themeData.textTheme.subtitle1!
-                          .copyWith(color: themeData.accentColor)
-                      : themeData.textTheme.headline6!
-                          .copyWith(fontWeight: FontWeight.w400),
-                  child: IconTheme.merge(
-                    data: const IconThemeData(opacity: 0.54),
-                    child: Ink(
-                      height: 64.0,
-                      color: _selectedRowCount > 0
-                          ? themeData.secondaryHeaderColor
-                          : null,
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.only(
-                            start: startPadding, end: 14.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: headerWidgets,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            Flexible(
-              fit: widget.fit,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minWidth: constraints.minWidth),
-                child: DataTable2(
-                  key: _tableKey,
-                  columns: widget.columns,
-                  sortColumnIndex: widget.sortColumnIndex,
-                  sortAscending: widget.sortAscending,
-                  onSelectAll: widget.onSelectAll,
-                  // Make sure no decoration is set on the DataTable
-                  // from the theme, as its already wrapped in a Card.
-                  decoration: const BoxDecoration(),
-                  dataRowHeight: widget.dataRowHeight,
-                  headingRowHeight: widget.headingRowHeight,
-                  horizontalMargin: widget.horizontalMargin,
-                  checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
-                  columnSpacing: widget.columnSpacing,
-                  showCheckboxColumn: widget.showCheckboxColumn,
-                  showBottomBorder: true,
-                  rows: _getRows(_firstRowIndex, effectiveRowsPerPage),
-                  minWidth: widget.minWidth,
-                  scrollController: widget.scrollController,
-                  empty: widget.empty,
-                  border: widget.border,
-                  smRatio: widget.smRatio,
-                  lmRatio: widget.lmRatio,
-                ),
-              ),
-            ),
-            DefaultTextStyle(
-              style: footerTextStyle!,
-              child: IconTheme.merge(
-                data: const IconThemeData(opacity: 0.54),
-                child: SizedBox(
-                  // TODO(bkonyi): this won't handle text zoom correctly,
-                  //  https://github.com/flutter/flutter/issues/48522
-                  height: 56.0,
-                  child: SingleChildScrollView(
-                    dragStartBehavior: widget.dragStartBehavior,
-                    scrollDirection: Axis.horizontal,
-                    reverse: true,
-                    child: Row(
-                      children: footerWidgets,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            if (isHeaderPresent) getHeader(),
+            getTable(),
+            getFooter(),
           ],
         );
 
