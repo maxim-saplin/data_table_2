@@ -248,6 +248,7 @@ class PaginatedDataTable2 extends StatefulWidget {
 ///
 /// The table can be programmatically paged using the [pageTo] method.
 class PaginatedDataTable2State extends State<PaginatedDataTable2> {
+  // !remove
   late int _firstRowIndex;
   late int _rowCount;
   late bool _rowCountApproximate;
@@ -358,20 +359,23 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   }
 
   void _handlePrevious() {
-    pageTo(math.max(_firstRowIndex - widget.rowsPerPage, 0));
+    // !remove _firstRowIndex
+    pageTo(math.max(widget.initialFirstRowIndex! - widget.rowsPerPage, 0));
   }
 
   void _handleNext() {
-    pageTo(_firstRowIndex + widget.rowsPerPage);
+    // !remove _firstRowIndex
+    pageTo(widget.initialFirstRowIndex! + widget.rowsPerPage);
   }
 
   void _handleLast() {
+    // !remove _firstRowIndex
     pageTo(((_rowCount - 1) / widget.rowsPerPage).floor() * widget.rowsPerPage);
   }
 
   bool _isNextPageUnavailable() =>
       !_rowCountApproximate &&
-      (_firstRowIndex + widget.rowsPerPage >= _rowCount);
+      (widget.initialFirstRowIndex! + widget.rowsPerPage >= _rowCount);
 
   final GlobalKey _tableKey = GlobalKey();
 
@@ -450,8 +454,8 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       Container(width: 32.0),
       Text(
         localizations.pageRowsInfoTitle(
-          _firstRowIndex + 1,
-          _firstRowIndex + widget.rowsPerPage,
+          widget.initialFirstRowIndex! + 1,
+          widget.initialFirstRowIndex! + widget.rowsPerPage,
           _rowCount,
           _rowCountApproximate,
         ),
@@ -462,13 +466,13 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           icon: const Icon(Icons.skip_previous),
           padding: EdgeInsets.zero,
           tooltip: localizations.firstPageTooltip,
-          onPressed: _firstRowIndex <= 0 ? null : _handleFirst,
+          onPressed: widget.initialFirstRowIndex! <= 0 ? null : _handleFirst,
         ),
       IconButton(
         icon: const Icon(Icons.chevron_left),
         padding: EdgeInsets.zero,
         tooltip: localizations.previousPageTooltip,
-        onPressed: _firstRowIndex <= 0 ? null : _handlePrevious,
+        onPressed: widget.initialFirstRowIndex! <= 0 ? null : _handlePrevious,
       ),
       Container(width: 24.0),
       IconButton(
@@ -544,7 +548,8 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                   columnSpacing: widget.columnSpacing,
                   showCheckboxColumn: widget.showCheckboxColumn,
                   showBottomBorder: true,
-                  rows: _getRows(_firstRowIndex, widget.rowsPerPage),
+                  rows: _getRows(
+                      widget.initialFirstRowIndex!, widget.rowsPerPage),
                   minWidth: widget.minWidth,
                   scrollController: widget.scrollController,
                   empty: widget.empty,
