@@ -3,6 +3,12 @@ import 'package:data_table_2/paginated_data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+// Copyright 2014 The Flutter Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+// Copyright 2021 Maxim Saplin - changes and modifications to original Flutter implementation of DataTable
+
 class Dessert {
   Dessert(this.name, this.calories, this.fat, this.carbs, this.protein,
       this.sodium, this.calcium, this.iron);
@@ -49,6 +55,24 @@ final testColumns = <DataColumn2>[
   ),
 ];
 
+final smlColumns = <DataColumn2>[
+  const DataColumn2(label: Text('Name'), tooltip: 'Name', size: ColumnSize.S),
+  DataColumn2(
+    label: const Text('Calories'),
+    tooltip: 'Calories',
+    size: ColumnSize.M,
+    numeric: true,
+    onSort: (int columnIndex, bool ascending) {},
+  ),
+  DataColumn2(
+    label: const Text('Carbs'),
+    tooltip: 'Carbs',
+    size: ColumnSize.L,
+    numeric: true,
+    onSort: (int columnIndex, bool ascending) {},
+  ),
+];
+
 final testRows = kDesserts.map<DataRow2>((Dessert dessert) {
   return DataRow2(
     key: ValueKey<String>(dessert.name),
@@ -71,23 +95,33 @@ final testRows = kDesserts.map<DataRow2>((Dessert dessert) {
   );
 }).toList();
 
-DataTable2 buildDefaultTable(
-    {int? sortColumnIndex, bool sortAscending = true}) {
+DataTable2 buildTable(
+    {int? sortColumnIndex,
+    bool sortAscending = true,
+    bool overrideSizes = false,
+    List<DataColumn2>? columns}) {
   return DataTable2(
+    horizontalMargin: 24,
+    showCheckboxColumn: true,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
     onSelectAll: (bool? value) {},
-    columns: testColumns,
+    columns: columns ?? testColumns,
+    smRatio: overrideSizes ? 0.5 : 0.67,
+    lmRatio: overrideSizes ? 1.5 : 1.2,
     rows: testRows,
   );
 }
 
 class TestDataSource extends DataTableSource {
-  TestDataSource({
-    this.allowSelection = false,
-  });
+  TestDataSource(
+      {this.allowSelection = false,
+      this.showPage = true,
+      this.showGeneration = true});
 
   final bool allowSelection;
+  final bool showPage;
+  final bool showGeneration;
 
   int get generation => _generation;
   int _generation = 0;
@@ -111,13 +145,14 @@ class TestDataSource extends DataTableSource {
   @override
   DataRow getRow(int index) {
     final Dessert dessert = kDesserts[index % kDesserts.length];
+    final int page = index ~/ kDesserts.length;
     return DataRow.byIndex(
       index: index,
       selected: _selectedRows.contains(index),
       cells: <DataCell>[
-        DataCell(Text(dessert.name)),
+        DataCell(Text(showPage ? '${dessert.name} ($page)' : dessert.name)),
         DataCell(Text('${dessert.calories}')),
-        DataCell(Text('${dessert.carbs}')),
+        DataCell(Text(showGeneration ? '$generation' : '${dessert.carbs}')),
       ],
       onSelectChanged: allowSelection
           ? (bool? selected) => _handleSelected(index, selected)
@@ -135,18 +170,33 @@ class TestDataSource extends DataTableSource {
   int get selectedRowCount => _selectedRows.length;
 }
 
-PaginatedDataTable2 buildDefaultPaginatedTable(
-    {int? sortColumnIndex, bool sortAscending = true}) {
+PaginatedDataTable2 buildPaginatedTable(
+    {int? sortColumnIndex,
+    bool sortAscending = true,
+    bool showPage = true,
+    bool showGeneration = true,
+    bool overrideSizes = false,
+    bool autoRowsToHeight = false,
+    bool showHeader = false,
+    bool wrapInCard = false,
+    List<DataColumn2>? columns}) {
   return PaginatedDataTable2(
     horizontalMargin: 24,
     showCheckboxColumn: true,
+    wrapInCard: wrapInCard,
+    header: showHeader ? Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
     onSelectAll: (bool? value) {},
-    columns: testColumns,
-    source: TestDataSource(),
+    columns: columns ?? testColumns,
     showFirstLastButtons: true,
-    rowsPerPage: 2,
+    smRatio: overrideSizes ? 0.5 : 0.67,
+    lmRatio: overrideSizes ? 1.5 : 1.2,
+    autoRowsToHeight: autoRowsToHeight,
+    source: TestDataSource(
+        allowSelection: true,
+        showPage: showPage,
+        showGeneration: showGeneration),
   );
 }
 
@@ -159,7 +209,10 @@ class DataTable2Tests extends StatelessWidget {
     //setColumnSizeRatios(1, 2);
     return Padding(
         padding: const EdgeInsets.all(16),
-        child: buildDefaultPaginatedTable() //buildDefaultTable(),
+        child: buildPaginatedTable(
+            showPage: false,
+            showGeneration: false,
+            autoRowsToHeight: false) //buildDefaultTable(),
         );
   }
 }

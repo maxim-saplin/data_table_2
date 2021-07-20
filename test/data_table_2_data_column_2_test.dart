@@ -14,7 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vector_math/vector_math_64.dart' show Matrix3;
 
 import 'mock_canvas.dart';
-import 'data_table_2_test_utils.dart';
+import 'test_utils.dart';
 
 void main() {
   testWidgets('DataTable2 control test', (WidgetTester tester) async {

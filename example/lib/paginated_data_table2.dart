@@ -62,8 +62,8 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
       columnSpacing: 0,
       wrapInCard: false,
       header: Text('PaginatedDataTable2'),
-      //rowsPerPage: _rowsPerPage,
-      autoRowsToHeight: true,
+      rowsPerPage: _rowsPerPage,
+      //autoRowsToHeight: true,
       minWidth: 800,
       fit: FlexFit.tight,
       border: TableBorder(
