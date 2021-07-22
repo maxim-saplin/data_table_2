@@ -7,6 +7,12 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:data_table_2/paginated_data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+Future wrapWidgetSetSurf(WidgetTester tester, Widget widget) async {
+  await tester.binding.setSurfaceSize(Size(1000, 200));
+  return tester.pumpWidget(MaterialApp(home: Material(child: widget)));
+}
 
 class Dessert {
   Dessert(this.name, this.calories, this.fat, this.carbs, this.protein,
@@ -99,6 +105,7 @@ DataTable2 buildTable(
     bool sortAscending = true,
     bool overrideSizes = false,
     double? minWidth,
+    ScrollController? scrollController,
     List<DataColumn2>? columns}) {
   return DataTable2(
     horizontalMargin: 24,
@@ -108,6 +115,7 @@ DataTable2 buildTable(
     minWidth: minWidth,
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
+    scrollController: scrollController,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     rows: testRows,
@@ -181,6 +189,7 @@ PaginatedDataTable2 buildPaginatedTable(
     bool showHeader = false,
     bool wrapInCard = false,
     bool showPageSizeSelector = false,
+    ScrollController? scrollController,
     double? minWidth,
     List<DataColumn2>? columns}) {
   return PaginatedDataTable2(
@@ -193,6 +202,7 @@ PaginatedDataTable2 buildPaginatedTable(
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
     showFirstLastButtons: true,
+    scrollController: scrollController,
     minWidth: minWidth,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,

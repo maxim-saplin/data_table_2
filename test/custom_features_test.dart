@@ -10,156 +10,146 @@ void main() {
   group('DataTable2', () {
     testWidgets('Default column size is applied to header cells',
         (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(child: buildTable()),
-      ));
+      await wrapWidgetSetSurf(tester, buildTable());
 
       await _defaultColumnSizeApplied(tester, true);
     });
 
     testWidgets('Default column size is applied to data cells',
         (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(child: buildTable()),
-      ));
+      await wrapWidgetSetSurf(tester, buildTable());
 
       await _defaultColumnSizeApplied(tester, false);
     });
 
     testWidgets('Default S, M, L column sizes are applied to header cells',
         (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(child: buildTable(columns: smlColumns)),
-      ));
+      await wrapWidgetSetSurf(tester, buildTable(columns: smlColumns));
 
       await _smlColumnSizeApplied(tester, true);
     });
 
     testWidgets('Default S, M, L column sizes are applied to data cells',
         (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(child: buildTable(columns: smlColumns)),
-      ));
+      await wrapWidgetSetSurf(tester, buildTable(columns: smlColumns));
 
       await _smlColumnSizeApplied(tester, false);
     });
 
     testWidgets('Overidden S, M, L column sizes are applied to header cells',
         (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-            child: buildTable(columns: smlColumns, overrideSizes: true)),
-      ));
+      await wrapWidgetSetSurf(
+          tester, buildTable(columns: smlColumns, overrideSizes: true));
 
       await _smlOverridenColumnSizeApplied(tester, true);
     });
 
     testWidgets('Overidden S, M, L column sizes are applied to data cells',
         (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-            child: buildTable(columns: smlColumns, overrideSizes: true)),
-      ));
+      await wrapWidgetSetSurf(
+          tester, buildTable(columns: smlColumns, overrideSizes: true));
 
       await _smlOverridenColumnSizeApplied(tester, false);
     });
 
     testWidgets('minWidth is respected', (WidgetTester tester) async {
+      await wrapWidgetSetSurf(tester, buildTable(minWidth: 350));
       await tester.binding.setSurfaceSize(Size(250, 500));
-      await tester.pumpWidget(MaterialApp(
-        home: Material(child: buildTable(minWidth: 350)),
-      ));
+      await tester.pumpAndSettle();
 
       var s1 = tester.getSize(find.byType(Column).last);
       print('${s1.width} ${s1.height} ');
 
       expect(s1.width > 349 && s1.width < 351, true);
     });
+
+    testWidgets('scrollController scrolls to bottom',
+        (WidgetTester tester) async {
+      var sc = ScrollController();
+      await wrapWidgetSetSurf(tester, buildTable(scrollController: sc));
+
+      expect(find.text('KitKat').hitTestable(), findsNothing);
+      sc.jumpTo(10000);
+      await tester.pumpAndSettle();
+      expect(find.text('KitKat').hitTestable(), findsOneWidget);
+    });
   });
 
   group('PaginatedDataTable2', () {
     testWidgets('Default column size is applied to header cells',
         (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-            child: buildPaginatedTable(showPage: false, showGeneration: false)),
-      ));
+      await wrapWidgetSetSurf(
+          tester, buildPaginatedTable(showPage: false, showGeneration: false));
 
       await _defaultColumnSizeApplied(tester, true);
     });
 
     testWidgets('Default column size is applied to data cells',
         (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-            child: buildPaginatedTable(showPage: false, showGeneration: false)),
-      ));
+      await wrapWidgetSetSurf(
+          tester, buildPaginatedTable(showPage: false, showGeneration: false));
 
       await _defaultColumnSizeApplied(tester, false);
     });
 
     testWidgets('Default S, M, L column sizes are applied to header cells',
         (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-            child: buildPaginatedTable(
-                showPage: false, showGeneration: false, columns: smlColumns)),
-      ));
+      await wrapWidgetSetSurf(
+          tester,
+          buildPaginatedTable(
+              showPage: false, showGeneration: false, columns: smlColumns));
 
       await _smlColumnSizeApplied(tester, true);
     });
 
     testWidgets('Default S, M, L column sizes are applied to data cells',
         (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-            child: buildPaginatedTable(
-                showPage: false, showGeneration: false, columns: smlColumns)),
-      ));
+      await wrapWidgetSetSurf(
+          tester,
+          buildPaginatedTable(
+              showPage: false, showGeneration: false, columns: smlColumns));
 
       await _smlColumnSizeApplied(tester, false);
     });
 
     testWidgets('Overidden S, M, L column sizes are applied to header cells',
         (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-            child: buildPaginatedTable(
-                showPage: false,
-                showGeneration: false,
-                columns: smlColumns,
-                overrideSizes: true)),
-      ));
+      await wrapWidgetSetSurf(
+          tester,
+          buildPaginatedTable(
+              showPage: false,
+              showGeneration: false,
+              columns: smlColumns,
+              overrideSizes: true));
 
       await _smlOverridenColumnSizeApplied(tester, true);
     });
 
     testWidgets('Overidden S, M, L column sizes are applied to data cells',
         (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-            child: buildPaginatedTable(
-                showPage: false,
-                showGeneration: false,
-                columns: smlColumns,
-                overrideSizes: true)),
-      ));
+      await wrapWidgetSetSurf(
+          tester,
+          buildPaginatedTable(
+              showPage: false,
+              showGeneration: false,
+              columns: smlColumns,
+              overrideSizes: true));
 
       await _smlOverridenColumnSizeApplied(tester, false);
     });
 
     testWidgets('autoRowsToHeight WITHOUT headers works fine',
         (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          buildPaginatedTable(
+              showPage: false,
+              showGeneration: false,
+              showHeader: false,
+              autoRowsToHeight: true));
       const height = 300.0;
       await tester.binding.setSurfaceSize(Size(1000, height));
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-            child: buildPaginatedTable(
-                showPage: false,
-                showGeneration: false,
-                showHeader: false,
-                autoRowsToHeight: true)),
-      ));
+      await tester.pumpAndSettle();
 
       var s1 = tester.getSize(find.byType(PaginatedDataTable2).first);
       print('${s1.width} ${s1.height} ');
@@ -180,16 +170,17 @@ void main() {
 
     testWidgets('autoRowsToHeight WITH headers works fine',
         (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          buildPaginatedTable(
+              showPage: false,
+              showGeneration: false,
+              showHeader: true,
+              autoRowsToHeight: true));
+
       const height = 300.0;
       await tester.binding.setSurfaceSize(Size(1000, height));
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-            child: buildPaginatedTable(
-                showPage: false,
-                showGeneration: false,
-                showHeader: true,
-                autoRowsToHeight: true)),
-      ));
+      await tester.pumpAndSettle();
 
       var s1 = tester.getSize(find.byType(PaginatedDataTable2).first);
       print('${s1.width} ${s1.height} ');
@@ -210,20 +201,21 @@ void main() {
 
     testWidgets('autoRowsToHeight WITH headers AND card works fine',
         (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          buildPaginatedTable(
+              showPage: false,
+              showGeneration: false,
+              showHeader: true,
+              wrapInCard: true,
+              autoRowsToHeight: true));
+
       const height = 300.0;
       await tester.binding.setSurfaceSize(Size(1000, height));
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-            child: buildPaginatedTable(
-                showPage: false,
-                showGeneration: false,
-                showHeader: true,
-                wrapInCard: true,
-                autoRowsToHeight: true)),
-      ));
 
       var s1 = tester.getSize(find.byType(PaginatedDataTable2).first);
       print('${s1.width} ${s1.height} ');
+      await tester.pumpAndSettle();
 
       expect(find.byType(Checkbox),
           findsNWidgets(((height - 64 - 56 - 56 - 8) / 48).floor() + 1));
@@ -255,17 +247,32 @@ void main() {
     });
 
     testWidgets('minWidth is respected', (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          buildPaginatedTable(
+              showPage: false, showGeneration: false, minWidth: 350));
+
       await tester.binding.setSurfaceSize(Size(200, 300));
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-            child: buildPaginatedTable(
-                showPage: false, showGeneration: false, minWidth: 350)),
-      ));
+      await tester.pumpAndSettle();
 
       var s1 = tester.getSize(find.byType(Column).last);
       print('${s1.width} ${s1.height} ');
 
       expect(s1.width > 349 && s1.width < 351, true);
+    });
+
+    testWidgets('scrollController scrolls to bottom',
+        (WidgetTester tester) async {
+      var sc = ScrollController();
+      await wrapWidgetSetSurf(
+          tester,
+          buildPaginatedTable(
+              scrollController: sc, showGeneration: false, showPage: false));
+
+      expect(find.text('KitKat').hitTestable(), findsNothing);
+      sc.jumpTo(10000);
+      await tester.pumpAndSettle();
+      expect(find.text('KitKat').hitTestable(), findsOneWidget);
     });
   });
 }
@@ -300,7 +307,6 @@ Tripple<Size> _getColumnSizes(WidgetTester tester, bool header) {
 }
 
 Future<void> _defaultColumnSizeApplied(WidgetTester tester, bool header) async {
-  await tester.binding.setSurfaceSize(Size(1000, 200));
   var s = _getColumnSizes(tester, header);
 
   // Firsrt column is half margin greater than the  second one.
@@ -312,7 +318,6 @@ Future<void> _defaultColumnSizeApplied(WidgetTester tester, bool header) async {
 }
 
 Future<void> _smlColumnSizeApplied(WidgetTester tester, bool header) async {
-  await tester.binding.setSurfaceSize(Size(1000, 200));
   var s = _getColumnSizes(tester, header);
 
   // Firsrt column is half margin greater than the  second one.
@@ -325,7 +330,6 @@ Future<void> _smlColumnSizeApplied(WidgetTester tester, bool header) async {
 
 Future<void> _smlOverridenColumnSizeApplied(
     WidgetTester tester, bool header) async {
-  await tester.binding.setSurfaceSize(Size(1000, 200));
   var s = _getColumnSizes(tester, header);
 
   // Firsrt column is half margin greater than the  second one.

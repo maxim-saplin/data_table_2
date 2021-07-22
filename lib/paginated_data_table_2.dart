@@ -241,7 +241,6 @@ class PaginatedDataTable2 extends StatefulWidget {
   final double lmRatio;
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
-  // TODO add test
   final ScrollController? scrollController;
 
   @override
