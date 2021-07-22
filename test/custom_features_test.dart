@@ -73,6 +73,15 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('KitKat').hitTestable(), findsOneWidget);
     });
+
+    testWidgets('empty widget is displayed when there\'s no data',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester, buildTable(empty: Text('No data'), noData: true));
+
+      expect(find.text('Name'), findsOneWidget);
+      expect(find.text('No data'), findsOneWidget);
+    });
   });
 
   group('PaginatedDataTable2', () {
@@ -274,17 +283,16 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('KitKat').hitTestable(), findsOneWidget);
     });
+
+    testWidgets('empty widget is displayed when there\'s no data',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester, buildPaginatedTable(empty: Text('No data'), noData: true));
+
+      expect(find.text('Name'), findsOneWidget);
+      expect(find.text('No data'), findsOneWidget);
+    });
   });
-}
-
-Finder findFirstContainerFor(String text) =>
-    find.widgetWithText(Container, text).first;
-
-class Tripple<T> {
-  Tripple(this.v1, this.v2, this.v3);
-  final T v1;
-  final T v2;
-  final T v3;
 }
 
 Tripple<Size> _getColumnSizes(WidgetTester tester, bool header) {

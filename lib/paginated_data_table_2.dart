@@ -56,7 +56,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.checkboxHorizontalMargin,
     this.wrapInCard = true,
     this.minWidth,
-    this.fit = FlexFit.loose,
+    this.fit = FlexFit.tight,
     this.scrollController,
     this.empty,
     this.border,
@@ -218,10 +218,10 @@ class PaginatedDataTable2 extends StatefulWidget {
   // TODO add test
   final FlexFit fit;
 
-  // TODO: Add test
   /// Set vertical and horizontal borders between cells, as well as outside borders around table.
   /// NOTE: setting this field will disable standard horizontal dividers which are controlled by
   /// themes and [dividerThickness] property
+  // TODO: Add test
   final TableBorder? border;
 
   ///If true rows per page is set to fill available height so that no scroll bar is ever displayed.

@@ -83,7 +83,7 @@ class DataRow2 extends DataRow {
             cells: cells);
 
   /// Row tap handler
-  // TODO add tests
+  // TODO: Add test
   final VoidCallback? onTap;
 
   /// Row right click handler
@@ -198,7 +198,6 @@ class DataTable2 extends DataTable {
 
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
-  // TODO: Add test
   final Widget? empty;
 
   /// Set vertical and horizontal borders between cells, as well as outside borders around table.

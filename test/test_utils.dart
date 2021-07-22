@@ -14,6 +14,16 @@ Future wrapWidgetSetSurf(WidgetTester tester, Widget widget) async {
   return tester.pumpWidget(MaterialApp(home: Material(child: widget)));
 }
 
+Finder findFirstContainerFor(String text) =>
+    find.widgetWithText(Container, text).first;
+
+class Tripple<T> {
+  Tripple(this.v1, this.v2, this.v3);
+  final T v1;
+  final T v2;
+  final T v3;
+}
+
 class Dessert {
   Dessert(this.name, this.calories, this.fat, this.carbs, this.protein,
       this.sodium, this.calcium, this.iron);
@@ -105,6 +115,8 @@ DataTable2 buildTable(
     bool sortAscending = true,
     bool overrideSizes = false,
     double? minWidth,
+    bool noData = false,
+    Widget? empty,
     ScrollController? scrollController,
     List<DataColumn2>? columns}) {
   return DataTable2(
@@ -113,12 +125,13 @@ DataTable2 buildTable(
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
     minWidth: minWidth,
+    empty: empty,
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
     scrollController: scrollController,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
-    rows: testRows,
+    rows: noData ? [] : testRows,
   );
 }
 
@@ -126,11 +139,13 @@ class TestDataSource extends DataTableSource {
   TestDataSource(
       {this.allowSelection = false,
       this.showPage = true,
-      this.showGeneration = true});
+      this.showGeneration = true,
+      this.noData = false});
 
   final bool allowSelection;
   final bool showPage;
   final bool showGeneration;
+  final bool noData;
 
   int get generation => _generation;
   int _generation = 0;
@@ -170,7 +185,7 @@ class TestDataSource extends DataTableSource {
   }
 
   @override
-  int get rowCount => 50 * kDesserts.length;
+  int get rowCount => noData ? 0 : 50 * kDesserts.length;
 
   @override
   bool get isRowCountApproximate => false;
@@ -189,6 +204,8 @@ PaginatedDataTable2 buildPaginatedTable(
     bool showHeader = false,
     bool wrapInCard = false,
     bool showPageSizeSelector = false,
+    bool noData = false,
+    Widget? empty,
     ScrollController? scrollController,
     double? minWidth,
     List<DataColumn2>? columns}) {
@@ -202,6 +219,7 @@ PaginatedDataTable2 buildPaginatedTable(
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
     showFirstLastButtons: true,
+    empty: empty,
     scrollController: scrollController,
     minWidth: minWidth,
     smRatio: overrideSizes ? 0.5 : 0.67,
@@ -211,6 +229,7 @@ PaginatedDataTable2 buildPaginatedTable(
     source: TestDataSource(
         allowSelection: true,
         showPage: showPage,
-        showGeneration: showGeneration),
+        showGeneration: showGeneration,
+        noData: noData),
   );
 }
