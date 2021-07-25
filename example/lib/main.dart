@@ -1,12 +1,13 @@
 import 'package:example/data_table2_scrollup.dart';
 import 'package:example/data_table2_tests.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'data_table2.dart';
 import 'data_table2_simple.dart';
-import 'isEmptyArg.dart';
+import 'nav_helper.dart';
 import 'paginated_data_table2.dart';
 import 'data_table.dart';
 import 'paginated_data_table.dart';
@@ -18,8 +19,10 @@ void main() {
 const String initialRoute = '/datatable2';
 
 Scaffold _getScaffold(BuildContext context, Widget body,
-    [bool isAllowEmpty = false]) {
-  var isEmpty = getIsEmpty(context);
+    [List<String>? options]) {
+  var defaultOption = getCurrentRouteOption(context);
+  if (defaultOption.isEmpty && options != null && options.isNotEmpty)
+    defaultOption = options[0];
   return Scaffold(
     appBar: AppBar(
       shadowColor: Colors.transparent,
@@ -28,6 +31,7 @@ Scaffold _getScaffold(BuildContext context, Widget body,
         Container(
             padding: EdgeInsets.fromLTRB(12, 4, 12, 4),
             color: Colors.grey[850],
+            //screen selection
             child: DropdownButton<String>(
               icon: Icon(Icons.arrow_forward),
               dropdownColor: Colors.grey[800],
@@ -64,42 +68,36 @@ Scaffold _getScaffold(BuildContext context, Widget body,
                   child: Text('PaginatedDataTable'),
                   value: '/paginated',
                 ),
-                DropdownMenuItem(
-                  child: Text('Unit Tests Preview'),
-                  value: '/datatable2tests',
-                ),
+                if (kDebugMode)
+                  DropdownMenuItem(
+                    child: Text('Unit Tests Preview'),
+                    value: '/datatable2tests',
+                  ),
               ],
             )),
-        isAllowEmpty
+        options != null && options.isNotEmpty
             ? Container(
                 padding: EdgeInsets.fromLTRB(12, 4, 12, 4),
-                child: DropdownButton<bool>(
+                // screen options
+                child: DropdownButton<String>(
                     icon: SizedBox(),
                     dropdownColor: Colors.grey[300],
                     style: Theme.of(context)
                         .textTheme
                         .subtitle1!
                         .copyWith(color: Colors.black),
-                    value: isEmpty,
+                    value: defaultOption,
                     onChanged: (v) {
                       var r = _getCurrentRoute(context);
-                      var flag = v ?? false;
-                      if (flag) {
-                        Navigator.of(context).pushNamed(r, arguments: true);
-                      } else {
-                        Navigator.of(context).pushNamed(r, arguments: false);
-                      }
+                      Navigator.of(context).pushNamed(r, arguments: v);
                     },
-                    items: [
-                      DropdownMenuItem(
-                        child: Text('With data'),
-                        value: false,
-                      ),
-                      DropdownMenuItem(
-                        child: Text('No data'),
-                        value: true,
-                      )
-                    ]))
+                    items: options
+                        .map<DropdownMenuItem<String>>(
+                            (v) => DropdownMenuItem<String>(
+                                  child: Text(v),
+                                  value: v,
+                                ))
+                        .toList()))
             : SizedBox()
       ]),
     ),
@@ -125,14 +123,14 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: initialRoute,
       routes: {
-        '/datatable2': (context) =>
-            _getScaffold(context, DataTable2Demo(), true),
+        '/datatable2': (context) => _getScaffold(
+            context, DataTable2Demo(), getOptionsForRoute('/datatable2')),
         '/datatable2simple': (context) =>
             _getScaffold(context, DataTable2SimpleDemo()),
         '/datatable2scrollup': (context) =>
             _getScaffold(context, DataTable2ScrollupDemo()),
-        '/paginated2': (context) =>
-            _getScaffold(context, PaginatedDataTable2Demo(), true),
+        '/paginated2': (context) => _getScaffold(context,
+            PaginatedDataTable2Demo(), getOptionsForRoute('/paginated2')),
         '/datatable': (context) => _getScaffold(context, DataTableDemo()),
         '/paginated': (context) =>
             _getScaffold(context, PaginatedDataTableDemo()),

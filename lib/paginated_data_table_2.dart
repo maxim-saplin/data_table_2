@@ -509,7 +509,16 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                 child: DropdownButton<int>(
                   items: availableRowsPerPage.cast<DropdownMenuItem<int>>(),
                   value: effectiveRowsPerPage,
-                  onChanged: widget.onRowsPerPageChanged,
+                  onChanged: (r) {
+                    if (r != null) {
+                      setState(() {
+                        effectiveRowsPerPage = r;
+                        if (widget.onRowsPerPageChanged != null) {
+                          widget.onRowsPerPageChanged!(r);
+                        }
+                      });
+                    }
+                  },
                   style: footerTextStyle,
                   iconSize: 24.0,
                 ),

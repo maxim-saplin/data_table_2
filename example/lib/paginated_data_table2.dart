@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:data_table_2/paginated_data_table_2.dart';
 
 import 'data_source.dart';
-import 'isEmptyArg.dart';
+import 'nav_helper.dart';
 
 // Copyright 2019 The Flutter team. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -63,7 +63,7 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
       wrapInCard: false,
       header: Text('PaginatedDataTable2'),
       rowsPerPage: _rowsPerPage,
-      //autoRowsToHeight: true,
+      autoRowsToHeight: getCurrentRouteOption(context) == autoRows,
       minWidth: 800,
       fit: FlexFit.tight,
       border: TableBorder(
@@ -74,15 +74,17 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
           verticalInside: BorderSide(color: Colors.grey[300]!),
           horizontalInside: BorderSide(color: Colors.grey, width: 1)),
       onRowsPerPageChanged: (value) {
-        setState(() {
-          _rowsPerPage = value!;
-        });
+        // No need to wrap into setState, it will be called inside the widget
+        // and trigger rebuild
+        //setState(() {
+        _rowsPerPage = value!;
+        //});
       },
       initialFirstRowIndex: _rowIndex,
       onPageChanged: (rowIndex) {
-        setState(() {
-          _rowIndex = rowIndex;
-        });
+        //setState(() {
+        _rowIndex = rowIndex;
+        //});
       },
       sortColumnIndex: _sortColumnIndex,
       sortAscending: _sortAscending,
@@ -141,7 +143,7 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
               padding: EdgeInsets.all(20),
               color: Colors.grey[200],
               child: Text('No data'))),
-      source: getIsEmpty(context)
+      source: getCurrentRouteOption(context) == noData
           ? DessertDataSource.empty(context)
           : _dessertsDataSource,
     );

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import 'data_source.dart';
-import 'isEmptyArg.dart';
+import 'nav_helper.dart';
 
 // Copyright 2019 The Flutter team. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -142,7 +142,7 @@ class _DataTable2DemoState extends State<DataTable2Demo> {
                 padding: EdgeInsets.all(20),
                 color: Colors.grey[200],
                 child: Text('No data'))),
-        rows: getIsEmpty(context)
+        rows: getCurrentRouteOption(context) == noData
             ? []
             : List<DataRow>.generate(_dessertsDataSource.rowCount,
                 (index) => _dessertsDataSource.getRow(index)),
