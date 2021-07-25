@@ -66,14 +66,17 @@ class _DataTable2DemoState extends State<DataTable2Demo> {
       child: DataTable2(
         columnSpacing: 12,
         horizontalMargin: 12,
-        border: TableBorder(
-            top: BorderSide(color: Colors.black),
-            bottom: BorderSide(color: Colors.grey[300]!),
-            left: BorderSide(color: Colors.grey[300]!),
-            right: BorderSide(color: Colors.grey[300]!),
-            verticalInside: BorderSide(color: Colors.grey[300]!),
-            horizontalInside: BorderSide(color: Colors.grey, width: 1)),
-        dividerThickness: 10, // this one is ignored since [border] is set above
+        border: getCurrentRouteOption(context) == showBorders
+            ? TableBorder(
+                top: BorderSide(color: Colors.black),
+                bottom: BorderSide(color: Colors.grey[300]!),
+                left: BorderSide(color: Colors.grey[300]!),
+                right: BorderSide(color: Colors.grey[300]!),
+                verticalInside: BorderSide(color: Colors.grey[300]!),
+                horizontalInside: BorderSide(color: Colors.grey, width: 1))
+            : null,
+        dividerThickness:
+            1, // this one will be ignored if [border] is set above
         bottomMargin: 10,
         minWidth: 900,
         sortColumnIndex: _sortColumnIndex,

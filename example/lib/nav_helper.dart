@@ -13,9 +13,10 @@ String getCurrentRouteOption(BuildContext context) {
 const hasData = 'Default';
 const noData = 'No data';
 const autoRows = 'Auto rows';
+const showBorders = 'Borders';
 
 const Map<String, List<String>> routeOptions = {
-  '/datatable2': [hasData, noData],
+  '/datatable2': [hasData, noData, showBorders],
   '/paginated2': [hasData, noData, autoRows],
 };
 
