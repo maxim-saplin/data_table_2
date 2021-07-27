@@ -458,39 +458,6 @@ class DessertDataSource extends DataTableSource {
     );
   }
 
-  // @override
-  // DataRow2 getRow2(int index) {
-  //   final format = NumberFormat.decimalPercentPattern(
-  //     locale: 'en',
-  //     decimalDigits: 0,
-  //   );
-  //   assert(index >= 0);
-  //   if (index >= desserts.length) throw 'index > _desserts.length';
-  //   final dessert = desserts[index];
-  //   return DataRow2.byIndex(
-  //     index: index,
-  //     selected: dessert.selected,
-  //     onSelectChanged: (value) {
-  //       if (dessert.selected != value) {
-  //         _selectedCount += value! ? 1 : -1;
-  //         assert(_selectedCount >= 0);
-  //         dessert.selected = value;
-  //         notifyListeners();
-  //       }
-  //     },
-  //     cells: [
-  //       DataCell(Text(dessert.name)),
-  //       DataCell(Text('${dessert.calories}')),
-  //       DataCell(Text(dessert.fat.toStringAsFixed(1))),
-  //       DataCell(Text('${dessert.carbs}')),
-  //       DataCell(Text(dessert.protein.toStringAsFixed(1))),
-  //       DataCell(Text('${dessert.sodium}')),
-  //       DataCell(Text('${format.format(dessert.calcium / 100)}')),
-  //       DataCell(Text('${format.format(dessert.iron / 100)}')),
-  //     ],
-  //   );
-  // }
-
   @override
   int get rowCount => desserts.length;
 

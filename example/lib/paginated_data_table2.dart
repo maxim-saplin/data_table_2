@@ -20,7 +20,6 @@ class PaginatedDataTable2Demo extends StatefulWidget {
 }
 
 class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
-  int _rowIndex = 0;
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   bool _sortAscending = true;
   int? _sortColumnIndex;
@@ -80,10 +79,10 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
         _rowsPerPage = value!;
         //});
       },
-      initialFirstRowIndex: _rowIndex,
+      initialFirstRowIndex: 0,
       onPageChanged: (rowIndex) {
+        print(rowIndex / _rowsPerPage);
         //setState(() {
-        _rowIndex = rowIndex;
         //});
       },
       sortColumnIndex: _sortColumnIndex,
