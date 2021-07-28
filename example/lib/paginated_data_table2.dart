@@ -77,6 +77,7 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
         // and trigger rebuild
         //setState(() {
         _rowsPerPage = value!;
+        print(_rowsPerPage);
         //});
       },
       initialFirstRowIndex: 0,

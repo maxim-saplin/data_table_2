@@ -208,6 +208,7 @@ PaginatedDataTable2 buildPaginatedTable(
     Widget? empty,
     ScrollController? scrollController,
     double? minWidth,
+    Function(int?)? onRowsPerPageChanged,
     List<DataColumn2>? columns}) {
   return PaginatedDataTable2(
     horizontalMargin: 24,
@@ -225,7 +226,9 @@ PaginatedDataTable2 buildPaginatedTable(
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     autoRowsToHeight: autoRowsToHeight,
-    onRowsPerPageChanged: showPageSizeSelector ? (int? rowsPerPage) {} : null,
+    onRowsPerPageChanged: showPageSizeSelector || onRowsPerPageChanged != null
+        ? onRowsPerPageChanged ?? (int? rowsPerPage) {}
+        : null,
     source: TestDataSource(
         allowSelection: true,
         showPage: showPage,

@@ -149,13 +149,19 @@ void main() {
 
     testWidgets('autoRowsToHeight WITHOUT headers works fine',
         (WidgetTester tester) async {
+      int? rowsPp = -1;
+
       await wrapWidgetSetSurf(
           tester,
           buildPaginatedTable(
               showPage: false,
               showGeneration: false,
               showHeader: false,
+              onRowsPerPageChanged: (p) {
+                rowsPp = p;
+              },
               autoRowsToHeight: true));
+      expect(rowsPp, -1);
       const height = 300.0;
       await tester.binding.setSurfaceSize(Size(1000, height));
       await tester.pumpAndSettle();
@@ -163,18 +169,22 @@ void main() {
       var s1 = tester.getSize(find.byType(PaginatedDataTable2).first);
       print('${s1.width} ${s1.height} ');
 
-      expect(find.byType(Checkbox),
-          findsNWidgets(((height - 56 - 56) / 48).floor() + 1));
+      var n = ((height - 56 - 56) / 48).floor() + 1;
       // - header row - footer
       // +1 - checkbox in header
+
+      expect(find.byType(Checkbox), findsNWidgets(n));
+      expect(rowsPp, n - 1);
 
       await tester.binding.setSurfaceSize(Size(1000, height * 2));
       await tester.pumpAndSettle();
       s1 = tester.getSize(find.byType(PaginatedDataTable2).first);
       print('${s1.width} ${s1.height} ');
 
-      expect(find.byType(Checkbox),
-          findsNWidgets(((2 * height - 56 - 56) / 48).floor() + 1));
+      n = ((2 * height - 56 - 56) / 48).floor() + 1;
+      expect(rowsPp, n - 1);
+
+      expect(find.byType(Checkbox), findsNWidgets(n));
     });
 
     testWidgets('autoRowsToHeight WITH headers works fine',

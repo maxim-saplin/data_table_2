@@ -257,6 +257,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   int _selectedRowCount = 0;
   final Map<int, DataRow?> _rows = <int, DataRow?>{};
   int effectiveRowsPerPage = -1;
+  int prevRowsPerPageForAutoRows = -1;
 
   @override
   void initState() {
@@ -610,6 +611,11 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                       widget.dataRowHeight)
                   .floor(),
               1);
+          if (prevRowsPerPageForAutoRows != effectiveRowsPerPage) {
+            if (prevRowsPerPageForAutoRows != -1)
+              widget.onRowsPerPageChanged?.call(effectiveRowsPerPage);
+            prevRowsPerPageForAutoRows = effectiveRowsPerPage;
+          }
         }
         assert(debugCheckHasMaterialLocalizations(context));
 
