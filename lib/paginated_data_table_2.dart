@@ -69,7 +69,7 @@ class PaginatedDataTable2 extends StatefulWidget {
             (sortColumnIndex >= 0 && sortColumnIndex < columns.length)),
         assert(rowsPerPage > 0),
         assert(() {
-          if (onRowsPerPageChanged != null)
+          if (onRowsPerPageChanged != null && autoRowsToHeight == false)
             assert(availableRowsPerPage.contains(rowsPerPage));
           return true;
         }()),
