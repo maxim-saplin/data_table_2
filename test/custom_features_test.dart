@@ -161,7 +161,6 @@ void main() {
                 rowsPp = p;
               },
               autoRowsToHeight: true));
-      expect(rowsPp, -1);
       const height = 300.0;
       await tester.binding.setSurfaceSize(Size(1000, height));
       await tester.pumpAndSettle();

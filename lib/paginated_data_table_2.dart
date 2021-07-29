@@ -612,8 +612,10 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                   .floor(),
               1);
           if (prevRowsPerPageForAutoRows != effectiveRowsPerPage) {
-            if (prevRowsPerPageForAutoRows != -1)
-              widget.onRowsPerPageChanged?.call(effectiveRowsPerPage);
+            //if (prevRowsPerPageForAutoRows != -1)
+            // Also call it on the first build to let clients know
+            // how many rows were autocalculated
+            widget.onRowsPerPageChanged?.call(effectiveRowsPerPage);
             prevRowsPerPageForAutoRows = effectiveRowsPerPage;
           }
         }
