@@ -13,6 +13,37 @@ import 'package:flutter/widgets.dart';
 
 import 'data_table_2.dart';
 
+/// Use instances of the class to externally control [PaginatedDataTable2] state
+/// and trigger actions such as changing page number or size. Instatiate object,
+/// keep it somewhere (e.g. parent widgets state or statis field/top level variable),
+/// pass it to [PaginatedDataTable2.controller] via constructor
+class PaginatorController {
+  PaginatedDataTable2State? _state;
+
+  void _attach(PaginatedDataTable2State state) {
+    _state = state;
+  }
+
+  void _detach() {
+    _state = null;
+  }
+
+  void _checkAttachedAndThrow() {
+    if (_state == null)
+      throw 'PaginatorController is not attached to any PaginatedDataTable2 and can\'t be used';
+  }
+
+  int getRowCount() {
+    _checkAttachedAndThrow();
+    return _state!._rowCount;
+  }
+
+  int getPageSize() {
+    _checkAttachedAndThrow();
+    return _state!._effectiveRowsPerPage;
+  }
+}
+
 /// In-place replacement of standard [PaginatedDataTable] widget, mimics it API.
 /// Has the header row and paginatior always fixed to top and bottom (correspondingly).
 /// Core of the table (with data rows) is scrollable and stretching to max width/height of it's container.
@@ -57,6 +88,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.wrapInCard = true,
     this.minWidth,
     this.fit = FlexFit.tight,
+    this.controller,
     this.scrollController,
     this.empty,
     this.border,
@@ -240,6 +272,11 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
 
+  /// Used to comntrol widget's state externally and trigger actions. See
+  /// [PaginatorController]
+  // TODO: Add test
+  final PaginatorController? controller;
+
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? scrollController;
 
@@ -256,8 +293,8 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   late bool _rowCountApproximate;
   int _selectedRowCount = 0;
   final Map<int, DataRow?> _rows = <int, DataRow?>{};
-  int effectiveRowsPerPage = -1;
-  int prevRowsPerPageForAutoRows = -1;
+  int _effectiveRowsPerPage = -1;
+  int _prevRowsPerPageForAutoRows = -1;
 
   @override
   void initState() {
@@ -266,7 +303,8 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
         widget.initialFirstRowIndex ??
         0;
     widget.source.addListener(_handleDataSourceChanged);
-    effectiveRowsPerPage = widget.rowsPerPage;
+    _effectiveRowsPerPage = widget.rowsPerPage;
+    widget.controller?._attach(this);
     _handleDataSourceChanged();
   }
 
@@ -277,6 +315,10 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       oldWidget.source.removeListener(_handleDataSourceChanged);
       widget.source.addListener(_handleDataSourceChanged);
       _handleDataSourceChanged();
+    }
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller?._detach();
+      widget.controller?._attach(this);
     }
   }
 
@@ -299,7 +341,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   void pageTo(int rowIndex) {
     final int oldFirstRowIndex = _firstRowIndex;
     setState(() {
-      final int rowsPerPage = effectiveRowsPerPage;
+      final int rowsPerPage = _effectiveRowsPerPage;
       _firstRowIndex = (rowIndex ~/ rowsPerPage) * rowsPerPage;
     });
     if ((widget.onPageChanged != null) && (oldFirstRowIndex != _firstRowIndex))
@@ -364,21 +406,21 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   }
 
   void _handlePrevious() {
-    pageTo(math.max(_firstRowIndex - effectiveRowsPerPage, 0));
+    pageTo(math.max(_firstRowIndex - _effectiveRowsPerPage, 0));
   }
 
   void _handleNext() {
-    pageTo(_firstRowIndex + effectiveRowsPerPage);
+    pageTo(_firstRowIndex + _effectiveRowsPerPage);
   }
 
   void _handleLast() {
-    pageTo(((_rowCount - 1) / effectiveRowsPerPage).floor() *
-        effectiveRowsPerPage);
+    pageTo(((_rowCount - 1) / _effectiveRowsPerPage).floor() *
+        _effectiveRowsPerPage);
   }
 
   bool _isNextPageUnavailable() =>
       !_rowCountApproximate &&
-      (_firstRowIndex + effectiveRowsPerPage >= _rowCount);
+      (_firstRowIndex + _effectiveRowsPerPage >= _rowCount);
 
   final GlobalKey _tableKey = GlobalKey();
 
@@ -466,7 +508,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           columnSpacing: widget.columnSpacing,
           showCheckboxColumn: widget.showCheckboxColumn,
           showBottomBorder: true,
-          rows: _getRows(_firstRowIndex, effectiveRowsPerPage),
+          rows: _getRows(_firstRowIndex, _effectiveRowsPerPage),
           minWidth: widget.minWidth,
           scrollController: widget.scrollController,
           empty: widget.empty,
@@ -488,7 +530,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     if (widget.onRowsPerPageChanged != null) {
       final List<Widget> availableRowsPerPage = widget.availableRowsPerPage
           .where((int value) =>
-              value <= _rowCount || value == effectiveRowsPerPage)
+              value <= _rowCount || value == _effectiveRowsPerPage)
           .map<DropdownMenuItem<int>>((int value) {
         return DropdownMenuItem<int>(
           value: value,
@@ -509,11 +551,11 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<int>(
                   items: availableRowsPerPage.cast<DropdownMenuItem<int>>(),
-                  value: effectiveRowsPerPage,
+                  value: _effectiveRowsPerPage,
                   onChanged: (r) {
                     if (r != null) {
                       setState(() {
-                        effectiveRowsPerPage = r;
+                        _effectiveRowsPerPage = r;
                         if (widget.onRowsPerPageChanged != null) {
                           widget.onRowsPerPageChanged!(r);
                         }
@@ -535,7 +577,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       Text(
         localizations.pageRowsInfoTitle(
           _firstRowIndex + 1,
-          _firstRowIndex + effectiveRowsPerPage,
+          _firstRowIndex + _effectiveRowsPerPage,
           _rowCount,
           _rowCountApproximate,
         ),
@@ -599,7 +641,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       builder: (BuildContext context, BoxConstraints constraints) {
         bool isHeaderPresent = widget.header != null || widget.actions != null;
         if (widget.autoRowsToHeight) {
-          effectiveRowsPerPage = math.max(
+          _effectiveRowsPerPage = math.max(
               ((constraints.maxHeight -
                           widget.headingRowHeight -
                           8 * (widget.wrapInCard ? 1 : 0) // card paddings
@@ -611,12 +653,12 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                       widget.dataRowHeight)
                   .floor(),
               1);
-          if (prevRowsPerPageForAutoRows != effectiveRowsPerPage) {
+          if (_prevRowsPerPageForAutoRows != _effectiveRowsPerPage) {
             //if (prevRowsPerPageForAutoRows != -1)
             // Also call it on the first build to let clients know
             // how many rows were autocalculated
-            widget.onRowsPerPageChanged?.call(effectiveRowsPerPage);
-            prevRowsPerPageForAutoRows = effectiveRowsPerPage;
+            widget.onRowsPerPageChanged?.call(_effectiveRowsPerPage);
+            _prevRowsPerPageForAutoRows = _effectiveRowsPerPage;
           }
         }
         assert(debugCheckHasMaterialLocalizations(context));
