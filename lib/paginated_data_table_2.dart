@@ -4,6 +4,7 @@
 
 // Copyright 2021 Maxim Saplin - chnages and modifications to original Flutter implementation of PaginatedDataTable
 
+import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart' show DragStartBehavior;
@@ -13,12 +14,32 @@ import 'package:flutter/widgets.dart';
 
 import 'data_table_2.dart';
 
-/// Use instances of the class to externally control [PaginatedDataTable2] state
-/// and trigger actions such as changing page number or size. Instatiate object,
-/// keep it somewhere (e.g. parent widgets state or statis field/top level variable),
-/// pass it to [PaginatedDataTable2.controller] via constructor
-class PaginatorController {
+/// Allows to externally control [PaginatedDataTable2] state
+/// and trigger actions such as changing page number or size. Instatiate an object,
+/// keep it somewhere (e.g. parent widgets state or static field/top level variable),
+/// pass it to [PaginatedDataTable2.controller] via constructor and you're ready to go.
+/// Please note that there're a few properties that allow to fetch internal state
+/// value's (such as rows per page), those values can't be fetched until the
+/// controller is attached - this happens during the first call to the build()
+/// method of [PaginatedDataTable2].
+/// The controller extends [ChangeNotifier] in order to let consumers know
+/// if there're changes to [PaginatedDataTable2] state. E.g. you can hide
+/// standard paginator of [PaginatedDataTable2] and simplement your own
+/// paginator as a StatefullWidget, subsribe to controller in order to update
+/// the paginator.
+/// TODO: Allow controlling selected rows
+class PaginatorController extends ChangeNotifier {
   PaginatedDataTable2State? _state;
+
+  // Whenever setState is called within PaginatedDataTable2State and there's
+  // an attached controlooer, than this method is called by PaginatedDataTable2State
+  void _notifyListeners() {
+    notifyListeners();
+  }
+
+  /// The controllor is attched to [PaginatedDataTable2] state upon
+  /// the first build. Until data from internal stare is not available
+  bool get isAttached => _state != null;
 
   void _attach(PaginatedDataTable2State state) {
     _state = state;
@@ -33,14 +54,58 @@ class PaginatorController {
       throw 'PaginatorController is not attached to any PaginatedDataTable2 and can\'t be used';
   }
 
-  int getRowCount() {
+  void _assertIfNotAttached() {
+    assert(_state != null,
+        'PaginatorController is not attached to any PaginatedDataTable2 and can\'t be used');
+  }
+
+  /// Returns number of rows displayed in the [PaginatedDataTable2]. Throws if no
+  /// table is attached to the controller
+  int get rowCount {
     _checkAttachedAndThrow();
     return _state!._rowCount;
   }
 
-  int getPageSize() {
+  /// Returns number of rows displayed in single page of the [PaginatedDataTable2].
+  /// Throws if no table is attached to the controller
+  int get rowsPerPage {
     _checkAttachedAndThrow();
     return _state!._effectiveRowsPerPage;
+  }
+
+  /// Returns the index of the first (topmost) row displayed currently displayed in [PaginatedDataTable2].
+  /// Throws if no table is attached to the controller
+  int get currentRowIndex {
+    _checkAttachedAndThrow();
+    return _state!._firstRowIndex;
+  }
+
+  void setRowsPerPage(int rowsPerPage) {
+    _assertIfNotAttached();
+    _state?._setRowsPerPage(rowsPerPage);
+  }
+
+  void goToNextPage() {
+    _assertIfNotAttached();
+    if (_state != null) {
+      if (_state!._isNextPageUnavailable()) return;
+      _state!._handleNext();
+    }
+  }
+
+  void goToPreviousPage() {
+    _assertIfNotAttached();
+    _state?._handlePrevious();
+  }
+
+  void goToFirstPage() {
+    _assertIfNotAttached();
+    _state!._handleFirst();
+  }
+
+  void goToLastPage() {
+    _assertIfNotAttached();
+    _state!._handleLast();
   }
 }
 
@@ -88,6 +153,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.wrapInCard = true,
     this.minWidth,
     this.fit = FlexFit.tight,
+    this.hidePaginator = false,
     this.controller,
     this.scrollController,
     this.empty,
@@ -272,6 +338,10 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
 
+  /// Hides the paginator at the bottom. Can be useful in case you decide create
+  /// your own paginator and control the widget via [PaginatedDataTable2.controller]
+  final bool hidePaginator;
+
   /// Used to comntrol widget's state externally and trigger actions. See
   /// [PaginatorController]
   // TODO: Add test
@@ -295,6 +365,12 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   final Map<int, DataRow?> _rows = <int, DataRow?>{};
   int _effectiveRowsPerPage = -1;
   int _prevRowsPerPageForAutoRows = -1;
+
+  @override
+  void setState(VoidCallback fn) {
+    widget.controller?._notifyListeners();
+    super.setState(fn);
+  }
 
   @override
   void initState() {
@@ -553,14 +629,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                   items: availableRowsPerPage.cast<DropdownMenuItem<int>>(),
                   value: _effectiveRowsPerPage,
                   onChanged: (r) {
-                    if (r != null) {
-                      setState(() {
-                        _effectiveRowsPerPage = r;
-                        if (widget.onRowsPerPageChanged != null) {
-                          widget.onRowsPerPageChanged!(r);
-                        }
-                      });
-                    }
+                    _setRowsPerPage(r);
                   },
                   style: footerTextStyle,
                   iconSize: 24.0,
@@ -634,6 +703,17 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     );
   }
 
+  void _setRowsPerPage(int? r) {
+    if (r != null) {
+      setState(() {
+        _effectiveRowsPerPage = r;
+        if (widget.onRowsPerPageChanged != null) {
+          widget.onRowsPerPageChanged!(r);
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO(ianh): This whole build function doesn't handle RTL yet.
@@ -670,7 +750,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           children: <Widget>[
             if (isHeaderPresent) getHeader(),
             getTable(constraints),
-            getFooter(),
+            if (!widget.hidePaginator) getFooter(),
           ],
         );
 
