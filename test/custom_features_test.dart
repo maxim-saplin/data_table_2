@@ -301,6 +301,82 @@ void main() {
       expect(find.text('Name'), findsOneWidget);
       expect(find.text('No data'), findsOneWidget);
     });
+
+    testWidgets('hidePaginator hides paginator', (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(Size(1000, 300));
+      await tester.pumpWidget(MaterialApp(
+          home: Material(
+              child: buildPaginatedTable(
+                  showPage: false,
+                  showGeneration: false,
+                  showPageSizeSelector: true,
+                  hidePaginator: true))));
+
+      expect(find.text('Rows per page:'), findsNothing);
+    });
+
+    testWidgets('PaginatorController works', (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(Size(1000, 300));
+      var controller = PaginatorController();
+      await tester.pumpWidget(MaterialApp(
+          home: Material(
+              child: buildPaginatedTable(
+                  showPage: false,
+                  showGeneration: false,
+                  showPageSizeSelector: true,
+                  controller: controller))));
+
+      // peek into what text is visible
+      // var d = find.byType(Text);
+      // var w = tester.widgetList(d).toList();
+
+      expect(controller.rowsPerPage, 10);
+      expect(find.text('10'), findsOneWidget);
+      expect(find.text('1–10 of 500'), findsOneWidget);
+      controller.setRowsPerPage(20);
+      await tester.pumpAndSettle();
+      expect(controller.rowsPerPage, 20);
+      expect(find.text('20'), findsOneWidget);
+      expect(find.text('1–20 of 500'), findsOneWidget);
+
+      controller.goToPageWithRow(40);
+      await tester.pumpAndSettle();
+      expect(controller.currentRowIndex, 40);
+      expect(find.text('41–60 of 500'), findsOneWidget);
+
+      controller.goToRow(41);
+      await tester.pumpAndSettle();
+      expect(controller.currentRowIndex, 41);
+      expect(find.text('42–61 of 500'), findsOneWidget);
+
+      controller.goToFirstPage();
+      await tester.pumpAndSettle();
+      expect(controller.currentRowIndex, 0);
+      expect(find.text('1–20 of 500'), findsOneWidget);
+
+      controller.setRowsPerPage(10);
+      await tester.pumpAndSettle();
+      expect(controller.rowsPerPage, 10);
+      expect(find.text('10'), findsOneWidget);
+      expect(find.text('1–10 of 500'), findsOneWidget);
+
+      controller.goToNextPage();
+      await tester.pumpAndSettle();
+      expect(controller.currentRowIndex, 10);
+      expect(find.text('11–20 of 500'), findsOneWidget);
+
+      controller.goToPreviousPage();
+      await tester.pumpAndSettle();
+      expect(controller.currentRowIndex, 0);
+      expect(find.text('1–10 of 500'), findsOneWidget);
+
+      controller.goToLastPage();
+      await tester.pumpAndSettle();
+      expect(controller.currentRowIndex, 490);
+      expect(find.text('491–500 of 500'), findsOneWidget);
+
+      expect(controller.rowCount, 500);
+    });
   });
 }
 

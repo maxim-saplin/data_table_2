@@ -4,7 +4,6 @@
 
 // Copyright 2021 Maxim Saplin - chnages and modifications to original Flutter implementation of PaginatedDataTable
 
-import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart' show DragStartBehavior;
@@ -80,11 +79,13 @@ class PaginatorController extends ChangeNotifier {
     return _state!._firstRowIndex;
   }
 
+  /// Сhange page size and set the number of rows in a single page
   void setRowsPerPage(int rowsPerPage) {
     _assertIfNotAttached();
     _state?._setRowsPerPage(rowsPerPage);
   }
 
+  /// Show rows from the next page
   void goToNextPage() {
     _assertIfNotAttached();
     if (_state != null) {
@@ -93,19 +94,43 @@ class PaginatorController extends ChangeNotifier {
     }
   }
 
+  /// Show rows from the previous page
   void goToPreviousPage() {
     _assertIfNotAttached();
     _state?._handlePrevious();
   }
 
+  /// Fast forward to the very first page/row
   void goToFirstPage() {
     _assertIfNotAttached();
-    _state!._handleFirst();
+    _state?._handleFirst();
   }
 
+  /// Fast forward to the very last page/row
   void goToLastPage() {
     _assertIfNotAttached();
-    _state!._handleLast();
+    _state?._handleLast();
+  }
+
+  /// Switch the page so that he given row is displayed at the top. I.e. it
+  /// is possible to have pages start at arbitrary rows, not at the boundaries
+  /// of pages as determined by page size
+  void goToRow(int rowIndex) {
+    _assertIfNotAttached();
+    if (_state != null) {
+      _state!.setState(() {
+        _state!._firstRowIndex =
+            math.max(math.min(_state!._rowCount - 1, rowIndex), 0);
+      });
+    }
+    //_state?.pageTo(rowIndex);
+  }
+
+  /// Switches to the page where the given row is present.
+  /// The row can be in the middle of the page
+  void goToPageWithRow(int rowIndex) {
+    _assertIfNotAttached();
+    _state?.pageTo(rowIndex);
   }
 }
 
@@ -344,7 +369,6 @@ class PaginatedDataTable2 extends StatefulWidget {
 
   /// Used to comntrol widget's state externally and trigger actions. See
   /// [PaginatorController]
-  // TODO: Add test
   final PaginatorController? controller;
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
@@ -500,7 +524,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
 
   final GlobalKey _tableKey = GlobalKey();
 
-  Widget getHeader() {
+  Widget _getHeader() {
     final MaterialLocalizations localizations =
         MaterialLocalizations.of(context);
     final ThemeData themeData = Theme.of(context);
@@ -563,7 +587,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     );
   }
 
-  Widget getTable(BoxConstraints constraints) {
+  Widget _getTable(BoxConstraints constraints) {
     return Flexible(
       fit: widget.fit,
       child: ConstrainedBox(
@@ -596,7 +620,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     );
   }
 
-  Widget getFooter() {
+  Widget _getFooter() {
     final MaterialLocalizations localizations =
         MaterialLocalizations.of(context);
     final ThemeData themeData = Theme.of(context);
@@ -728,7 +752,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
                           -
                           64 * (isHeaderPresent ? 1 : 0) //header
                           -
-                          56 // footer
+                          56 * (widget.hidePaginator ? 0 : 1) // footer
                       ) /
                       widget.dataRowHeight)
                   .floor(),
@@ -748,9 +772,9 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
         Widget t = Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            if (isHeaderPresent) getHeader(),
-            getTable(constraints),
-            if (!widget.hidePaginator) getFooter(),
+            if (isHeaderPresent) _getHeader(),
+            _getTable(constraints),
+            if (!widget.hidePaginator) _getFooter(),
           ],
         );
 

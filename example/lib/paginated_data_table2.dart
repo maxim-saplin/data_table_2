@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/paginated_data_table_2.dart';
 
@@ -118,6 +119,15 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
         header:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text('PaginatedDataTable2'),
+          if (kDebugMode && getCurrentRouteOption(context) == custPager)
+            Row(children: [
+              OutlinedButton(
+                  onPressed: () => _controller!.goToPageWithRow(25),
+                  child: Text('Go to row 25')),
+              OutlinedButton(
+                  onPressed: () => _controller!.goToRow(5),
+                  child: Text('Go to row 5'))
+            ]),
           if (getCurrentRouteOption(context) == custPager &&
               _controller != null)
             _PageNumber(controller: _controller!)
@@ -206,6 +216,8 @@ class _CustomPager extends StatefulWidget {
 }
 
 class _CustomPagerState extends State<_CustomPager> {
+  static const List<int> _availableSizes = [3, 5, 10, 20];
+
   @override
   void initState() {
     super.initState();
@@ -232,26 +244,16 @@ class _CustomPagerState extends State<_CustomPager> {
                   icon: Icon(Icons.chevron_left_sharp)),
               DropdownButton<int>(
                   onChanged: (v) => widget.controller.setRowsPerPage(v!),
-                  value: widget.controller.rowsPerPage,
+                  value: _availableSizes.contains(widget.controller.rowsPerPage)
+                      ? widget.controller.rowsPerPage
+                      : _availableSizes[0],
                   dropdownColor: Colors.grey[800],
-                  items: [
-                    DropdownMenuItem<int>(
-                      child: Text('3'),
-                      value: 3,
-                    ),
-                    DropdownMenuItem<int>(
-                      child: Text('5'),
-                      value: 5,
-                    ),
-                    DropdownMenuItem<int>(
-                      child: Text('10'),
-                      value: 10,
-                    ),
-                    DropdownMenuItem<int>(
-                      child: Text('20'),
-                      value: 20,
-                    )
-                  ]),
+                  items: _availableSizes
+                      .map((s) => DropdownMenuItem<int>(
+                            child: Text(s.toString()),
+                            value: s,
+                          ))
+                      .toList()),
               IconButton(
                   onPressed: () => widget.controller.goToNextPage(),
                   icon: Icon(Icons.chevron_right_sharp)),

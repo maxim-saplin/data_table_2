@@ -117,11 +117,13 @@ class TestDataSource extends DataTableSource {
   TestDataSource(
       {this.allowSelection = false,
       this.showPage = true,
-      this.showGeneration = true});
+      this.showGeneration = true,
+      this.noData = false});
 
   final bool allowSelection;
   final bool showPage;
   final bool showGeneration;
+  final bool noData;
 
   int get generation => _generation;
   int _generation = 0;
@@ -161,11 +163,10 @@ class TestDataSource extends DataTableSource {
   }
 
   @override
-  int get rowCount => 50 * kDesserts.length;
+  int get rowCount => noData ? 0 : 50 * kDesserts.length;
 
   @override
   bool get isRowCountApproximate => false;
-
   @override
   int get selectedRowCount => _selectedRows.length;
 }
@@ -179,6 +180,14 @@ PaginatedDataTable2 buildPaginatedTable(
     bool autoRowsToHeight = false,
     bool showHeader = false,
     bool wrapInCard = false,
+    bool showPageSizeSelector = false,
+    bool noData = false,
+    bool hidePaginator = false,
+    PaginatorController? controller,
+    Widget? empty,
+    ScrollController? scrollController,
+    double? minWidth,
+    Function(int?)? onRowsPerPageChanged,
     List<DataColumn2>? columns}) {
   return PaginatedDataTable2(
     horizontalMargin: 24,
@@ -190,13 +199,22 @@ PaginatedDataTable2 buildPaginatedTable(
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
     showFirstLastButtons: true,
+    controller: controller,
+    empty: empty,
+    scrollController: scrollController,
+    hidePaginator: hidePaginator,
+    minWidth: minWidth,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     autoRowsToHeight: autoRowsToHeight,
+    onRowsPerPageChanged: showPageSizeSelector || onRowsPerPageChanged != null
+        ? onRowsPerPageChanged ?? (int? rowsPerPage) {}
+        : null,
     source: TestDataSource(
         allowSelection: true,
         showPage: showPage,
-        showGeneration: showGeneration),
+        showGeneration: showGeneration,
+        noData: noData),
   );
 }
 
@@ -212,7 +230,8 @@ class DataTable2Tests extends StatelessWidget {
         child: buildPaginatedTable(
             showPage: false,
             showGeneration: false,
-            autoRowsToHeight: false) //buildDefaultTable(),
+            autoRowsToHeight: false,
+            showPageSizeSelector: true) //buildDefaultTable(),
         );
   }
 }
