@@ -24,7 +24,7 @@ If you've been using (or considered using) standard Flutter's widgets for displa
 - There's `DataRow2` alternative to stock `DataRow` which provides row level tap events (including right clicks)
 - `empty` property which allows defining a placeholder widget to be displayed when data source is empty
 - `border` allows drawing inner and outer vertical and horizontal borders (e.g. outlining individual cells) - stock widgets only allow drawing horizontal row splitters
-- PaginatorController allows externally control PaginatedDataTable2 state (e.g. switch pages, change page size etc.)
+- `PaginatorController` allows to externally control `PaginatedDataTable2` state (e.g. switch pages, change page size etc.)
 
 
 ## Usage
