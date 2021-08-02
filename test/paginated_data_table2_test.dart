@@ -10,7 +10,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
 
-import 'data_table_2_test_utils.dart';
+import 'test_utils.dart';
 
 void main() {
   final TestWidgetsFlutterBinding binding =
@@ -18,7 +18,7 @@ void main() {
           as TestWidgetsFlutterBinding;
 
   testWidgets('PaginatedDataTable2 paging', (WidgetTester tester) async {
-    final TestDataSource source = TestDataSource();
+    final TestDataSource source = TestDataSource(allowSelection: true);
 
     final List<String> log = <String>[];
 
@@ -27,6 +27,7 @@ void main() {
         header: const Text('Test table'),
         source: source,
         rowsPerPage: 2,
+        showCheckboxColumn: true,
         showFirstLastButtons: true,
         availableRowsPerPage: const <int>[
           2,
@@ -114,11 +115,16 @@ void main() {
 
     expect(log, isEmpty);
 
+    expect(find.text('8').hitTestable(), findsNothing);
+    expect(find.byType(Checkbox), findsNWidgets(3));
     await tester.tap(find.text('2'));
     await tester.pumpAndSettle(const Duration(milliseconds: 200));
 
     await tester.tap(find.text('8').last);
-    await tester.pumpAndSettle(const Duration(milliseconds: 200));
+    await tester.pumpAndSettle(const Duration(milliseconds: 1000));
+    await tester.pumpAndSettle();
+    expect(find.byType(Checkbox), findsNWidgets(9));
+    expect(find.text('8').hitTestable(), findsOneWidget);
 
     expect(log, <String>['rows-per-page-changed: 8']);
     log.clear();

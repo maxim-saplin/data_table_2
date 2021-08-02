@@ -83,7 +83,7 @@ class DataRow2 extends DataRow {
             cells: cells);
 
   /// Row tap handler
-  // TODO add tests
+  // TODO: Add test
   final VoidCallback? onTap;
 
   /// Row right click handler
@@ -186,7 +186,6 @@ class DataTable2 extends DataTable {
   /// If set, the table will stop shrinking below the threshold and provide
   /// horizontal scrolling. Useful for the cases with narrow screens (e.g. portrait phone orientation)
   /// and lots of columns (that get messed with little space)
-  // TODO: Add test
   final double? minWidth;
 
   /// If set the table will have empty space added after the the last row and allow scroll the
@@ -194,19 +193,17 @@ class DataTable2 extends DataTable {
   /// have the ability to slightly scroll up the bototm row to avoid the obstruction)
   final double? bottomMargin;
 
-  // TODO: Add test
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? scrollController;
 
-  // TODO: Add test
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
   final Widget? empty;
 
-  // TODO: Add test
   /// Set vertical and horizontal borders between cells, as well as outside borders around table.
   /// NOTE: setting this field will disable standard horizontal dividers which are controlled by
   /// themes and [dividerThickness] property
+  // TODO: Add test
   final TableBorder? border;
 
   /// Determines ratio of Small column's width to Medium column's width.
