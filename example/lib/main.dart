@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import 'data_table2.dart';
 import 'data_table2_simple.dart';
-import 'paginated_data_table2.dart';
 import 'data_table.dart';
 import 'paginated_data_table.dart';
 
@@ -100,8 +99,6 @@ class MyApp extends StatelessWidget {
             _getScaffold(context, DataTablePlusSimpleDemo()),
         '/DataTablePlusscrollup': (context) =>
             _getScaffold(context, DataTablePlusScrollupDemo()),
-        '/paginated2': (context) =>
-            _getScaffold(context, PaginatedDataTablePlusDemo()),
         '/datatable': (context) => _getScaffold(context, DataTableDemo()),
         '/paginated': (context) =>
             _getScaffold(context, PaginatedDataTableDemo()),
