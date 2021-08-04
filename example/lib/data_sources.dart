@@ -9,6 +9,7 @@ import 'package:data_table_2/data_table_2.dart';
 // The file was extracted from GitHub: https://github.com/flutter/gallery
 // Changes and modifications by Maxim Saplin, 2021
 
+/// Keeps track of selected rows, feed the data into DesertsDataSource
 class RestorableDessertSelections extends RestorableProperty<Set<int>> {
   Set<int> _dessertSelections = {};
 
@@ -50,6 +51,7 @@ class RestorableDessertSelections extends RestorableProperty<Set<int>> {
   Object toPrimitives() => _dessertSelections.toList();
 }
 
+/// Domain model entity
 class Dessert {
   Dessert(
     this.name,
@@ -73,6 +75,10 @@ class Dessert {
   bool selected = false;
 }
 
+/// Data source implementing standard Flutter's DataTableSource abstract class
+/// which is part of DataTable and PaginatedDataTable synchronous data fecthin API.
+/// This class uses static collection of deserts as a data store, projects it into
+/// DataRows, keeps track of selected items, provides sprting capability
 class DessertDataSource extends DataTableSource {
   DessertDataSource.empty(this.context) {
     desserts = [];
@@ -176,6 +182,9 @@ class DessertDataSource extends DataTableSource {
   }
 }
 
+/// Async datasource for AsynPaginatedDataTabke2 example. Based on AsyncDataTableSource which
+/// is an extension to FLutter's DataTableSource and aimed at solving
+/// saync data fetching scenarious by paginated table (such as using Web API)
 class DessertDataSourceAsync extends AsyncDataTableSource {
   @override
   Future<AsyncRowsResponse> getRows(int start, int end) {
@@ -186,6 +195,24 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
   @override
   // TODO: implement selectedRowCount
   int get selectedRowCount => throw UnimplementedError();
+}
+
+class DesertsFakeWebServiceResponse {
+  DesertsFakeWebServiceResponse(this.totalRecords, this.data);
+
+  /// THe total ammount of records on the server, e.g. 100
+  final int totalRecords;
+
+  /// One page, e.g. 10 reocrds
+  final List<Dessert> data;
+}
+
+class DesertsFakeWebService {
+  Future<DesertsFakeWebServiceResponse> getData(
+      int startingAt, int count, String sortedBy, bool sortedAsc) async {
+    return Future.delayed(Duration(milliseconds: 150),
+        () => DesertsFakeWebServiceResponse(100, []));
+  }
 }
 
 List<Dessert> _desserts = <Dessert>[
