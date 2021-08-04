@@ -1,6 +1,6 @@
-import 'package:example/async_data_source.dart';
+import 'package:example/data_sources.dart';
 import 'package:flutter/material.dart';
-import 'package:data_table_2/async_paginated_data_table_2.dart';
+import 'package:data_table_2/data_table_2.dart';
 
 // Copyright 2019 The Flutter team. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -23,14 +23,14 @@ class _AsyncPaginatedDataTable2DemoState
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   bool _sortAscending = true;
   int? _sortColumnIndex;
-  late AsyncDessertDataSource _dessertsDataSource;
+  late DessertDataSourceAsync _dessertsDataSource;
   bool _initialized = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialized) {
-      _dessertsDataSource = AsyncDessertDataSource(context);
+      _dessertsDataSource = DessertDataSourceAsync();
       _initialized = true;
     }
   }
@@ -40,7 +40,7 @@ class _AsyncPaginatedDataTable2DemoState
     int columnIndex,
     bool ascending,
   ) {
-    _dessertsDataSource.sort<T>(getField, ascending);
+    //_dessertsDataSource.sort<T>(getField, ascending);
     setState(() {
       _sortColumnIndex = columnIndex;
       _sortAscending = ascending;

@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 // Copyright 2021 Maxim Saplin - chnages and modifications to original Flutter implementation of PaginatedDataTable
-
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart' show DragStartBehavior;
@@ -12,6 +11,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import 'data_table_2.dart';
+
+part 'async_paginated_data_table_2.dart';
 
 /// Allows to externally control [PaginatedDataTable2] state
 /// and trigger actions such as changing page number or size. Instatiate an object,
@@ -383,7 +384,6 @@ class PaginatedDataTable2 extends StatefulWidget {
 /// The table can be programmatically paged using the [pageTo] method.
 class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   late int _firstRowIndex;
-  int get firstRowIndex => _firstRowIndex;
   late int _rowCount;
   late bool _rowCountApproximate;
   int _selectedRowCount = 0;

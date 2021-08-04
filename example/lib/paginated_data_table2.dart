@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:data_table_2/paginated_data_table_2.dart';
+import 'package:data_table_2/data_table_2.dart';
 
-import 'data_source.dart';
+import 'data_sources.dart';
 import 'nav_helper.dart';
 
 // Copyright 2019 The Flutter team. All rights reserved.
