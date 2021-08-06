@@ -135,6 +135,12 @@ class PaginatorController extends ChangeNotifier {
   }
 }
 
+/// The default value for [rowsPerPage].
+///
+/// Useful when initializing the field that will hold the current
+/// [rowsPerPage], when implemented [onRowsPerPageChanged].
+const int defaultRowsPerPage = 10;
+
 /// In-place replacement of standard [PaginatedDataTable] widget, mimics it API.
 /// Has the header row and paginatior always fixed to top and bottom (correspondingly).
 /// Core of the table (with data rows) is scrollable and stretching to max width/height of it's container.
@@ -291,12 +297,6 @@ class PaginatedDataTable2 extends StatefulWidget {
   ///  * [onRowsPerPageChanged]
   ///  * [defaultRowsPerPage]
   final int rowsPerPage;
-
-  /// The default value for [rowsPerPage].
-  ///
-  /// Useful when initializing the field that will hold the current
-  /// [rowsPerPage], when implemented [onRowsPerPageChanged].
-  static const int defaultRowsPerPage = 10;
 
   /// The options to offer for the rowsPerPage.
   ///
