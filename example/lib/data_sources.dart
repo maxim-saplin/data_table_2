@@ -117,20 +117,6 @@ class DessertDataSource extends DataTableSource {
     notifyListeners();
   }
 
-  void updateSelectedDessertsFromSet(Set<int> selectedRows) {
-    _selectedCount = 0;
-    for (var i = 0; i < desserts.length; i += 1) {
-      var dessert = desserts[i];
-      if (selectedRows.contains(i)) {
-        dessert.selected = true;
-        _selectedCount += 1;
-      } else {
-        dessert.selected = false;
-      }
-    }
-    notifyListeners();
-  }
-
   @override
   DataRow getRow(int index) {
     final format = NumberFormat.decimalPercentPattern(
@@ -186,15 +172,54 @@ class DessertDataSource extends DataTableSource {
 /// is an extension to FLutter's DataTableSource and aimed at solving
 /// saync data fetching scenarious by paginated table (such as using Web API)
 class DessertDataSourceAsync extends AsyncDataTableSource {
+  final DesertsFakeWebService _repo = DesertsFakeWebService();
+
+  int _selectedCount = 0;
+
   @override
-  Future<AsyncRowsResponse> getRows(int start, int end) {
-    // TODO: implement getRows
-    throw UnimplementedError();
+  Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
+    var index = startIndex;
+    final format = NumberFormat.decimalPercentPattern(
+      locale: 'en',
+      decimalDigits: 0,
+    );
+    assert(index >= 0);
+
+    var x = await _repo.getData(startIndex, count, '', true);
+
+    var r = AsyncRowsResponse(
+        x.totalRecords,
+        x.data.map((dessert) {
+          return DataRow.byIndex(
+            index: index++,
+            selected: dessert.selected,
+            onSelectChanged: (value) {
+              // if (dessert.selected != value) {
+              //   _selectedCount += value! ? 1 : -1;
+              //   assert(_selectedCount >= 0);
+              //   dessert.selected = value;
+              //   notifyListeners();
+              // }
+            },
+            cells: [
+              DataCell(Text(dessert.name)),
+              DataCell(Text('${dessert.calories}')),
+              DataCell(Text(dessert.fat.toStringAsFixed(1))),
+              DataCell(Text('${dessert.carbs}')),
+              DataCell(Text(dessert.protein.toStringAsFixed(1))),
+              DataCell(Text('${dessert.sodium}')),
+              DataCell(Text('${format.format(dessert.calcium / 100)}')),
+              DataCell(Text('${format.format(dessert.iron / 100)}')),
+            ],
+          );
+        }).toList());
+
+    return r;
   }
 
   @override
   // TODO: implement selectedRowCount
-  int get selectedRowCount => throw UnimplementedError();
+  int get selectedRowCount => 0;
 }
 
 class DesertsFakeWebServiceResponse {
@@ -210,8 +235,10 @@ class DesertsFakeWebServiceResponse {
 class DesertsFakeWebService {
   Future<DesertsFakeWebServiceResponse> getData(
       int startingAt, int count, String sortedBy, bool sortedAsc) async {
-    return Future.delayed(Duration(milliseconds: 150),
-        () => DesertsFakeWebServiceResponse(100, []));
+    return Future.delayed(
+        Duration(milliseconds: startingAt == 0 ? 1650 : 1000),
+        () => DesertsFakeWebServiceResponse(
+            _desserts.length, _desserts.skip(startingAt).take(count).toList()));
   }
 }
 

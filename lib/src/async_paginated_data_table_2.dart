@@ -20,8 +20,8 @@ abstract class AsyncDataTableSource extends DataTableSource {
   Object? get error => _error;
 
   List<DataRow> _rows = [];
-  //List<DataRow> get rows => _rows;
   int _totalRows = 0;
+  int _firstRowAbsoluteIndex = 0;
 
   /// Override this method to allow the data source asynchronously
   /// fetch data (e.g. from a server) and convert them to [DataRow]/[DataRow2]
@@ -31,17 +31,19 @@ abstract class AsyncDataTableSource extends DataTableSource {
   /// returned from this method)
   Future<AsyncRowsResponse> getRows(int start, int end);
 
-  Future _getRows(int start, int end) async {
+  Future _getRows(int startIndex, int count) async {
     _state = SourceState.loading;
     await Future(() => notifyListeners());
 
     try {
-      var data = await getRows(start, end);
+      var data = await getRows(startIndex, count);
       _rows = data.rows;
       _totalRows = data.totalRows;
+      _firstRowAbsoluteIndex = startIndex;
     } catch (e) {
       _rows = [];
       _totalRows = 0;
+      _firstRowAbsoluteIndex = 0;
       _state = SourceState.error;
       _error = e;
       notifyListeners();
@@ -56,9 +58,10 @@ abstract class AsyncDataTableSource extends DataTableSource {
 
   @override
   DataRow? getRow(int index) {
-    if (_rows.length - 1 <= index) return _rows[index];
+    if (index - _firstRowAbsoluteIndex < 0 ||
+        index >= _rows.length + _firstRowAbsoluteIndex) return null;
 
-    return null;
+    return _rows[index - _firstRowAbsoluteIndex];
   }
 
   @override
@@ -86,19 +89,75 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
   PaginatedDataTable2State createState() => AsyncPaginatedDataTable2State();
 }
 
+enum _TableOperationInProgress { none, pageTo, pageSize }
+
 class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
+  _TableOperationInProgress _operationInProgress =
+      _TableOperationInProgress.none;
+
+  int _rowIndexRequested = -1;
+  int _rowsPerPageRequested = -1;
+
+  @override
+  void pageTo(int rowIndex) {
+    if (_operationInProgress == _TableOperationInProgress.none) {
+      _operationInProgress = _TableOperationInProgress.pageTo;
+      _rowIndexRequested = rowIndex;
+      var source = widget.source as AsyncDataTableSource;
+      source._getRows(rowIndex, widget.rowsPerPage);
+    }
+  }
+
+  @override
+  void _setRowsPerPage(int? r) {
+    if (r != null && _operationInProgress == _TableOperationInProgress.none) {
+      _operationInProgress = _TableOperationInProgress.pageSize;
+      _rowsPerPageRequested = r;
+      var source = widget.source as AsyncDataTableSource;
+      source._getRows(_firstRowIndex, r);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var source = widget.source as AsyncDataTableSource;
+
     if (source.state == SourceState.none) {
+      var x = super.build(context);
       source._getRows(_firstRowIndex, widget.rowsPerPage);
-      return SizedBox();
+      return x;
     } else if (source.state == SourceState.loading) {
-      return Center(child: Text('Loading'));
+      var x = super.build(context);
+      return Stack(fit: StackFit.expand, children: [
+        x,
+        ColoredBox(
+            color: Colors.white.withAlpha(128),
+            child: Center(
+                child: Container(
+              color: Colors.amber,
+              padding: EdgeInsets.all(7),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [CircularProgressIndicator(), Text('Loading..')]),
+              width: 150,
+              height: 50,
+            ))),
+      ]);
     } else if (source.state == SourceState.error) {
       return Center(child: Text('Error'));
     }
 
-    return super.build(context);
+    // SourceState.ok
+    if (_operationInProgress == _TableOperationInProgress.pageTo) {
+      super.pageTo(_rowIndexRequested);
+      _operationInProgress = _TableOperationInProgress.none;
+    } else if (_operationInProgress == _TableOperationInProgress.pageSize) {
+      super._setRowsPerPage(_rowsPerPageRequested);
+      _operationInProgress = _TableOperationInProgress.none;
+    }
+
+    var x = super.build(context);
+
+    return x;
   }
 }
