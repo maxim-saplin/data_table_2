@@ -19,6 +19,7 @@ const custPager = 'Custom pager';
 const Map<String, List<String>> routeOptions = {
   '/datatable2': [hasData, noData, showBorders],
   '/paginated2': [hasData, noData, autoRows, custPager],
+  '/asyncpaginated2': [hasData, noData, autoRows, custPager],
 };
 
 List<String>? getOptionsForRoute(String route) {

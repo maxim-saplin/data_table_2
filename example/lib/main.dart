@@ -136,8 +136,10 @@ class MyApp extends StatelessWidget {
             _getScaffold(context, DataTable2ScrollupDemo()),
         '/paginated2': (context) => _getScaffold(context,
             PaginatedDataTable2Demo(), getOptionsForRoute('/paginated2')),
-        '/asyncpaginated2': (context) =>
-            _getScaffold(context, AsyncPaginatedDataTable2Demo()),
+        '/asyncpaginated2': (context) => _getScaffold(
+            context,
+            AsyncPaginatedDataTable2Demo(),
+            getOptionsForRoute('/asyncpaginated2')),
         '/datatable': (context) => _getScaffold(context, DataTableDemo()),
         '/paginated': (context) =>
             _getScaffold(context, PaginatedDataTableDemo()),

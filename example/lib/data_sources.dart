@@ -176,6 +176,15 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
 
   int _selectedCount = 0;
 
+  String _sortColumn = "name";
+  bool _sortAscending = true;
+
+  void sort(String columnName, bool ascending) {
+    _sortColumn = columnName;
+    _sortAscending = ascending;
+    refreshDatasource();
+  }
+
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
     var index = startIndex;
@@ -185,7 +194,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     );
     assert(index >= 0);
 
-    var x = await _repo.getData(startIndex, count, '', true);
+    var x = await _repo.getData(startIndex, count, _sortColumn, _sortAscending);
 
     var r = AsyncRowsResponse(
         x.totalRecords,
@@ -233,12 +242,25 @@ class DesertsFakeWebServiceResponse {
 }
 
 class DesertsFakeWebService {
+  int Function(Dessert, Dessert)? _getComparisonFunction(
+      String column, bool ascending) {
+    var coef = ascending ? 1 : -1;
+    switch (column) {
+      case 'name':
+        return (Dessert d1, Dessert d2) => coef * d1.name.compareTo(d2.name);
+      case 'calories':
+        return (Dessert d1, Dessert d2) => coef * (d1.calories - d2.calories);
+    }
+  }
+
   Future<DesertsFakeWebServiceResponse> getData(
       int startingAt, int count, String sortedBy, bool sortedAsc) async {
-    return Future.delayed(
-        Duration(milliseconds: startingAt == 0 ? 1650 : 1000),
-        () => DesertsFakeWebServiceResponse(
-            _desserts.length, _desserts.skip(startingAt).take(count).toList()));
+    return Future.delayed(Duration(milliseconds: startingAt == 0 ? 1650 : 1000),
+        () {
+      _desserts_x3.sort(_getComparisonFunction(sortedBy, sortedAsc));
+      return DesertsFakeWebServiceResponse(_desserts_x3.length,
+          _desserts_x3.skip(startingAt).take(count).toList());
+    });
   }
 }
 
@@ -544,3 +566,9 @@ List<Dessert> _desserts = <Dessert>[
     6,
   ),
 ];
+
+List<Dessert> _desserts_x3 = _desserts.toList()
+  ..addAll(_desserts.map((i) => Dessert(i.name + ' x2', i.calories, i.fat,
+      i.carbs, i.protein, i.sodium, i.calcium, i.iron)))
+  ..addAll(_desserts.map((i) => Dessert(i.name + ' x3', i.calories, i.fat,
+      i.carbs, i.protein, i.sodium, i.calcium, i.iron)));

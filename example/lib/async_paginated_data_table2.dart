@@ -21,7 +21,6 @@ class AsyncPaginatedDataTable2Demo extends StatefulWidget {
 
 class _AsyncPaginatedDataTable2DemoState
     extends State<AsyncPaginatedDataTable2Demo> {
-  int _rowIndex = 0;
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   bool _sortAscending = true;
   int? _sortColumnIndex;
@@ -37,16 +36,24 @@ class _AsyncPaginatedDataTable2DemoState
     }
   }
 
-  void sort<T>(
-    Comparable<T> Function(Dessert d) getField,
+  void sort(
     int columnIndex,
     bool ascending,
   ) {
     //_dessertsDataSource.sort<T>(getField, ascending);
-    setState(() {
-      _sortColumnIndex = columnIndex;
-      _sortAscending = ascending;
-    });
+    var columnName = "name";
+    switch (columnIndex) {
+      case 1:
+        columnName = "calories";
+        break;
+    }
+    _dessertsDataSource.sort(columnName, ascending);
+    // No need to call state, data source will trigger rebuild via
+    // notifyListeners()
+    //setState(() {
+    _sortColumnIndex = columnIndex;
+    _sortAscending = ascending;
+    //});
   }
 
   @override
@@ -59,50 +66,42 @@ class _AsyncPaginatedDataTable2DemoState
     return [
       DataColumn(
         label: Text('Desert'),
-        onSort: (columnIndex, ascending) =>
-            sort<String>((d) => d.name, columnIndex, ascending),
+        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
       DataColumn(
         label: Text('Calories'),
         numeric: true,
-        onSort: (columnIndex, ascending) =>
-            sort<num>((d) => d.calories, columnIndex, ascending),
+        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
       DataColumn(
         label: Text('Fat (gm)'),
         numeric: true,
-        onSort: (columnIndex, ascending) =>
-            sort<num>((d) => d.fat, columnIndex, ascending),
+        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
       DataColumn(
         label: Text('Carbs (gm)'),
         numeric: true,
-        onSort: (columnIndex, ascending) =>
-            sort<num>((d) => d.carbs, columnIndex, ascending),
+        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
       DataColumn(
         label: Text('Protein (gm)'),
         numeric: true,
-        onSort: (columnIndex, ascending) =>
-            sort<num>((d) => d.protein, columnIndex, ascending),
+        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
       DataColumn(
         label: Text('Sodium (mg)'),
         numeric: true,
-        onSort: (columnIndex, ascending) =>
-            sort<num>((d) => d.sodium, columnIndex, ascending),
+        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
       DataColumn(
         label: Text('Calcium (%)'),
         numeric: true,
-        onSort: (columnIndex, ascending) =>
-            sort<num>((d) => d.calcium, columnIndex, ascending),
+        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
       DataColumn(
         label: Text('Iron (%)'),
         numeric: true,
-        onSort: (columnIndex, ascending) =>
-            sort<num>((d) => d.iron, columnIndex, ascending),
+        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
     ];
   }

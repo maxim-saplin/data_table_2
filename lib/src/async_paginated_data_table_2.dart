@@ -31,7 +31,14 @@ abstract class AsyncDataTableSource extends DataTableSource {
   /// returned from this method)
   Future<AsyncRowsResponse> getRows(int start, int end);
 
-  Future _getRows(int startIndex, int count) async {
+  /// This method triggers getRows() requesting same rows as the last time
+  /// and intitaite update workflow (and thus rebuilding of [AsyncPaginatedDataTable2]
+  /// attached to this data source). Can be used for sorting
+  void refreshDatasource() {
+    _fetchData(_firstRowAbsoluteIndex, _rows.length);
+  }
+
+  Future _fetchData(int startIndex, int count) async {
     _state = SourceState.loading;
     await Future(() => notifyListeners());
 
@@ -163,7 +170,7 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
       _operationInProgress = _TableOperationInProgress.pageTo;
       _rowIndexRequested = rowIndex;
       var source = widget.source as AsyncDataTableSource;
-      source._getRows(rowIndex, widget.rowsPerPage);
+      source._fetchData(rowIndex, widget.rowsPerPage);
     }
   }
 
@@ -173,7 +180,7 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
       _operationInProgress = _TableOperationInProgress.pageSize;
       _rowsPerPageRequested = r;
       var source = widget.source as AsyncDataTableSource;
-      source._getRows(_firstRowIndex, r);
+      source._fetchData(_firstRowIndex, r);
     }
   }
 
@@ -183,7 +190,7 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
 
     if (source.state == SourceState.none) {
       var x = super.build(context);
-      source._getRows(_firstRowIndex, widget.rowsPerPage);
+      source._fetchData(_firstRowIndex, widget.rowsPerPage);
       return x;
     } else if (source.state == SourceState.loading) {
       var x = super.build(context);
