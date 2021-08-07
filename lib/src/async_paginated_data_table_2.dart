@@ -23,7 +23,27 @@ class AsyncRowsResponse {
 /// to make it legible as a data source.
 abstract class AsyncDataTableSource extends DataTableSource {
   _SourceState _state = _SourceState.none;
+
   _SourceState get state => _state;
+
+  /// Highlights if there're any selected rows (SelectionState.none means there're not any)
+  /// and how [selectionRowKeys] must be treated.
+  /// If SelectionState.include is the status, it is assumed that by default
+  /// all rows are considered deselected and only those items in [selectionRowKeys]
+  /// are selected.
+  /// If SelectionState.exclude is the status, it is assumed that by default
+  /// all rows are considered selected and only those items in [selectionRowKeys]
+  /// are de-selected - this can be usefull if yopu deal with scenarious when you need
+  /// to have many more selected items than deselected (e.g. selecting all rows across
+  /// hundres of pages and than deselecting certain ines).
+  SelectionState _selectionState = SelectionState.none;
+
+  SelectionState get selectionState => _selectionState;
+
+  Set<LocalKey> _selectionRowKeys = {};
+
+  /// Lists rows (their keys) which are treated as eitehr selected or deselected (see [selectionState])
+  Set<LocalKey> get selectionRowKeys => _selectionRowKeys;
 
   Object? _error;
   Object? get error => _error;
@@ -66,26 +86,22 @@ abstract class AsyncDataTableSource extends DataTableSource {
   void _fixSelectedState(int rowIndex) {
     if (_selectionState == SelectionState.include) {
       if (!_rows[rowIndex].selected &&
-          _selectionRowIds.contains(_rows[rowIndex].key)) {
+          _selectionRowKeys.contains(_rows[rowIndex].key)) {
         _rows[rowIndex] = _clone(_rows[rowIndex], true);
       } else if (_rows[rowIndex].selected &&
-          !_selectionRowIds.contains(_rows[rowIndex].key)) {
+          !_selectionRowKeys.contains(_rows[rowIndex].key)) {
         _rows[rowIndex] = _clone(_rows[rowIndex], false);
       }
     } else if (_selectionState == SelectionState.exclude) {
       if (!_rows[rowIndex].selected &&
-          !_selectionRowIds.contains(_rows[rowIndex].key)) {
+          !_selectionRowKeys.contains(_rows[rowIndex].key)) {
         _rows[rowIndex] = _clone(_rows[rowIndex], true);
       } else if (_rows[rowIndex].selected &&
-          _selectionRowIds.contains(_rows[rowIndex].key)) {
+          _selectionRowKeys.contains(_rows[rowIndex].key)) {
         _rows[rowIndex] = _clone(_rows[rowIndex], false);
       }
     }
   }
-
-  Set<LocalKey> _selectionRowIds = {};
-
-  SelectionState _selectionState = SelectionState.none;
 
   void selectAllOnThePage() {
     for (var i = 0; i < _rows.length; i++) {
@@ -95,22 +111,27 @@ abstract class AsyncDataTableSource extends DataTableSource {
       if (r.key != null) {
         if (_selectionState == SelectionState.none ||
             _selectionState == SelectionState.include) {
-          _selectionRowIds.add(r.key!);
+          _selectionRowKeys.add(r.key!);
         } else {
           //exclude
-          _selectionRowIds.remove(r.key!);
+          _selectionRowKeys.remove(r.key!);
         }
         if (!_rows[i].selected) _rows[i] = _clone(r, true);
       }
     }
-    if (_selectionState == SelectionState.none && _selectionRowIds.isNotEmpty) {
+    if (_selectionState == SelectionState.none &&
+        _selectionRowKeys.isNotEmpty) {
       _selectionState = SelectionState.include;
     }
     notifyListeners();
   }
 
   @override
-  int get selectedRowCount => _selectionRowIds.length;
+  int get selectedRowCount => _selectionState == SelectionState.none
+      ? 0
+      : _selectionState == SelectionState.include
+          ? _selectionRowKeys.length
+          : _totalRows - _selectionRowKeys.length;
 
   void deselectAllOnThePage() {
     for (var i = 0; i < _rows.length; i++) {
@@ -119,49 +140,54 @@ abstract class AsyncDataTableSource extends DataTableSource {
       if (r.key != null) {
         if (_selectionState == SelectionState.none ||
             _selectionState == SelectionState.include) {
-          _selectionRowIds.remove(r.key!);
+          _selectionRowKeys.remove(r.key!);
         } else {
           // exclude
-          _selectionRowIds.add(r.key!);
+          _selectionRowKeys.add(r.key!);
         }
-        if (!_rows[i].selected) _rows[i] = _clone(r, false);
+        if (_rows[i].selected) _rows[i] = _clone(r, false);
       }
     }
-    if (_selectionState == SelectionState.include && _selectionRowIds.isEmpty) {
+    if (_selectionState == SelectionState.include &&
+        _selectionRowKeys.isEmpty) {
       _selectionState = SelectionState.none;
     }
     notifyListeners();
   }
 
-  void toggleRowSelection(LocalKey rowKey) {
+  void setRowSelection(LocalKey rowKey, bool selected) {
     var i = _rows.indexWhere((r) => r.key == rowKey);
-    if (i > -1) {
-      _rows[i] = _clone(_rows[i], !_rows[i].selected);
-      if (_selectionState == SelectionState.none) {
-        if (_rows[i].selected) {
-          _selectionRowIds.add(_rows[i].key!);
-          _selectionState = SelectionState.include;
-        }
-      } else if (_selectionState == SelectionState.include) {
-        if (_rows[i].selected) {
-          _selectionRowIds.add(_rows[i].key!);
-        } else {
-          _selectionRowIds.remove(_rows[i].key!);
-        }
-        if (_selectionRowIds.isEmpty) {
-          _selectionState = SelectionState.none;
-        }
-      } else {
-        // exclude
-        if (_rows[i].selected) {
-          _selectionRowIds.remove(_rows[i].key!);
-        } else {
-          _selectionRowIds.add(_rows[i].key!);
-        }
-      }
-
-      notifyListeners();
+    if (i > -1 && _rows[i].selected != selected) {
+      _toggleRowSelection(i);
     }
+  }
+
+  void _toggleRowSelection(int i) {
+    _rows[i] = _clone(_rows[i], !_rows[i].selected);
+    if (_selectionState == SelectionState.none) {
+      if (_rows[i].selected) {
+        _selectionRowKeys.add(_rows[i].key!);
+        _selectionState = SelectionState.include;
+      }
+    } else if (_selectionState == SelectionState.include) {
+      if (_rows[i].selected) {
+        _selectionRowKeys.add(_rows[i].key!);
+      } else {
+        _selectionRowKeys.remove(_rows[i].key!);
+      }
+      if (_selectionRowKeys.isEmpty) {
+        _selectionState = SelectionState.none;
+      }
+    } else {
+      // exclude
+      if (_rows[i].selected) {
+        _selectionRowKeys.remove(_rows[i].key!);
+      } else {
+        _selectionRowKeys.add(_rows[i].key!);
+      }
+    }
+
+    notifyListeners();
   }
 
   /// This method triggers getRows() requesting same rows as the last time

@@ -209,13 +209,8 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
             key: ValueKey<int>(dessert.id),
             selected: dessert.selected,
             onSelectChanged: (value) {
-              toggleRowSelection(ValueKey<int>(dessert.id));
-              // if (dessert.selected != value) {
-              //   _selectedCount += value! ? 1 : -1;
-              //   assert(_selectedCount >= 0);
-              //   dessert.selected = value;
-              //   notifyListeners();
-              // }
+              if (value != null)
+                setRowSelection(ValueKey<int>(dessert.id), value);
             },
             cells: [
               DataCell(Text(dessert.name)),
