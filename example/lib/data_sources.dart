@@ -250,6 +250,19 @@ class DesertsFakeWebService {
         return (Dessert d1, Dessert d2) => coef * d1.name.compareTo(d2.name);
       case 'calories':
         return (Dessert d1, Dessert d2) => coef * (d1.calories - d2.calories);
+      case 'fat':
+        return (Dessert d1, Dessert d2) => coef * (d1.fat - d2.fat).round();
+      case 'carbs':
+        return (Dessert d1, Dessert d2) => coef * (d1.carbs - d2.carbs);
+      case 'protein':
+        return (Dessert d1, Dessert d2) =>
+            coef * (d1.protein - d2.protein).round();
+      case 'sodium':
+        return (Dessert d1, Dessert d2) => coef * (d1.sodium - d2.sodium);
+      case 'calcium':
+        return (Dessert d1, Dessert d2) => coef * (d1.calcium - d2.calcium);
+      case 'iron':
+        return (Dessert d1, Dessert d2) => coef * (d1.iron - d2.iron);
     }
   }
 

@@ -46,14 +46,30 @@ class _AsyncPaginatedDataTable2DemoState
       case 1:
         columnName = "calories";
         break;
+      case 2:
+        columnName = "fat";
+        break;
+      case 3:
+        columnName = "carbs";
+        break;
+      case 4:
+        columnName = "protein";
+        break;
+      case 5:
+        columnName = "sodium";
+        break;
+      case 6:
+        columnName = "calcium";
+        break;
+      case 7:
+        columnName = "iron";
+        break;
     }
     _dessertsDataSource.sort(columnName, ascending);
-    // No need to call state, data source will trigger rebuild via
-    // notifyListeners()
-    //setState(() {
-    _sortColumnIndex = columnIndex;
-    _sortAscending = ascending;
-    //});
+    setState(() {
+      _sortColumnIndex = columnIndex;
+      _sortAscending = ascending;
+    });
   }
 
   @override
