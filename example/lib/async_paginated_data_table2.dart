@@ -1,4 +1,6 @@
+import 'package:example/custom_pager.dart';
 import 'package:example/data_sources.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 
@@ -26,12 +28,14 @@ class _AsyncPaginatedDataTable2DemoState
   int? _sortColumnIndex;
   late DessertDataSourceAsync _dessertsDataSource;
   bool _initialized = false;
+  PaginatorController? _controller;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialized) {
       _dessertsDataSource = DessertDataSourceAsync();
+      _controller = PaginatorController();
       _initialized = true;
     }
   }
@@ -124,62 +128,68 @@ class _AsyncPaginatedDataTable2DemoState
 
   @override
   Widget build(BuildContext context) {
-    return AsyncPaginatedDataTable2(
-        horizontalMargin: 20,
-        checkboxHorizontalMargin: 12,
-        columnSpacing: 0,
-        wrapInCard: false,
-        // header:
-        //     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        //   Text('PaginatedDataTable2'),
-        //   if (kDebugMode && getCurrentRouteOption(context) == custPager)
-        //     Row(children: [
-        //       OutlinedButton(
-        //           onPressed: () => _controller!.goToPageWithRow(25),
-        //           child: Text('Go to row 25')),
-        //       OutlinedButton(
-        //           onPressed: () => _controller!.goToRow(5),
-        //           child: Text('Go to row 5'))
-        //     ]),
-        //   if (getCurrentRouteOption(context) == custPager &&
-        //       _controller != null)
-        //     _PageNumber(controller: _controller!)
-        // ]),
-        rowsPerPage: _rowsPerPage,
-        autoRowsToHeight: getCurrentRouteOption(context) == autoRows,
-        minWidth: 800,
-        fit: FlexFit.tight,
-        border: TableBorder(
-            top: BorderSide(color: Colors.black),
-            bottom: BorderSide(color: Colors.grey[300]!),
-            left: BorderSide(color: Colors.grey[300]!),
-            right: BorderSide(color: Colors.grey[300]!),
-            verticalInside: BorderSide(color: Colors.grey[300]!),
-            horizontalInside: BorderSide(color: Colors.grey, width: 1)),
-        onRowsPerPageChanged: (value) {
-          // No need to wrap into setState, it will be called inside the widget
-          // and trigger rebuild
-          //setState(() {
-          _rowsPerPage = value!;
-          print(_rowsPerPage);
-          //});
-        },
-        initialFirstRowIndex: 0,
-        onPageChanged: (rowIndex) {
-          print(rowIndex / _rowsPerPage);
-        },
-        sortColumnIndex: _sortColumnIndex,
-        sortAscending: _sortAscending,
-        //onSelectAll: _dessertsDataSource.selectAll,
-        // controller:
-        //     getCurrentRouteOption(context) == custPager ? _controller : null,
-        hidePaginator: getCurrentRouteOption(context) == custPager,
-        columns: _columns,
-        empty: Center(
-            child: Container(
-                padding: EdgeInsets.all(20),
-                color: Colors.grey[200],
-                child: Text('No data'))),
-        source: _dessertsDataSource);
+    return Stack(alignment: Alignment.bottomCenter, children: [
+      AsyncPaginatedDataTable2(
+          horizontalMargin: 20,
+          checkboxHorizontalMargin: 12,
+          columnSpacing: 0,
+          wrapInCard: false,
+          header:
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text('AsyncPaginatedDataTable2'),
+            if (kDebugMode && getCurrentRouteOption(context) == custPager)
+              Row(children: [
+                OutlinedButton(
+                    onPressed: () => _controller!.goToPageWithRow(25),
+                    child: Text('Go to row 25')),
+                OutlinedButton(
+                    onPressed: () => _controller!.goToRow(5),
+                    child: Text('Go to row 5'))
+              ]),
+            if (getCurrentRouteOption(context) == custPager &&
+                _controller != null)
+              PageNumber(controller: _controller!)
+          ]),
+          rowsPerPage: _rowsPerPage,
+          autoRowsToHeight: getCurrentRouteOption(context) == autoRows,
+          minWidth: 800,
+          fit: FlexFit.tight,
+          border: TableBorder(
+              top: BorderSide(color: Colors.black),
+              bottom: BorderSide(color: Colors.grey[300]!),
+              left: BorderSide(color: Colors.grey[300]!),
+              right: BorderSide(color: Colors.grey[300]!),
+              verticalInside: BorderSide(color: Colors.grey[300]!),
+              horizontalInside: BorderSide(color: Colors.grey, width: 1)),
+          onRowsPerPageChanged: (value) {
+            // No need to wrap into setState, it will be called inside the widget
+            // and trigger rebuild
+            //setState(() {
+            _rowsPerPage = value!;
+            print(_rowsPerPage);
+            //});
+          },
+          initialFirstRowIndex: 0,
+          onPageChanged: (rowIndex) {
+            print(rowIndex / _rowsPerPage);
+          },
+          sortColumnIndex: _sortColumnIndex,
+          sortAscending: _sortAscending,
+          onSelectAll: (select) => select != null && select
+              ? _dessertsDataSource.selectAllOnThePage()
+              : _dessertsDataSource.deselectAllOnThePage(),
+          controller:
+              getCurrentRouteOption(context) == custPager ? _controller : null,
+          hidePaginator: getCurrentRouteOption(context) == custPager,
+          columns: _columns,
+          empty: Center(
+              child: Container(
+                  padding: EdgeInsets.all(20),
+                  color: Colors.grey[200],
+                  child: Text('No data'))),
+          source: _dessertsDataSource),
+      if (getCurrentRouteOption(context) == custPager)
+        Positioned(bottom: 16, child: CustomPager(_controller!))
+    ]);
   }
 }

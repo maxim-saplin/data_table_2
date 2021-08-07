@@ -31,6 +31,55 @@ abstract class AsyncDataTableSource extends DataTableSource {
   /// returned from this method)
   Future<AsyncRowsResponse> getRows(int start, int end);
 
+  DataRow _clone(DataRow row, bool? selected) {
+    if (row is DataRow2) {
+      return DataRow2(
+          key: row.key,
+          selected: selected == null ? row.selected : selected,
+          onSelectChanged: row.onSelectChanged,
+          color: row.color,
+          cells: row.cells,
+          onTap: row.onTap,
+          onSecondaryTap: row.onSecondaryTap,
+          onSecondaryTapDown: row.onSecondaryTapDown);
+    }
+
+    return DataRow(
+      key: row.key,
+      selected: selected == null ? row.selected : selected,
+      onSelectChanged: row.onSelectChanged,
+      color: row.color,
+      cells: row.cells,
+    );
+  }
+
+  void _fixSelected(int rowIndex) {}
+
+  Set<LocalKey> _selectedRows = {};
+
+  void selectAllOnThePage() {
+    for (var i = 0; i < _rows.length; i++) {
+      var r = _rows[i];
+      assert(r.key != null, 'Row key can\'t be null');
+      if (r.key != null) _selectedRows.add(r.key!);
+      _rows[i] = _clone(r, true);
+    }
+    notifyListeners();
+  }
+
+  @override
+  int get selectedRowCount => _selectedRows.length;
+
+  void deselectAllOnThePage() {
+    for (var i = 0; i < _rows.length; i++) {
+      var r = _rows[i];
+      assert(r.key != null, 'Row key can\'t be null');
+      if (r.key != null) _selectedRows.remove(r.key!);
+      _rows[i] = _clone(r, false);
+    }
+    notifyListeners();
+  }
+
   /// This method triggers getRows() requesting same rows as the last time
   /// and intitaite update workflow (and thus rebuilding of [AsyncPaginatedDataTable2]
   /// attached to this data source). Can be used for sorting

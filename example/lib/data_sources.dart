@@ -51,6 +51,8 @@ class RestorableDessertSelections extends RestorableProperty<Set<int>> {
   Object toPrimitives() => _dessertSelections.toList();
 }
 
+int _idCounter = 0;
+
 /// Domain model entity
 class Dessert {
   Dessert(
@@ -63,6 +65,8 @@ class Dessert {
     this.calcium,
     this.iron,
   );
+
+  final int id = _idCounter++;
 
   final String name;
   final int calories;
@@ -174,10 +178,12 @@ class DessertDataSource extends DataTableSource {
 class DessertDataSourceAsync extends AsyncDataTableSource {
   final DesertsFakeWebService _repo = DesertsFakeWebService();
 
-  int _selectedCount = 0;
-
   String _sortColumn = "name";
   bool _sortAscending = true;
+
+  // void selectItems(HashSet<int> ids) {
+
+  // }
 
   void sort(String columnName, bool ascending) {
     _sortColumn = columnName;
@@ -199,8 +205,8 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     var r = AsyncRowsResponse(
         x.totalRecords,
         x.data.map((dessert) {
-          return DataRow.byIndex(
-            index: index++,
+          return DataRow(
+            key: ValueKey<int>(dessert.id),
             selected: dessert.selected,
             onSelectChanged: (value) {
               // if (dessert.selected != value) {
@@ -225,10 +231,6 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
 
     return r;
   }
-
-  @override
-  // TODO: implement selectedRowCount
-  int get selectedRowCount => 0;
 }
 
 class DesertsFakeWebServiceResponse {
@@ -270,9 +272,9 @@ class DesertsFakeWebService {
       int startingAt, int count, String sortedBy, bool sortedAsc) async {
     return Future.delayed(Duration(milliseconds: startingAt == 0 ? 1650 : 1000),
         () {
-      _desserts_x3.sort(_getComparisonFunction(sortedBy, sortedAsc));
-      return DesertsFakeWebServiceResponse(_desserts_x3.length,
-          _desserts_x3.skip(startingAt).take(count).toList());
+      _dessertsX3.sort(_getComparisonFunction(sortedBy, sortedAsc));
+      return DesertsFakeWebServiceResponse(_dessertsX3.length,
+          _dessertsX3.skip(startingAt).take(count).toList());
     });
   }
 }
@@ -580,7 +582,7 @@ List<Dessert> _desserts = <Dessert>[
   ),
 ];
 
-List<Dessert> _desserts_x3 = _desserts.toList()
+List<Dessert> _dessertsX3 = _desserts.toList()
   ..addAll(_desserts.map((i) => Dessert(i.name + ' x2', i.calories, i.fat,
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)))
   ..addAll(_desserts.map((i) => Dessert(i.name + ' x3', i.calories, i.fat,
