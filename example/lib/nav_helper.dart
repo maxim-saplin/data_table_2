@@ -10,16 +10,17 @@ String getCurrentRouteOption(BuildContext context) {
   return isEmpty;
 }
 
-const hasData = 'Default';
+const dflt = 'Default';
 const noData = 'No data';
 const autoRows = 'Auto rows';
 const showBorders = 'Borders';
 const custPager = 'Custom pager';
+const selectAllPage = 'Select all at page';
 
 const Map<String, List<String>> routeOptions = {
-  '/datatable2': [hasData, noData, showBorders],
-  '/paginated2': [hasData, noData, autoRows, custPager],
-  '/asyncpaginated2': [hasData, noData, autoRows, custPager],
+  '/datatable2': [dflt, noData, showBorders],
+  '/paginated2': [dflt, noData, autoRows, custPager],
+  '/asyncpaginated2': [dflt, selectAllPage, autoRows, custPager],
 };
 
 List<String>? getOptionsForRoute(String route) {

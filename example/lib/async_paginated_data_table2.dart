@@ -176,8 +176,12 @@ class _AsyncPaginatedDataTable2DemoState
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
           onSelectAll: (select) => select != null && select
-              ? _dessertsDataSource.selectAllOnThePage()
-              : _dessertsDataSource.deselectAllOnThePage(),
+              ? (getCurrentRouteOption(context) != selectAllPage
+                  ? _dessertsDataSource.selectAll()
+                  : _dessertsDataSource.selectAllOnThePage())
+              : (getCurrentRouteOption(context) != selectAllPage
+                  ? _dessertsDataSource.deselectAll()
+                  : _dessertsDataSource.deselectAllOnThePage()),
           controller:
               getCurrentRouteOption(context) == custPager ? _controller : null,
           hidePaginator: getCurrentRouteOption(context) == custPager,

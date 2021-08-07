@@ -100,7 +100,24 @@ abstract class AsyncDataTableSource extends DataTableSource {
           _selectionRowKeys.contains(_rows[rowIndex].key)) {
         _rows[rowIndex] = _clone(_rows[rowIndex], false);
       }
+    } else {
+      //none
+      if (_rows[rowIndex].selected) {
+        _rows[rowIndex] = _clone(_rows[rowIndex], false);
+      }
     }
+  }
+
+  void selectAll() {
+    _selectionState = SelectionState.exclude;
+    _selectionRowKeys.clear();
+    notifyListeners();
+  }
+
+  void deselectAll() {
+    _selectionState = SelectionState.none;
+    _selectionRowKeys.clear();
+    notifyListeners();
   }
 
   void selectAllOnThePage() {
