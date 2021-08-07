@@ -1,6 +1,15 @@
 part of 'paginated_data_table_2.dart';
 
-enum SourceState { none, ok, loading, error }
+enum _SourceState { none, ok, loading, error }
+
+/// AsyncDataTableSource states:
+/// none -> toggle/selectAllOnPage -> include
+/// include -> toggle/deselectAllOnPage -> no
+/// include -> selectAll -> exclude
+/// none -> selectAll -> exclude
+/// exclude -> deselectAll -> none
+/// exclude -> toggle/selectAllOnPage/deselectAllOnPage -> exclude
+enum SelectionState { none, include, exclude }
 
 class AsyncRowsResponse {
   AsyncRowsResponse(this.totalRows, this.rows);
@@ -13,8 +22,8 @@ class AsyncRowsResponse {
 /// Please overide [AsyncDataTableSource.getRows] and [DataTableSource.selectedRowCount]
 /// to make it legible as a data source.
 abstract class AsyncDataTableSource extends DataTableSource {
-  SourceState _state = SourceState.none;
-  SourceState get state => _state;
+  _SourceState _state = _SourceState.none;
+  _SourceState get state => _state;
 
   Object? _error;
   Object? get error => _error;
@@ -53,31 +62,106 @@ abstract class AsyncDataTableSource extends DataTableSource {
     );
   }
 
-  void _fixSelected(int rowIndex) {}
+  // set row's seelcted property in accordance with included/excluded from selection items
+  void _fixSelectedState(int rowIndex) {
+    if (_selectionState == SelectionState.include) {
+      if (!_rows[rowIndex].selected &&
+          _selectionRowIds.contains(_rows[rowIndex].key)) {
+        _rows[rowIndex] = _clone(_rows[rowIndex], true);
+      } else if (_rows[rowIndex].selected &&
+          !_selectionRowIds.contains(_rows[rowIndex].key)) {
+        _rows[rowIndex] = _clone(_rows[rowIndex], false);
+      }
+    } else if (_selectionState == SelectionState.exclude) {
+      if (!_rows[rowIndex].selected &&
+          !_selectionRowIds.contains(_rows[rowIndex].key)) {
+        _rows[rowIndex] = _clone(_rows[rowIndex], true);
+      } else if (_rows[rowIndex].selected &&
+          _selectionRowIds.contains(_rows[rowIndex].key)) {
+        _rows[rowIndex] = _clone(_rows[rowIndex], false);
+      }
+    }
+  }
 
-  Set<LocalKey> _selectedRows = {};
+  Set<LocalKey> _selectionRowIds = {};
+
+  SelectionState _selectionState = SelectionState.none;
 
   void selectAllOnThePage() {
     for (var i = 0; i < _rows.length; i++) {
       var r = _rows[i];
       assert(r.key != null, 'Row key can\'t be null');
-      if (r.key != null) _selectedRows.add(r.key!);
-      _rows[i] = _clone(r, true);
+
+      if (r.key != null) {
+        if (_selectionState == SelectionState.none ||
+            _selectionState == SelectionState.include) {
+          _selectionRowIds.add(r.key!);
+        } else {
+          //exclude
+          _selectionRowIds.remove(r.key!);
+        }
+        if (!_rows[i].selected) _rows[i] = _clone(r, true);
+      }
+    }
+    if (_selectionState == SelectionState.none && _selectionRowIds.isNotEmpty) {
+      _selectionState = SelectionState.include;
     }
     notifyListeners();
   }
 
   @override
-  int get selectedRowCount => _selectedRows.length;
+  int get selectedRowCount => _selectionRowIds.length;
 
   void deselectAllOnThePage() {
     for (var i = 0; i < _rows.length; i++) {
       var r = _rows[i];
       assert(r.key != null, 'Row key can\'t be null');
-      if (r.key != null) _selectedRows.remove(r.key!);
-      _rows[i] = _clone(r, false);
+      if (r.key != null) {
+        if (_selectionState == SelectionState.none ||
+            _selectionState == SelectionState.include) {
+          _selectionRowIds.remove(r.key!);
+        } else {
+          // exclude
+          _selectionRowIds.add(r.key!);
+        }
+        if (!_rows[i].selected) _rows[i] = _clone(r, false);
+      }
+    }
+    if (_selectionState == SelectionState.include && _selectionRowIds.isEmpty) {
+      _selectionState = SelectionState.none;
     }
     notifyListeners();
+  }
+
+  void toggleRowSelection(LocalKey rowKey) {
+    var i = _rows.indexWhere((r) => r.key == rowKey);
+    if (i > -1) {
+      _rows[i] = _clone(_rows[i], !_rows[i].selected);
+      if (_selectionState == SelectionState.none) {
+        if (_rows[i].selected) {
+          _selectionRowIds.add(_rows[i].key!);
+          _selectionState = SelectionState.include;
+        }
+      } else if (_selectionState == SelectionState.include) {
+        if (_rows[i].selected) {
+          _selectionRowIds.add(_rows[i].key!);
+        } else {
+          _selectionRowIds.remove(_rows[i].key!);
+        }
+        if (_selectionRowIds.isEmpty) {
+          _selectionState = SelectionState.none;
+        }
+      } else {
+        // exclude
+        if (_rows[i].selected) {
+          _selectionRowIds.remove(_rows[i].key!);
+        } else {
+          _selectionRowIds.add(_rows[i].key!);
+        }
+      }
+
+      notifyListeners();
+    }
   }
 
   /// This method triggers getRows() requesting same rows as the last time
@@ -88,7 +172,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
   }
 
   Future _fetchData(int startIndex, int count) async {
-    _state = SourceState.loading;
+    _state = _SourceState.loading;
     await Future(() => notifyListeners());
 
     try {
@@ -100,13 +184,13 @@ abstract class AsyncDataTableSource extends DataTableSource {
       _rows = [];
       _totalRows = 0;
       _firstRowAbsoluteIndex = 0;
-      _state = SourceState.error;
+      _state = _SourceState.error;
       _error = e;
       notifyListeners();
       return;
     }
 
-    _state = SourceState.ok;
+    _state = _SourceState.ok;
     _error = null;
     notifyListeners();
     return;
@@ -116,8 +200,10 @@ abstract class AsyncDataTableSource extends DataTableSource {
   DataRow? getRow(int index) {
     if (index - _firstRowAbsoluteIndex < 0 ||
         index >= _rows.length + _firstRowAbsoluteIndex) return null;
+    index -= _firstRowAbsoluteIndex;
+    _fixSelectedState(index);
 
-    return _rows[index - _firstRowAbsoluteIndex];
+    return _rows[index];
   }
 
   @override
@@ -237,11 +323,11 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
   Widget build(BuildContext context) {
     var source = widget.source as AsyncDataTableSource;
 
-    if (source.state == SourceState.none) {
+    if (source.state == _SourceState.none) {
       var x = super.build(context);
       source._fetchData(_firstRowIndex, widget.rowsPerPage);
       return x;
-    } else if (source.state == SourceState.loading) {
+    } else if (source.state == _SourceState.loading) {
       var x = super.build(context);
       return Stack(fit: StackFit.expand, children: [
         x,
@@ -258,7 +344,7 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
               height: 50,
             ))),
       ]);
-    } else if (source.state == SourceState.error) {
+    } else if (source.state == _SourceState.error) {
       return Center(child: Text('Error'));
     }
 
