@@ -26,25 +26,13 @@ class _AsyncPaginatedDataTable2DemoState
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   bool _sortAscending = true;
   int? _sortColumnIndex;
-  late DessertDataSourceAsync _dessertsDataSource;
-  bool _initialized = false;
-  PaginatorController? _controller;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_initialized) {
-      _dessertsDataSource = DessertDataSourceAsync();
-      _controller = PaginatorController();
-      _initialized = true;
-    }
-  }
+  DessertDataSourceAsync? _dessertsDataSource;
+  PaginatorController _controller = PaginatorController();
 
   void sort(
     int columnIndex,
     bool ascending,
   ) {
-    //_dessertsDataSource.sort<T>(getField, ascending);
     var columnName = "name";
     switch (columnIndex) {
       case 1:
@@ -69,7 +57,7 @@ class _AsyncPaginatedDataTable2DemoState
         columnName = "iron";
         break;
     }
-    _dessertsDataSource.sort(columnName, ascending);
+    _dessertsDataSource!.sort(columnName, ascending);
     setState(() {
       _sortColumnIndex = columnIndex;
       _sortAscending = ascending;
@@ -78,7 +66,7 @@ class _AsyncPaginatedDataTable2DemoState
 
   @override
   void dispose() {
-    _dessertsDataSource.dispose();
+    _dessertsDataSource!.dispose();
     super.dispose();
   }
 
@@ -128,6 +116,13 @@ class _AsyncPaginatedDataTable2DemoState
 
   @override
   Widget build(BuildContext context) {
+    if (_dessertsDataSource == null) {
+      _dessertsDataSource = getCurrentRouteOption(context) == noData
+          ? DessertDataSourceAsync.empty()
+          : getCurrentRouteOption(context) == asyncErrors
+              ? DessertDataSourceAsync.error()
+              : DessertDataSourceAsync();
+    }
     return Stack(alignment: Alignment.bottomCenter, children: [
       AsyncPaginatedDataTable2(
           horizontalMargin: 20,
@@ -140,15 +135,14 @@ class _AsyncPaginatedDataTable2DemoState
             if (kDebugMode && getCurrentRouteOption(context) == custPager)
               Row(children: [
                 OutlinedButton(
-                    onPressed: () => _controller!.goToPageWithRow(25),
+                    onPressed: () => _controller.goToPageWithRow(25),
                     child: Text('Go to row 25')),
                 OutlinedButton(
-                    onPressed: () => _controller!.goToRow(5),
+                    onPressed: () => _controller.goToRow(5),
                     child: Text('Go to row 5'))
               ]),
-            if (getCurrentRouteOption(context) == custPager &&
-                _controller != null)
-              PageNumber(controller: _controller!)
+            if (getCurrentRouteOption(context) == custPager)
+              PageNumber(controller: _controller)
           ]),
           rowsPerPage: _rowsPerPage,
           autoRowsToHeight: getCurrentRouteOption(context) == autoRows,
@@ -176,11 +170,11 @@ class _AsyncPaginatedDataTable2DemoState
           sortAscending: _sortAscending,
           onSelectAll: (select) => select != null && select
               ? (getCurrentRouteOption(context) != selectAllPage
-                  ? _dessertsDataSource.selectAll()
-                  : _dessertsDataSource.selectAllOnThePage())
+                  ? _dessertsDataSource!.selectAll()
+                  : _dessertsDataSource!.selectAllOnThePage())
               : (getCurrentRouteOption(context) != selectAllPage
-                  ? _dessertsDataSource.deselectAll()
-                  : _dessertsDataSource.deselectAllOnThePage()),
+                  ? _dessertsDataSource!.deselectAll()
+                  : _dessertsDataSource!.deselectAllOnThePage()),
           controller:
               getCurrentRouteOption(context) == custPager ? _controller : null,
           hidePaginator: getCurrentRouteOption(context) == custPager,
@@ -191,9 +185,34 @@ class _AsyncPaginatedDataTable2DemoState
                   color: Colors.grey[200],
                   child: Text('No data'))),
           loading: _Loading(),
-          source: _dessertsDataSource),
+          errorBuilder: (e) => Center(
+                child: Container(
+                    padding: EdgeInsets.all(10),
+                    height: 70,
+                    color: Colors.red,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Oops! ${e != null ? e.toString() : ""}',
+                              style: TextStyle(color: Colors.white)),
+                          TextButton(
+                              onPressed: () =>
+                                  _dessertsDataSource!.refreshDatasource(),
+                              child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.refresh,
+                                      color: Colors.white,
+                                    ),
+                                    Text('Retry',
+                                        style: TextStyle(color: Colors.white))
+                                  ]))
+                        ])),
+              ),
+          source: _dessertsDataSource!),
       if (getCurrentRouteOption(context) == custPager)
-        Positioned(bottom: 16, child: CustomPager(_controller!))
+        Positioned(bottom: 16, child: CustomPager(_controller))
     ]);
   }
 }
@@ -208,9 +227,9 @@ class __LoadingState extends State<_Loading> {
   Widget build(BuildContext context) {
     return ColoredBox(
         color: Colors.white.withAlpha(128),
-        // at first show shade, if loading takes longer than 1s show spinner
+        // at first show shade, if loading takes longer than 0,5s show spinner
         child: FutureBuilder(
-            future: Future.delayed(Duration(milliseconds: 1000), () => true),
+            future: Future.delayed(Duration(milliseconds: 500), () => true),
             builder: (context, snapshot) {
               return !snapshot.hasData
                   ? SizedBox()

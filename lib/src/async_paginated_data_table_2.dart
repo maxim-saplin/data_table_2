@@ -52,6 +52,9 @@ abstract class AsyncDataTableSource extends DataTableSource {
   int _totalRows = 0;
   int _firstRowAbsoluteIndex = 0;
 
+  int _prevFetchSratIndex = 0;
+  int _prevFetchCount = 0;
+
   /// Override this method to allow the data source asynchronously
   /// fetch data (e.g. from a server) and convert them to [DataRow]/[DataRow2]
   /// entities consumed by [AsyncPaginatedDataTable2] widget.
@@ -211,10 +214,12 @@ abstract class AsyncDataTableSource extends DataTableSource {
   /// and intitaite update workflow (and thus rebuilding of [AsyncPaginatedDataTable2]
   /// attached to this data source). Can be used for sorting
   void refreshDatasource() {
-    _fetchData(_firstRowAbsoluteIndex, _rows.length);
+    _fetchData(_prevFetchSratIndex, _prevFetchCount);
   }
 
   Future _fetchData(int startIndex, int count) async {
+    _prevFetchSratIndex = startIndex;
+    _prevFetchCount = count;
     _state = _SourceState.loading;
     await Future(() => notifyListeners());
 
@@ -292,7 +297,7 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
       ScrollController? scrollController,
       Widget? empty,
       this.loading,
-      this.errorWidgetBuilder,
+      this.errorBuilder,
       TableBorder? border,
       bool autoRowsToHeight = false,
       double smRatio = 0.67,
@@ -332,7 +337,7 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
             lmRatio: lmRatio);
 
   final Widget? loading;
-  final Widget Function(dynamic error)? errorWidgetBuilder;
+  final Widget Function(Object? error)? errorBuilder;
 
   @override
   PaginatedDataTable2State createState() => AsyncPaginatedDataTable2State();
@@ -394,7 +399,9 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
       ]);
     } else if (source.state == _SourceState.error) {
       _showNothing = true;
-      return Center(child: Text('Error'));
+      return w.errorBuilder != null
+          ? w.errorBuilder!(source._error)
+          : SizedBox();
     }
 
     // SourceState.ok

@@ -16,11 +16,19 @@ const autoRows = 'Auto rows';
 const showBorders = 'Borders';
 const custPager = 'Custom pager';
 const selectAllPage = 'Select all at page';
+const asyncErrors = "Errors/Retries";
 
 const Map<String, List<String>> routeOptions = {
   '/datatable2': [dflt, noData, showBorders],
   '/paginated2': [dflt, noData, autoRows, custPager],
-  '/asyncpaginated2': [dflt, selectAllPage, autoRows, custPager],
+  '/asyncpaginated2': [
+    dflt,
+    noData,
+    selectAllPage,
+    autoRows,
+    asyncErrors,
+    custPager
+  ],
 };
 
 List<String>? getOptionsForRoute(String route) {

@@ -176,14 +176,22 @@ class DessertDataSource extends DataTableSource {
 /// is an extension to FLutter's DataTableSource and aimed at solving
 /// saync data fetching scenarious by paginated table (such as using Web API)
 class DessertDataSourceAsync extends AsyncDataTableSource {
+  DessertDataSourceAsync();
+  DessertDataSourceAsync.empty() {
+    _empty = true;
+  }
+
+  DessertDataSourceAsync.error() {
+    _errorCounter = 0;
+  }
+
+  bool _empty = false;
+  int? _errorCounter;
+
   final DesertsFakeWebService _repo = DesertsFakeWebService();
 
   String _sortColumn = "name";
   bool _sortAscending = true;
-
-  // void selectItems(HashSet<int> ids) {
-
-  // }
 
   void sort(String columnName, bool ascending) {
     _sortColumn = columnName;
@@ -193,6 +201,15 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
 
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
+    if (_errorCounter != null) {
+      _errorCounter = _errorCounter! + 1;
+
+      if (_errorCounter! % 2 == 1) {
+        await Future.delayed(Duration(milliseconds: 1000));
+        throw 'Error #${((_errorCounter! - 1) / 2).round() + 1} has occured';
+      }
+    }
+
     var index = startIndex;
     final format = NumberFormat.decimalPercentPattern(
       locale: 'en',
@@ -200,7 +217,10 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     );
     assert(index >= 0);
 
-    var x = await _repo.getData(startIndex, count, _sortColumn, _sortAscending);
+    var x = _empty
+        ? await Future.delayed(Duration(milliseconds: 2000),
+            () => DesertsFakeWebServiceResponse(0, []))
+        : await _repo.getData(startIndex, count, _sortColumn, _sortAscending);
 
     var r = AsyncRowsResponse(
         x.totalRecords,
