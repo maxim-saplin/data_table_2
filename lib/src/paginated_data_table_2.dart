@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 // Copyright 2021 Maxim Saplin - chnages and modifications to original Flutter implementation of PaginatedDataTable
-import 'dart:collection';
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart' show DragStartBehavior;
@@ -28,7 +27,6 @@ part 'async_paginated_data_table_2.dart';
 /// standard paginator of [PaginatedDataTable2] and simplement your own
 /// paginator as a StatefullWidget, subsribe to controller in order to update
 /// the paginator.
-/// TODO: Allow controlling selected rows
 class PaginatorController extends ChangeNotifier {
   PaginatedDataTable2State? _state;
 
@@ -479,10 +477,13 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     );
   }
 
+  // Flag to be used by AsyncDataTable to show empty table when loading data
+  bool _showNothing = false;
+
   List<DataRow> _getRows(int firstRowIndex, int rowsPerPage) {
     final List<DataRow> result = <DataRow>[];
 
-    if (widget.empty != null && widget.source.rowCount < 1)
+    if ((widget.empty != null && widget.source.rowCount < 1) || _showNothing)
       return result; // If empty placeholder is provided - don't create blank rows
 
     final int nextPageFirstRowIndex = firstRowIndex + rowsPerPage;
@@ -613,7 +614,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           rows: _getRows(_firstRowIndex, _effectiveRowsPerPage),
           minWidth: widget.minWidth,
           scrollController: widget.scrollController,
-          empty: widget.empty,
+          empty: _showNothing ? null : widget.empty,
           border: widget.border,
           smRatio: widget.smRatio,
           lmRatio: widget.lmRatio,
@@ -729,14 +730,18 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     );
   }
 
-  void _setRowsPerPage(int? r) {
+  void _setRowsPerPage(int? r, [bool wrapInSetState = true]) {
     if (r != null) {
-      setState(() {
+      var f = () {
         _effectiveRowsPerPage = r;
         if (widget.onRowsPerPageChanged != null) {
           widget.onRowsPerPageChanged!(r);
         }
-      });
+      };
+      if (wrapInSetState)
+        setState(f);
+      else
+        f();
     }
   }
 
@@ -763,7 +768,11 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
             //if (prevRowsPerPageForAutoRows != -1)
             // Also call it on the first build to let clients know
             // how many rows were autocalculated
-            widget.onRowsPerPageChanged?.call(_effectiveRowsPerPage);
+            //widget.onRowsPerPageChanged?.call(_effectiveRowsPerPage);
+            _setRowsPerPage(_effectiveRowsPerPage, false);
+            // don't call setState here to avoid assertion
+            // The following assertion was thrown building LayoutBuilder:
+            // setState() or markNeedsBuild() called during build.
             _prevRowsPerPageForAutoRows = _effectiveRowsPerPage;
           }
         }

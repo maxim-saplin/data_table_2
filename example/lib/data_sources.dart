@@ -266,8 +266,13 @@ class DesertsFakeWebService {
 
   Future<DesertsFakeWebServiceResponse> getData(
       int startingAt, int count, String sortedBy, bool sortedAsc) async {
-    return Future.delayed(Duration(milliseconds: startingAt == 0 ? 1650 : 1000),
-        () {
+    return Future.delayed(
+        Duration(
+            milliseconds: startingAt == 0
+                ? 2650
+                : startingAt < 20
+                    ? 2000
+                    : 400), () {
       _dessertsX3.sort(_getComparisonFunction(sortedBy, sortedAsc));
       return DesertsFakeWebServiceResponse(_dessertsX3.length,
           _dessertsX3.skip(startingAt).take(count).toList());

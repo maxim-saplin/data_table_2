@@ -291,6 +291,8 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
       PaginatorController? controller,
       ScrollController? scrollController,
       Widget? empty,
+      this.loading,
+      this.errorWidgetBuilder,
       TableBorder? border,
       bool autoRowsToHeight = false,
       double smRatio = 0.67,
@@ -329,6 +331,9 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
             smRatio: smRatio,
             lmRatio: lmRatio);
 
+  final Widget? loading;
+  final Widget Function(dynamic error)? errorWidgetBuilder;
+
   @override
   PaginatedDataTable2State createState() => AsyncPaginatedDataTable2State();
 }
@@ -352,52 +357,59 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
     }
   }
 
+  int? _pageSizeInQueue;
+
   @override
-  void _setRowsPerPage(int? r) {
-    if (r != null && _operationInProgress == _TableOperationInProgress.none) {
-      _operationInProgress = _TableOperationInProgress.pageSize;
-      _rowsPerPageRequested = r;
-      var source = widget.source as AsyncDataTableSource;
-      source._fetchData(_firstRowIndex, r);
+  void _setRowsPerPage(int? r, [bool wrapInSetState = true]) {
+    if (r != null) {
+      if (_operationInProgress == _TableOperationInProgress.none) {
+        _pageSizeInQueue = null;
+        _operationInProgress = _TableOperationInProgress.pageSize;
+        _rowsPerPageRequested = r;
+        var source = widget.source as AsyncDataTableSource;
+        source._fetchData(_firstRowIndex, r);
+      } else {
+        // workaround to auto rows and resizing the window while previous fetch is not complete
+        _pageSizeInQueue = r;
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     var source = widget.source as AsyncDataTableSource;
+    var w = widget as AsyncPaginatedDataTable2;
 
     if (source.state == _SourceState.none) {
+      _showNothing = true;
       var x = super.build(context);
       source._fetchData(_firstRowIndex, widget.rowsPerPage);
       return x;
     } else if (source.state == _SourceState.loading) {
+      //_showNothing = true;
       var x = super.build(context);
       return Stack(fit: StackFit.expand, children: [
         x,
-        ColoredBox(
-            color: Colors.white.withAlpha(128),
-            child: Center(
-                child: Container(
-              color: Colors.amber,
-              padding: EdgeInsets.all(7),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [CircularProgressIndicator(), Text('Loading..')]),
-              width: 150,
-              height: 50,
-            ))),
+        if (w.loading != null) w.loading!,
       ]);
     } else if (source.state == _SourceState.error) {
+      _showNothing = true;
       return Center(child: Text('Error'));
     }
 
     // SourceState.ok
+    _showNothing = false;
     if (_operationInProgress == _TableOperationInProgress.pageTo) {
+      _operationInProgress = _TableOperationInProgress.none;
+
       super.pageTo(_rowIndexRequested);
-      _operationInProgress = _TableOperationInProgress.none;
     } else if (_operationInProgress == _TableOperationInProgress.pageSize) {
-      super._setRowsPerPage(_rowsPerPageRequested);
       _operationInProgress = _TableOperationInProgress.none;
+      if (_pageSizeInQueue == null)
+        super._setRowsPerPage(_rowsPerPageRequested);
+      else {
+        _setRowsPerPage(_pageSizeInQueue);
+      }
     }
 
     var x = super.build(context);

@@ -166,12 +166,11 @@ class _AsyncPaginatedDataTable2DemoState
             // and trigger rebuild
             //setState(() {
             _rowsPerPage = value!;
-            print(_rowsPerPage);
             //});
           },
           initialFirstRowIndex: 0,
           onPageChanged: (rowIndex) {
-            print(rowIndex / _rowsPerPage);
+            //print(rowIndex / _rowsPerPage);
           },
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
@@ -191,9 +190,46 @@ class _AsyncPaginatedDataTable2DemoState
                   padding: EdgeInsets.all(20),
                   color: Colors.grey[200],
                   child: Text('No data'))),
+          loading: _Loading(),
           source: _dessertsDataSource),
       if (getCurrentRouteOption(context) == custPager)
         Positioned(bottom: 16, child: CustomPager(_controller!))
     ]);
+  }
+}
+
+class _Loading extends StatefulWidget {
+  @override
+  __LoadingState createState() => __LoadingState();
+}
+
+class __LoadingState extends State<_Loading> {
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+        color: Colors.white.withAlpha(128),
+        // at first show shade, if loading takes longer than 1s show spinner
+        child: FutureBuilder(
+            future: Future.delayed(Duration(milliseconds: 1000), () => true),
+            builder: (context, snapshot) {
+              return !snapshot.hasData
+                  ? SizedBox()
+                  : Center(
+                      child: Container(
+                      color: Colors.yellow,
+                      padding: EdgeInsets.all(7),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.black,
+                            ),
+                            Text('Loading..')
+                          ]),
+                      width: 150,
+                      height: 50,
+                    ));
+            }));
   }
 }
