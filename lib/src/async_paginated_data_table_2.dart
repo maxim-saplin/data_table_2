@@ -355,10 +355,15 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
   @override
   void pageTo(int rowIndex) {
     if (_operationInProgress == _TableOperationInProgress.none) {
+      // int oldFirstRowIndex = _firstRowIndex;
       _operationInProgress = _TableOperationInProgress.pageTo;
-      _rowIndexRequested = rowIndex;
+      _rowIndexRequested = math.min(
+          ((rowIndex + 1) / _effectiveRowsPerPage).floor() *
+              _effectiveRowsPerPage,
+          (_rowCount / _effectiveRowsPerPage).floor() * _effectiveRowsPerPage);
+
       var source = widget.source as AsyncDataTableSource;
-      source._fetchData(rowIndex, widget.rowsPerPage);
+      source._fetchData(_rowIndexRequested, _effectiveRowsPerPage);
     }
   }
 
@@ -371,8 +376,13 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
         _pageSizeInQueue = null;
         _operationInProgress = _TableOperationInProgress.pageSize;
         _rowsPerPageRequested = r;
+        _rowIndexRequested = math.min(
+            ((_firstRowIndex + 1) / _rowsPerPageRequested).floor() *
+                _rowsPerPageRequested,
+            (_rowCount / _rowsPerPageRequested).floor() *
+                _rowsPerPageRequested);
         var source = widget.source as AsyncDataTableSource;
-        source._fetchData(_firstRowIndex, r);
+        source._fetchData(_rowIndexRequested, r);
       } else {
         // workaround to auto rows and resizing the window while previous fetch is not complete
         _pageSizeInQueue = r;
@@ -388,7 +398,7 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
     if (source.state == _SourceState.none) {
       _showNothing = true;
       var x = super.build(context);
-      source._fetchData(_firstRowIndex, widget.rowsPerPage);
+      source._fetchData(_firstRowIndex, _effectiveRowsPerPage);
       return x;
     } else if (source.state == _SourceState.loading) {
       //_showNothing = true;
@@ -412,9 +422,10 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
       super.pageTo(_rowIndexRequested);
     } else if (_operationInProgress == _TableOperationInProgress.pageSize) {
       _operationInProgress = _TableOperationInProgress.none;
-      if (_pageSizeInQueue == null)
+      if (_pageSizeInQueue == null) {
+        _firstRowIndex = _rowIndexRequested;
         super._setRowsPerPage(_rowsPerPageRequested);
-      else {
+      } else {
         _setRowsPerPage(_pageSizeInQueue);
       }
     }

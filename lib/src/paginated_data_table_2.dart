@@ -441,8 +441,8 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   void pageTo(int rowIndex) {
     final int oldFirstRowIndex = _firstRowIndex;
     setState(() {
-      final int rowsPerPage = _effectiveRowsPerPage;
-      _firstRowIndex = (rowIndex ~/ rowsPerPage) * rowsPerPage;
+      _firstRowIndex =
+          (rowIndex ~/ _effectiveRowsPerPage) * _effectiveRowsPerPage;
     });
     if ((widget.onPageChanged != null) && (oldFirstRowIndex != _firstRowIndex))
       widget.onPageChanged!(_firstRowIndex);
