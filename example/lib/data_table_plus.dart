@@ -1,23 +1,3 @@
-Table based on DataTable stock and [DataTable2](https://pub.dev/packages/data_table_2), with some improvements
-
-This is a simple table implementation, where the goal is to add small improvements to the default table avoiding interface breaks.
-
-For a more advanced view, with support for pagination, sorting, search and more, see [select_any](https://pub.dev/packages/select_any)
-
-## Differences
-- Table expands horizontally according to content size (https://github.com/maxim-saplin/data_table_2/issues/8])
-- Support Custom Rows
-- Support specify width columns 
-- Possibility to hide select all button
-- Possibility to hide selection button and continue capturing line click events
-
-## Usage
-
-1. Add reference to pubspec.yaml.
-
-
-2. Code:
-```dart
 import 'package:data_table_plus/data_table_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -101,8 +81,3 @@ class _DataTablePlusDemoState extends State<DataTablePlusDemo> {
     );
   }
 }
-```
-
-## TODO List
-[ ] - Add more examples
-[ ] - Add Tests
