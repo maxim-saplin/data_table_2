@@ -104,5 +104,5 @@ class _DataTablePlusDemoState extends State<DataTablePlusDemo> {
 ```
 
 ## TODO List
-[ ] - Add more examples
+[ ] - Add more examples<br>
 [ ] - Add Tests
