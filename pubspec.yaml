@@ -1,5 +1,5 @@
 name: data_table_plus
-description: In-place replacement for Flutter's DataTable and PaginatedDataTable
+description: In-place replacement for Flutter's DataTable
 version: 0.0.1
 homepage: https://github.com/ReniDelonzek/data_table_plus
 repository: https://github.com/ReniDelonzek/data_table_plus
