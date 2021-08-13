@@ -199,6 +199,11 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     refreshDatasource();
   }
 
+  Future<int> getTotalRecors() {
+    return Future<int>.delayed(
+        Duration(milliseconds: 0), () => _empty ? 0 : _dessertsX3.length);
+  }
+
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
     if (_errorCounter != null) {

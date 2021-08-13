@@ -17,6 +17,7 @@ const showBorders = 'Borders';
 const custPager = 'Custom pager';
 const selectAllPage = 'Select all at page';
 const asyncErrors = "Errors/Retries";
+const goToLast = "Start at last page";
 
 const Map<String, List<String>> routeOptions = {
   '/datatable2': [dflt, noData, showBorders],
@@ -27,6 +28,7 @@ const Map<String, List<String>> routeOptions = {
     selectAllPage,
     autoRows,
     asyncErrors,
+    goToLast,
     custPager
   ],
 };

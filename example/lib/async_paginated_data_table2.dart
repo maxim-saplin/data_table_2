@@ -29,6 +29,9 @@ class _AsyncPaginatedDataTable2DemoState
   DessertDataSourceAsync? _dessertsDataSource;
   PaginatorController _controller = PaginatorController();
 
+  bool _dataSourceLoading = false;
+  int _initialRow = 0;
+
   @override
   void didChangeDependencies() {
     // initState is to early to access route options, context is invalid at that stage
@@ -38,6 +41,14 @@ class _AsyncPaginatedDataTable2DemoState
           : getCurrentRouteOption(context) == asyncErrors
               ? DessertDataSourceAsync.error()
               : DessertDataSourceAsync();
+    }
+
+    if (getCurrentRouteOption(context) == goToLast) {
+      _dataSourceLoading = true;
+      _dessertsDataSource!.getTotalRecors().then((count) => setState(() {
+            _initialRow = count - _rowsPerPage;
+            _dataSourceLoading = false;
+          }));
     }
     super.didChangeDependencies();
   }
@@ -129,6 +140,9 @@ class _AsyncPaginatedDataTable2DemoState
 
   @override
   Widget build(BuildContext context) {
+    // Last ppage example uses extra API call to get the number of items in datasource
+    if (_dataSourceLoading) return SizedBox();
+
     return Stack(alignment: Alignment.bottomCenter, children: [
       AsyncPaginatedDataTable2(
           horizontalMargin: 20,
@@ -168,7 +182,7 @@ class _AsyncPaginatedDataTable2DemoState
             _rowsPerPage = value!;
             //});
           },
-          initialFirstRowIndex: 0,
+          initialFirstRowIndex: _initialRow,
           onPageChanged: (rowIndex) {
             //print(rowIndex / _rowsPerPage);
           },
