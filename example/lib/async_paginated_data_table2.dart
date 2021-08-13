@@ -29,6 +29,19 @@ class _AsyncPaginatedDataTable2DemoState
   DessertDataSourceAsync? _dessertsDataSource;
   PaginatorController _controller = PaginatorController();
 
+  @override
+  void didChangeDependencies() {
+    // initState is to early to access route options, context is invalid at that stage
+    if (_dessertsDataSource == null) {
+      _dessertsDataSource = getCurrentRouteOption(context) == noData
+          ? DessertDataSourceAsync.empty()
+          : getCurrentRouteOption(context) == asyncErrors
+              ? DessertDataSourceAsync.error()
+              : DessertDataSourceAsync();
+    }
+    super.didChangeDependencies();
+  }
+
   void sort(
     int columnIndex,
     bool ascending,
@@ -116,13 +129,6 @@ class _AsyncPaginatedDataTable2DemoState
 
   @override
   Widget build(BuildContext context) {
-    if (_dessertsDataSource == null) {
-      _dessertsDataSource = getCurrentRouteOption(context) == noData
-          ? DessertDataSourceAsync.empty()
-          : getCurrentRouteOption(context) == asyncErrors
-              ? DessertDataSourceAsync.error()
-              : DessertDataSourceAsync();
-    }
     return Stack(alignment: Alignment.bottomCenter, children: [
       AsyncPaginatedDataTable2(
           horizontalMargin: 20,

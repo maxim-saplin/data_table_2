@@ -398,7 +398,11 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
     if (source.state == _SourceState.none) {
       _showNothing = true;
       var x = super.build(context);
+
       source._fetchData(_firstRowIndex, _effectiveRowsPerPage);
+
+      // Future.delayed(Duration(milliseconds: 0),
+      //     () => source._fetchData(_firstRowIndex, _effectiveRowsPerPage));
       return x;
     } else if (source.state == _SourceState.loading) {
       //_showNothing = true;

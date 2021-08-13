@@ -13,16 +13,31 @@ class PageNumber extends StatefulWidget {
 }
 
 class _PageNumberState extends State<PageNumber> {
+  void update() {
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
-    widget._controller.addListener(() {
-      setState(() {});
-    });
+    widget._controller.addListener(update);
+  }
+
+  @override
+  void dispose() {
+    widget._controller.removeListener(update);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Checking instance id to see if build is called
+    // on different ones
+    // Due to some reasons when using this widget
+    // with AsyncPaginatedDatatable2 the widget is instatiotaed once
+    // though it's state is created 3 times upon first loading
+    // of the Custom pager example
+    // print(identityHashCode(this));
     return Text(widget._controller.isAttached
         ? 'Page: ${1 + ((widget._controller.currentRowIndex + 1) / widget._controller.rowsPerPage).floor()} of '
             '${(widget._controller.rowCount / widget._controller.rowsPerPage).ceil()}'

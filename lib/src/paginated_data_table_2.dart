@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 // Copyright 2021 Maxim Saplin - chnages and modifications to original Flutter implementation of PaginatedDataTable
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart' show DragStartBehavior;
@@ -114,16 +115,21 @@ class PaginatorController extends ChangeNotifier {
 
   /// Switch the page so that he given row is displayed at the top. I.e. it
   /// is possible to have pages start at arbitrary rows, not at the boundaries
-  /// of pages as determined by page size
+  /// of pages as determined by page size.
+  /// NOTE: If attached to [AsyncPaginatedDataTable2] this method call [goToPageWithRow]
+  /// since the control doesn't allow breaking pages and have them aligned to page size
   void goToRow(int rowIndex) {
     _assertIfNotAttached();
     if (_state != null) {
-      _state!.setState(() {
-        _state!._firstRowIndex =
-            math.max(math.min(_state!._rowCount - 1, rowIndex), 0);
-      });
+      if (_state is AsyncPaginatedDataTable2State) {
+        goToPageWithRow(rowIndex);
+      } else {
+        _state!.setState(() {
+          _state!._firstRowIndex =
+              math.max(math.min(_state!._rowCount - 1, rowIndex), 0);
+        });
+      }
     }
-    //_state?.pageTo(rowIndex);
   }
 
   /// Switches to the page where the given row is present.
@@ -392,7 +398,13 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
 
   @override
   void setState(VoidCallback fn) {
-    widget.controller?._notifyListeners();
+    // Notifying listeners in the next message queue pass
+    // Doing that in the current call somehow messes with update
+    // lifecycle when using async table
+    if (widget.controller != null)
+      Future.delayed(Duration(milliseconds: 0),
+          () => widget.controller?._notifyListeners());
+    //widget.controller?._notifyListeners();
     super.setState(fn);
   }
 
