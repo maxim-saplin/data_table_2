@@ -357,11 +357,15 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
     if (_operationInProgress == _TableOperationInProgress.none) {
       // int oldFirstRowIndex = _firstRowIndex;
       _operationInProgress = _TableOperationInProgress.pageTo;
-      _rowIndexRequested = math.min(
-          ((rowIndex + 1) / _effectiveRowsPerPage).floor() *
-              _effectiveRowsPerPage,
-          (_rowCount / _effectiveRowsPerPage).floor() * _effectiveRowsPerPage);
-
+      // if row requested happens to be outside the available range - change it to the last aligned page
+      if (rowIndex > _rowCount - 1) {
+        _rowIndexRequested = math.min(
+            ((rowIndex + 1) / _effectiveRowsPerPage).floor() *
+                _effectiveRowsPerPage,
+            (_rowCount / _effectiveRowsPerPage).floor() *
+                _effectiveRowsPerPage);
+      } else
+        _rowIndexRequested = _alignRowIndex(rowIndex, _effectiveRowsPerPage);
       var source = widget.source as AsyncDataTableSource;
       source._fetchData(_rowIndexRequested, _effectiveRowsPerPage);
     }
@@ -376,13 +380,14 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
         _pageSizeInQueue = null;
         _operationInProgress = _TableOperationInProgress.pageSize;
         _rowsPerPageRequested = r;
-        _rowIndexRequested = math.min(
-            ((_firstRowIndex + 1) / _rowsPerPageRequested).floor() *
-                _rowsPerPageRequested,
-            (_rowCount / _rowsPerPageRequested).floor() *
-                _rowsPerPageRequested);
+        _rowIndexRequested = _firstRowIndex;
+        // _rowIndexRequested = math.min(
+        //     ((_firstRowIndex + 1) / _rowsPerPageRequested).floor() *
+        //         _rowsPerPageRequested,
+        //     (_rowCount / _rowsPerPageRequested).floor() *
+        //         _rowsPerPageRequested);
         var source = widget.source as AsyncDataTableSource;
-        source._fetchData(_rowIndexRequested, r);
+        source._fetchData(_firstRowIndex, r);
       } else {
         // workaround to auto rows and resizing the window while previous fetch is not complete
         _pageSizeInQueue = r;

@@ -116,19 +116,13 @@ class PaginatorController extends ChangeNotifier {
   /// Switch the page so that he given row is displayed at the top. I.e. it
   /// is possible to have pages start at arbitrary rows, not at the boundaries
   /// of pages as determined by page size.
-  /// NOTE: If attached to [AsyncPaginatedDataTable2] this method call [goToPageWithRow]
-  /// since the control doesn't allow breaking pages and have them aligned to page size
   void goToRow(int rowIndex) {
     _assertIfNotAttached();
     if (_state != null) {
-      if (_state is AsyncPaginatedDataTable2State) {
-        goToPageWithRow(rowIndex);
-      } else {
-        _state!.setState(() {
-          _state!._firstRowIndex =
-              math.max(math.min(_state!._rowCount - 1, rowIndex), 0);
-        });
-      }
+      _state!.setState(() {
+        _state!._firstRowIndex =
+            math.max(math.min(_state!._rowCount - 1, rowIndex), 0);
+      });
     }
   }
 
@@ -449,12 +443,16 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     });
   }
 
+  // returns
+  int _alignRowIndex(int rowIndex, int rowsPerPage) {
+    return (rowIndex ~/ rowsPerPage) * rowsPerPage;
+  }
+
   /// Ensures that the given row is visible.
   void pageTo(int rowIndex) {
     final int oldFirstRowIndex = _firstRowIndex;
     setState(() {
-      _firstRowIndex =
-          (rowIndex ~/ _effectiveRowsPerPage) * _effectiveRowsPerPage;
+      _firstRowIndex = _alignRowIndex(rowIndex, _effectiveRowsPerPage);
     });
     if ((widget.onPageChanged != null) && (oldFirstRowIndex != _firstRowIndex))
       widget.onPageChanged!(_firstRowIndex);
