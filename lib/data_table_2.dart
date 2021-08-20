@@ -725,7 +725,7 @@ class _SortArrow extends StatefulWidget {
   final Duration duration;
 
   @override
-  _SortArrowState createState() => _SortArrowState();
+  _SortArrowState createState() => _SortArrowState(up);
 }
 
 class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
@@ -738,6 +738,10 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
 
   bool? _up;
 
+  _SortArrowState(bool? up) {
+    _up = up;
+  }
+  
   static final Animatable<double> _turnTween =
       Tween<double>(begin: 0.0, end: math.pi)
           .chain(CurveTween(curve: Curves.easeIn));
