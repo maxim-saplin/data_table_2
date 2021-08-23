@@ -33,8 +33,14 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialized) {
-      _dessertsDataSource = DessertDataSource(context);
+      _dessertsDataSource = DessertDataSource(
+          context, getCurrentRouteOption(context) == defaultSorting);
+
       _controller = PaginatorController();
+
+      if (getCurrentRouteOption(context) == defaultSorting) {
+        _sortColumnIndex = 1;
+      }
       _initialized = true;
     }
   }

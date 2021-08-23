@@ -88,8 +88,11 @@ class DessertDataSource extends DataTableSource {
     desserts = [];
   }
 
-  DessertDataSource(this.context) {
+  DessertDataSource(this.context, [sortedByCalories = false]) {
     desserts = _desserts;
+    if (sortedByCalories) {
+      sort((d) => d.calories, true);
+    }
   }
 
   final BuildContext context;
