@@ -52,10 +52,10 @@ final List<Dessert> kDesserts = <Dessert>[
 ];
 
 final testColumns = <DataColumn2>[
-  const DataColumn2(
-    label: Text('Name'),
-    tooltip: 'Name',
-  ),
+  DataColumn2(
+      label: const Text('Name'),
+      tooltip: 'Name',
+      onSort: (int columnIndex, bool ascending) {}),
   DataColumn2(
     label: const Text('Calories'),
     tooltip: 'Calories',

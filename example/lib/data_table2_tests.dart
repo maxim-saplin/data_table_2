@@ -37,10 +37,10 @@ final List<Dessert> kDesserts = <Dessert>[
 ];
 
 final testColumns = <DataColumn2>[
-  const DataColumn2(
-    label: Text('Name'),
-    tooltip: 'Name',
-  ),
+  DataColumn2(
+      label: const Text('Name'),
+      tooltip: 'Name',
+      onSort: (int columnIndex, bool ascending) {}),
   DataColumn2(
     label: const Text('Calories'),
     tooltip: 'Calories',
@@ -99,17 +99,24 @@ DataTable2 buildTable(
     {int? sortColumnIndex,
     bool sortAscending = true,
     bool overrideSizes = false,
+    double? minWidth,
+    bool noData = false,
+    Widget? empty,
+    ScrollController? scrollController,
     List<DataColumn2>? columns}) {
   return DataTable2(
     horizontalMargin: 24,
     showCheckboxColumn: true,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
+    minWidth: minWidth,
+    empty: empty,
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
+    scrollController: scrollController,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
-    rows: testRows,
+    rows: noData ? [] : testRows,
   );
 }
 
@@ -167,6 +174,7 @@ class TestDataSource extends DataTableSource {
 
   @override
   bool get isRowCountApproximate => false;
+
   @override
   int get selectedRowCount => _selectedRows.length;
 }
@@ -228,9 +236,8 @@ class DataTable2Tests extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.all(16),
         child: buildPaginatedTable(
-            showPage: false,
-            showGeneration: false,
-            autoRowsToHeight: false,
+            sortAscending: false,
+            sortColumnIndex: 0,
             showPageSizeSelector: true) //buildDefaultTable(),
         );
   }

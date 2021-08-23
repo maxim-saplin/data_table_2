@@ -3,6 +3,8 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:vector_math/vector_math.dart';
+import 'dart:math' as math;
 import 'test_utils.dart';
 
 void main() {
@@ -375,6 +377,69 @@ void main() {
       expect(find.text('491–500 of 500'), findsOneWidget);
 
       expect(controller.rowCount, 500);
+    });
+
+    testWidgets('DataTable2 initial sort indicator orientation not spoiled',
+        (WidgetTester tester) async {
+      // Check for ascending list
+      await tester.pumpWidget(MaterialApp(
+        home: Material(
+            child:
+                buildPaginatedTable(sortAscending: true, sortColumnIndex: 0)),
+      ));
+      // The `tester.widget` ensures that there is exactly one upward arrow.
+      Transform transformOfArrow = tester.widget<Transform>(
+          find.widgetWithIcon(Transform, Icons.arrow_upward).first);
+
+      expect(transformOfArrow.transform.getRotation().getColumn(0)[0],
+          equals(1.0));
+
+      // Setting surface size via await tester.binding.setSurfaceSize(Size(1000, 200));
+      // messes with float numbers and sizes precision. That's why not using full matrix comparison but components
+
+      // expect(
+      //     transformOfArrow.transform.getRotation(), equals(Matrix3.identity()));
+      // Expected: Matrix3:<
+      //   [0] [1.0,0.0,0.0]
+      //   [1] [0.0,1.0,0.0]
+      //   [2] [0.0,0.0,1.0]
+      // Actual: Matrix3:<
+      // [0] [1.0,-0.0,0.0]
+      //   [1] [0.0,1.0,0.0]
+      //   [2] [0.0,0.0,1.0]
+      //   >
+
+      // There was a bug thaty after first rebuild the initial sort direction
+      // got spoiled
+      // https://github.com/maxim-saplin/data_table_2/pull/39
+      await tester.tap(find.byTooltip('Next page'));
+      await tester.pumpAndSettle();
+      expect(transformOfArrow.transform.getRotation().getColumn(0)[0],
+          equals(1.0));
+
+      // Check for descending list.
+      await tester.pumpWidget(MaterialApp(
+        home: Material(
+            child:
+                buildPaginatedTable(sortAscending: false, sortColumnIndex: 0)),
+      ));
+      await tester.pumpAndSettle();
+      // The `tester.widget` ensures that there is exactly one upward arrow.
+      transformOfArrow = tester.widget<Transform>(
+          find.widgetWithIcon(Transform, Icons.arrow_upward).first);
+      expect(transformOfArrow.transform.getRotation().getColumn(0)[0],
+          equals(-1.0));
+      // expect(transformOfArrow.transform.getRotation(),
+      //     equals(Matrix3.rotationZ(math.pi)));
+      //  Expected: Matrix3:<
+      // [0] [-1.0,-1.2246468525851679e-16,0.0]
+      // [1] [1.2246468525851679e-16,-1.0,0.0]
+      // [2] [0.0,0.0,1.0]
+
+      //  Actual: Matrix3:<
+      //  [0] [-1.0,-1.2246467991473532e-16,0.0]
+      // [1] [1.2246467991473532e-16,-1.0,0.0]
+      // [2] [0.0,0.0,1.0]
     });
   });
 }

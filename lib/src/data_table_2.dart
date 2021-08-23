@@ -725,10 +725,13 @@ class _SortArrow extends StatefulWidget {
   final Duration duration;
 
   @override
-  _SortArrowState createState() => _SortArrowState();
+  _SortArrowState createState() => _SortArrowState(up);
 }
 
 class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
+  _SortArrowState(bool? up) {
+    _up = up;
+  }
   late AnimationController _opacityController;
   late Animation<double> _opacityAnimation;
 
