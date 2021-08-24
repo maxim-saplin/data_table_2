@@ -118,12 +118,13 @@ class PaginatorController extends ChangeNotifier {
   /// of pages as determined by page size.
   void goToRow(int rowIndex) {
     _assertIfNotAttached();
-    if (_state != null) {
-      _state!.setState(() {
-        _state!._firstRowIndex =
-            math.max(math.min(_state!._rowCount - 1, rowIndex), 0);
-      });
-    }
+    // if (_state != null) {
+    //   _state!.setState(() {
+    //     _state!._firstRowIndex =
+    //         math.max(math.min(_state!._rowCount - 1, rowIndex), 0);
+    //   });
+    //}
+    _state?.pageTo(rowIndex, false);
   }
 
   /// Switches to the page where the given row is present.
@@ -449,10 +450,12 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   }
 
   /// Ensures that the given row is visible.
-  void pageTo(int rowIndex) {
+  void pageTo(int rowIndex, [bool align = true]) {
     final int oldFirstRowIndex = _firstRowIndex;
     setState(() {
-      _firstRowIndex = _alignRowIndex(rowIndex, _effectiveRowsPerPage);
+      _firstRowIndex = align
+          ? _alignRowIndex(rowIndex, _effectiveRowsPerPage)
+          : math.max(math.min(_rowCount - 1, rowIndex), 0);
     });
     if ((widget.onPageChanged != null) && (oldFirstRowIndex != _firstRowIndex))
       widget.onPageChanged!(_firstRowIndex);

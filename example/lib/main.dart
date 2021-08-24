@@ -1,17 +1,17 @@
-import 'package:example/data_table2_scrollup.dart';
-import 'package:example/data_table2_tests.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'async_paginated_data_table2.dart';
-import 'data_table2.dart';
-import 'data_table2_simple.dart';
 import 'nav_helper.dart';
-import 'paginated_data_table2.dart';
-import 'data_table.dart';
-import 'paginated_data_table.dart';
+import 'screens/async_paginated_data_table2.dart';
+import 'screens/data_table.dart';
+import 'screens/data_table2.dart';
+import 'screens/data_table2_scrollup.dart';
+import 'screens/data_table2_simple.dart';
+import 'screens/data_table2_tests.dart';
+import 'screens/paginated_data_table.dart';
+import 'screens/paginated_data_table2.dart';
 
 void main() {
   runApp(MyApp());

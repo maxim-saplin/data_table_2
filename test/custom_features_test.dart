@@ -3,8 +3,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vector_math/vector_math.dart';
-import 'dart:math' as math;
 import 'test_utils.dart';
 
 void main() {

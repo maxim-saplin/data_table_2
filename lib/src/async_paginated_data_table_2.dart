@@ -351,24 +351,31 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
 
   int _rowIndexRequested = -1;
   int _rowsPerPageRequested = -1;
+  bool _aligned = true;
 
   @override
-  void pageTo(int rowIndex) {
+  void pageTo(int rowIndex, [bool align = true]) {
     if (_operationInProgress == _TableOperationInProgress.none) {
+      _aligned = align;
       // int oldFirstRowIndex = _firstRowIndex;
       _operationInProgress = _TableOperationInProgress.pageTo;
       // if row requested happens to be outside the available range - change it to the last aligned page
       if (rowIndex > _rowCount - 1) {
-        _rowIndexRequested = math.min(
-            ((rowIndex + 1) / _effectiveRowsPerPage).floor() *
-                _effectiveRowsPerPage,
-            (_rowCount / _effectiveRowsPerPage).floor() *
-                _effectiveRowsPerPage);
+        _rowIndexRequested = _lastAligned(rowIndex);
       } else
-        _rowIndexRequested = _alignRowIndex(rowIndex, _effectiveRowsPerPage);
+        _rowIndexRequested = align
+            ? _alignRowIndex(rowIndex, _effectiveRowsPerPage)
+            : math.max(math.min(_rowCount - 1, rowIndex), 0);
       var source = widget.source as AsyncDataTableSource;
       source._fetchData(_rowIndexRequested, _effectiveRowsPerPage);
     }
+  }
+
+  int _lastAligned(int rowIndex) {
+    return math.min(
+        ((rowIndex + 1) / _effectiveRowsPerPage).floor() *
+            _effectiveRowsPerPage,
+        (_rowCount / _effectiveRowsPerPage).floor() * _effectiveRowsPerPage);
   }
 
   int? _pageSizeInQueue;
@@ -428,7 +435,7 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
     if (_operationInProgress == _TableOperationInProgress.pageTo) {
       _operationInProgress = _TableOperationInProgress.none;
 
-      super.pageTo(_rowIndexRequested);
+      super.pageTo(_rowIndexRequested, _aligned);
     } else if (_operationInProgress == _TableOperationInProgress.pageSize) {
       _operationInProgress = _TableOperationInProgress.none;
       if (_pageSizeInQueue == null) {
