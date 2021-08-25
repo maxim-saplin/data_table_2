@@ -2,9 +2,9 @@
 
 ## 2.1.2
 - Asycnhronous data fecthing model via AsyncDataTableSource and tailored widget AsyncPaginatedDataTable2
-- Change of package exports (no need to import paginated_data_table_2.dart, data_table_2.dart is enough)
-- Fixed broken initial sort arrow direction in column header after 1st rebuild
-- Breaking change, there's no more 'package:data_table_2/paginated_data_table_2.dart', import 'package:data_table_2/data_table_2.dart' instead
+- (Breaking) change of package exports (no need to import paginated_data_table_2.dart, data_table_2.dart noe has all wodgets)
+- Fixed broken initial sort arrow direction in column header after 1st rebuild, added default sorting example to PaginatedDataTable2
+
 
 ## 2.1.1
 - PaginatorController that allows externally control PaginatedDataTable2 state (e.g. switch pages, change page size etc.)
