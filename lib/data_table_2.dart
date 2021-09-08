@@ -701,8 +701,11 @@ class DataTable2 extends DataTable {
               child: availableWidth > constraints.maxWidth
                   ? Scrollbar(
                       isAlwaysShown: false,
+                      controller: _horizontalController,
                       child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal, child: t))
+                          controller: _horizontalController,
+                          scrollDirection: Axis.horizontal,
+                          child: t))
                   : t));
 
       return w;
@@ -712,6 +715,8 @@ class DataTable2 extends DataTable {
     if (!kReleaseMode) print('DataTable2 built: ${sw.elapsedMilliseconds}ms');
     return builder;
   }
+
+  ScrollController _horizontalController = ScrollController();
 }
 
 class _SortArrow extends StatefulWidget {
