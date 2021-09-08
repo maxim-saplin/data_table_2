@@ -687,8 +687,10 @@ class DataTable2 extends DataTable {
               fit: FlexFit.loose,
               child: tableRows.isEmpty
                   ? empty ?? SizedBox()
-                  : SingleChildScrollView(
-                      child: marginedTable, controller: scrollController))
+                  : Scrollbar(
+                      isAlwaysShown: false,
+                      child: SingleChildScrollView(
+                          child: marginedTable, controller: scrollController)))
         ],
       );
 
@@ -697,8 +699,10 @@ class DataTable2 extends DataTable {
           child: Material(
               type: MaterialType.transparency,
               child: availableWidth > constraints.maxWidth
-                  ? SingleChildScrollView(
-                      scrollDirection: Axis.horizontal, child: t)
+                  ? Scrollbar(
+                      isAlwaysShown: false,
+                      child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal, child: t))
                   : t));
 
       return w;
