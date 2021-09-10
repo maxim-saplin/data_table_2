@@ -179,6 +179,7 @@ class _AsyncPaginatedDataTable2DemoState
             // No need to wrap into setState, it will be called inside the widget
             // and trigger rebuild
             //setState(() {
+            print('Row per page changed to $value');
             _rowsPerPage = value!;
             //});
           },
