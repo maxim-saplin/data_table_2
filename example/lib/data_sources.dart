@@ -209,6 +209,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
 
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
+    print('getRows($startIndex, $count)');
     if (_errorCounter != null) {
       _errorCounter = _errorCounter! + 1;
 

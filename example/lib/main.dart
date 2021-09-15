@@ -26,6 +26,7 @@ Scaffold _getScaffold(BuildContext context, Widget body,
     defaultOption = options[0];
   return Scaffold(
     appBar: AppBar(
+      backgroundColor: Colors.grey[200],
       shadowColor: Colors.transparent,
       automaticallyImplyLeading: false,
       title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
