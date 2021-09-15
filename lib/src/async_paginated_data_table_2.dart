@@ -26,6 +26,8 @@ abstract class AsyncDataTableSource extends DataTableSource {
 
   _SourceState get state => _state;
 
+  bool _debouncable = false;
+
   /// Highlights if there're any selected rows (SelectionState.none means there're not any)
   /// and how [selectionRowKeys] must be treated.
   /// If SelectionState.include is the status, it is assumed that by default
@@ -217,31 +219,58 @@ abstract class AsyncDataTableSource extends DataTableSource {
     _fetchData(_prevFetchSratIndex, _prevFetchCount);
   }
 
-  Future _fetchData(int startIndex, int count) async {
-    _prevFetchSratIndex = startIndex;
-    _prevFetchCount = count;
-    _state = _SourceState.loading;
-    await Future(() => notifyListeners());
+  Timer? _debounceTimer;
+  CancelableOperation<AsyncRowsResponse>? _fetchOpp;
 
-    try {
-      var data = await getRows(startIndex, count);
-      _rows = data.rows;
-      _totalRows = data.totalRows;
-      _firstRowAbsoluteIndex = startIndex;
-    } catch (e) {
-      _rows = [];
-      _totalRows = 0;
-      _firstRowAbsoluteIndex = 0;
-      _state = _SourceState.error;
-      _error = e;
+  void _debounce(Function f, int milliseconds) {
+    _debounceTimer?.cancel();
+    _debounceTimer =
+        Timer(Duration(milliseconds: milliseconds), f as void Function());
+  }
+
+  Future _fetchData(int startIndex, int count) async {
+    void fetch() async {
+      try {
+        _fetchOpp = CancelableOperation<AsyncRowsResponse>.fromFuture(
+            getRows(startIndex, count));
+        var data = await _fetchOpp!.value;
+        if (_fetchOpp!.isCanceled) return;
+        //var data = await getRows(startIndex, count);
+        _rows = data.rows;
+        _totalRows = data.totalRows;
+        _firstRowAbsoluteIndex = startIndex;
+      } catch (e) {
+        _rows = [];
+        _totalRows = 0;
+        _firstRowAbsoluteIndex = 0;
+        _state = _SourceState.error;
+        _error = e;
+        notifyListeners();
+        return;
+      }
+
+      _state = _SourceState.ok;
+      _error = null;
       notifyListeners();
-      return;
     }
 
-    _state = _SourceState.ok;
-    _error = null;
-    notifyListeners();
-    return;
+    if (!_debouncable ||
+        _debounceTimer == null ||
+        (_debounceTimer != null && !_debounceTimer!.isActive)) {
+      _prevFetchSratIndex = startIndex;
+      _prevFetchCount = count;
+      _state = _SourceState.loading;
+      await Future(() => notifyListeners());
+    }
+
+    if (!_debouncable) {
+      fetch();
+    } else {
+      _debounce(() {
+        _fetchOpp?.cancel();
+        fetch();
+      }, 700);
+    }
   }
 
   @override
@@ -388,11 +417,6 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
         _operationInProgress = _TableOperationInProgress.pageSize;
         _rowsPerPageRequested = r;
         _rowIndexRequested = _firstRowIndex;
-        // _rowIndexRequested = math.min(
-        //     ((_firstRowIndex + 1) / _rowsPerPageRequested).floor() *
-        //         _rowsPerPageRequested,
-        //     (_rowCount / _rowsPerPageRequested).floor() *
-        //         _rowsPerPageRequested);
         var source = widget.source as AsyncDataTableSource;
         source._fetchData(_firstRowIndex, r);
       } else {
@@ -406,6 +430,8 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
   Widget build(BuildContext context) {
     var source = widget.source as AsyncDataTableSource;
     var w = widget as AsyncPaginatedDataTable2;
+
+    source._debouncable = widget.autoRowsToHeight;
 
     if (source.state == _SourceState.none) {
       _showNothing = true;
