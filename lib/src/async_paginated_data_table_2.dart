@@ -228,9 +228,13 @@ abstract class AsyncDataTableSource extends DataTableSource {
         Timer(Duration(milliseconds: milliseconds), f as void Function());
   }
 
-  Future _fetchData(int startIndex, int count) async {
+  // If previously loaded rows encompass requested row range and forceReload
+  // is false than no actual fetch will happen
+  Future _fetchData(int startIndex, int count,
+      [bool forceReload = true]) async {
     void fetch() async {
       try {
+        _fetchOpp?.cancel();
         _fetchOpp = CancelableOperation<AsyncRowsResponse>.fromFuture(
             getRows(startIndex, count));
         var data = await _fetchOpp!.value;
@@ -254,9 +258,22 @@ abstract class AsyncDataTableSource extends DataTableSource {
       notifyListeners();
     }
 
+    print("_fetch");
+
     if (!_debouncable ||
         _debounceTimer == null ||
         (_debounceTimer != null && !_debounceTimer!.isActive)) {
+      print("_deb");
+      if (!forceReload &&
+          _prevFetchSratIndex <= startIndex &&
+          _prevFetchCount >= count &&
+          _prevFetchCount > 0) {
+        _prevFetchSratIndex = startIndex;
+        _prevFetchCount = count;
+        _state = _SourceState.ok;
+        await Future(() => notifyListeners());
+        return;
+      }
       _prevFetchSratIndex = startIndex;
       _prevFetchCount = count;
       _state = _SourceState.loading;
@@ -267,7 +284,6 @@ abstract class AsyncDataTableSource extends DataTableSource {
       fetch();
     } else {
       _debounce(() {
-        _fetchOpp?.cancel();
         fetch();
       }, 700);
     }
@@ -407,22 +423,14 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
         (_rowCount / _effectiveRowsPerPage).floor() * _effectiveRowsPerPage);
   }
 
-  int? _pageSizeInQueue;
-
   @override
   void _setRowsPerPage(int? r, [bool wrapInSetState = true]) {
     if (r != null) {
-      if (_operationInProgress == _TableOperationInProgress.none) {
-        _pageSizeInQueue = null;
-        _operationInProgress = _TableOperationInProgress.pageSize;
-        _rowsPerPageRequested = r;
-        _rowIndexRequested = _firstRowIndex;
-        var source = widget.source as AsyncDataTableSource;
-        source._fetchData(_firstRowIndex, r);
-      } else {
-        // workaround to auto rows and resizing the window while previous fetch is not complete
-        _pageSizeInQueue = r;
-      }
+      _operationInProgress = _TableOperationInProgress.pageSize;
+      _rowsPerPageRequested = r;
+      _rowIndexRequested = _firstRowIndex;
+      var source = widget.source as AsyncDataTableSource;
+      source._fetchData(_firstRowIndex, r, false);
     }
   }
 
@@ -465,12 +473,8 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
       super.pageTo(_rowIndexRequested, _aligned);
     } else if (_operationInProgress == _TableOperationInProgress.pageSize) {
       _operationInProgress = _TableOperationInProgress.none;
-      if (_pageSizeInQueue == null) {
-        _firstRowIndex = _rowIndexRequested;
-        super._setRowsPerPage(_rowsPerPageRequested);
-      } else {
-        _setRowsPerPage(_pageSizeInQueue);
-      }
+      _firstRowIndex = _rowIndexRequested;
+      super._setRowsPerPage(_rowsPerPageRequested);
     }
 
     var x = super.build(context);
