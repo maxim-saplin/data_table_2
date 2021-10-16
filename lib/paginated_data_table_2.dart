@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+import 'basic_types.dart';
 import 'data_table_2.dart';
 
 /// Allows to externally control [PaginatedDataTable2] state
@@ -49,13 +50,11 @@ class PaginatorController extends ChangeNotifier {
   }
 
   void _checkAttachedAndThrow() {
-    if (_state == null)
-      throw 'PaginatorController is not attached to any PaginatedDataTable2 and can\'t be used';
+    if (_state == null) throw 'PaginatorController is not attached to any PaginatedDataTable2 and can\'t be used';
   }
 
   void _assertIfNotAttached() {
-    assert(_state != null,
-        'PaginatorController is not attached to any PaginatedDataTable2 and can\'t be used');
+    assert(_state != null, 'PaginatorController is not attached to any PaginatedDataTable2 and can\'t be used');
   }
 
   /// Returns number of rows displayed in the [PaginatedDataTable2]. Throws if no
@@ -119,8 +118,7 @@ class PaginatorController extends ChangeNotifier {
     _assertIfNotAttached();
     if (_state != null) {
       _state!.setState(() {
-        _state!._firstRowIndex =
-            math.max(math.min(_state!._rowCount - 1, rowIndex), 0);
+        _state!._firstRowIndex = math.max(math.min(_state!._rowCount - 1, rowIndex), 0);
       });
     }
     //_state?.pageTo(rowIndex);
@@ -128,9 +126,9 @@ class PaginatorController extends ChangeNotifier {
 
   /// Switches to the page where the given row is present.
   /// The row can be in the middle of the page
-  void goToPageWithRow(int rowIndex) {
+  Future<void> goToPageWithRow(int rowIndex) async {
     _assertIfNotAttached();
-    _state?.pageTo(rowIndex);
+    await _state?.pageTo(rowIndex);
   }
 }
 
@@ -164,6 +162,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.showFirstLastButtons = false,
     this.initialFirstRowIndex = 0,
     this.onPageChanged,
+    this.onBeforePageChanged,
     this.rowsPerPage = defaultRowsPerPage,
     this.availableRowsPerPage = const <int>[
       defaultRowsPerPage,
@@ -188,8 +187,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.lmRatio = 1.2,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
-        assert(sortColumnIndex == null ||
-            (sortColumnIndex >= 0 && sortColumnIndex < columns.length)),
+        assert(sortColumnIndex == null || (sortColumnIndex >= 0 && sortColumnIndex < columns.length)),
         assert(rowsPerPage > 0),
         assert(() {
           if (onRowsPerPageChanged != null && autoRowsToHeight == false)
@@ -278,10 +276,15 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// The index of the first row to display when the widget is first created.
   final int? initialFirstRowIndex;
 
+  /// Invoked before changing page.
+  ///
+  /// The value is the index of the first row on the currently displayed page.
+  final OnPageChanged? onBeforePageChanged;
+
   /// Invoked when the user switches to another page.
   ///
   /// The value is the index of the first row on the currently displayed page.
-  final ValueChanged<int>? onPageChanged;
+  final OnPageChanged? onPageChanged;
 
   /// The number of rows to show on each page.
   ///
@@ -399,9 +402,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   @override
   void initState() {
     super.initState();
-    _firstRowIndex = PageStorage.of(context)?.readState(context) as int? ??
-        widget.initialFirstRowIndex ??
-        0;
+    _firstRowIndex = PageStorage.of(context)?.readState(context) as int? ?? widget.initialFirstRowIndex ?? 0;
     widget.source.addListener(_handleDataSourceChanged);
     _effectiveRowsPerPage = widget.rowsPerPage;
     widget.controller?._attach(this);
@@ -438,29 +439,27 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   }
 
   /// Ensures that the given row is visible.
-  void pageTo(int rowIndex) {
+  Future<void> pageTo(int rowIndex) async {
     final int oldFirstRowIndex = _firstRowIndex;
-    setState(() {
-      final int rowsPerPage = _effectiveRowsPerPage;
-      _firstRowIndex = (rowIndex ~/ rowsPerPage) * rowsPerPage;
-    });
+    final int rowsPerPage = _effectiveRowsPerPage;
+    _firstRowIndex = (rowIndex ~/ rowsPerPage) * rowsPerPage;
+    if ((widget.onBeforePageChanged != null) && (oldFirstRowIndex != _firstRowIndex))
+      await widget.onBeforePageChanged!(_firstRowIndex);
+    setState(() {});
     if ((widget.onPageChanged != null) && (oldFirstRowIndex != _firstRowIndex))
-      widget.onPageChanged!(_firstRowIndex);
+      await widget.onPageChanged!(_firstRowIndex);
   }
 
   DataRow _getBlankRowFor(int index) {
     return DataRow.byIndex(
       index: index,
-      cells: widget.columns
-          .map<DataCell>((DataColumn column) => DataCell.empty)
-          .toList(),
+      cells: widget.columns.map<DataCell>((DataColumn column) => DataCell.empty).toList(),
     );
   }
 
   DataRow _getProgressIndicatorRowFor(int index) {
     bool haveProgressIndicator = false;
-    final List<DataCell> cells =
-        widget.columns.map<DataCell>((DataColumn column) {
+    final List<DataCell> cells = widget.columns.map<DataCell>((DataColumn column) {
       if (!column.numeric) {
         haveProgressIndicator = true;
         return const DataCell(CircularProgressIndicator());
@@ -501,32 +500,28 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     return result;
   }
 
-  void _handleFirst() {
-    pageTo(0);
+  Future<void> _handleFirst() async {
+    await pageTo(0);
   }
 
-  void _handlePrevious() {
-    pageTo(math.max(_firstRowIndex - _effectiveRowsPerPage, 0));
+  Future<void> _handlePrevious() async {
+    await pageTo(math.max(_firstRowIndex - _effectiveRowsPerPage, 0));
   }
 
-  void _handleNext() {
-    pageTo(_firstRowIndex + _effectiveRowsPerPage);
+  Future<void> _handleNext() async {
+    await pageTo(_firstRowIndex + _effectiveRowsPerPage);
   }
 
-  void _handleLast() {
-    pageTo(((_rowCount - 1) / _effectiveRowsPerPage).floor() *
-        _effectiveRowsPerPage);
+  Future<void> _handleLast() async {
+    await pageTo(((_rowCount - 1) / _effectiveRowsPerPage).floor() * _effectiveRowsPerPage);
   }
 
-  bool _isNextPageUnavailable() =>
-      !_rowCountApproximate &&
-      (_firstRowIndex + _effectiveRowsPerPage >= _rowCount);
+  bool _isNextPageUnavailable() => !_rowCountApproximate && (_firstRowIndex + _effectiveRowsPerPage >= _rowCount);
 
   final GlobalKey _tableKey = GlobalKey();
 
   Widget _getHeader() {
-    final MaterialLocalizations localizations =
-        MaterialLocalizations.of(context);
+    final MaterialLocalizations localizations = MaterialLocalizations.of(context);
     final ThemeData themeData = Theme.of(context);
     double startPadding = widget.horizontalMargin;
     final List<Widget> headerWidgets = <Widget>[];
@@ -563,19 +558,15 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
         // list and then tweak them appropriately.
         // See https://material.io/design/components/data-tables.html#tables-within-cards
         style: _selectedRowCount > 0
-            ? themeData.textTheme.subtitle1!
-                .copyWith(color: themeData.accentColor)
-            : themeData.textTheme.headline6!
-                .copyWith(fontWeight: FontWeight.w400),
+            ? themeData.textTheme.subtitle1!.copyWith(color: themeData.accentColor)
+            : themeData.textTheme.headline6!.copyWith(fontWeight: FontWeight.w400),
         child: IconTheme.merge(
           data: const IconThemeData(opacity: 0.54),
           child: Ink(
             height: 64.0,
-            color:
-                _selectedRowCount > 0 ? themeData.secondaryHeaderColor : null,
+            color: _selectedRowCount > 0 ? themeData.secondaryHeaderColor : null,
             child: Padding(
-              padding:
-                  EdgeInsetsDirectional.only(start: startPadding, end: 14.0),
+              padding: EdgeInsetsDirectional.only(start: startPadding, end: 14.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: headerWidgets,
@@ -621,16 +612,14 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   }
 
   Widget _getFooter() {
-    final MaterialLocalizations localizations =
-        MaterialLocalizations.of(context);
+    final MaterialLocalizations localizations = MaterialLocalizations.of(context);
     final ThemeData themeData = Theme.of(context);
     final TextStyle? footerTextStyle = themeData.textTheme.caption;
     final List<Widget> footerWidgets = <Widget>[];
 
     if (widget.onRowsPerPageChanged != null) {
       final List<Widget> availableRowsPerPage = widget.availableRowsPerPage
-          .where((int value) =>
-              value <= _rowCount || value == _effectiveRowsPerPage)
+          .where((int value) => value <= _rowCount || value == _effectiveRowsPerPage)
           .map<DropdownMenuItem<int>>((int value) {
         return DropdownMenuItem<int>(
           value: value,
@@ -639,13 +628,10 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       }).toList();
       if (!widget.autoRowsToHeight) {
         footerWidgets.addAll(<Widget>[
-          Container(
-              width:
-                  14.0), // to match trailing padding in case we overflow and end up scrolling
+          Container(width: 14.0), // to match trailing padding in case we overflow and end up scrolling
           Text(localizations.rowsPerPageTitle),
           ConstrainedBox(
-            constraints: const BoxConstraints(
-                minWidth: 64.0), // 40.0 for the text, 24.0 for the icon
+            constraints: const BoxConstraints(minWidth: 64.0), // 40.0 for the text, 24.0 for the icon
             child: Align(
               alignment: AlignmentDirectional.centerEnd,
               child: DropdownButtonHideUnderline(
