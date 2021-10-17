@@ -185,6 +185,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.autoRowsToHeight = false,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
+    this.footerTextStyle,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null || (sortColumnIndex >= 0 && sortColumnIndex < columns.length)),
@@ -376,6 +377,9 @@ class PaginatedDataTable2 extends StatefulWidget {
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? scrollController;
+
+  /// Force footer Text Style
+  final TextStyle? footerTextStyle;
 
   @override
   PaginatedDataTable2State createState() => PaginatedDataTable2State();
@@ -614,7 +618,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   Widget _getFooter() {
     final MaterialLocalizations localizations = MaterialLocalizations.of(context);
     final ThemeData themeData = Theme.of(context);
-    final TextStyle? footerTextStyle = themeData.textTheme.caption;
+    final TextStyle? footerTextStyle = widget.footerTextStyle ?? themeData.textTheme.caption;
     final List<Widget> footerWidgets = <Widget>[];
 
     if (widget.onRowsPerPageChanged != null) {
