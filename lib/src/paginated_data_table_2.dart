@@ -129,7 +129,9 @@ class PaginatorController extends ChangeNotifier {
   }
 
   /// Switches to the page where the given row is present.
-  /// The row can be in the middle of the page
+  /// The row can be in the middle of the page, pages are aligned
+  /// to page size. E.g. with page size 5 going to index 6 (rows #7)
+  /// will set page starting index at 5 (#6)
   void goToPageWithRow(int rowIndex) {
     _assertIfNotAttached();
     _state?.pageTo(rowIndex);
@@ -445,12 +447,16 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     });
   }
 
-  // returns
+  // Aligns row index to page size returning the first index of a page
+  // that contains given row
   int _alignRowIndex(int rowIndex, int rowsPerPage) {
-    return (rowIndex ~/ rowsPerPage) * rowsPerPage;
+    return ((rowIndex + 1) ~/ rowsPerPage) * rowsPerPage;
   }
 
-  /// Ensures that the given row is visible.
+  /// Ensures that the given row is visible. [align] params makes sure that
+  /// starting index will be aligned to page size, e.g. if page size is 5, row with
+  /// index 7 (ordinal number 8) is requested, rather than showing rows 8 - 12
+  /// starting page at row 7 it will make first row index 5 displaying 6-10
   void pageTo(int rowIndex, [bool align = true]) {
     final int oldFirstRowIndex = _firstRowIndex;
     setState(() {

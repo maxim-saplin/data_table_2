@@ -258,12 +258,9 @@ abstract class AsyncDataTableSource extends DataTableSource {
       notifyListeners();
     }
 
-    print("_fetch");
-
     if (!_debouncable ||
         _debounceTimer == null ||
         (_debounceTimer != null && !_debounceTimer!.isActive)) {
-      print("_deb");
       if (!forceReload &&
           _prevFetchSratIndex <= startIndex &&
           _prevFetchCount >= count &&
