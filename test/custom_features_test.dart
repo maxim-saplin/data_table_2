@@ -813,6 +813,86 @@ void main() {
       // [1] [1.2246467991473532e-16,-1.0,0.0]
       // [2] [0.0,0.0,1.0]
     });
+    testWidgets('Default loading spinner is shown',
+        (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(Size(1000, 300));
+      await tester.pumpWidget(MaterialApp(
+          home: Material(
+              child: buildAsyncPaginatedTable(
+                  showPage: false,
+                  showGeneration: false,
+                  showPageSizeSelector: true,
+                  hidePaginator: true))));
+
+      await tester.pump(Duration(milliseconds: 100));
+
+      expect(find.byType(LinearProgressIndicator), findsOneWidget);
+
+      await tester.pumpAndSettle();
+
+      expect(find.byType(LinearProgressIndicator), findsNothing);
+    });
+
+    testWidgets('Custom loading spinner is shown', (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(Size(1000, 300));
+      await tester.pumpWidget(MaterialApp(
+          home: Material(
+              child: buildAsyncPaginatedTable(
+                  showPage: false,
+                  showGeneration: false,
+                  showPageSizeSelector: true,
+                  circularSpinner: true,
+                  hidePaginator: true))));
+
+      await tester.pump(Duration(milliseconds: 100));
+
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
+
+    testWidgets('Switching page shows loading spinner',
+        (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(Size(1000, 300));
+      await tester.pumpWidget(MaterialApp(
+          home: Material(
+              child: buildAsyncPaginatedTable(
+                  showGeneration: false,
+                  showPageSizeSelector: true,
+                  hidePaginator: false))));
+
+      await tester.pumpAndSettle();
+      expect(find.byType(LinearProgressIndicator), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.chevron_right));
+      await tester.pump(Duration(milliseconds: 100));
+
+      expect(find.byType(LinearProgressIndicator), findsOneWidget);
+
+      await tester.pumpAndSettle();
+      expect(find.byType(LinearProgressIndicator), findsNothing);
+    });
+
+    testWidgets('Error widget is displayed', (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(Size(1000, 300));
+      await tester.pumpWidget(MaterialApp(
+          home: Material(child: buildAsyncPaginatedTable(throwError: true))));
+
+      await tester.pump(Duration(milliseconds: 100));
+
+      expect(find.byType(LinearProgressIndicator), findsOneWidget);
+
+      await tester.pumpAndSettle();
+
+      // peek into what text is visible
+      // var d = find.byType(Text);
+      // var w = tester.widgetList(d).toList();
+
+      expect(find.text("Cupcake"), findsNothing);
+      expect(find.text('Error #1 has occured'), findsOneWidget);
+    });
   });
 }
 

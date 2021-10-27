@@ -378,7 +378,17 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
             smRatio: smRatio,
             lmRatio: lmRatio);
 
+  /// Widget that is goin to be displayed while loading is in progress
+  /// If no widget is specified the following defaul widget will be disoplayed:
+  /// ```
+  /// Center(
+  ///   child: SizedBox(
+  ///     width: 64, height: 16, child: LinearProgressIndicator()))
+  /// ```
   final Widget? loading;
+
+  /// The function allows displaying custom widget on top of table should an error happen.
+  /// E.g. data source faild to load data
   final Widget Function(Object? error)? errorBuilder;
 
   @override
@@ -453,7 +463,11 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
       var x = super.build(context);
       return Stack(fit: StackFit.expand, children: [
         x,
-        if (w.loading != null) w.loading!,
+        w.loading != null
+            ? w.loading!
+            : Center(
+                child: SizedBox(
+                    width: 64, height: 16, child: LinearProgressIndicator())),
       ]);
     } else if (source.state == _SourceState.error) {
       _showNothing = true;

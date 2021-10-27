@@ -2,7 +2,6 @@ import 'package:data_table_2/data_table_2.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:intl/intl.dart';
 
 // Copyright 2014 The Flutter Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -292,12 +291,14 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
       {this.allowSelection = false,
       this.showPage = true,
       this.showGeneration = true,
-      this.noData = false});
+      this.noData = false,
+      this.useKDeserts = false});
 
   final bool allowSelection;
   final bool showPage;
   final bool showGeneration;
   final bool noData;
+  final bool useKDeserts;
 
   int get generation => _generation;
 
@@ -340,17 +341,17 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     }
 
     var index = startIndex;
-    final format = NumberFormat.decimalPercentPattern(
-      locale: 'en',
-      decimalDigits: 0,
-    );
+    // final format = NumberFormat.decimalPercentPattern(
+    //   locale: 'en',
+    //   decimalDigits: 0,
+    // );
     assert(index >= 0);
 
     var x = _empty
         ? await Future.delayed(Duration(milliseconds: 2000),
             () => DesertsFakeWebServiceResponse(0, []))
-        : await _repo.getData(
-            startIndex, count, _sortColumn, _sortAscending, noData);
+        : await _repo.getData(startIndex, count, _sortColumn, _sortAscending,
+            noData, useKDeserts);
 
     var r = AsyncRowsResponse(
         x.totalRecords,
@@ -372,7 +373,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
                 onTap: () {},
               ),
               DataCell(
-                Text('${dessert.carbs}'),
+                Text(showGeneration ? '$generation' : '${dessert.carbs}'),
                 showEditIcon: true,
                 onTap: () {},
               ),
@@ -419,8 +420,9 @@ class DesertsFakeWebService {
     }
   }
 
-  Future<DesertsFakeWebServiceResponse> getData(int startingAt, int count,
-      String sortedBy, bool sortedAsc, bool noData) async {
+  Future<DesertsFakeWebServiceResponse> getData(
+      int startingAt, int count, String sortedBy, bool sortedAsc, bool noData,
+      [bool useKDesserts = false]) async {
     return Future.delayed(
         Duration(
             milliseconds: startingAt == 0
@@ -431,8 +433,15 @@ class DesertsFakeWebService {
       _dessertsX3.sort(_getComparisonFunction(sortedBy, sortedAsc));
       return noData
           ? DesertsFakeWebServiceResponse(0, [])
-          : DesertsFakeWebServiceResponse(_dessertsX3.length,
-              _dessertsX3.skip(startingAt).take(count).toList());
+          : (useKDesserts
+              ? DesertsFakeWebServiceResponse(
+                  50 * kDesserts.length,
+                  List.generate(
+                      count,
+                      (index) =>
+                          kDesserts[(startingAt + index) % kDesserts.length]))
+              : DesertsFakeWebServiceResponse(_dessertsX3.length,
+                  _dessertsX3.skip(startingAt).take(count).toList()));
     });
   }
 }
@@ -456,10 +465,34 @@ class DataTable2Tests extends StatelessWidget {
     //setColumnSizeRatios(1, 2);
     return Padding(
         padding: const EdgeInsets.all(16),
-        child: buildAsyncPaginatedTable(
-            showPage: false,
-            showGeneration: false,
-            showPageSizeSelector: true,
-            controller: pc));
+        child: AsyncPaginatedDataTable2(
+          header: const Text('Test table'),
+          source: DessertDataSourceAsync(
+              allowSelection: true,
+              useKDeserts: true,
+              showGeneration: true,
+              noData: false),
+          rowsPerPage: 2,
+          availableRowsPerPage: const <int>[
+            2,
+            4,
+          ],
+          onRowsPerPageChanged: (int? rowsPerPage) {},
+          onPageChanged: (int rowIndex) {},
+          onSelectAll: (bool? value) {},
+          columns: const <DataColumn2>[
+            DataColumn2(label: Text('Name')),
+            DataColumn2(label: Text('Calories'), numeric: true),
+            DataColumn2(label: Text('Generation')),
+          ],
+        )
+
+        // buildAsyncPaginatedTable(
+        //     showPage: false,
+        //     showGeneration: false,
+        //     showPageSizeSelector: true,
+        //     controller: pc)
+
+        );
   }
 }

@@ -260,7 +260,9 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     bool wrapInCard = false,
     bool showPageSizeSelector = false,
     bool noData = false,
+    bool throwError = false,
     bool hidePaginator = false,
+    bool circularSpinner = false,
     PaginatorController? controller,
     Widget? empty,
     ScrollController? scrollController,
@@ -278,14 +280,16 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     columns: columns ?? testColumns,
     showFirstLastButtons: true,
     controller: controller,
-    loading: Center(
-        child: SizedBox(
-            width: 32,
-            height: 32,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: Colors.black,
-            ))),
+    loading: circularSpinner
+        ? Center(
+            child: SizedBox(
+                width: 32,
+                height: 32,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.black,
+                )))
+        : null,
     empty: empty,
     scrollController: scrollController,
     hidePaginator: hidePaginator,
@@ -293,14 +297,13 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     autoRowsToHeight: autoRowsToHeight,
+    errorBuilder: (e) => Text(e.toString()),
     onRowsPerPageChanged: showPageSizeSelector || onRowsPerPageChanged != null
         ? onRowsPerPageChanged ?? (int? rowsPerPage) {}
         : null,
     source: DessertDataSourceAsync(
-        allowSelection: true,
-        showPage: showPage,
-        showGeneration: showGeneration,
-        noData: noData),
+        allowSelection: true, showPage: showPage, noData: noData)
+      .._errorCounter = throwError ? 0 : null,
   );
 }
 
@@ -308,13 +311,13 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
   DessertDataSourceAsync(
       {this.allowSelection = false,
       this.showPage = true,
-      this.showGeneration = true,
-      this.noData = false});
+      this.noData = false,
+      this.useKDeserts = false});
 
   final bool allowSelection;
   final bool showPage;
-  final bool showGeneration;
   final bool noData;
+  final bool useKDeserts;
 
   int get generation => _generation;
 
@@ -366,8 +369,8 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     var x = _empty
         ? await Future.delayed(Duration(milliseconds: 2000),
             () => DesertsFakeWebServiceResponse(0, []))
-        : await _repo.getData(
-            startIndex, count, _sortColumn, _sortAscending, noData);
+        : await _repo.getData(startIndex, count, _sortColumn, _sortAscending,
+            noData, useKDeserts);
 
     var r = AsyncRowsResponse(
         x.totalRecords,
@@ -436,8 +439,9 @@ class DesertsFakeWebService {
     }
   }
 
-  Future<DesertsFakeWebServiceResponse> getData(int startingAt, int count,
-      String sortedBy, bool sortedAsc, bool noData) async {
+  Future<DesertsFakeWebServiceResponse> getData(
+      int startingAt, int count, String sortedBy, bool sortedAsc, bool noData,
+      [bool useKDesserts = false]) async {
     return Future.delayed(
         Duration(
             milliseconds: startingAt == 0
@@ -448,8 +452,15 @@ class DesertsFakeWebService {
       _dessertsX3.sort(_getComparisonFunction(sortedBy, sortedAsc));
       return noData
           ? DesertsFakeWebServiceResponse(0, [])
-          : DesertsFakeWebServiceResponse(_dessertsX3.length,
-              _dessertsX3.skip(startingAt).take(count).toList());
+          : (useKDesserts
+              ? DesertsFakeWebServiceResponse(
+                  50 * kDesserts.length,
+                  List.generate(
+                      count,
+                      (index) =>
+                          kDesserts[(startingAt + index) % kDesserts.length]))
+              : DesertsFakeWebServiceResponse(_dessertsX3.length,
+                  _dessertsX3.skip(startingAt).take(count).toList()));
     });
   }
 }
