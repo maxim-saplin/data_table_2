@@ -179,17 +179,30 @@ class DessertDataSource extends DataTableSource {
 /// is an extension to FLutter's DataTableSource and aimed at solving
 /// saync data fetching scenarious by paginated table (such as using Web API)
 class DessertDataSourceAsync extends AsyncDataTableSource {
-  DessertDataSourceAsync();
+  DessertDataSourceAsync() {
+    print('DessertDataSourceAsync created');
+  }
+
   DessertDataSourceAsync.empty() {
     _empty = true;
+    print('DessertDataSourceAsync.empty created');
   }
 
   DessertDataSourceAsync.error() {
     _errorCounter = 0;
+    print('DessertDataSourceAsync.error created');
   }
 
   bool _empty = false;
   int? _errorCounter;
+
+  RangeValues? _caloriesFilter;
+
+  RangeValues? get caloriesFilter => _caloriesFilter;
+  set caloriesFilter(RangeValues? calories) {
+    _caloriesFilter = calories;
+    refreshDatasource();
+  }
 
   final DesertsFakeWebService _repo = DesertsFakeWebService();
 
@@ -226,10 +239,12 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     );
     assert(index >= 0);
 
+    // List returned will be empty is there're fewer items than startingAt
     var x = _empty
         ? await Future.delayed(Duration(milliseconds: 2000),
             () => DesertsFakeWebServiceResponse(0, []))
-        : await _repo.getData(startIndex, count, _sortColumn, _sortAscending);
+        : await _repo.getData(
+            startIndex, count, _caloriesFilter, _sortColumn, _sortAscending);
 
     var r = AsyncRowsResponse(
         x.totalRecords,
@@ -293,8 +308,8 @@ class DesertsFakeWebService {
     }
   }
 
-  Future<DesertsFakeWebServiceResponse> getData(
-      int startingAt, int count, String sortedBy, bool sortedAsc) async {
+  Future<DesertsFakeWebServiceResponse> getData(int startingAt, int count,
+      RangeValues? caloriesFilter, String sortedBy, bool sortedAsc) async {
     return Future.delayed(
         Duration(
             milliseconds: startingAt == 0
@@ -302,9 +317,19 @@ class DesertsFakeWebService {
                 : startingAt < 20
                     ? 2000
                     : 400), () {
-      _dessertsX3.sort(_getComparisonFunction(sortedBy, sortedAsc));
-      return DesertsFakeWebServiceResponse(_dessertsX3.length,
-          _dessertsX3.skip(startingAt).take(count).toList());
+      var result = _dessertsX3;
+
+      if (caloriesFilter != null) {
+        result = result
+            .where((e) =>
+                e.calories >= caloriesFilter.start &&
+                e.calories <= caloriesFilter.end)
+            .toList();
+      }
+
+      result.sort(_getComparisonFunction(sortedBy, sortedAsc));
+      return DesertsFakeWebServiceResponse(
+          result.length, result.skip(startingAt).take(count).toList());
     });
   }
 }

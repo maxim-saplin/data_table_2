@@ -1,5 +1,3 @@
-library data_table_2;
-
 // Copyright 2014 The Flutter Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -195,6 +193,9 @@ class DataTable2 extends DataTable {
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? scrollController;
+
+  // https://github.com/maxim-saplin/data_table_2/issues/42
+  final ScrollController _horizontalController = ScrollController();
 
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
@@ -711,8 +712,6 @@ class DataTable2 extends DataTable {
     if (!kReleaseMode) print('DataTable2 built: ${sw.elapsedMilliseconds}ms');
     return builder;
   }
-
-  ScrollController _horizontalController = ScrollController();
 }
 
 class _SortArrow extends StatefulWidget {

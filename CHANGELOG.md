@@ -4,6 +4,7 @@
 - Asycnhronous data fecthing model via AsyncDataTableSource and tailored widget AsyncPaginatedDataTable2
 - (Breaking) change of package exports (no need to import paginated_data_table_2.dart, data_table_2.dart noe has all wodgets)
 - Fixed broken initial sort arrow direction in column header after 1st rebuild, added default sorting example to PaginatedDataTable2
+- Draggable horizontal scroll bar Issues #42
 
 
 ## 2.1.1

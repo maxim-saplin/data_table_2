@@ -8,7 +8,6 @@ import 'package:data_table_2/data_table_2.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:intl/intl.dart';
 
 Future wrapWidgetSetSurf(WidgetTester tester, Widget widget) async {
   await tester.binding.setSurfaceSize(Size(1000, 200));
@@ -360,10 +359,6 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     }
 
     var index = startIndex;
-    final format = NumberFormat.decimalPercentPattern(
-      locale: 'en',
-      decimalDigits: 0,
-    );
     assert(index >= 0);
 
     var x = _empty
