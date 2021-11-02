@@ -893,6 +893,215 @@ void main() {
       expect(find.text("Cupcake"), findsNothing);
       expect(find.text('Error #1 has occured'), findsOneWidget);
     });
+
+    testWidgets('Not empty table loaded', (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(Size(1000, 300));
+      await tester.pumpWidget(MaterialApp(
+          home: Material(
+              child: buildAsyncPaginatedTable(
+                  showHeader: false,
+                  showCheckboxColumn: false,
+                  fewerResultsAfterRefresh: false,
+                  syncApproach: PageSyncApproach.doNothing))));
+
+      await tester.pumpAndSettle();
+
+      expect(
+          find.byType(Text),
+          findsNWidgets(
+              3 * 11 + 1)); // 3 columns, 10 rows + 1 header row + paginator
+      expect(find.text('Cupcake'), findsOneWidget);
+      expect(find.text('1–10 of 30'), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.chevron_right));
+      await tester.pumpAndSettle();
+
+      expect(
+          find.byType(Text),
+          findsNWidgets(
+              3 * 11 + 1)); // 3 columns, 10 rows + 1 header row + paginator
+      expect(find.text('Frozen yogurt x2'), findsOneWidget);
+      expect(find.text('11–20 of 30'), findsOneWidget);
+    });
+  });
+
+  testWidgets('PageSyncApproach.doNothing', (WidgetTester tester) async {
+    await tester.binding.setSurfaceSize(Size(1000, 300));
+    await tester.pumpWidget(MaterialApp(
+        home: Material(
+            child: buildAsyncPaginatedTable(
+                showHeader: false,
+                showCheckboxColumn: false,
+                fewerResultsAfterRefresh: true,
+                syncApproach: PageSyncApproach.doNothing))));
+
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byType(Text),
+        findsNWidgets(
+            3 * 11 + 1)); // 3 columns, 10 rows + 1 header row + paginator
+    expect(find.text('Cupcake'), findsOneWidget);
+    expect(find.text('1–10 of 30'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.chevron_right));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byType(Text),
+        findsNWidgets(
+            3 * 1 + 1)); // 3 columns, 0 rows + 1 header row + paginator
+    expect(find.text('Frozen yogurt x2'), findsNothing);
+    expect(find.text('11–20 of 10'), findsOneWidget);
+  });
+
+  testWidgets('Page switch and PageSyncApproach.goToFirst',
+      (WidgetTester tester) async {
+    await tester.binding.setSurfaceSize(Size(1000, 300));
+    await tester.pumpWidget(MaterialApp(
+        home: Material(
+            child: buildAsyncPaginatedTable(
+                showHeader: false,
+                showCheckboxColumn: false,
+                fewerResultsAfterRefresh: true,
+                syncApproach: PageSyncApproach.goToFirst))));
+
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byType(Text),
+        findsNWidgets(
+            3 * 11 + 1)); // 3 columns, 10 rows + 1 header row + paginator
+    expect(find.text('Cupcake'), findsOneWidget);
+    expect(find.text('1–10 of 30'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.chevron_right));
+    await tester.pumpAndSettle();
+
+    // // peek into what text is visible
+    // var d = find.byType(Text);
+    // var w = tester.widgetList(d).toList();
+
+    expect(
+        find.byType(Text),
+        findsNWidgets(
+            3 * 11 + 1)); // 3 columns, 0 rows + 1 header row + paginator
+    expect(find.text('Frozen yogurt x2'), findsNothing);
+    expect(find.text('1–10 of 10'), findsOneWidget);
+  });
+
+  testWidgets('Page switch and PageSyncApproach.goToLast',
+      (WidgetTester tester) async {
+    await tester.binding.setSurfaceSize(Size(1000, 300));
+    await tester.pumpWidget(MaterialApp(
+        home: Material(
+            child: buildAsyncPaginatedTable(
+                showHeader: false,
+                rowsPerPage: 5,
+                showCheckboxColumn: false,
+                fewerResultsAfterRefresh: true,
+                syncApproach: PageSyncApproach.goToLast))));
+
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byType(Text),
+        findsNWidgets(
+            3 * 6 + 1)); // 3 columns, 10 rows + 1 header row + paginator
+    expect(find.text('Cupcake'), findsOneWidget);
+    expect(find.text('1–5 of 30'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.chevron_right));
+    await tester.pumpAndSettle();
+
+    // // peek into what text is visible
+    // var d = find.byType(Text);
+    // var w = tester.widgetList(d).toList();
+
+    expect(
+        find.byType(Text),
+        findsNWidgets(
+            3 * 6 + 1)); // 3 columns, 0 rows + 1 header row + paginator
+    expect(find.text('Frozen yogurt x2'), findsNothing);
+    expect(find.text('6–10 of 10'), findsOneWidget);
+  });
+
+  testWidgets('Page size and PageSyncApproach.goToFirst',
+      (WidgetTester tester) async {
+    var controller = PaginatorController();
+    await tester.binding.setSurfaceSize(Size(1000, 300));
+    await tester.pumpWidget(MaterialApp(
+        home: Material(
+            child: buildAsyncPaginatedTable(
+                showHeader: false,
+                rowsPerPage: 5,
+                controller: controller,
+                initialFirstRowIndex: 15,
+                showCheckboxColumn: false,
+                fewerResultsAfterRefresh: true,
+                syncApproach: PageSyncApproach.goToFirst))));
+
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byType(Text),
+        findsNWidgets(
+            3 * 6 + 1)); // 3 columns, 10 rows + 1 header row + paginator
+    expect(find.text('Honeycomb'), findsOneWidget);
+    expect(find.text('16–20 of 30'), findsOneWidget);
+
+    controller.setRowsPerPage(10);
+    await tester.pumpAndSettle();
+
+    // // peek into what text is visible
+    // var d = find.byType(Text);
+    // var w = tester.widgetList(d).toList();
+
+    expect(
+        find.byType(Text),
+        findsNWidgets(
+            3 * 11 + 1)); // 3 columns, 0 rows + 1 header row + paginator
+    expect(find.text('Cupcake'), findsOneWidget);
+    expect(find.text('1–10 of 10'), findsOneWidget);
+  });
+
+  testWidgets('Page size and PageSyncApproach.goToLast',
+      (WidgetTester tester) async {
+    var controller = PaginatorController();
+    await tester.binding.setSurfaceSize(Size(1000, 300));
+    await tester.pumpWidget(MaterialApp(
+        home: Material(
+            child: buildAsyncPaginatedTable(
+                showHeader: false,
+                rowsPerPage: 5,
+                controller: controller,
+                initialFirstRowIndex: 20,
+                showCheckboxColumn: false,
+                fewerResultsAfterRefresh: true,
+                syncApproach: PageSyncApproach.goToLast))));
+
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byType(Text),
+        findsNWidgets(
+            3 * 6 + 1)); // 3 columns, 10 rows + 1 header row + paginator
+    expect(find.text('Jelly bean'), findsOneWidget);
+    expect(find.text('21–25 of 30'), findsOneWidget);
+
+    controller.setRowsPerPage(10);
+    await tester.pumpAndSettle();
+
+    // peek into what text is visible
+    var d = find.byType(Text);
+    var w = tester.widgetList(d).toList();
+
+    expect(
+        find.byType(Text),
+        findsNWidgets(
+            3 * 11 + 1)); // 3 columns, 0 rows + 1 header row + paginator
+    expect(find.text('Donut x3'), findsOneWidget);
+    expect(find.text('1–10 of 10'), findsOneWidget);
   });
 }
 

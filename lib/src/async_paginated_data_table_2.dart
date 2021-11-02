@@ -399,6 +399,12 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
   /// E.g. data source faild to load data
   final Widget Function(Object? error)? errorBuilder;
 
+  /// Should a data source return less rows than required to fill the current
+  /// page of the table (e.g. when regresshin with a new filter value),
+  /// the widget can take 3 actions (see [PageSyncApproach]):
+  /// 1. Do nothing and display empty rows (e.g. rows 51-60 of 45)
+  /// 2. Make another request to thу data source fetching the very first page (e.g. rows 0-10 of 45 )
+  /// 3. Make another request fetchiung the very last page (e.g. rows 41 - 45 of 45)
   final PageSyncApproach pageSyncApproach;
 
   @override
@@ -477,8 +483,6 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
       if (!widget.autoRowsToHeight)
         source._fetchData(_firstRowIndex, _effectiveRowsPerPage);
 
-      // Future.delayed(Duration(milliseconds: 0),
-      //     () => source._fetchData(_firstRowIndex, _effectiveRowsPerPage));
       return x;
     } else if (source.state == _SourceState.loading) {
       //_showNothing = true;
@@ -501,11 +505,12 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
       _operationInProgress = _TableOperationInProgress.none;
       _firstRowIndex = _rowIndexRequested;
       super._setRowsPerPage(_rowsPerPageRequested);
-    } else if (_firstRowIndex >= _rowCount &&
+    }
+    // current row is beyond max row
+    if (_firstRowIndex >= _rowCount &&
         w.pageSyncApproach != PageSyncApproach.doNothing &&
-        _firstRowIndex > _effectiveRowsPerPage) {
+        _firstRowIndex >= _effectiveRowsPerPage) {
       // TODO test with 0 rows returned from data source
-      // current row is beyond max row
 
       if (w.pageSyncApproach == PageSyncApproach.goToFirst) {
         pageTo(0);

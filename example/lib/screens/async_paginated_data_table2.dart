@@ -254,11 +254,9 @@ class _AsyncPaginatedDataTable2DemoState
                 _TitledRangeSelector(
                     range: RangeValues(150, 600),
                     onChanged: (v) {
-                      // Data source can't change  page. If the current page
-                      // happens to be larger than the number of pages empty rows will be
-                      // displayed.
-                      // _controller.goToFirstPage();
-
+                      // If the curren row/current page happens to be larger than
+                      // the total rows/total number of pages what would happen is determined by
+                      // [pageSyncApproach] field
                       _dessertsDataSource!.caloriesFilter = v;
                     },
                     key: _rangeSelectorKey,
@@ -277,9 +275,12 @@ class _AsyncPaginatedDataTable2DemoState
               ]),
           rowsPerPage: _rowsPerPage,
           autoRowsToHeight: getCurrentRouteOption(context) == autoRows,
-          pageSyncApproach: getCurrentRouteOption(context) == autoRows
-              ? PageSyncApproach.goToLast
-              : PageSyncApproach.goToFirst,
+          // Default - do nothing, autoRows - goToLast, other - goToFirst
+          pageSyncApproach: getCurrentRouteOption(context) == dflt
+              ? PageSyncApproach.doNothing
+              : getCurrentRouteOption(context) == autoRows
+                  ? PageSyncApproach.goToLast
+                  : PageSyncApproach.goToFirst,
           minWidth: 800,
           fit: FlexFit.tight,
           border: TableBorder(

@@ -261,17 +261,24 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     bool noData = false,
     bool throwError = false,
     bool hidePaginator = false,
+    int rowsPerPage = 10,
+    initialFirstRowIndex = 0,
     bool circularSpinner = false,
+    bool showCheckboxColumn = true,
+    bool fewerResultsAfterRefresh = false,
     PaginatorController? controller,
     Widget? empty,
+    PageSyncApproach syncApproach = PageSyncApproach.doNothing,
+    // Return less rows when calling refresh method on the data source
     ScrollController? scrollController,
     double? minWidth,
     Function(int?)? onRowsPerPageChanged,
     List<DataColumn2>? columns}) {
   return AsyncPaginatedDataTable2(
     horizontalMargin: 24,
-    showCheckboxColumn: true,
+    showCheckboxColumn: showCheckboxColumn,
     wrapInCard: wrapInCard,
+    initialFirstRowIndex: initialFirstRowIndex,
     header: showHeader ? Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
@@ -279,6 +286,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     columns: columns ?? testColumns,
     showFirstLastButtons: true,
     controller: controller,
+    rowsPerPage: rowsPerPage,
     loading: circularSpinner
         ? Center(
             child: SizedBox(
@@ -300,23 +308,31 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     onRowsPerPageChanged: showPageSizeSelector || onRowsPerPageChanged != null
         ? onRowsPerPageChanged ?? (int? rowsPerPage) {}
         : null,
+    pageSyncApproach: syncApproach,
     source: DessertDataSourceAsync(
-        allowSelection: true, showPage: showPage, noData: noData)
+        allowSelection: true,
+        showPage: showPage,
+        noData: noData,
+        fewerResultsAfterRefresh: fewerResultsAfterRefresh)
       .._errorCounter = throwError ? 0 : null,
   );
 }
 
 class DessertDataSourceAsync extends AsyncDataTableSource {
-  DessertDataSourceAsync(
-      {this.allowSelection = false,
-      this.showPage = true,
-      this.noData = false,
-      this.useKDeserts = false});
+  DessertDataSourceAsync({
+    this.allowSelection = false,
+    this.showPage = true,
+    this.noData = false,
+    this.useKDeserts = false,
+    this.fewerResultsAfterRefresh = false,
+  });
 
   final bool allowSelection;
   final bool showPage;
   final bool noData;
   final bool useKDeserts;
+  final bool fewerResultsAfterRefresh;
+  bool _usefewerResultsAfterRefresh = false;
 
   int get generation => _generation;
 
@@ -364,8 +380,16 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     var x = _empty
         ? await Future.delayed(Duration(milliseconds: 2000),
             () => DesertsFakeWebServiceResponse(0, []))
-        : await _repo.getData(startIndex, count, _sortColumn, _sortAscending,
-            noData, useKDeserts);
+        : (_usefewerResultsAfterRefresh)
+            ? await Future.delayed(
+                Duration(milliseconds: 2000),
+                () => DesertsFakeWebServiceResponse(
+                    10, _dessertsX3.take(10).toList()))
+            : await _repo.getData(startIndex, count, _sortColumn,
+                _sortAscending, noData, useKDeserts);
+
+    if (fewerResultsAfterRefresh && !_usefewerResultsAfterRefresh)
+      _usefewerResultsAfterRefresh = true;
 
     var r = AsyncRowsResponse(
         x.totalRecords,
