@@ -329,7 +329,7 @@ class DataTable2 extends DataTable {
     required VoidCallback? onRowTap,
     required VoidCallback? onRowSecondaryTap,
     required GestureTapDownCallback? onRowSecondaryTapDown,
-    required VoidCallback? onSelectChanged,
+    required VoidCallback onSelectChanged,
     required MaterialStateProperty<Color?>? overlayColor,
   }) {
     final ThemeData themeData = Theme.of(context);
@@ -368,7 +368,7 @@ class DataTable2 extends DataTable {
         child: label,
         overlayColor: overlayColor,
       );
-    } else if (onSelectChanged != null) {
+    } else {
       label = GestureDetector(
         child: TableRowInkWell(
             child: label,
