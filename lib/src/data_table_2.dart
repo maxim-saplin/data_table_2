@@ -55,6 +55,8 @@ class DataRow2 extends DataRow {
       MaterialStateProperty<Color?>? color,
       required List<DataCell> cells,
       this.onTap,
+      this.onDoubleTap,
+      this.onLongPress,
       this.onSecondaryTap,
       this.onSecondaryTapDown})
       : super(
@@ -71,6 +73,8 @@ class DataRow2 extends DataRow {
       MaterialStateProperty<Color?>? color,
       required List<DataCell> cells,
       this.onTap,
+      this.onDoubleTap,
+      this.onLongPress,
       this.onSecondaryTap,
       this.onSecondaryTapDown})
       : super.byIndex(
@@ -81,14 +85,19 @@ class DataRow2 extends DataRow {
             cells: cells);
 
   /// Row tap handler
-  // TODO: Add test
-  final VoidCallback? onTap;
+  final GestureTapCallback? onTap;
 
   /// Row right click handler
-  final VoidCallback? onSecondaryTap;
+  final GestureTapCallback? onSecondaryTap;
 
   /// Row right mouse down handler
   final GestureTapDownCallback? onSecondaryTapDown;
+
+  /// Row double tap handler
+  final GestureTapCallback? onDoubleTap;
+
+  /// Row long press handler
+  final GestureLongPressCallback? onLongPress;
 }
 
 /// In-place replacement of standard [DataTable] widget, mimics it API.
@@ -330,8 +339,10 @@ class DataTable2 extends DataTable {
     required GestureLongPressCallback? onLongPress,
     required GestureTapDownCallback? onTapDown,
     required GestureTapCancelCallback? onTapCancel,
-    required VoidCallback? onRowTap,
-    required VoidCallback? onRowSecondaryTap,
+    required GestureTapCallback? onRowTap,
+    required GestureTapCallback? onRowDoubleTap,
+    required GestureLongPressCallback? onRowLongPress,
+    required GestureTapCallback? onRowSecondaryTap,
     required GestureTapDownCallback? onRowSecondaryTapDown,
     required VoidCallback onSelectChanged,
     required MaterialStateProperty<Color?>? overlayColor,
@@ -383,14 +394,17 @@ class DataTable2 extends DataTable {
     } else {
       label = GestureDetector(
         child: TableRowInkWell(
-            child: label,
-            overlayColor: overlayColor,
-            onTap: onRowTap == null
-                ? onSelectChanged
-                : () {
-                    onRowTap();
-                    onSelectChanged();
-                  }),
+          child: label,
+          overlayColor: overlayColor,
+          onTap: onRowTap == null
+              ? onSelectChanged
+              : () {
+                  onRowTap();
+                  onSelectChanged();
+                },
+          onDoubleTap: onRowDoubleTap,
+          onLongPress: onRowLongPress,
+        ),
         onSecondaryTap: onRowSecondaryTap,
         onSecondaryTapDown: onRowSecondaryTapDown,
       );
@@ -648,6 +662,8 @@ class DataTable2 extends DataTable {
             onTapDown: cell.onTapDown,
             onTapCancel: cell.onTapCancel,
             onRowTap: row is DataRow2 ? row.onTap : null,
+            onRowDoubleTap: row is DataRow2 ? row.onDoubleTap : null,
+            onRowLongPress: row is DataRow2 ? row.onLongPress : null,
             onRowSecondaryTap: row is DataRow2 ? row.onSecondaryTap : null,
             onRowSecondaryTapDown:
                 row is DataRow2 ? row.onSecondaryTapDown : null,

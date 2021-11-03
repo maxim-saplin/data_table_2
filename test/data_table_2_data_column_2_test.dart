@@ -345,6 +345,12 @@ void main() {
             onSecondaryTapDown: (_) {
               log.add('row-secondaryTapDown: ${dessert.name}');
             },
+            onDoubleTap: () {
+              log.add('row-doubleTap: ${dessert.name}');
+            },
+            onLongPress: () {
+              log.add('row-longPress: ${dessert.name}');
+            },
             cells: <DataCell>[
               DataCell(
                 Text(dessert.name),
@@ -363,11 +369,15 @@ void main() {
     ));
 
     await tester.tap(find.text('Cupcake'));
+    // Wait 500ms to get tap registered instead of double tap
+    await tester.pump(const Duration(milliseconds: 500));
 
     expect(log, <String>['row-tap: Cupcake', 'row-selected: Cupcake']);
     log.clear();
 
     await tester.tap(find.text('305'));
+    // Wait 500ms to get tap registered instead of double tap
+    await tester.pump(const Duration(milliseconds: 500));
 
     expect(log, <String>['row-tap: Cupcake', 'row-selected: Cupcake']);
     log.clear();
@@ -382,6 +392,17 @@ void main() {
 
     expect(log,
         <String>['row-secondaryTapDown: Cupcake', 'row-secondaryTap: Cupcake']);
+    log.clear();
+
+    await tester.tap(find.text('305'));
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.tap(find.text('305'));
+
+    expect(log, <String>['row-doubleTap: Cupcake']);
+    log.clear();
+
+    await tester.longPress(find.text('305'));
+    expect(log, <String>['row-longPress: Cupcake']);
     log.clear();
   });
 
