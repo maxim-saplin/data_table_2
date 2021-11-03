@@ -303,6 +303,13 @@ abstract class AsyncDataTableSource extends DataTableSource {
   bool get isRowCountApproximate => false;
 }
 
+/// Should data source return less rows that ca
+enum PageSyncApproach { doNothing, goToFirst, goToLast }
+
+/// Asynchronous version of PaginatedDataTable2 which relies on data source
+/// returning data rows wrappd in [Future]. Provides a straightworward way
+/// of integrating data table with remote back-end and is loaded with
+/// convenienece features such as error handling, reloading etc.
 class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
   AsyncPaginatedDataTable2(
       {Key? key,
@@ -340,6 +347,7 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
       Widget? empty,
       this.loading,
       this.errorBuilder,
+      this.pageSyncApproach = PageSyncApproach.doNothing,
       TableBorder? border,
       bool autoRowsToHeight = false,
       double smRatio = 0.67,
@@ -390,6 +398,14 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
   /// The function allows displaying custom widget on top of table should an error happen.
   /// E.g. data source faild to load data
   final Widget Function(Object? error)? errorBuilder;
+
+  /// Should a data source return less rows than required to fill the current
+  /// page of the table (e.g. when regresshin with a new filter value),
+  /// the widget can take 3 actions (see [PageSyncApproach]):
+  /// 1. Do nothing and display empty rows (e.g. rows 51-60 of 45)
+  /// 2. Make another request to thу data source fetching the very first page (e.g. rows 0-10 of 45 )
+  /// 3. Make another request fetchiung the very last page (e.g. rows 41 - 45 of 45)
+  final PageSyncApproach pageSyncApproach;
 
   @override
   PaginatedDataTable2State createState() => AsyncPaginatedDataTable2State();
@@ -446,20 +462,7 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
     var source = widget.source as AsyncDataTableSource;
     var w = widget as AsyncPaginatedDataTable2;
 
-    source._debouncable = widget.autoRowsToHeight;
-
-    if (source.state == _SourceState.none) {
-      _showNothing = true;
-      var x = super.build(context);
-
-      if (!widget.autoRowsToHeight)
-        source._fetchData(_firstRowIndex, _effectiveRowsPerPage);
-
-      // Future.delayed(Duration(milliseconds: 0),
-      //     () => source._fetchData(_firstRowIndex, _effectiveRowsPerPage));
-      return x;
-    } else if (source.state == _SourceState.loading) {
-      //_showNothing = true;
+    Widget loading() {
       var x = super.build(context);
       return Stack(fit: StackFit.expand, children: [
         x,
@@ -469,6 +472,22 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
                 child: SizedBox(
                     width: 64, height: 16, child: LinearProgressIndicator())),
       ]);
+    }
+
+    source._debouncable = widget.autoRowsToHeight;
+
+    if (source.state == _SourceState.none) {
+      _showNothing = true;
+      var x = super.build(context);
+
+      if (!widget.autoRowsToHeight)
+        source._fetchData(_firstRowIndex, _effectiveRowsPerPage);
+
+      return x;
+    } else if (source.state == _SourceState.loading) {
+      //_showNothing = true;
+
+      return loading();
     } else if (source.state == _SourceState.error) {
       _showNothing = true;
       return w.errorBuilder != null
@@ -487,9 +506,22 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
       _firstRowIndex = _rowIndexRequested;
       super._setRowsPerPage(_rowsPerPageRequested);
     }
+    // current row is beyond max row
+    if (_firstRowIndex >= _rowCount &&
+        w.pageSyncApproach != PageSyncApproach.doNothing &&
+        _firstRowIndex >= _effectiveRowsPerPage) {
+      // TODO test with 0 rows returned from data source
 
-    var x = super.build(context);
+      if (w.pageSyncApproach == PageSyncApproach.goToFirst) {
+        pageTo(0);
+      } else {
+        pageTo(((_rowCount - 1) / _effectiveRowsPerPage).floor() *
+            _effectiveRowsPerPage);
+      }
 
-    return x;
+      return loading();
+    }
+
+    return super.build(context);
   }
 }

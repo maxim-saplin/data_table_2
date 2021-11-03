@@ -465,34 +465,34 @@ class DataTable2Tests extends StatelessWidget {
     //setColumnSizeRatios(1, 2);
     return Padding(
         padding: const EdgeInsets.all(16),
-        child: AsyncPaginatedDataTable2(
-          header: const Text('Test table'),
-          source: DessertDataSourceAsync(
-              allowSelection: true,
-              useKDeserts: true,
-              showGeneration: true,
-              noData: false),
-          rowsPerPage: 2,
-          availableRowsPerPage: const <int>[
-            2,
-            4,
-          ],
-          onRowsPerPageChanged: (int? rowsPerPage) {},
-          onPageChanged: (int rowIndex) {},
-          onSelectAll: (bool? value) {},
-          columns: const <DataColumn2>[
-            DataColumn2(label: Text('Name')),
-            DataColumn2(label: Text('Calories'), numeric: true),
-            DataColumn2(label: Text('Generation')),
-          ],
-        )
+        child:
 
-        // buildAsyncPaginatedTable(
-        //     showPage: false,
-        //     showGeneration: false,
-        //     showPageSizeSelector: true,
-        //     controller: pc)
+            // AsyncPaginatedDataTable2(
+            //   header: const Text('Test table'),
+            //   source: DessertDataSourceAsync(
+            //       allowSelection: true,
+            //       useKDeserts: true,
+            //       showGeneration: true,
+            //       noData: false),
+            //   rowsPerPage: 2,
+            //   availableRowsPerPage: const <int>[
+            //     2,
+            //     4,
+            //   ],
+            //   onRowsPerPageChanged: (int? rowsPerPage) {},
+            //   onPageChanged: (int rowIndex) {},
+            //   onSelectAll: (bool? value) {},
+            //   columns: const <DataColumn2>[
+            //     DataColumn2(label: Text('Name')),
+            //     DataColumn2(label: Text('Calories'), numeric: true),
+            //     DataColumn2(label: Text('Generation')),
+            //   ],
+            // )
 
-        );
+            buildAsyncPaginatedTable(
+                showPage: false,
+                showGeneration: false,
+                showPageSizeSelector: true,
+                controller: pc));
   }
 }

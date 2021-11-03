@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:example/custom_pager.dart';
 import 'package:example/data_sources.dart';
 import 'package:flutter/foundation.dart';
@@ -6,12 +8,104 @@ import 'package:data_table_2/data_table_2.dart';
 
 import '../nav_helper.dart';
 
-// Copyright 2019 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+class _TitledRangeSelector extends StatefulWidget {
+  const _TitledRangeSelector(
+      {this.key,
+      required this.onChanged,
+      this.title = "",
+      this.range = const RangeValues(0, 100),
+      this.titleToSelectorSwitch = const Duration(seconds: 2)});
 
-// The file was extracted from GitHub: https://github.com/flutter/gallery
-// Changes and modifications by Maxim Saplin, 2021
+  final Key? key;
+  final String title;
+  final Duration titleToSelectorSwitch;
+  final RangeValues range;
+  final Function(RangeValues) onChanged;
+
+  @override
+  State<_TitledRangeSelector> createState() => _TitledRangeSelectorState();
+}
+
+class _TitledRangeSelectorState extends State<_TitledRangeSelector> {
+  bool _titleVisible = true;
+  RangeValues _values = const RangeValues(0, 100);
+
+  @override
+  void initState() {
+    super.initState();
+
+    _values = widget.range;
+
+    Timer(
+        widget.titleToSelectorSwitch,
+        () => setState(() {
+              _titleVisible = false;
+            }));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(alignment: Alignment.centerLeft, children: [
+      AnimatedOpacity(
+          opacity: _titleVisible ? 1 : 0,
+          duration: Duration(milliseconds: 1000),
+          child: Align(
+              alignment: Alignment.centerLeft, child: Text(widget.title))),
+      AnimatedOpacity(
+          opacity: _titleVisible ? 0 : 1,
+          duration: Duration(milliseconds: 1000),
+          child: SizedBox(
+              child: Theme(
+                  data: Theme.of(context).copyWith(
+                      sliderTheme: SliderThemeData(
+                          rangeThumbShape:
+                              RoundRangeSliderThumbShape(enabledThumbRadius: 8),
+                          thumbColor: Colors.black,
+                          activeTrackColor: Colors.grey[700],
+                          inactiveTrackColor: Colors.grey[400],
+                          activeTickMarkColor: Colors.white,
+                          inactiveTickMarkColor: Colors.white)),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        DefaultTextStyle(
+                            style: TextStyle(fontSize: 15, color: Colors.black),
+                            child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        _values.start.toStringAsFixed(0),
+                                      ),
+                                      Text(
+                                        'Carbs',
+                                      ),
+                                      Text(
+                                        _values.end.toStringAsFixed(0),
+                                      )
+                                    ]))),
+                        SizedBox(
+                            height: 24,
+                            child: RangeSlider(
+                              values: _values,
+                              divisions: 9,
+                              min: widget.range.start,
+                              max: widget.range.end,
+                              onChanged: (v) {
+                                setState(() {
+                                  _values = v;
+                                });
+                                widget.onChanged(v);
+                              },
+                            ))
+                      ])),
+              width: 340))
+    ]);
+  }
+}
 
 class AsyncPaginatedDataTable2Demo extends StatefulWidget {
   const AsyncPaginatedDataTable2Demo();
@@ -138,6 +232,10 @@ class _AsyncPaginatedDataTable2DemoState
     ];
   }
 
+  // Use global key to avoid rebuilding state of _TitledRangeSelector
+  // upon AsyncPaginatedDataTable2 refreshes, e.g. upon page switches
+  GlobalKey _rangeSelectorKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     // Last ppage example uses extra API call to get the number of items in datasource
@@ -149,23 +247,40 @@ class _AsyncPaginatedDataTable2DemoState
           checkboxHorizontalMargin: 12,
           columnSpacing: 0,
           wrapInCard: false,
-          header:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text('AsyncPaginatedDataTable2'),
-            if (kDebugMode && getCurrentRouteOption(context) == custPager)
-              Row(children: [
-                OutlinedButton(
-                    onPressed: () => _controller.goToPageWithRow(25),
-                    child: Text('Go to row 25')),
-                OutlinedButton(
-                    onPressed: () => _controller.goToRow(5),
-                    child: Text('Go to row 5'))
+          header: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                _TitledRangeSelector(
+                    range: RangeValues(150, 600),
+                    onChanged: (v) {
+                      // If the curren row/current page happens to be larger than
+                      // the total rows/total number of pages what would happen is determined by
+                      // [pageSyncApproach] field
+                      _dessertsDataSource!.caloriesFilter = v;
+                    },
+                    key: _rangeSelectorKey,
+                    title: 'AsyncPaginatedDataTable2'),
+                if (kDebugMode && getCurrentRouteOption(context) == custPager)
+                  Row(children: [
+                    OutlinedButton(
+                        onPressed: () => _controller.goToPageWithRow(25),
+                        child: Text('Go to row 25')),
+                    OutlinedButton(
+                        onPressed: () => _controller.goToRow(5),
+                        child: Text('Go to row 5'))
+                  ]),
+                if (getCurrentRouteOption(context) == custPager)
+                  PageNumber(controller: _controller)
               ]),
-            if (getCurrentRouteOption(context) == custPager)
-              PageNumber(controller: _controller)
-          ]),
           rowsPerPage: _rowsPerPage,
           autoRowsToHeight: getCurrentRouteOption(context) == autoRows,
+          // Default - do nothing, autoRows - goToLast, other - goToFirst
+          pageSyncApproach: getCurrentRouteOption(context) == dflt
+              ? PageSyncApproach.doNothing
+              : getCurrentRouteOption(context) == autoRows
+                  ? PageSyncApproach.goToLast
+                  : PageSyncApproach.goToFirst,
           minWidth: 800,
           fit: FlexFit.tight,
           border: TableBorder(
@@ -196,8 +311,7 @@ class _AsyncPaginatedDataTable2DemoState
               : (getCurrentRouteOption(context) != selectAllPage
                   ? _dessertsDataSource!.deselectAll()
                   : _dessertsDataSource!.deselectAllOnThePage()),
-          controller:
-              getCurrentRouteOption(context) == custPager ? _controller : null,
+          controller: _controller,
           hidePaginator: getCurrentRouteOption(context) == custPager,
           columns: _columns,
           empty: Center(
@@ -206,36 +320,43 @@ class _AsyncPaginatedDataTable2DemoState
                   color: Colors.grey[200],
                   child: Text('No data'))),
           loading: _Loading(),
-          errorBuilder: (e) => Center(
-                child: Container(
-                    padding: EdgeInsets.all(10),
-                    height: 70,
-                    color: Colors.red,
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Oops! ${e != null ? e.toString() : ""}',
-                              style: TextStyle(color: Colors.white)),
-                          TextButton(
-                              onPressed: () =>
-                                  _dessertsDataSource!.refreshDatasource(),
-                              child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.refresh,
-                                      color: Colors.white,
-                                    ),
-                                    Text('Retry',
-                                        style: TextStyle(color: Colors.white))
-                                  ]))
-                        ])),
-              ),
+          errorBuilder: (e) => _ErrorAndRetry(
+              e.toString(), () => _dessertsDataSource!.refreshDatasource()),
           source: _dessertsDataSource!),
       if (getCurrentRouteOption(context) == custPager)
         Positioned(bottom: 16, child: CustomPager(_controller))
     ]);
   }
+}
+
+class _ErrorAndRetry extends StatelessWidget {
+  _ErrorAndRetry(this.errorMessage, this.retry);
+
+  final String errorMessage;
+  final void Function() retry;
+
+  @override
+  Widget build(BuildContext context) => Center(
+        child: Container(
+            padding: EdgeInsets.all(10),
+            height: 70,
+            color: Colors.red,
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Oops! $errorMessage',
+                      style: TextStyle(color: Colors.white)),
+                  TextButton(
+                      onPressed: retry,
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(
+                          Icons.refresh,
+                          color: Colors.white,
+                        ),
+                        Text('Retry', style: TextStyle(color: Colors.white))
+                      ]))
+                ])),
+      );
 }
 
 class _Loading extends StatefulWidget {
