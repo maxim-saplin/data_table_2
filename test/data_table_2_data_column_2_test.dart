@@ -305,6 +305,86 @@ void main() {
     log.clear();
   });
 
+  testWidgets('DataTable2 control test - row taps',
+      (WidgetTester tester) async {
+    final List<String> log = <String>[];
+
+    Widget buildTable({int? sortColumnIndex, bool sortAscending = true}) {
+      return DataTable2(
+        sortColumnIndex: sortColumnIndex,
+        sortAscending: sortAscending,
+        onSelectAll: (bool? value) {
+          log.add('select-all: $value');
+        },
+        columns: <DataColumn2>[
+          const DataColumn2(
+            label: Text('Name'),
+            tooltip: 'Name',
+          ),
+          DataColumn2(
+            label: const Text('Calories'),
+            tooltip: 'Calories',
+            numeric: true,
+            onSort: (int columnIndex, bool ascending) {
+              log.add('column-sort: $columnIndex $ascending');
+            },
+          ),
+        ],
+        rows: kDesserts.map<DataRow2>((Dessert dessert) {
+          return DataRow2(
+            key: ValueKey<String>(dessert.name),
+            onSelectChanged: (bool? selected) {
+              log.add('row-selected: ${dessert.name}');
+            },
+            onTap: () {
+              log.add('row-tap: ${dessert.name}');
+            },
+            onSecondaryTap: () {
+              log.add('row-secondaryTap: ${dessert.name}');
+            },
+            onSecondaryTapDown: (_) {
+              log.add('row-secondaryTapDown: ${dessert.name}');
+            },
+            cells: <DataCell>[
+              DataCell(
+                Text(dessert.name),
+              ),
+              DataCell(
+                Text('${dessert.calories}'),
+              ),
+            ],
+          );
+        }).toList(),
+      );
+    }
+
+    await tester.pumpWidget(MaterialApp(
+      home: Material(child: buildTable()),
+    ));
+
+    await tester.tap(find.text('Cupcake'));
+
+    expect(log, <String>['row-tap: Cupcake', 'row-selected: Cupcake']);
+    log.clear();
+
+    await tester.tap(find.text('305'));
+
+    expect(log, <String>['row-tap: Cupcake', 'row-selected: Cupcake']);
+    log.clear();
+
+    await tester.tap(find.text('Cupcake'), buttons: kSecondaryMouseButton);
+
+    expect(log,
+        <String>['row-secondaryTapDown: Cupcake', 'row-secondaryTap: Cupcake']);
+    log.clear();
+
+    await tester.tap(find.text('305'), buttons: kSecondaryMouseButton);
+
+    expect(log,
+        <String>['row-secondaryTapDown: Cupcake', 'row-secondaryTap: Cupcake']);
+    log.clear();
+  });
+
   testWidgets('DataTable2 overflow test - header', (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
