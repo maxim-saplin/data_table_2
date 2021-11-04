@@ -8,105 +8,6 @@ import 'package:data_table_2/data_table_2.dart';
 
 import '../nav_helper.dart';
 
-class _TitledRangeSelector extends StatefulWidget {
-  const _TitledRangeSelector(
-      {this.key,
-      required this.onChanged,
-      this.title = "",
-      this.range = const RangeValues(0, 100),
-      this.titleToSelectorSwitch = const Duration(seconds: 2)});
-
-  final Key? key;
-  final String title;
-  final Duration titleToSelectorSwitch;
-  final RangeValues range;
-  final Function(RangeValues) onChanged;
-
-  @override
-  State<_TitledRangeSelector> createState() => _TitledRangeSelectorState();
-}
-
-class _TitledRangeSelectorState extends State<_TitledRangeSelector> {
-  bool _titleVisible = true;
-  RangeValues _values = const RangeValues(0, 100);
-
-  @override
-  void initState() {
-    super.initState();
-
-    _values = widget.range;
-
-    Timer(
-        widget.titleToSelectorSwitch,
-        () => setState(() {
-              _titleVisible = false;
-            }));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(alignment: Alignment.centerLeft, children: [
-      AnimatedOpacity(
-          opacity: _titleVisible ? 1 : 0,
-          duration: Duration(milliseconds: 1000),
-          child: Align(
-              alignment: Alignment.centerLeft, child: Text(widget.title))),
-      AnimatedOpacity(
-          opacity: _titleVisible ? 0 : 1,
-          duration: Duration(milliseconds: 1000),
-          child: SizedBox(
-              child: Theme(
-                  data: Theme.of(context).copyWith(
-                      sliderTheme: SliderThemeData(
-                          rangeThumbShape:
-                              RoundRangeSliderThumbShape(enabledThumbRadius: 8),
-                          thumbColor: Colors.black,
-                          activeTrackColor: Colors.grey[700],
-                          inactiveTrackColor: Colors.grey[400],
-                          activeTickMarkColor: Colors.white,
-                          inactiveTickMarkColor: Colors.white)),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        DefaultTextStyle(
-                            style: TextStyle(fontSize: 15, color: Colors.black),
-                            child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 20),
-                                child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        _values.start.toStringAsFixed(0),
-                                      ),
-                                      Text(
-                                        'Carbs',
-                                      ),
-                                      Text(
-                                        _values.end.toStringAsFixed(0),
-                                      )
-                                    ]))),
-                        SizedBox(
-                            height: 24,
-                            child: RangeSlider(
-                              values: _values,
-                              divisions: 9,
-                              min: widget.range.start,
-                              max: widget.range.end,
-                              onChanged: (v) {
-                                setState(() {
-                                  _values = v;
-                                });
-                                widget.onChanged(v);
-                              },
-                            ))
-                      ])),
-              width: 340))
-    ]);
-  }
-}
-
 class AsyncPaginatedDataTable2Demo extends StatefulWidget {
   const AsyncPaginatedDataTable2Demo();
 
@@ -260,7 +161,8 @@ class _AsyncPaginatedDataTable2DemoState
                       _dessertsDataSource!.caloriesFilter = v;
                     },
                     key: _rangeSelectorKey,
-                    title: 'AsyncPaginatedDataTable2'),
+                    title: 'AsyncPaginatedDataTable2',
+                    caption: 'Calories'),
                 if (kDebugMode && getCurrentRouteOption(context) == custPager)
                   Row(children: [
                     OutlinedButton(
@@ -392,5 +294,107 @@ class __LoadingState extends State<_Loading> {
                       height: 50,
                     ));
             }));
+  }
+}
+
+class _TitledRangeSelector extends StatefulWidget {
+  const _TitledRangeSelector(
+      {this.key,
+      required this.onChanged,
+      this.title = "",
+      this.caption = "",
+      this.range = const RangeValues(0, 100),
+      this.titleToSelectorSwitch = const Duration(seconds: 2)});
+
+  final Key? key;
+
+  final String title;
+  final String caption;
+  final Duration titleToSelectorSwitch;
+  final RangeValues range;
+  final Function(RangeValues) onChanged;
+
+  @override
+  State<_TitledRangeSelector> createState() => _TitledRangeSelectorState();
+}
+
+class _TitledRangeSelectorState extends State<_TitledRangeSelector> {
+  bool _titleVisible = true;
+  RangeValues _values = const RangeValues(0, 100);
+
+  @override
+  void initState() {
+    super.initState();
+
+    _values = widget.range;
+
+    Timer(
+        widget.titleToSelectorSwitch,
+        () => setState(() {
+              _titleVisible = false;
+            }));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(alignment: Alignment.centerLeft, children: [
+      AnimatedOpacity(
+          opacity: _titleVisible ? 1 : 0,
+          duration: Duration(milliseconds: 1000),
+          child: Align(
+              alignment: Alignment.centerLeft, child: Text(widget.title))),
+      AnimatedOpacity(
+          opacity: _titleVisible ? 0 : 1,
+          duration: Duration(milliseconds: 1000),
+          child: SizedBox(
+              child: Theme(
+                  data: Theme.of(context).copyWith(
+                      sliderTheme: SliderThemeData(
+                          rangeThumbShape:
+                              RoundRangeSliderThumbShape(enabledThumbRadius: 8),
+                          thumbColor: Colors.black,
+                          activeTrackColor: Colors.grey[700],
+                          inactiveTrackColor: Colors.grey[400],
+                          activeTickMarkColor: Colors.white,
+                          inactiveTickMarkColor: Colors.white)),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        DefaultTextStyle(
+                            style: TextStyle(fontSize: 15, color: Colors.black),
+                            child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        _values.start.toStringAsFixed(0),
+                                      ),
+                                      Text(
+                                        widget.caption,
+                                      ),
+                                      Text(
+                                        _values.end.toStringAsFixed(0),
+                                      )
+                                    ]))),
+                        SizedBox(
+                            height: 24,
+                            child: RangeSlider(
+                              values: _values,
+                              divisions: 9,
+                              min: widget.range.start,
+                              max: widget.range.end,
+                              onChanged: (v) {
+                                setState(() {
+                                  _values = v;
+                                });
+                                widget.onChanged(v);
+                              },
+                            ))
+                      ])),
+              width: 340))
+    ]);
   }
 }
