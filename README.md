@@ -88,3 +88,17 @@ class DataTable2SimpleDemo extends StatelessWidget {
 
 ```
 If you're already using the standard widgets you can reference the package and add '2' to the names of stock widgets (making them **DataTable2** or **PaginatedDataTable2**) and that is it. 
+
+
+##  Know issues/limitations
+- All data rows are fixed height, you can't control individual heights of arbitrary rows
+- There's no capability to size data table cells to fit contents. Column width's adapt to available width (eihther to parent width or `minWidth`), data rows width are predefined by constructir params. Content that doesn't fit a cell gets clipped
+- Using `border` properties disables row coloring via `DataRow2(color: MaterialStateColor.resolveWith((states) => ...`
+- When setting DataRow/DataRow2 color via `color` property to any material color other than transparent hover colors doesn't get applied. I.e. you can't have both striped rows with hovering working by using MaterialStateColor:
+      `color: MaterialStateProperty.resolveWith(
+          (states) => states.contains(MaterialState.hovered)
+              ? Colors.blue
+              : index % 2 == 0
+                  ? Colors.red
+                  : Colors.amber)`
+- Cell tap events disabling any row level events. If both a row and a cell within that row happen to have tap events, tapping on a cell won't raise any row events

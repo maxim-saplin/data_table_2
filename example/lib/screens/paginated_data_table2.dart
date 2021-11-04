@@ -1,9 +1,10 @@
+import 'package:example/custom_pager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:data_table_2/paginated_data_table_2.dart';
+import 'package:data_table_2/data_table_2.dart';
 
-import 'data_source.dart';
-import 'nav_helper.dart';
+import '../data_sources.dart';
+import '../nav_helper.dart';
 
 // Copyright 2019 The Flutter team. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -32,8 +33,14 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialized) {
-      _dessertsDataSource = DessertDataSource(context);
+      _dessertsDataSource = DessertDataSource(
+          context, getCurrentRouteOption(context) == defaultSorting);
+
       _controller = PaginatorController();
+
+      if (getCurrentRouteOption(context) == defaultSorting) {
+        _sortColumnIndex = 1;
+      }
       _initialized = true;
     }
   }
@@ -130,7 +137,7 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
             ]),
           if (getCurrentRouteOption(context) == custPager &&
               _controller != null)
-            _PageNumber(controller: _controller!)
+            PageNumber(controller: _controller!)
         ]),
         rowsPerPage: _rowsPerPage,
         autoRowsToHeight: getCurrentRouteOption(context) == autoRows,
@@ -172,109 +179,7 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
             : _dessertsDataSource,
       ),
       if (getCurrentRouteOption(context) == custPager)
-        Positioned(bottom: 16, child: _CustomPager(_controller!))
+        Positioned(bottom: 16, child: CustomPager(_controller!))
     ]);
-  }
-}
-
-class _PageNumber extends StatefulWidget {
-  const _PageNumber({
-    required PaginatorController controller,
-  }) : _controller = controller;
-
-  final PaginatorController _controller;
-
-  @override
-  _PageNumberState createState() => _PageNumberState();
-}
-
-class _PageNumberState extends State<_PageNumber> {
-  @override
-  void initState() {
-    super.initState();
-    widget._controller.addListener(() {
-      setState(() {});
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(widget._controller.isAttached
-        ? 'Page: ${1 + ((widget._controller.currentRowIndex + 1) / widget._controller.rowsPerPage).floor()} of '
-            '${(widget._controller.rowCount / widget._controller.rowsPerPage).ceil()}'
-        : 'Page: x of y');
-  }
-}
-
-class _CustomPager extends StatefulWidget {
-  const _CustomPager(this.controller);
-
-  final PaginatorController controller;
-
-  @override
-  _CustomPagerState createState() => _CustomPagerState();
-}
-
-class _CustomPagerState extends State<_CustomPager> {
-  static const List<int> _availableSizes = [3, 5, 10, 20];
-
-  @override
-  void initState() {
-    super.initState();
-    widget.controller.addListener(() {
-      setState(() {});
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Theme(
-          data: Theme.of(context).copyWith(
-              iconTheme: IconThemeData(color: Colors.white),
-              textTheme: TextTheme(subtitle1: TextStyle(color: Colors.white))),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                  onPressed: () => widget.controller.goToFirstPage(),
-                  icon: Icon(Icons.skip_previous)),
-              IconButton(
-                  onPressed: () => widget.controller.goToPreviousPage(),
-                  icon: Icon(Icons.chevron_left_sharp)),
-              DropdownButton<int>(
-                  onChanged: (v) => widget.controller.setRowsPerPage(v!),
-                  value: _availableSizes.contains(widget.controller.rowsPerPage)
-                      ? widget.controller.rowsPerPage
-                      : _availableSizes[0],
-                  dropdownColor: Colors.grey[800],
-                  items: _availableSizes
-                      .map((s) => DropdownMenuItem<int>(
-                            child: Text(s.toString()),
-                            value: s,
-                          ))
-                      .toList()),
-              IconButton(
-                  onPressed: () => widget.controller.goToNextPage(),
-                  icon: Icon(Icons.chevron_right_sharp)),
-              IconButton(
-                  onPressed: () => widget.controller.goToLastPage(),
-                  icon: Icon(Icons.skip_next))
-            ],
-          )),
-      width: 220,
-      height: 40,
-      decoration: BoxDecoration(
-        color: Colors.grey[850],
-        borderRadius: BorderRadius.circular(3),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(100),
-            blurRadius: 4,
-            offset: Offset(4, 8), // Shadow position
-          ),
-        ],
-      ),
-    );
   }
 }

@@ -57,6 +57,18 @@ void main() {
                 onTap: () {
                   log.add('cell-tap: ${dessert.calories}');
                 },
+                onDoubleTap: () {
+                  log.add('cell-doubleTap: ${dessert.calories}');
+                },
+                onLongPress: () {
+                  log.add('cell-longPress: ${dessert.calories}');
+                },
+                onTapCancel: () {
+                  log.add('cell-tapCancel: ${dessert.calories}');
+                },
+                onTapDown: (TapDownDetails details) {
+                  log.add('cell-tapDown: ${dessert.calories}');
+                },
               ),
             ],
           );
@@ -99,8 +111,52 @@ void main() {
     await tester.pumpAndSettle(const Duration(milliseconds: 200));
 
     await tester.tap(find.text('375'));
+    // Wait 500ms to get tap registered instead of double tap
+    await tester.pump(const Duration(milliseconds: 500));
 
-    expect(log, <String>['cell-tap: 375']);
+    expect(log, <String>['cell-tapDown: 375', 'cell-tap: 375']);
+    log.clear();
+
+    await tester.tap(find.text('375'));
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.tap(find.text('375'));
+
+    expect(log, <String>['cell-doubleTap: 375']);
+    log.clear();
+
+    await tester.longPress(find.text('375'));
+    // The tap down is triggered on gesture down.
+    // Then, the cancel is triggered when the gesture arena
+    // recognizes that the long press overrides the tap event
+    // so it triggers a tap cancel, followed by the long press.
+    expect(log, <String>[
+      'cell-tapDown: 375',
+      'cell-tapCancel: 375',
+      'cell-longPress: 375'
+    ]);
+    log.clear();
+
+    TestGesture gesture = await tester.startGesture(
+      tester.getRect(find.text('375')).center,
+    );
+    await tester.pump(const Duration(milliseconds: 100));
+    // onTapDown callback is registered.
+    expect(log, equals(<String>['cell-tapDown: 375']));
+    await gesture.up();
+
+    await tester.pump(const Duration(seconds: 1));
+    // onTap callback is registered after the gesture is removed.
+    expect(log, equals(<String>['cell-tapDown: 375', 'cell-tap: 375']));
+    log.clear();
+
+    // dragging off the bounds of the cell calls the cancel callback
+    gesture =
+        await tester.startGesture(tester.getRect(find.text('375')).center);
+    await tester.pump(const Duration(milliseconds: 100));
+    await gesture.moveBy(const Offset(0.0, 200.0));
+    await gesture.cancel();
+    expect(log, equals(<String>['cell-tapDown: 375', 'cell-tapCancel: 375']));
+
     log.clear();
 
     await tester.tap(find.byType(Checkbox).last);
@@ -246,6 +302,107 @@ void main() {
     await tester.tap(checkboxes.first);
 
     expect(log, <String>['select-all: true']);
+    log.clear();
+  });
+
+  testWidgets('DataTable2 control test - row taps',
+      (WidgetTester tester) async {
+    final List<String> log = <String>[];
+
+    Widget buildTable({int? sortColumnIndex, bool sortAscending = true}) {
+      return DataTable2(
+        sortColumnIndex: sortColumnIndex,
+        sortAscending: sortAscending,
+        onSelectAll: (bool? value) {
+          log.add('select-all: $value');
+        },
+        columns: <DataColumn>[
+          const DataColumn(
+            label: Text('Name'),
+            tooltip: 'Name',
+          ),
+          DataColumn(
+            label: const Text('Calories'),
+            tooltip: 'Calories',
+            numeric: true,
+            onSort: (int columnIndex, bool ascending) {
+              log.add('column-sort: $columnIndex $ascending');
+            },
+          ),
+        ],
+        rows: kDesserts.map<DataRow2>((Dessert dessert) {
+          return DataRow2(
+            key: ValueKey<String>(dessert.name),
+            onSelectChanged: (bool? selected) {
+              log.add('row-selected: ${dessert.name}');
+            },
+            onTap: () {
+              log.add('row-tap: ${dessert.name}');
+            },
+            onSecondaryTap: () {
+              log.add('row-secondaryTap: ${dessert.name}');
+            },
+            onSecondaryTapDown: (_) {
+              log.add('row-secondaryTapDown: ${dessert.name}');
+            },
+            onDoubleTap: () {
+              log.add('row-doubleTap: ${dessert.name}');
+            },
+            onLongPress: () {
+              log.add('row-longPress: ${dessert.name}');
+            },
+            cells: <DataCell>[
+              DataCell(
+                Text(dessert.name),
+              ),
+              DataCell(
+                Text('${dessert.calories}'),
+              ),
+            ],
+          );
+        }).toList(),
+      );
+    }
+
+    await tester.pumpWidget(MaterialApp(
+      home: Material(child: buildTable()),
+    ));
+
+    await tester.tap(find.text('Cupcake'));
+    // Wait 500ms to get tap registered instead of double tap
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(log, <String>['row-tap: Cupcake', 'row-selected: Cupcake']);
+    log.clear();
+
+    await tester.tap(find.text('305'));
+    // Wait 500ms to get tap registered instead of double tap
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(log, <String>['row-tap: Cupcake', 'row-selected: Cupcake']);
+    log.clear();
+
+    await tester.tap(find.text('Cupcake'), buttons: kSecondaryMouseButton);
+
+    expect(log,
+        <String>['row-secondaryTapDown: Cupcake', 'row-secondaryTap: Cupcake']);
+    log.clear();
+
+    await tester.tap(find.text('305'), buttons: kSecondaryMouseButton);
+
+    expect(log,
+        <String>['row-secondaryTapDown: Cupcake', 'row-secondaryTap: Cupcake']);
+    log.clear();
+
+    await tester.tap(find.text('305'));
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.tap(find.text('305'));
+
+    expect(log, <String>['row-doubleTap: Cupcake']);
+    log.clear();
+
+    await tester.longPress(find.text('305'));
+    expect(log, <String>['row-longPress: Cupcake']);
     log.clear();
   });
 

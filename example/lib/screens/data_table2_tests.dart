@@ -1,30 +1,13 @@
+import 'package:data_table_2/data_table_2.dart';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+
 // Copyright 2014 The Flutter Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 // Copyright 2021 Maxim Saplin - changes and modifications to original Flutter implementation of DataTable
-
-import 'package:data_table_2/data_table_2.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-Future wrapWidgetSetSurf(WidgetTester tester, Widget widget) async {
-  await tester.binding.setSurfaceSize(Size(1000, 200));
-  return tester.pumpWidget(MaterialApp(home: Material(child: widget)));
-  // return tester.pumpWidget(
-  //     MaterialApp(home: Material(child: widget)), Duration(seconds: 10));
-}
-
-Finder findFirstContainerFor(String text) =>
-    find.widgetWithText(Container, text).first;
-
-class Tripple<T> {
-  Tripple(this.v1, this.v2, this.v3);
-  final T v1;
-  final T v2;
-  final T v3;
-}
 
 int _idCounter = 0;
 
@@ -259,26 +242,17 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     bool wrapInCard = false,
     bool showPageSizeSelector = false,
     bool noData = false,
-    bool throwError = false,
     bool hidePaginator = false,
-    int rowsPerPage = 10,
-    initialFirstRowIndex = 0,
-    bool circularSpinner = false,
-    bool showCheckboxColumn = true,
-    bool fewerResultsAfterRefresh = false,
     PaginatorController? controller,
     Widget? empty,
-    PageSyncApproach syncApproach = PageSyncApproach.doNothing,
-    // Return less rows when calling refresh method on the data source
     ScrollController? scrollController,
     double? minWidth,
     Function(int?)? onRowsPerPageChanged,
     List<DataColumn2>? columns}) {
   return AsyncPaginatedDataTable2(
     horizontalMargin: 24,
-    showCheckboxColumn: showCheckboxColumn,
+    showCheckboxColumn: true,
     wrapInCard: wrapInCard,
-    initialFirstRowIndex: initialFirstRowIndex,
     header: showHeader ? Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
@@ -286,53 +260,45 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     columns: columns ?? testColumns,
     showFirstLastButtons: true,
     controller: controller,
-    rowsPerPage: rowsPerPage,
-    loading: circularSpinner
-        ? Center(
-            child: SizedBox(
-                width: 32,
-                height: 32,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.black,
-                )))
-        : null,
     empty: empty,
+    loading: Center(
+        child: SizedBox(
+            width: 32,
+            height: 32,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Colors.black,
+            ))),
     scrollController: scrollController,
     hidePaginator: hidePaginator,
     minWidth: minWidth,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     autoRowsToHeight: autoRowsToHeight,
-    errorBuilder: (e) => Text(e.toString()),
     onRowsPerPageChanged: showPageSizeSelector || onRowsPerPageChanged != null
         ? onRowsPerPageChanged ?? (int? rowsPerPage) {}
         : null,
-    pageSyncApproach: syncApproach,
     source: DessertDataSourceAsync(
         allowSelection: true,
         showPage: showPage,
-        noData: noData,
-        fewerResultsAfterRefresh: fewerResultsAfterRefresh)
-      .._errorCounter = throwError ? 0 : null,
+        showGeneration: showGeneration,
+        noData: noData),
   );
 }
 
 class DessertDataSourceAsync extends AsyncDataTableSource {
-  DessertDataSourceAsync({
-    this.allowSelection = false,
-    this.showPage = true,
-    this.noData = false,
-    this.useKDeserts = false,
-    this.fewerResultsAfterRefresh = false,
-  });
+  DessertDataSourceAsync(
+      {this.allowSelection = false,
+      this.showPage = true,
+      this.showGeneration = true,
+      this.noData = false,
+      this.useKDeserts = false});
 
   final bool allowSelection;
   final bool showPage;
+  final bool showGeneration;
   final bool noData;
   final bool useKDeserts;
-  final bool fewerResultsAfterRefresh;
-  bool _usefewerResultsAfterRefresh = false;
 
   int get generation => _generation;
 
@@ -375,21 +341,17 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     }
 
     var index = startIndex;
+    // final format = NumberFormat.decimalPercentPattern(
+    //   locale: 'en',
+    //   decimalDigits: 0,
+    // );
     assert(index >= 0);
 
     var x = _empty
         ? await Future.delayed(Duration(milliseconds: 2000),
             () => DesertsFakeWebServiceResponse(0, []))
-        : (_usefewerResultsAfterRefresh)
-            ? await Future.delayed(
-                Duration(milliseconds: 2000),
-                () => DesertsFakeWebServiceResponse(
-                    10, _dessertsX3.take(10).toList()))
-            : await _repo.getData(startIndex, count, _sortColumn,
-                _sortAscending, noData, useKDeserts);
-
-    if (fewerResultsAfterRefresh && !_usefewerResultsAfterRefresh)
-      _usefewerResultsAfterRefresh = true;
+        : await _repo.getData(startIndex, count, _sortColumn, _sortAscending,
+            noData, useKDeserts);
 
     var r = AsyncRowsResponse(
         x.totalRecords,
@@ -411,7 +373,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
                 onTap: () {},
               ),
               DataCell(
-                Text('${dessert.carbs}'),
+                Text(showGeneration ? '$generation' : '${dessert.carbs}'),
                 showEditIcon: true,
                 onTap: () {},
               ),
@@ -491,3 +453,46 @@ List<Dessert> _dessertsX3 = _desserts.toList()
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)))
   ..addAll(_desserts.map((i) => Dessert(i.name + ' x3', i.calories, i.fat,
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)));
+
+class DataTable2Tests extends StatelessWidget {
+  const DataTable2Tests();
+
+  static ScrollController sc = ScrollController();
+  static PaginatorController pc = PaginatorController();
+
+  @override
+  Widget build(BuildContext context) {
+    //setColumnSizeRatios(1, 2);
+    return Padding(
+        padding: const EdgeInsets.all(16),
+        child:
+
+            // AsyncPaginatedDataTable2(
+            //   header: const Text('Test table'),
+            //   source: DessertDataSourceAsync(
+            //       allowSelection: true,
+            //       useKDeserts: true,
+            //       showGeneration: true,
+            //       noData: false),
+            //   rowsPerPage: 2,
+            //   availableRowsPerPage: const <int>[
+            //     2,
+            //     4,
+            //   ],
+            //   onRowsPerPageChanged: (int? rowsPerPage) {},
+            //   onPageChanged: (int rowIndex) {},
+            //   onSelectAll: (bool? value) {},
+            //   columns: const <DataColumn2>[
+            //     DataColumn2(label: Text('Name')),
+            //     DataColumn2(label: Text('Calories'), numeric: true),
+            //     DataColumn2(label: Text('Generation')),
+            //   ],
+            // )
+
+            buildAsyncPaginatedTable(
+                showPage: false,
+                showGeneration: false,
+                showPageSizeSelector: true,
+                controller: pc));
+  }
+}

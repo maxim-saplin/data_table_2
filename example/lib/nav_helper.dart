@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+/// Route options are used to configure certain features of
+/// the given example
 String getCurrentRouteOption(BuildContext context) {
   var isEmpty = ModalRoute.of(context) != null &&
           ModalRoute.of(context)!.settings.arguments != null &&
@@ -10,15 +12,33 @@ String getCurrentRouteOption(BuildContext context) {
   return isEmpty;
 }
 
-const hasData = 'Default';
+const dflt = 'Default';
 const noData = 'No data';
 const autoRows = 'Auto rows';
 const showBorders = 'Borders';
 const custPager = 'Custom pager';
+const defaultSorting = 'Default sorting';
+const selectAllPage = 'Select all at page';
 
+/// Async sample that emulates network error and allow retrying load operation
+const asyncErrors = "Errors/Retries";
+
+/// Used by asyn example, navigates to the very last page upon opening the screen
+const goToLast = "Start at last page";
+
+/// Configurations available to given example routes
 const Map<String, List<String>> routeOptions = {
-  '/datatable2': [hasData, noData, showBorders],
-  '/paginated2': [hasData, noData, autoRows, custPager],
+  '/datatable2': [dflt, noData, showBorders],
+  '/paginated2': [dflt, noData, autoRows, custPager, defaultSorting],
+  '/asyncpaginated2': [
+    dflt,
+    noData,
+    selectAllPage,
+    autoRows,
+    asyncErrors,
+    goToLast,
+    custPager
+  ],
 };
 
 List<String>? getOptionsForRoute(String route) {

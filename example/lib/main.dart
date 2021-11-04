@@ -1,16 +1,17 @@
-import 'package:example/data_table2_scrollup.dart';
-import 'package:example/data_table2_tests.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'data_table2.dart';
-import 'data_table2_simple.dart';
 import 'nav_helper.dart';
-import 'paginated_data_table2.dart';
-import 'data_table.dart';
-import 'paginated_data_table.dart';
+import 'screens/async_paginated_data_table2.dart';
+import 'screens/data_table.dart';
+import 'screens/data_table2.dart';
+import 'screens/data_table2_scrollup.dart';
+import 'screens/data_table2_simple.dart';
+import 'screens/data_table2_tests.dart';
+import 'screens/paginated_data_table.dart';
+import 'screens/paginated_data_table2.dart';
 
 void main() {
   runApp(MyApp());
@@ -25,6 +26,7 @@ Scaffold _getScaffold(BuildContext context, Widget body,
     defaultOption = options[0];
   return Scaffold(
     appBar: AppBar(
+      backgroundColor: Colors.grey[200],
       shadowColor: Colors.transparent,
       automaticallyImplyLeading: false,
       title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -59,6 +61,10 @@ Scaffold _getScaffold(BuildContext context, Widget body,
                 DropdownMenuItem(
                   child: Text('PaginatedDataTable2'),
                   value: '/paginated2',
+                ),
+                DropdownMenuItem(
+                  child: Text('AsyncPaginatedDataTable2'),
+                  value: '/asyncpaginated2',
                 ),
                 DropdownMenuItem(
                   child: Text('DataTable'),
@@ -131,6 +137,10 @@ class MyApp extends StatelessWidget {
             _getScaffold(context, DataTable2ScrollupDemo()),
         '/paginated2': (context) => _getScaffold(context,
             PaginatedDataTable2Demo(), getOptionsForRoute('/paginated2')),
+        '/asyncpaginated2': (context) => _getScaffold(
+            context,
+            AsyncPaginatedDataTable2Demo(),
+            getOptionsForRoute('/asyncpaginated2')),
         '/datatable': (context) => _getScaffold(context, DataTableDemo()),
         '/paginated': (context) =>
             _getScaffold(context, PaginatedDataTableDemo()),

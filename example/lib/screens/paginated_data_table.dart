@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import 'data_source.dart';
+import '../data_sources.dart';
 
 // Copyright 2019 The Flutter team. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -10,14 +10,15 @@ import 'data_source.dart';
 // The file was extracted from GitHub: https://github.com/flutter/gallery
 // Changes and modifications by Maxim Saplin, 2021
 
-class DataTableDemo extends StatefulWidget {
-  const DataTableDemo();
+class PaginatedDataTableDemo extends StatefulWidget {
+  const PaginatedDataTableDemo();
 
   @override
-  _DataTableDemoState createState() => _DataTableDemoState();
+  _PaginatedDataTableDemoState createState() => _PaginatedDataTableDemoState();
 }
 
-class _DataTableDemoState extends State<DataTableDemo> with RestorationMixin {
+class _PaginatedDataTableDemoState extends State<PaginatedDataTableDemo>
+    with RestorationMixin {
   final RestorableDessertSelections _dessertSelections =
       RestorableDessertSelections();
   final RestorableInt _rowIndex = RestorableInt(0);
@@ -29,7 +30,7 @@ class _DataTableDemoState extends State<DataTableDemo> with RestorationMixin {
   bool initialized = false;
 
   @override
-  String get restorationId => 'data_table_demo';
+  String get restorationId => 'paginated_data_table_demo';
 
   @override
   void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
@@ -84,12 +85,10 @@ class _DataTableDemoState extends State<DataTableDemo> with RestorationMixin {
   }
 
   void _updateSelectedDessertRowListener() {
-    setState(() {
-      _dessertSelections.setDessertSelections(_dessertsDataSource.desserts);
-    });
+    _dessertSelections.setDessertSelections(_dessertsDataSource.desserts);
   }
 
-  void _sort<T>(
+  void sort<T>(
     Comparable<T> Function(Dessert d) getField,
     int columnIndex,
     bool ascending,
@@ -113,67 +112,79 @@ class _DataTableDemoState extends State<DataTableDemo> with RestorationMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                  sortColumnIndex: _sortColumnIndex.value,
-                  sortAscending: _sortAscending.value,
-                  onSelectAll: _dessertsDataSource.selectAll,
-                  columns: [
-                    DataColumn(
-                      label: Text('Desert'),
-                      onSort: (columnIndex, ascending) =>
-                          _sort<String>((d) => d.name, columnIndex, ascending),
-                    ),
-                    DataColumn(
-                      label: Text('Calories'),
-                      numeric: true,
-                      onSort: (columnIndex, ascending) =>
-                          _sort<num>((d) => d.calories, columnIndex, ascending),
-                    ),
-                    DataColumn(
-                      label: Text('Fat (gm)'),
-                      numeric: true,
-                      onSort: (columnIndex, ascending) =>
-                          _sort<num>((d) => d.fat, columnIndex, ascending),
-                    ),
-                    DataColumn(
-                      label: Text('Carbs (gm)'),
-                      numeric: true,
-                      onSort: (columnIndex, ascending) =>
-                          _sort<num>((d) => d.carbs, columnIndex, ascending),
-                    ),
-                    DataColumn(
-                      label: Text('Protein (gm)'),
-                      numeric: true,
-                      onSort: (columnIndex, ascending) =>
-                          _sort<num>((d) => d.protein, columnIndex, ascending),
-                    ),
-                    DataColumn(
-                      label: Text('Sodium (mg)'),
-                      numeric: true,
-                      onSort: (columnIndex, ascending) =>
-                          _sort<num>((d) => d.sodium, columnIndex, ascending),
-                    ),
-                    DataColumn(
-                      label: Text('Calcium (%)'),
-                      numeric: true,
-                      onSort: (columnIndex, ascending) =>
-                          _sort<num>((d) => d.calcium, columnIndex, ascending),
-                    ),
-                    DataColumn(
-                      label: Text('Iron (%)'),
-                      numeric: true,
-                      onSort: (columnIndex, ascending) =>
-                          _sort<num>((d) => d.iron, columnIndex, ascending),
-                    ),
-                  ],
-                  rows: List<DataRow>.generate(_dessertsDataSource.rowCount,
-                      (index) => _dessertsDataSource.getRow(index))),
-            )));
+    return ListView(
+      restorationId: 'paginated_data_table_list_view',
+      padding: const EdgeInsets.all(16),
+      children: [
+        PaginatedDataTable(
+          header: Text('PaginatedDataTable'),
+          rowsPerPage: _rowsPerPage.value,
+          onRowsPerPageChanged: (value) {
+            setState(() {
+              _rowsPerPage.value = value!;
+            });
+          },
+          initialFirstRowIndex: _rowIndex.value,
+          onPageChanged: (rowIndex) {
+            setState(() {
+              _rowIndex.value = rowIndex;
+            });
+          },
+          sortColumnIndex: _sortColumnIndex.value,
+          sortAscending: _sortAscending.value,
+          onSelectAll: _dessertsDataSource.selectAll,
+          columns: [
+            DataColumn(
+              label: Text('Desert'),
+              onSort: (columnIndex, ascending) =>
+                  sort<String>((d) => d.name, columnIndex, ascending),
+            ),
+            DataColumn(
+              label: Text('Calories'),
+              numeric: true,
+              onSort: (columnIndex, ascending) =>
+                  sort<num>((d) => d.calories, columnIndex, ascending),
+            ),
+            DataColumn(
+              label: Text('Fat (gm)'),
+              numeric: true,
+              onSort: (columnIndex, ascending) =>
+                  sort<num>((d) => d.fat, columnIndex, ascending),
+            ),
+            DataColumn(
+              label: Text('Carbs (gm)'),
+              numeric: true,
+              onSort: (columnIndex, ascending) =>
+                  sort<num>((d) => d.carbs, columnIndex, ascending),
+            ),
+            DataColumn(
+              label: Text('Protein (gm)'),
+              numeric: true,
+              onSort: (columnIndex, ascending) =>
+                  sort<num>((d) => d.protein, columnIndex, ascending),
+            ),
+            DataColumn(
+              label: Text('Sodium (mg)'),
+              numeric: true,
+              onSort: (columnIndex, ascending) =>
+                  sort<num>((d) => d.sodium, columnIndex, ascending),
+            ),
+            DataColumn(
+              label: Text('Calcium (%)'),
+              numeric: true,
+              onSort: (columnIndex, ascending) =>
+                  sort<num>((d) => d.calcium, columnIndex, ascending),
+            ),
+            DataColumn(
+              label: Text('Iron (%)'),
+              numeric: true,
+              onSort: (columnIndex, ascending) =>
+                  sort<num>((d) => d.iron, columnIndex, ascending),
+            ),
+          ],
+          source: _dessertsDataSource,
+        ),
+      ],
+    );
   }
 }

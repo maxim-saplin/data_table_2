@@ -4,11 +4,12 @@
 
 // Copyright 2021 Maxim Saplin - changes and modifications to original Flutter implementation of DataTable
 
+import 'package:data_table_2/data_table_2.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
-import 'package:data_table_2/data_table_2.dart';
 
 import 'test_utils.dart';
 
@@ -18,7 +19,7 @@ void main() {
           as TestWidgetsFlutterBinding;
 
   testWidgets('PaginatedDataTable2 paging', (WidgetTester tester) async {
-    final TestDataSource source = TestDataSource(allowSelection: true);
+    final TestDataSource source = TestDataSource();
 
     final List<String> log = <String>[];
 
@@ -27,7 +28,6 @@ void main() {
         header: const Text('Test table'),
         source: source,
         rowsPerPage: 2,
-        showCheckboxColumn: true,
         showFirstLastButtons: true,
         availableRowsPerPage: const <int>[
           2,
@@ -41,10 +41,10 @@ void main() {
         onPageChanged: (int rowIndex) {
           log.add('page-changed: $rowIndex');
         },
-        columns: const <DataColumn>[
-          DataColumn(label: Text('Name')),
-          DataColumn(label: Text('Calories'), numeric: true),
-          DataColumn(label: Text('Generation')),
+        columns: const <DataColumn2>[
+          DataColumn2(label: Text('Name')),
+          DataColumn2(label: Text('Calories'), numeric: true),
+          DataColumn2(label: Text('Generation')),
         ],
       ),
     ));
@@ -115,16 +115,11 @@ void main() {
 
     expect(log, isEmpty);
 
-    expect(find.text('8').hitTestable(), findsNothing);
-    expect(find.byType(Checkbox), findsNWidgets(3));
     await tester.tap(find.text('2'));
     await tester.pumpAndSettle(const Duration(milliseconds: 200));
 
     await tester.tap(find.text('8').last);
-    await tester.pumpAndSettle(const Duration(milliseconds: 1000));
-    await tester.pumpAndSettle();
-    expect(find.byType(Checkbox), findsNWidgets(9));
-    expect(find.text('8').hitTestable(), findsOneWidget);
+    await tester.pumpAndSettle(const Duration(milliseconds: 200));
 
     expect(log, <String>['rows-per-page-changed: 8']);
     log.clear();
@@ -142,12 +137,12 @@ void main() {
         onPageChanged: (int rowIndex) {
           log.add('page-changed: $rowIndex');
         },
-        columns: <DataColumn>[
-          const DataColumn(
+        columns: <DataColumn2>[
+          const DataColumn2(
             label: Text('Name'),
             tooltip: 'Name',
           ),
-          DataColumn(
+          DataColumn2(
             label: const Text('Calories'),
             tooltip: 'Calories',
             numeric: true,
@@ -155,7 +150,7 @@ void main() {
               log.add('column-sort: $columnIndex $ascending');
             },
           ),
-          const DataColumn(
+          const DataColumn2(
             label: Text('Generation'),
             tooltip: 'Generation',
           ),
@@ -233,10 +228,10 @@ void main() {
           9,
         ],
         onRowsPerPageChanged: (int? rowsPerPage) {},
-        columns: const <DataColumn>[
-          DataColumn(label: Text('COL1')),
-          DataColumn(label: Text('COL2')),
-          DataColumn(label: Text('COL3')),
+        columns: const <DataColumn2>[
+          DataColumn2(label: Text('COL1')),
+          DataColumn2(label: Text('COL2')),
+          DataColumn2(label: Text('COL3')),
         ],
       ),
     ));
@@ -259,10 +254,10 @@ void main() {
             actions: actions,
             source: TestDataSource(allowSelection: true),
             showCheckboxColumn: true,
-            columns: const <DataColumn>[
-              DataColumn(label: Text('Name')),
-              DataColumn(label: Text('Calories'), numeric: true),
-              DataColumn(label: Text('Generation')),
+            columns: const <DataColumn2>[
+              DataColumn2(label: Text('Name')),
+              DataColumn2(label: Text('Calories'), numeric: true),
+              DataColumn2(label: Text('Generation')),
             ],
           ),
         );
@@ -298,10 +293,10 @@ void main() {
           rowsPerPage: 501,
           availableRowsPerPage: const <int>[501],
           onRowsPerPageChanged: (int? rowsPerPage) {},
-          columns: const <DataColumn>[
-            DataColumn(label: Text('COL1')),
-            DataColumn(label: Text('COL2')),
-            DataColumn(label: Text('COL3')),
+          columns: const <DataColumn2>[
+            DataColumn2(label: Text('COL1')),
+            DataColumn2(label: Text('COL2')),
+            DataColumn2(label: Text('COL3')),
           ],
         ),
       ),
@@ -340,10 +335,10 @@ void main() {
               dragStartBehavior: DragStartBehavior.down,
               availableRowsPerPage: const <int>[5],
               onRowsPerPageChanged: (int? rowsPerPage) {},
-              columns: const <DataColumn>[
-                DataColumn(label: Text('COL1')),
-                DataColumn(label: Text('COL2')),
-                DataColumn(label: Text('COL3')),
+              columns: const <DataColumn2>[
+                DataColumn2(label: Text('COL1')),
+                DataColumn2(label: Text('COL2')),
+                DataColumn2(label: Text('COL3')),
               ],
             ),
           ),
@@ -382,10 +377,10 @@ void main() {
         ],
         onRowsPerPageChanged: (int? rowsPerPage) {},
         onPageChanged: (int rowIndex) {},
-        columns: const <DataColumn>[
-          DataColumn(label: Text('Name')),
-          DataColumn(label: Text('Calories'), numeric: true),
-          DataColumn(label: Text('Generation')),
+        columns: const <DataColumn2>[
+          DataColumn2(label: Text('Name')),
+          DataColumn2(label: Text('Calories'), numeric: true),
+          DataColumn2(label: Text('Generation')),
         ],
         dataRowHeight: dataRowHeight,
         headingRowHeight: headingRowHeight,
@@ -406,10 +401,10 @@ void main() {
         ],
         onRowsPerPageChanged: (int? rowsPerPage) {},
         onPageChanged: (int rowIndex) {},
-        columns: const <DataColumn>[
-          DataColumn(label: Text('Name')),
-          DataColumn(label: Text('Calories'), numeric: true),
-          DataColumn(label: Text('Generation')),
+        columns: const <DataColumn2>[
+          DataColumn2(label: Text('Name')),
+          DataColumn2(label: Text('Calories'), numeric: true),
+          DataColumn2(label: Text('Generation')),
         ],
       ),
     ));
@@ -511,10 +506,10 @@ void main() {
         onRowsPerPageChanged: (int? rowsPerPage) {},
         onPageChanged: (int rowIndex) {},
         onSelectAll: (bool? value) {},
-        columns: const <DataColumn>[
-          DataColumn(label: Text('Name')),
-          DataColumn(label: Text('Calories'), numeric: true),
-          DataColumn(label: Text('Generation')),
+        columns: const <DataColumn2>[
+          DataColumn2(label: Text('Name')),
+          DataColumn2(label: Text('Calories'), numeric: true),
+          DataColumn2(label: Text('Generation')),
         ],
       ),
     ));
@@ -582,10 +577,10 @@ void main() {
           onRowsPerPageChanged: (int? rowsPerPage) {},
           onPageChanged: (int rowIndex) {},
           onSelectAll: (bool? value) {},
-          columns: const <DataColumn>[
-            DataColumn(label: Text('Name')),
-            DataColumn(label: Text('Calories'), numeric: true),
-            DataColumn(label: Text('Generation')),
+          columns: const <DataColumn2>[
+            DataColumn2(label: Text('Name')),
+            DataColumn2(label: Text('Calories'), numeric: true),
+            DataColumn2(label: Text('Generation')),
           ],
           horizontalMargin: _customHorizontalMargin,
           columnSpacing: _customColumnSpacing,
@@ -669,10 +664,10 @@ void main() {
         ],
         onRowsPerPageChanged: (int? rowsPerPage) {},
         onPageChanged: (int rowIndex) {},
-        columns: const <DataColumn>[
-          DataColumn(label: Text('Name')),
-          DataColumn(label: Text('Calories'), numeric: true),
-          DataColumn(label: Text('Generation')),
+        columns: const <DataColumn2>[
+          DataColumn2(label: Text('Name')),
+          DataColumn2(label: Text('Calories'), numeric: true),
+          DataColumn2(label: Text('Generation')),
         ],
       ),
     ));
@@ -729,10 +724,10 @@ void main() {
           ],
           onRowsPerPageChanged: (int? rowsPerPage) {},
           onPageChanged: (int rowIndex) {},
-          columns: const <DataColumn>[
-            DataColumn(label: Text('Name')),
-            DataColumn(label: Text('Calories'), numeric: true),
-            DataColumn(label: Text('Generation')),
+          columns: const <DataColumn2>[
+            DataColumn2(label: Text('Name')),
+            DataColumn2(label: Text('Calories'), numeric: true),
+            DataColumn2(label: Text('Generation')),
           ],
           horizontalMargin: _customHorizontalMargin,
           columnSpacing: _customColumnSpacing,
@@ -804,10 +799,10 @@ void main() {
             ],
             onRowsPerPageChanged: (int? rowsPerPage) {},
             onPageChanged: (int rowIndex) {},
-            columns: const <DataColumn>[
-              DataColumn(label: Text('Name')),
-              DataColumn(label: Text('Calories'), numeric: true),
-              DataColumn(label: Text('Generation')),
+            columns: const <DataColumn2>[
+              DataColumn2(label: Text('Name')),
+              DataColumn2(label: Text('Calories'), numeric: true),
+              DataColumn2(label: Text('Generation')),
             ],
           ),
         );
@@ -850,10 +845,10 @@ void main() {
             header: const Text('Test table'),
             source: TestDataSource(allowSelection: true),
             showCheckboxColumn: checkbox,
-            columns: const <DataColumn>[
-              DataColumn(label: Text('Name')),
-              DataColumn(label: Text('Calories'), numeric: true),
-              DataColumn(label: Text('Generation')),
+            columns: const <DataColumn2>[
+              DataColumn2(label: Text('Name')),
+              DataColumn2(label: Text('Calories'), numeric: true),
+              DataColumn2(label: Text('Generation')),
             ],
           ),
         );
@@ -881,10 +876,10 @@ void main() {
           header: const Text('Test table'),
           source: TestDataSource(allowSelection: true),
           showCheckboxColumn: true,
-          columns: const <DataColumn>[
-            DataColumn(label: Text('Name')),
-            DataColumn(label: Text('Calories'), numeric: true),
-            DataColumn(label: Text('Generation')),
+          columns: const <DataColumn2>[
+            DataColumn2(label: Text('Name')),
+            DataColumn2(label: Text('Calories'), numeric: true),
+            DataColumn2(label: Text('Generation')),
           ],
         ),
       );
@@ -935,10 +930,10 @@ void main() {
           onRowsPerPageChanged: (int? rowsPerPage) {},
           onPageChanged: (int rowIndex) {},
           onSelectAll: (bool? value) {},
-          columns: const <DataColumn>[
-            DataColumn(label: Text('Name')),
-            DataColumn(label: Text('Calories'), numeric: true),
-            DataColumn(label: Text('Generation')),
+          columns: const <DataColumn2>[
+            DataColumn2(label: Text('Name')),
+            DataColumn2(label: Text('Calories'), numeric: true),
+            DataColumn2(label: Text('Generation')),
           ],
           horizontalMargin: _customHorizontalMargin,
           checkboxHorizontalMargin: _customCheckboxHorizontalMargin,
@@ -984,10 +979,10 @@ void main() {
         home: PaginatedDataTable2(
           header: const Text('Test table'),
           source: TestDataSource(allowSelection: true),
-          columns: const <DataColumn>[
-            DataColumn(label: Text('Name')),
-            DataColumn(label: Text('Calories'), numeric: true),
-            DataColumn(label: Text('Generation')),
+          columns: const <DataColumn2>[
+            DataColumn2(label: Text('Name')),
+            DataColumn2(label: Text('Calories'), numeric: true),
+            DataColumn2(label: Text('Generation')),
           ],
         ),
       );
