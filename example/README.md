@@ -1,3 +1,3 @@
 # DataTable2 and PaginatedDataTable2 examples
 
-Clone, get packages, and Run.
+Clone, get packages and Run.

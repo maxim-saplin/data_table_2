@@ -40,7 +40,7 @@ class _AsyncPaginatedDataTable2DemoState
 
     if (getCurrentRouteOption(context) == goToLast) {
       _dataSourceLoading = true;
-      _dessertsDataSource!.getTotalRecors().then((count) => setState(() {
+      _dessertsDataSource!.getTotalRecords().then((count) => setState(() {
             _initialRow = count - _rowsPerPage;
             _dataSourceLoading = false;
           }));
