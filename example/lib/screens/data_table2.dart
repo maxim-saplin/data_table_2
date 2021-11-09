@@ -29,7 +29,8 @@ class _DataTable2DemoState extends State<DataTable2Demo> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialized) {
-      _dessertsDataSource = DessertDataSource(context);
+      _dessertsDataSource = DessertDataSource(
+          context, false, getCurrentRouteOption(context) == rowTaps);
       // Default sorting sample. Set __sortColumnIndex to 0 and uncoment the lines below
       // if (_sortColumnIndex == 0) {
       //   _sort<String>((d) => d.name, _sortColumnIndex!, _sortAscending);
