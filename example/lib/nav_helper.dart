@@ -19,6 +19,7 @@ const showBorders = 'Borders';
 const custPager = 'Custom pager';
 const defaultSorting = 'Default sorting';
 const selectAllPage = 'Select all at page';
+const rowTaps = 'Row Taps';
 
 /// Async sample that emulates network error and allow retrying load operation
 const asyncErrors = "Errors/Retries";
@@ -28,7 +29,7 @@ const goToLast = "Start at last page";
 
 /// Configurations available to given example routes
 const Map<String, List<String>> routeOptions = {
-  '/datatable2': [dflt, noData, showBorders],
+  '/datatable2': [dflt, noData, showBorders, rowTaps],
   '/paginated2': [dflt, noData, autoRows, custPager, defaultSorting],
   '/asyncpaginated2': [
     dflt,
