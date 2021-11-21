@@ -729,7 +729,6 @@ class DataTable2 extends DataTable {
           decoration: decoration ?? theme.dataTableTheme.decoration,
           child: availableWidth > constraints.maxWidth
               ? Scrollbar(
-                  isAlwaysShown: false,
                   controller: _horizontalController,
                   child: SingleChildScrollView(
                       controller: _horizontalController,

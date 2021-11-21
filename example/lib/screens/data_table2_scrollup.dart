@@ -60,75 +60,83 @@ class _DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
     return Padding(
         padding: const EdgeInsets.all(16),
         child: Stack(children: [
-          DataTable2(
-              scrollController: _controller,
-              columnSpacing: 0,
-              horizontalMargin: 12,
-              bottomMargin: 10,
-              minWidth: 600,
-              sortColumnIndex: _sortColumnIndex,
-              sortAscending: _sortAscending,
-              onSelectAll: (val) =>
-                  setState(() => _dessertsDataSource.selectAll(val)),
-              columns: [
-                DataColumn2(
-                  label: Text('Desert'),
-                  size: ColumnSize.S,
-                  onSort: (columnIndex, ascending) =>
-                      _sort<String>((d) => d.name, columnIndex, ascending),
-                ),
-                DataColumn2(
-                  label: Text('Calories'),
-                  size: ColumnSize.S,
-                  numeric: true,
-                  onSort: (columnIndex, ascending) =>
-                      _sort<num>((d) => d.calories, columnIndex, ascending),
-                ),
-                DataColumn2(
-                  label: Text('Fat (gm)'),
-                  size: ColumnSize.S,
-                  numeric: true,
-                  onSort: (columnIndex, ascending) =>
-                      _sort<num>((d) => d.fat, columnIndex, ascending),
-                ),
-                DataColumn2(
-                  label: Text('Carbs (gm)'),
-                  size: ColumnSize.S,
-                  numeric: true,
-                  onSort: (columnIndex, ascending) =>
-                      _sort<num>((d) => d.carbs, columnIndex, ascending),
-                ),
-                DataColumn2(
-                  label: Text('Protein (gm)'),
-                  size: ColumnSize.S,
-                  numeric: true,
-                  onSort: (columnIndex, ascending) =>
-                      _sort<num>((d) => d.protein, columnIndex, ascending),
-                ),
-                DataColumn2(
-                  label: Text('Sodium (mg)'),
-                  size: ColumnSize.S,
-                  numeric: true,
-                  onSort: (columnIndex, ascending) =>
-                      _sort<num>((d) => d.sodium, columnIndex, ascending),
-                ),
-                DataColumn2(
-                  label: Text('Calcium (%)'),
-                  size: ColumnSize.S,
-                  numeric: true,
-                  onSort: (columnIndex, ascending) =>
-                      _sort<num>((d) => d.calcium, columnIndex, ascending),
-                ),
-                DataColumn2(
-                  label: Text('Iron (%)'),
-                  size: ColumnSize.S,
-                  numeric: true,
-                  onSort: (columnIndex, ascending) =>
-                      _sort<num>((d) => d.iron, columnIndex, ascending),
-                ),
-              ],
-              rows: List<DataRow>.generate(_dessertsDataSource.rowCount,
-                  (index) => _dessertsDataSource.getRow(index))),
+          Theme(
+              // These makes scroll bars almost always visible. If horizontal scroll bar
+              // is displayed then vertical migh be hidden as it will go out of viewport
+              data: ThemeData(
+                  scrollbarTheme: ScrollbarThemeData(
+                      isAlwaysShown: true,
+                      thumbColor:
+                          MaterialStateProperty.all<Color>(Colors.black))),
+              child: DataTable2(
+                  scrollController: _controller,
+                  columnSpacing: 0,
+                  horizontalMargin: 12,
+                  bottomMargin: 10,
+                  minWidth: 600,
+                  sortColumnIndex: _sortColumnIndex,
+                  sortAscending: _sortAscending,
+                  onSelectAll: (val) =>
+                      setState(() => _dessertsDataSource.selectAll(val)),
+                  columns: [
+                    DataColumn2(
+                      label: Text('Desert'),
+                      size: ColumnSize.S,
+                      onSort: (columnIndex, ascending) =>
+                          _sort<String>((d) => d.name, columnIndex, ascending),
+                    ),
+                    DataColumn2(
+                      label: Text('Calories'),
+                      size: ColumnSize.S,
+                      numeric: true,
+                      onSort: (columnIndex, ascending) =>
+                          _sort<num>((d) => d.calories, columnIndex, ascending),
+                    ),
+                    DataColumn2(
+                      label: Text('Fat (gm)'),
+                      size: ColumnSize.S,
+                      numeric: true,
+                      onSort: (columnIndex, ascending) =>
+                          _sort<num>((d) => d.fat, columnIndex, ascending),
+                    ),
+                    DataColumn2(
+                      label: Text('Carbs (gm)'),
+                      size: ColumnSize.S,
+                      numeric: true,
+                      onSort: (columnIndex, ascending) =>
+                          _sort<num>((d) => d.carbs, columnIndex, ascending),
+                    ),
+                    DataColumn2(
+                      label: Text('Protein (gm)'),
+                      size: ColumnSize.S,
+                      numeric: true,
+                      onSort: (columnIndex, ascending) =>
+                          _sort<num>((d) => d.protein, columnIndex, ascending),
+                    ),
+                    DataColumn2(
+                      label: Text('Sodium (mg)'),
+                      size: ColumnSize.S,
+                      numeric: true,
+                      onSort: (columnIndex, ascending) =>
+                          _sort<num>((d) => d.sodium, columnIndex, ascending),
+                    ),
+                    DataColumn2(
+                      label: Text('Calcium (%)'),
+                      size: ColumnSize.S,
+                      numeric: true,
+                      onSort: (columnIndex, ascending) =>
+                          _sort<num>((d) => d.calcium, columnIndex, ascending),
+                    ),
+                    DataColumn2(
+                      label: Text('Iron (%)'),
+                      size: ColumnSize.S,
+                      numeric: true,
+                      onSort: (columnIndex, ascending) =>
+                          _sort<num>((d) => d.iron, columnIndex, ascending),
+                    ),
+                  ],
+                  rows: List<DataRow>.generate(_dessertsDataSource.rowCount,
+                      (index) => _dessertsDataSource.getRow(index)))),
           _ScrollUpButton(_controller)
         ]));
   }
