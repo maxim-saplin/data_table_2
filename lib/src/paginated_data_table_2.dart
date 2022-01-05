@@ -642,6 +642,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           border: widget.border,
           smRatio: widget.smRatio,
           lmRatio: widget.lmRatio,
+          endWidget: widget.endWidget,
         ),
       ),
     );
@@ -809,7 +810,6 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           children: <Widget>[
             if (isHeaderPresent) _getHeader(),
             _getTable(constraints),
-            if(widget.endWidget!=null) widget.endWidget!,
             if (!widget.hidePaginator) _getFooter(),
           ],
         );

@@ -134,6 +134,7 @@ class DataTable2 extends DataTable {
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
     required List<DataRow> rows,
+    this.endWidget,
   }) : super(
             key: key,
             columns: columns,
@@ -223,6 +224,9 @@ class DataTable2 extends DataTable {
   /// Determines ratio of Large column's width to Medium column's width.
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
+
+  /// allow to add a single widget between table data and its paginator footer
+  final Widget? endWidget;
 
   Widget _buildCheckbox({
     required BuildContext context,
@@ -723,7 +727,8 @@ class DataTable2 extends DataTable {
                   : SingleChildScrollView(
                       primary: false,
                       child: marginedTable,
-                      controller: scrollController))
+                      controller: scrollController)),
+          if (endWidget != null) endWidget!,
         ],
       );
 
