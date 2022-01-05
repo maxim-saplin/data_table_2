@@ -196,6 +196,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.autoRowsToHeight = false,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
+    this.endWidget,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
@@ -366,6 +367,9 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// Determines ratio of Large column's width to Medium column's width.
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
+
+  /// allow to add a single widget between table data and its paginator footer
+  final Widget? endWidget;
 
   /// Hides the paginator at the bottom. Can be useful in case you decide create
   /// your own paginator and control the widget via [PaginatedDataTable2.controller]
@@ -805,6 +809,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           children: <Widget>[
             if (isHeaderPresent) _getHeader(),
             _getTable(constraints),
+            if(widget.endWidget!=null) widget.endWidget!,
             if (!widget.hidePaginator) _getFooter(),
           ],
         );

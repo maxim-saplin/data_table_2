@@ -177,6 +177,19 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
         source: getCurrentRouteOption(context) == noData
             ? DessertDataSource.empty(context)
             : _dessertsDataSource,
+        endWidget: DataTable2(
+          columns: _columns,
+          rows: [
+            DataRow(cells: [
+              ..._columns.map((colum) {
+                return DataCell(Center(
+                  child: Text(
+                      "${_dessertsDataSource.desserts.fold<double>(0, (p, e) => p += e.calcium)}"),
+                ));
+              }).toList()
+            ])
+          ],
+        ),
       ),
       if (getCurrentRouteOption(context) == custPager)
         Positioned(bottom: 16, child: CustomPager(_controller!))
