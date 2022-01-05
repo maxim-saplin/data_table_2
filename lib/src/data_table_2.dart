@@ -721,7 +721,9 @@ class DataTable2 extends DataTable {
               child: tableRows.isEmpty
                   ? empty ?? SizedBox()
                   : SingleChildScrollView(
-                      child: marginedTable, controller: scrollController))
+                      primary: false,
+                      child: marginedTable,
+                      controller: scrollController))
         ],
       );
 
@@ -731,6 +733,7 @@ class DataTable2 extends DataTable {
               ? Scrollbar(
                   controller: _horizontalController,
                   child: SingleChildScrollView(
+                      primary: false,
                       controller: _horizontalController,
                       scrollDirection: Axis.horizontal,
                       child: t))
