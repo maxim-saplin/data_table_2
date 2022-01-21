@@ -158,45 +158,46 @@ const int defaultRowsPerPage = 10;
 class PaginatedDataTable2 extends StatefulWidget {
   /// Check out [PaginatedDataTable] for the API decription.
   /// Key differences are [minWidth] and [fit] properties.
-  PaginatedDataTable2({
-    Key? key,
-    this.header,
-    this.actions,
-    required this.columns,
-    this.sortColumnIndex,
-    this.sortAscending = true,
-    this.onSelectAll,
-    this.dataRowHeight = kMinInteractiveDimension,
-    this.headingRowHeight = 56.0,
-    this.horizontalMargin = 24.0,
-    this.columnSpacing = 56.0,
-    this.showCheckboxColumn = true,
-    this.showFirstLastButtons = false,
-    this.initialFirstRowIndex = 0,
-    this.onPageChanged,
-    this.rowsPerPage = defaultRowsPerPage,
-    this.availableRowsPerPage = const <int>[
-      defaultRowsPerPage,
-      defaultRowsPerPage * 2,
-      defaultRowsPerPage * 5,
-      defaultRowsPerPage * 10
-    ],
-    this.onRowsPerPageChanged,
-    this.dragStartBehavior = DragStartBehavior.start,
-    required this.source,
-    this.checkboxHorizontalMargin,
-    this.wrapInCard = true,
-    this.minWidth,
-    this.fit = FlexFit.tight,
-    this.hidePaginator = false,
-    this.controller,
-    this.scrollController,
-    this.empty,
-    this.border,
-    this.autoRowsToHeight = false,
-    this.smRatio = 0.67,
-    this.lmRatio = 1.2,
-  })  : assert(actions == null || (header != null)),
+  PaginatedDataTable2(
+      {Key? key,
+      this.header,
+      this.actions,
+      required this.columns,
+      this.sortColumnIndex,
+      this.sortAscending = true,
+      this.onSelectAll,
+      this.dataRowHeight = kMinInteractiveDimension,
+      this.headingRowHeight = 56.0,
+      this.horizontalMargin = 24.0,
+      this.columnSpacing = 56.0,
+      this.showCheckboxColumn = true,
+      this.showFirstLastButtons = false,
+      this.initialFirstRowIndex = 0,
+      this.onPageChanged,
+      this.rowsPerPage = defaultRowsPerPage,
+      this.availableRowsPerPage = const <int>[
+        defaultRowsPerPage,
+        defaultRowsPerPage * 2,
+        defaultRowsPerPage * 5,
+        defaultRowsPerPage * 10
+      ],
+      this.onRowsPerPageChanged,
+      this.dragStartBehavior = DragStartBehavior.start,
+      required this.source,
+      this.checkboxHorizontalMargin,
+      this.wrapInCard = true,
+      this.minWidth,
+      this.fit = FlexFit.tight,
+      this.hidePaginator = false,
+      this.controller,
+      this.scrollController,
+      this.empty,
+      this.border,
+      this.autoRowsToHeight = false,
+      this.smRatio = 0.67,
+      this.lmRatio = 1.2,
+      this.headingRowColor})
+      : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
             (sortColumnIndex >= 0 && sortColumnIndex < columns.length)),
@@ -377,6 +378,8 @@ class PaginatedDataTable2 extends StatefulWidget {
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? scrollController;
+
+  final MaterialStateProperty<Color?>? headingRowColor;
 
   @override
   PaginatedDataTable2State createState() => PaginatedDataTable2State();
@@ -571,8 +574,10 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     }
     if (widget.actions != null) {
       headerWidgets.addAll(widget.actions!.map<Widget>((Widget action) {
-        return Padding(
+        print("ENTROU AQUI");
+        return Container(
           // 8.0 is the default padding of an icon button
+          color: Colors.red,
           padding: const EdgeInsetsDirectional.only(start: 24.0 - 8.0 * 2.0),
           child: action,
         );
@@ -621,6 +626,8 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           sortColumnIndex: widget.sortColumnIndex,
           sortAscending: widget.sortAscending,
           onSelectAll: widget.onSelectAll,
+          headingRowColor: widget.headingRowColor ??
+              MaterialStateProperty.all(Colors.transparent),
           // Make sure no decoration is set on the DataTable
           // from the theme, as its already wrapped in a Card.
           decoration: const BoxDecoration(),

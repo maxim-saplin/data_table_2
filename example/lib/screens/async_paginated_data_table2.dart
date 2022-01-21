@@ -96,7 +96,9 @@ class _AsyncPaginatedDataTable2DemoState
         onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
       DataColumn(
-        label: Text('Calories'),
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
+          child: Center( child: Text('Calories'))),
         numeric: true,
         onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
