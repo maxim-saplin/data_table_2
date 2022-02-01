@@ -54,6 +54,7 @@ class DataRow2 extends DataRow {
       ValueChanged<bool?>? onSelectChanged,
       MaterialStateProperty<Color?>? color,
       required List<DataCell> cells,
+      this.specificRowHeight,
       this.onTap,
       this.onDoubleTap,
       this.onLongPress,
@@ -72,6 +73,7 @@ class DataRow2 extends DataRow {
       ValueChanged<bool?>? onSelectChanged,
       MaterialStateProperty<Color?>? color,
       required List<DataCell> cells,
+      this.specificRowHeight,
       this.onTap,
       this.onDoubleTap,
       this.onLongPress,
@@ -83,6 +85,10 @@ class DataRow2 extends DataRow {
             onSelectChanged: onSelectChanged,
             color: color,
             cells: cells);
+
+  /// Specific row height, which will be used only if provided.
+  /// If not provided, dataRowHeight will be applied.
+  final double? specificRowHeight;
 
   /// Row tap handler, won't be called if tapped cell has any tap event handlers
   final GestureTapCallback? onTap;
@@ -330,6 +336,7 @@ class DataTable2 extends DataTable {
   Widget _buildDataCell({
     required BuildContext context,
     required EdgeInsetsGeometry padding,
+    required double? specificRowHeight,
     required Widget label,
     required bool numeric,
     required bool placeholder,
@@ -360,7 +367,8 @@ class DataTable2 extends DataTable {
     final TextStyle effectiveDataTextStyle = dataTextStyle ??
         themeData.dataTableTheme.dataTextStyle ??
         themeData.textTheme.bodyText2!;
-    final double effectiveDataRowHeight = dataRowHeight ??
+    final double effectiveDataRowHeight = specificRowHeight ??
+        dataRowHeight ??
         themeData.dataTableTheme.dataRowHeight ??
         kMinInteractiveDimension;
     label = Container(
@@ -652,6 +660,7 @@ class DataTable2 extends DataTable {
           tableRows[rowIndex].children![displayColumnIndex] = _buildDataCell(
             context: context,
             padding: padding,
+            specificRowHeight: row is DataRow2 ? row.specificRowHeight : null,
             label: cell.child,
             numeric: column.numeric,
             placeholder: cell.placeholder,
