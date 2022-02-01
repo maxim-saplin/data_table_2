@@ -670,6 +670,7 @@ void main() {
           return DataRow2(
             key: ValueKey<String>(dessert.name),
             onSelectChanged: (bool? selected) {},
+            specificRowHeight: dessert.name == 'Donut' ? 96.0 : null,
             cells: <DataCell>[
               DataCell(
                 Text(dessert.name),
@@ -730,27 +731,32 @@ void main() {
 
     expect(tester.getSize(findFirstContainerFor('Name')).height, 56.0);
     expect(tester.getSize(findFirstContainerFor('Frozen yogurt')).height, 48.0);
+    expect(tester.getSize(findFirstContainerFor('Donut')).height, 48.0);
 
     // CUSTOM VALUES
     await tester.pumpWidget(MaterialApp(
       home: Material(child: buildCustomTable(headingRowHeight: 48.0)),
     ));
     expect(tester.getSize(findFirstContainerFor('Name')).height, 48.0);
+    expect(tester.getSize(findFirstContainerFor('Donut')).height, 96.0);
 
     await tester.pumpWidget(MaterialApp(
       home: Material(child: buildCustomTable(headingRowHeight: 64.0)),
     ));
     expect(tester.getSize(findFirstContainerFor('Name')).height, 64.0);
+    expect(tester.getSize(findFirstContainerFor('Donut')).height, 96.0);
 
     await tester.pumpWidget(MaterialApp(
       home: Material(child: buildCustomTable(dataRowHeight: 30.0)),
     ));
     expect(tester.getSize(findFirstContainerFor('Frozen yogurt')).height, 30.0);
+    expect(tester.getSize(findFirstContainerFor('Donut')).height, 96.0);
 
     await tester.pumpWidget(MaterialApp(
       home: Material(child: buildCustomTable(dataRowHeight: 56.0)),
     ));
     expect(tester.getSize(findFirstContainerFor('Frozen yogurt')).height, 56.0);
+    expect(tester.getSize(findFirstContainerFor('Donut')).height, 96.0);
   });
 
   testWidgets('DataTable2 custom horizontal padding - checkbox',
