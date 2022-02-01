@@ -168,6 +168,7 @@ class DessertDataSource extends DataTableSource {
                 content: Text('Right clicked on ${dessert.name}'),
               ))
           : null,
+      specificRowHeight: dessert.fat >= 25 ? 100 : null,
       cells: [
         DataCell(Text(dessert.name)),
         DataCell(Text('${dessert.calories}')),
