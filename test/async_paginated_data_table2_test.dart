@@ -5,9 +5,9 @@
 // Copyright 2021 Maxim Saplin - changes and modifications to original Flutter implementation of DataTable
 
 import 'package:data_table_2/data_table_2.dart';
-
-import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/material.dart';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
 
