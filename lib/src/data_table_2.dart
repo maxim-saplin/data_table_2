@@ -25,17 +25,21 @@ class DataColumn2 extends DataColumn {
   /// Creates the configuration for a column of a [DataTable2].
   ///
   /// The [label] argument must not be null.
-  const DataColumn2(
-      {required Widget label,
-      String? tooltip,
-      bool numeric = false,
-      Function(int, bool)? onSort,
-      this.size = ColumnSize.M})
-      : super(label: label, tooltip: tooltip, numeric: numeric, onSort: onSort);
+  const DataColumn2({
+    required Widget label,
+    String? tooltip,
+    bool numeric = false,
+    Function(int, bool)? onSort,
+    this.size = ColumnSize.M,
+    this.fixedWidth,
+  }) : super(label: label, tooltip: tooltip, numeric: numeric, onSort: onSort);
 
   /// Column sizes are determined based on available width by distributing it
   /// to individual columns accounting for their relative sizes (see [ColumnSize])
   final ColumnSize size;
+
+  /// Fixed width will override default column size if it's set
+  final double? fixedWidth;
 }
 
 /// Extension of standard [DataRow], adds row level tap events. Also there're
@@ -567,7 +571,9 @@ class DataTable2 extends DataTable {
         var w = columnWidth;
         var column = columns[i];
         if (column is DataColumn2) {
-          if (column.size == ColumnSize.S) {
+          if (column.fixedWidth != null) {
+            w = column.fixedWidth!;
+          } else if (column.size == ColumnSize.S) {
             w *= smRatio;
           } else if (column.size == ColumnSize.L) {
             w *= lmRatio;
@@ -767,6 +773,7 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
   _SortArrowState(bool? up) {
     _up = up;
   }
+
   late AnimationController _opacityController;
   late Animation<double> _opacityAnimation;
 

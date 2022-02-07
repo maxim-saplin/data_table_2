@@ -9,9 +9,6 @@ import 'dart:math' as math;
 import 'package:async/async.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
-
 import 'data_table_2.dart';
 
 part 'async_paginated_data_table_2.dart';
