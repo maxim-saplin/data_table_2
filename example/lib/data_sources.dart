@@ -89,7 +89,9 @@ class DessertDataSource extends DataTableSource {
   }
 
   DessertDataSource(this.context,
-      [sortedByCalories = false, this.hasRowTaps = false]) {
+      [sortedByCalories = false,
+      this.hasRowTaps = false,
+      this.hasRowHeightOverrides = false]) {
     desserts = _desserts;
     if (sortedByCalories) {
       sort((d) => d.calories, true);
@@ -99,6 +101,7 @@ class DessertDataSource extends DataTableSource {
   final BuildContext context;
   late List<Dessert> desserts;
   late bool hasRowTaps;
+  late bool hasRowHeightOverrides;
 
   void sort<T>(Comparable<T> Function(Dessert d) getField, bool ascending) {
     desserts.sort((a, b) {
@@ -168,6 +171,8 @@ class DessertDataSource extends DataTableSource {
                 content: Text('Right clicked on ${dessert.name}'),
               ))
           : null,
+      specificRowHeight:
+          this.hasRowHeightOverrides && dessert.fat >= 25 ? 100 : null,
       cells: [
         DataCell(Text(dessert.name)),
         DataCell(Text('${dessert.calories}')),
@@ -330,6 +335,8 @@ class DesertsFakeWebService {
       case 'iron':
         return (Dessert d1, Dessert d2) => coef * (d1.iron - d2.iron);
     }
+
+    return null;
   }
 
   Future<DesertsFakeWebServiceResponse> getData(int startingAt, int count,
