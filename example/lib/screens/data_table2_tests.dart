@@ -417,6 +417,8 @@ class DesertsFakeWebService {
       case 'iron':
         return (Dessert d1, Dessert d2) => coef * (d1.iron - d2.iron);
     }
+
+    return null;
   }
 
   Future<DesertsFakeWebServiceResponse> getData(

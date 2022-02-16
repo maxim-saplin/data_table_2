@@ -6,7 +6,7 @@ If you've been using (or considered using) standard Flutter's widgets for displa
 
 [<img width="866" alt="image" src="https://user-images.githubusercontent.com/7947027/115952188-48c4e600-a4ed-11eb-9ff9-e5b4deaf9580.png">](https://maxim-saplin.github.io/data_table_2/)
 
-\- please check the [example folder](https://github.com/maxim-saplin/data_table_2/tree/main/example) which demos  various features of the widgets as well as contains few screens with original DataTable and PgaintedDataTable widgets for a reference. There's also a [DataGrid Sample](https://maxim-saplin.github.io/flutter_web_spa_sample/canvaskit/) in separate repo which is based on `DataTable2`.
+\- please check the [example folder](https://github.com/maxim-saplin/data_table_2/tree/main/example) which demos  various features of the widgets as well as contains few screens with original DataTable and PaginatedDataTable widgets for a reference. There's also a [DataGrid Sample](https://maxim-saplin.github.io/flutter_web_spa_sample/canvaskit/) in separate repo which is based on `DataTable2`.
 
 ## Extra Features
 - Sticky headers and paginator (when using `PabinatedDataTable2`)
@@ -16,12 +16,13 @@ If you've been using (or considered using) standard Flutter's widgets for displa
   - Should you want to adjust sizes of columns, you can replace `DataColumn` definitions with `DataColumn2` (which is a descendant of DataColumn). The class provides `size` property which can be set to one of 3 relative sizes (S, M and L)
   - Width ratios between Small and Medium, Large and Medium columns are defined by `smRatio` and `lmRatio` params
   - You can limit the minimal width of the control and scroll it horizontally if the viewport is narrower (by setting `minWidth` property) which is useful in portrait orientations with multiple columns not fitting the screen
-  - You can add bottom margin (by setting `bottomMargin` property) to allow slight overscroll
+  - You can add bottom margin (by setting `bottomMargin` property) to allow slight over-scroll
   - Fixed width columns are faster than default implementation of DataTable which does 2 passes to determine contents size and justify column widths
 - Data rows are wrapped in `Flexible` and `SingleScrollView` widgets to allow widget to fill parent container and be scrollable
   - Vertical scroller is exposed via table's `scrollController` property. See example 'DataTable2 - Scroll-up' which shows 'up' button when scrolling down and allows to jump to the top of the table
   - `PaginatedDataTable2.fit` property controls whether the paginator sticks to the bottom and leaves a gap to data rows above
 - There's `DataRow2` alternative to stock `DataRow` which provides row level tap events (including right clicks)
+  - `DataRow2.specificRowHeight` allows overriding default height for any row
 - `empty` property which allows defining a placeholder widget to be displayed when data source is empty
 - `border` allows drawing inner and outer vertical and horizontal borders (e.g. outlining individual cells) - stock widgets only allow drawing horizontal row splitters
 - `PaginatorController` allows to externally control `PaginatedDataTable2` state (e.g. switch pages, change page size etc.)
