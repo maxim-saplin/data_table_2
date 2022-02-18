@@ -36,6 +36,9 @@ jobs:
     - name: Build Web
       run: flutter build web
       working-directory: ./example
+      
+    - name: Fix PWA
+      run: sed -i 's+"/"+""+g' flutter_service_worker.js #https://github.com/flutter/flutter/issues/68449
     
     - name: Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@4.1.1
