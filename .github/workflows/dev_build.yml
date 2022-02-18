@@ -29,14 +29,15 @@ jobs:
     - name: Install dependencies
       run: flutter packages get
       working-directory: ./
-#     - name: Setup tmate session
-#       uses: mxschmitt/action-tmate@v3
-#       timeout-minutes: 15
-#     - name: Install dependencies
-#       run: |
-#         flutter clean
-#         flutter pub upgrade
-#       working-directory: ./
+      
+    - name: Analyze
+      run: flutter analyze
+    - name: Run tests
+      run: flutter test --coverage
+    - name: Upload coverage to codecov
+      run: curl -s https://codecov.io/bash
+      shell: bash
+      
     - name: Build Web
       run: flutter build web
       working-directory: ./example
