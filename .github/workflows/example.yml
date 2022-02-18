@@ -38,8 +38,9 @@ jobs:
       working-directory: ./example
       
     - name: Fix PWA
-      run: sed -i 's+"/"+""+g' flutter_service_worker.js #https://github.com/flutter/flutter/issues/68449
-    
+      run: sed -i'.js' -e 's+"/"+""+g' flutter_service_worker.js #https://github.com/flutter/flutter/issues/68449
+      working-directory: ./example/build/web
+      
     - name: Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@4.1.1
       with:
