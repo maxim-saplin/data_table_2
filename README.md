@@ -11,7 +11,7 @@ If you've been using (or considered using) standard Flutter's widgets for displa
 \- please check the [example folder](https://github.com/maxim-saplin/data_table_2/tree/main/example) which demos  various features of the widgets as well as contains few screens with original DataTable and PaginatedDataTable widgets for a reference. There's also a [DataGrid Sample](https://maxim-saplin.github.io/flutter_web_spa_sample/canvaskit/) in separate repo which is based on `DataTable2`.
 
 ## Extra Features
-- Sticky headers and paginator (when using `PabinatedDataTable2`)
+- Sticky headers and paginator (when using `PaginatedDataTable2`)
 - Vertically scrollable main area (with data rows)
   - `autoRowsToHeight` property on PaginatedDataTable2 allows to auto calculate page size depending on how much rows fit the height and makes vertical scrolling unnecessary
 - All columns are fixed width, table automatically stretches horizontally, individual column's width is determined as **(Width)/(Number of Columns)**
