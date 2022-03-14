@@ -28,12 +28,18 @@ class DataColumn2 extends DataColumn {
       String? tooltip,
       bool numeric = false,
       Function(int, bool)? onSort,
-      this.size = ColumnSize.M})
+      this.size = ColumnSize.M,
+      this.fixedWidth})
       : super(label: label, tooltip: tooltip, numeric: numeric, onSort: onSort);
 
   /// Column sizes are determined based on available width by distributing it
   /// to individual columns accounting for their relative sizes (see [ColumnSize])
   final ColumnSize size;
+
+  /// Defines absolute width of the column in pixel (as opposed to relative size used by default).
+  /// Warning, if the width happens to be larger than available total width other
+  /// columns can be clipped
+  final double? fixedWidth;
 }
 
 /// Extension of standard [DataRow], adds row level tap events. Also there're
@@ -568,12 +574,16 @@ class DataTable2 extends DataTable {
 
       var columnWidth = totalColWidth / columns.length;
       var totalWidth = 0.0;
+      var fixedWidth = 0.0;
 
       var widths = List<double>.generate(columns.length, (i) {
         var w = columnWidth;
         var column = columns[i];
         if (column is DataColumn2) {
-          if (column.size == ColumnSize.S) {
+          if (column.fixedWidth != null) {
+            w = column.fixedWidth!;
+            fixedWidth += w;
+          } else if (column.size == ColumnSize.S) {
             w *= smRatio;
           } else if (column.size == ColumnSize.L) {
             w *= lmRatio;

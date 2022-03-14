@@ -20,3 +20,5 @@ doc/api/
 *.js.deps
 *.js.map
 .DS_Store
+.idea
+coverage/lcov.info

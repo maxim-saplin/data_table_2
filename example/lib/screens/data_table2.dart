@@ -70,7 +70,8 @@ class _DataTable2DemoState extends State<DataTable2Demo> {
       child: DataTable2(
         columnSpacing: 12,
         horizontalMargin: 12,
-        border: getCurrentRouteOption(context) == showBorders
+        border: getCurrentRouteOption(context) == showBorders ||
+                getCurrentRouteOption(context) == fixedColumnWidth
             ? TableBorder(
                 top: BorderSide(color: Colors.black),
                 bottom: BorderSide(color: Colors.grey[300]!),
@@ -91,6 +92,9 @@ class _DataTable2DemoState extends State<DataTable2Demo> {
           DataColumn2(
             label: Text('Desert'),
             size: ColumnSize.S,
+            // example of fixed 1st row
+            fixedWidth:
+                getCurrentRouteOption(context) == fixedColumnWidth ? 44 : null,
             onSort: (columnIndex, ascending) =>
                 _sort<String>((d) => d.name, columnIndex, ascending),
           ),
