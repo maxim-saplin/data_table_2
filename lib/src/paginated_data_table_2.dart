@@ -290,7 +290,7 @@ class PaginatedDataTable2 extends StatefulWidget {
   ///    <https://material.io/design/interaction/states.html#anatomy>.
   /// {@endtemplate}
   //TODO: add test
-  MaterialStateProperty<Color?>? headingRowColor;
+  final MaterialStateProperty<Color?>? headingRowColor;
 
   /// The horizontal margin between the edges of the table and the content
   /// in the first and last cells of each row.
