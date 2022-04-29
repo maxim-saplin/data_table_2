@@ -166,6 +166,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.onSelectAll,
     this.dataRowHeight = kMinInteractiveDimension,
     this.headingRowHeight = 56.0,
+    this.headingRowColor,
     this.horizontalMargin = 24.0,
     this.columnSpacing = 56.0,
     this.showCheckboxColumn = true,
@@ -259,6 +260,38 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// This value is optional and defaults to 56.0 if not specified.
   final double headingRowHeight;
 
+  /// {@template flutter.material.dataTable.headingRowColor}
+  /// The background color for the heading row.
+  ///
+  /// The effective background color can be made to depend on the
+  /// [MaterialState] state, i.e. if the row is pressed, hovered, focused when
+  /// sorted. The color is painted as an overlay to the row. To make sure that
+  /// the row's [InkWell] is visible (when pressed, hovered and focused), it is
+  /// recommended to use a translucent color.
+  /// {@endtemplate}
+  ///
+  /// If null, [DataTableThemeData.headingRowColor] is used.
+  ///
+  /// {@template flutter.material.DataTable.headingRowColor}
+  /// ```dart
+  /// PaginatedDataTable2(
+  ///   headingRowColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+  ///     if (states.contains(MaterialState.hovered))
+  ///       return Theme.of(context).colorScheme.primary.withOpacity(0.08);
+  ///     return null;  // Use the default value.
+  ///   }),
+  /// )
+  /// ```
+  ///
+  /// See also:
+  ///
+  ///  * The Material Design specification for overlay colors and how they
+  ///    match a component's state:
+  ///    <https://material.io/design/interaction/states.html#anatomy>.
+  /// {@endtemplate}
+  //TODO: add test
+  MaterialStateProperty<Color?>? headingRowColor;
+
   /// The horizontal margin between the edges of the table and the content
   /// in the first and last cells of each row.
   ///
@@ -340,13 +373,13 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// you want the paginator to stick to the bottom when there're few rows) or
   /// of you want to have the table to take minimal space and do not have bottom
   /// pager stick to the bottom (FlexFit.loose)
-  // TODO add test
+  // TODO: add test
   final FlexFit fit;
 
   /// Set vertical and horizontal borders between cells, as well as outside borders around table.
   /// NOTE: setting this field will disable standard horizontal dividers which are controlled by
   /// themes and [dividerThickness] property
-  // TODO: Add test
+  // TODO: add test
   final TableBorder? border;
 
   ///If true rows per page is set to fill available height so that no scroll bar is ever displayed.
@@ -623,6 +656,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           // from the theme, as its already wrapped in a Card.
           decoration: const BoxDecoration(),
           dataRowHeight: widget.dataRowHeight,
+          headingRowColor: widget.headingRowColor,
           headingRowHeight: widget.headingRowHeight,
           horizontalMargin: widget.horizontalMargin,
           checkboxHorizontalMargin: widget.checkboxHorizontalMargin,

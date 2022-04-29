@@ -1,3 +1,6 @@
+## 2.2.x
+- Added PaginatedDataTable2.headingRowColor property
+
 ## 2.2.1
 - DataRow2.specificRowHeight allows overriding default row height for any row. The feature allows to have arbitrary heights of rows rather then same height for every row
 - Added example for DataRow2.specificRowHeight

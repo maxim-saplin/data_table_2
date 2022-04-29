@@ -18,6 +18,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   data_table_2:
     path: ../
+    #git: https://github.com/maxim-saplin/data_table_2
 
 flutter:
   uses-material-design: true

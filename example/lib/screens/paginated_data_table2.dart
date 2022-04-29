@@ -123,6 +123,8 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
         checkboxHorizontalMargin: 12,
         columnSpacing: 0,
         wrapInCard: false,
+        headingRowColor:
+            MaterialStateColor.resolveWith((states) => Colors.grey[200]!),
         header:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text('PaginatedDataTable2'),
