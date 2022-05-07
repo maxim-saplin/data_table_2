@@ -469,7 +469,9 @@ class DataTable2 extends DataTable {
                   border: _border,
                   color: rowColor ?? defaultRowColor.resolve(states),
                 )
-              : null,
+              : BoxDecoration(
+                  color: rowColor ?? defaultRowColor.resolve(states),
+                ),
           children: List<Widget>.filled(tableColumns.length, const _NullWidget()),
         );
       },
