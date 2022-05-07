@@ -16,10 +16,13 @@ class PaginatedDataTableDemo extends StatefulWidget {
   _PaginatedDataTableDemoState createState() => _PaginatedDataTableDemoState();
 }
 
-class _PaginatedDataTableDemoState extends State<PaginatedDataTableDemo> with RestorationMixin {
-  final RestorableDessertSelections _dessertSelections = RestorableDessertSelections();
+class _PaginatedDataTableDemoState extends State<PaginatedDataTableDemo>
+    with RestorationMixin {
+  final RestorableDessertSelections _dessertSelections =
+      RestorableDessertSelections();
   final RestorableInt _rowIndex = RestorableInt(0);
-  final RestorableInt _rowsPerPage = RestorableInt(PaginatedDataTable.defaultRowsPerPage);
+  final RestorableInt _rowsPerPage =
+      RestorableInt(PaginatedDataTable.defaultRowsPerPage);
   final RestorableBool _sortAscending = RestorableBool(true);
   final RestorableIntN _sortColumnIndex = RestorableIntN(null);
   late DessertDataSource _dessertsDataSource;
@@ -132,42 +135,50 @@ class _PaginatedDataTableDemoState extends State<PaginatedDataTableDemo> with Re
           columns: [
             DataColumn(
               label: const Text('Desert'),
-              onSort: (columnIndex, ascending) => sort<String>((d) => d.name, columnIndex, ascending),
+              onSort: (columnIndex, ascending) =>
+                  sort<String>((d) => d.name, columnIndex, ascending),
             ),
             DataColumn(
               label: const Text('Calories'),
               numeric: true,
-              onSort: (columnIndex, ascending) => sort<num>((d) => d.calories, columnIndex, ascending),
+              onSort: (columnIndex, ascending) =>
+                  sort<num>((d) => d.calories, columnIndex, ascending),
             ),
             DataColumn(
               label: const Text('Fat (gm)'),
               numeric: true,
-              onSort: (columnIndex, ascending) => sort<num>((d) => d.fat, columnIndex, ascending),
+              onSort: (columnIndex, ascending) =>
+                  sort<num>((d) => d.fat, columnIndex, ascending),
             ),
             DataColumn(
               label: const Text('Carbs (gm)'),
               numeric: true,
-              onSort: (columnIndex, ascending) => sort<num>((d) => d.carbs, columnIndex, ascending),
+              onSort: (columnIndex, ascending) =>
+                  sort<num>((d) => d.carbs, columnIndex, ascending),
             ),
             DataColumn(
               label: const Text('Protein (gm)'),
               numeric: true,
-              onSort: (columnIndex, ascending) => sort<num>((d) => d.protein, columnIndex, ascending),
+              onSort: (columnIndex, ascending) =>
+                  sort<num>((d) => d.protein, columnIndex, ascending),
             ),
             DataColumn(
               label: const Text('Sodium (mg)'),
               numeric: true,
-              onSort: (columnIndex, ascending) => sort<num>((d) => d.sodium, columnIndex, ascending),
+              onSort: (columnIndex, ascending) =>
+                  sort<num>((d) => d.sodium, columnIndex, ascending),
             ),
             DataColumn(
               label: const Text('Calcium (%)'),
               numeric: true,
-              onSort: (columnIndex, ascending) => sort<num>((d) => d.calcium, columnIndex, ascending),
+              onSort: (columnIndex, ascending) =>
+                  sort<num>((d) => d.calcium, columnIndex, ascending),
             ),
             DataColumn(
               label: const Text('Iron (%)'),
               numeric: true,
-              onSort: (columnIndex, ascending) => sort<num>((d) => d.iron, columnIndex, ascending),
+              onSort: (columnIndex, ascending) =>
+                  sort<num>((d) => d.iron, columnIndex, ascending),
             ),
           ],
           source: _dessertsDataSource,

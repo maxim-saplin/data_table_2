@@ -89,7 +89,9 @@ class DessertDataSource extends DataTableSource {
   }
 
   DessertDataSource(this.context,
-      [sortedByCalories = false, this.hasRowTaps = false, this.hasRowHeightOverrides = false]) {
+      [sortedByCalories = false,
+      this.hasRowTaps = false,
+      this.hasRowHeightOverrides = false]) {
     desserts = _desserts;
     if (sortedByCalories) {
       sort((d) => d.calories, true);
@@ -105,7 +107,9 @@ class DessertDataSource extends DataTableSource {
     desserts.sort((a, b) {
       final aValue = getField(a);
       final bValue = getField(b);
-      return ascending ? Comparable.compare(aValue, bValue) : Comparable.compare(bValue, aValue);
+      return ascending
+          ? Comparable.compare(aValue, bValue)
+          : Comparable.compare(bValue, aValue);
     });
     notifyListeners();
   }
@@ -167,7 +171,8 @@ class DessertDataSource extends DataTableSource {
                 content: Text('Right clicked on ${dessert.name}'),
               ))
           : null,
-      specificRowHeight: hasRowHeightOverrides && dessert.fat >= 25 ? 100 : null,
+      specificRowHeight:
+          hasRowHeightOverrides && dessert.fat >= 25 ? 100 : null,
       cells: [
         DataCell(Text(dessert.name)),
         DataCell(Text('${dessert.calories}')),
@@ -240,7 +245,8 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
   }
 
   Future<int> getTotalRecords() {
-    return Future<int>.delayed(const Duration(milliseconds: 0), () => _empty ? 0 : _dessertsX3.length);
+    return Future<int>.delayed(
+        const Duration(milliseconds: 0), () => _empty ? 0 : _dessertsX3.length);
   }
 
   @override
@@ -264,8 +270,10 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
 
     // List returned will be empty is there're fewer items than startingAt
     var x = _empty
-        ? await Future.delayed(const Duration(milliseconds: 2000), () => DesertsFakeWebServiceResponse(0, []))
-        : await _repo.getData(start, end, _caloriesFilter, _sortColumn, _sortAscending);
+        ? await Future.delayed(const Duration(milliseconds: 2000),
+            () => DesertsFakeWebServiceResponse(0, []))
+        : await _repo.getData(
+            start, end, _caloriesFilter, _sortColumn, _sortAscending);
 
     var r = AsyncRowsResponse(
         x.totalRecords,
@@ -274,7 +282,8 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
             key: ValueKey<int>(dessert.id),
             selected: dessert.selected,
             onSelectChanged: (value) {
-              if (value != null) setRowSelection(ValueKey<int>(dessert.id), value);
+              if (value != null)
+                setRowSelection(ValueKey<int>(dessert.id), value);
             },
             cells: [
               DataCell(Text(dessert.name)),
@@ -304,7 +313,8 @@ class DesertsFakeWebServiceResponse {
 }
 
 class DesertsFakeWebService {
-  int Function(Dessert, Dessert)? _getComparisonFunction(String column, bool ascending) {
+  int Function(Dessert, Dessert)? _getComparisonFunction(
+      String column, bool ascending) {
     var coef = ascending ? 1 : -1;
     switch (column) {
       case 'name':
@@ -316,7 +326,8 @@ class DesertsFakeWebService {
       case 'carbs':
         return (Dessert d1, Dessert d2) => coef * (d1.carbs - d2.carbs);
       case 'protein':
-        return (Dessert d1, Dessert d2) => coef * (d1.protein - d2.protein).round();
+        return (Dessert d1, Dessert d2) =>
+            coef * (d1.protein - d2.protein).round();
       case 'sodium':
         return (Dessert d1, Dessert d2) => coef * (d1.sodium - d2.sodium);
       case 'calcium':
@@ -328,8 +339,8 @@ class DesertsFakeWebService {
     return null;
   }
 
-  Future<DesertsFakeWebServiceResponse> getData(
-      int startingAt, int count, RangeValues? caloriesFilter, String sortedBy, bool sortedAsc) async {
+  Future<DesertsFakeWebServiceResponse> getData(int startingAt, int count,
+      RangeValues? caloriesFilter, String sortedBy, bool sortedAsc) async {
     return Future.delayed(
         Duration(
             milliseconds: startingAt == 0
@@ -340,11 +351,16 @@ class DesertsFakeWebService {
       var result = _dessertsX3;
 
       if (caloriesFilter != null) {
-        result = result.where((e) => e.calories >= caloriesFilter.start && e.calories <= caloriesFilter.end).toList();
+        result = result
+            .where((e) =>
+                e.calories >= caloriesFilter.start &&
+                e.calories <= caloriesFilter.end)
+            .toList();
       }
 
       result.sort(_getComparisonFunction(sortedBy, sortedAsc));
-      return DesertsFakeWebServiceResponse(result.length, result.skip(startingAt).take(count).toList());
+      return DesertsFakeWebServiceResponse(
+          result.length, result.skip(startingAt).take(count).toList());
     });
   }
 }
@@ -653,7 +669,7 @@ List<Dessert> _desserts = <Dessert>[
 ];
 
 List<Dessert> _dessertsX3 = _desserts.toList()
-  ..addAll(
-      _desserts.map((i) => Dessert(i.name + ' x2', i.calories, i.fat, i.carbs, i.protein, i.sodium, i.calcium, i.iron)))
-  ..addAll(_desserts
-      .map((i) => Dessert(i.name + ' x3', i.calories, i.fat, i.carbs, i.protein, i.sodium, i.calcium, i.iron)));
+  ..addAll(_desserts.map((i) => Dessert(i.name + ' x2', i.calories, i.fat,
+      i.carbs, i.protein, i.sodium, i.calcium, i.iron)))
+  ..addAll(_desserts.map((i) => Dessert(i.name + ' x3', i.calories, i.fat,
+      i.carbs, i.protein, i.sodium, i.calcium, i.iron)));

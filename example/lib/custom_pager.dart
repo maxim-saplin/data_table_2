@@ -75,13 +75,17 @@ class _CustomPagerState extends State<CustomPager> {
       child: Theme(
           data: Theme.of(context).copyWith(
               iconTheme: const IconThemeData(color: Colors.white),
-              textTheme: const TextTheme(subtitle1: TextStyle(color: Colors.white))),
+              textTheme:
+                  const TextTheme(subtitle1: TextStyle(color: Colors.white))),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(onPressed: () => widget.controller.goToFirstPage(), icon: const Icon(Icons.skip_previous)),
               IconButton(
-                  onPressed: () => widget.controller.goToPreviousPage(), icon: const Icon(Icons.chevron_left_sharp)),
+                  onPressed: () => widget.controller.goToFirstPage(),
+                  icon: const Icon(Icons.skip_previous)),
+              IconButton(
+                  onPressed: () => widget.controller.goToPreviousPage(),
+                  icon: const Icon(Icons.chevron_left_sharp)),
               DropdownButton<int>(
                   onChanged: (v) => widget.controller.setRowsPerPage(v!),
                   value: _availableSizes.contains(widget.controller.rowsPerPage)
@@ -95,8 +99,11 @@ class _CustomPagerState extends State<CustomPager> {
                           ))
                       .toList()),
               IconButton(
-                  onPressed: () => widget.controller.goToNextPage(), icon: const Icon(Icons.chevron_right_sharp)),
-              IconButton(onPressed: () => widget.controller.goToLastPage(), icon: const Icon(Icons.skip_next))
+                  onPressed: () => widget.controller.goToNextPage(),
+                  icon: const Icon(Icons.chevron_right_sharp)),
+              IconButton(
+                  onPressed: () => widget.controller.goToLastPage(),
+                  icon: const Icon(Icons.skip_next))
             ],
           )),
       width: 220,
