@@ -55,15 +55,17 @@ class DataRow2 extends DataRow {
       this.specificRowHeight,
       this.onTap,
       this.onDoubleTap,
-      this.onLongPress,
+      VoidCallback? onLongPress,
       this.onSecondaryTap,
       this.onSecondaryTapDown})
       : super(
-            key: key,
-            selected: selected,
-            onSelectChanged: onSelectChanged,
-            color: color,
-            cells: cells);
+          key: key,
+          selected: selected,
+          onSelectChanged: onSelectChanged,
+          onLongPress: onLongPress,
+          color: color,
+          cells: cells,
+        );
 
   DataRow2.byIndex(
       {int? index,
@@ -74,15 +76,17 @@ class DataRow2 extends DataRow {
       this.specificRowHeight,
       this.onTap,
       this.onDoubleTap,
-      this.onLongPress,
+      VoidCallback? onLongPress,
       this.onSecondaryTap,
       this.onSecondaryTapDown})
       : super.byIndex(
-            index: index,
-            selected: selected,
-            onSelectChanged: onSelectChanged,
-            color: color,
-            cells: cells);
+          index: index,
+          selected: selected,
+          onSelectChanged: onSelectChanged,
+          onLongPress: onLongPress,
+          color: color,
+          cells: cells,
+        );
 
   /// Specific row height, which will be used only if provided.
   /// If not provided, dataRowHeight will be applied.
@@ -99,9 +103,6 @@ class DataRow2 extends DataRow {
 
   /// Row double tap handler, won't be called if tapped cell has any tap event handlers
   final GestureTapCallback? onDoubleTap;
-
-  /// Row long press handler, won't be called if tapped cell has any tap event handlers
-  final GestureLongPressCallback? onLongPress;
 }
 
 /// In-place replacement of standard [DataTable] widget, mimics it API.
@@ -134,30 +135,32 @@ class DataTable2 extends DataTable {
     this.minWidth,
     this.scrollController,
     this.empty,
-    this.border,
+    TableBorder? border,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
     required List<DataRow> rows,
   }) : super(
-            key: key,
-            columns: columns,
-            sortColumnIndex: sortColumnIndex,
-            sortAscending: sortAscending,
-            onSelectAll: onSelectAll,
-            decoration: decoration,
-            dataRowColor: dataRowColor,
-            dataRowHeight: dataRowHeight,
-            dataTextStyle: dataTextStyle,
-            headingRowColor: headingRowColor,
-            headingRowHeight: headingRowHeight,
-            headingTextStyle: headingTextStyle,
-            horizontalMargin: horizontalMargin,
-            checkboxHorizontalMargin: checkboxHorizontalMargin,
-            columnSpacing: columnSpacing,
-            showCheckboxColumn: showCheckboxColumn,
-            showBottomBorder: showBottomBorder,
-            dividerThickness: dividerThickness,
-            rows: rows);
+          key: key,
+          columns: columns,
+          sortColumnIndex: sortColumnIndex,
+          sortAscending: sortAscending,
+          onSelectAll: onSelectAll,
+          decoration: decoration,
+          dataRowColor: dataRowColor,
+          dataRowHeight: dataRowHeight,
+          dataTextStyle: dataTextStyle,
+          headingRowColor: headingRowColor,
+          headingRowHeight: headingRowHeight,
+          headingTextStyle: headingTextStyle,
+          horizontalMargin: horizontalMargin,
+          checkboxHorizontalMargin: checkboxHorizontalMargin,
+          columnSpacing: columnSpacing,
+          showCheckboxColumn: showCheckboxColumn,
+          showBottomBorder: showBottomBorder,
+          dividerThickness: dividerThickness,
+          border: border,
+          rows: rows,
+        );
 
   static final LocalKey _headingRowKey = UniqueKey();
 
@@ -169,8 +172,7 @@ class DataTable2 extends DataTable {
       onSelectAll!(effectiveChecked);
     } else {
       for (final DataRow row in rows) {
-        if (row.onSelectChanged != null && row.selected != effectiveChecked)
-          row.onSelectChanged!(effectiveChecked);
+        if (row.onSelectChanged != null && row.selected != effectiveChecked) row.onSelectChanged!(effectiveChecked);
       }
     }
   }
@@ -191,8 +193,7 @@ class DataTable2 extends DataTable {
   /// The default divider thickness.
   static const double _dividerThickness = 1.0;
 
-  static const Duration _sortArrowAnimationDuration =
-      Duration(milliseconds: 150);
+  static const Duration _sortArrowAnimationDuration = Duration(milliseconds: 150);
 
   /// If set, the table will stop shrinking below the threshold and provide
   /// horizontal scrolling. Useful for the cases with narrow screens (e.g. portrait phone orientation)
@@ -214,12 +215,6 @@ class DataTable2 extends DataTable {
   /// The widget will be displayed below column
   final Widget? empty;
 
-  /// Set vertical and horizontal borders between cells, as well as outside borders around table.
-  /// NOTE: setting this field will disable standard horizontal dividers which are controlled by
-  /// themes and [dividerThickness] property
-  // TODO: Add test
-  final TableBorder? border;
-
   /// Determines ratio of Small column's width to Medium column's width.
   /// I.e. 0.5 means that Small column is twice narower than Medium column.
   final double smRatio;
@@ -237,9 +232,8 @@ class DataTable2 extends DataTable {
     required bool tristate,
   }) {
     final ThemeData themeData = Theme.of(context);
-    final double effectiveHorizontalMargin = horizontalMargin ??
-        themeData.dataTableTheme.horizontalMargin ??
-        _horizontalMargin;
+    final double effectiveHorizontalMargin =
+        horizontalMargin ?? themeData.dataTableTheme.horizontalMargin ?? _horizontalMargin;
     Widget contents = Semantics(
       container: true,
       child: Padding(
@@ -298,17 +292,14 @@ class DataTable2 extends DataTable {
       ],
     );
 
-    final TextStyle effectiveHeadingTextStyle = headingTextStyle ??
-        themeData.dataTableTheme.headingTextStyle ??
-        themeData.textTheme.subtitle2!;
-    final double effectiveHeadingRowHeight = headingRowHeight ??
-        themeData.dataTableTheme.headingRowHeight ??
-        _headingRowHeight;
+    final TextStyle effectiveHeadingTextStyle =
+        headingTextStyle ?? themeData.dataTableTheme.headingTextStyle ?? themeData.textTheme.subtitle2!;
+    final double effectiveHeadingRowHeight =
+        headingRowHeight ?? themeData.dataTableTheme.headingRowHeight ?? _headingRowHeight;
     label = Container(
       padding: padding,
       height: effectiveHeadingRowHeight,
-      alignment:
-          numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
+      alignment: numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
       child: AnimatedDefaultTextStyle(
         style: effectiveHeadingTextStyle,
         softWrap: false,
@@ -362,32 +353,22 @@ class DataTable2 extends DataTable {
       );
     }
 
-    final TextStyle effectiveDataTextStyle = dataTextStyle ??
-        themeData.dataTableTheme.dataTextStyle ??
-        themeData.textTheme.bodyText2!;
-    final double effectiveDataRowHeight = specificRowHeight ??
-        dataRowHeight ??
-        themeData.dataTableTheme.dataRowHeight ??
-        kMinInteractiveDimension;
+    final TextStyle effectiveDataTextStyle =
+        dataTextStyle ?? themeData.dataTableTheme.dataTextStyle ?? themeData.textTheme.bodyText2!;
+    final double effectiveDataRowHeight =
+        specificRowHeight ?? dataRowHeight ?? themeData.dataTableTheme.dataRowHeight ?? kMinInteractiveDimension;
     label = Container(
       padding: padding,
       height: effectiveDataRowHeight,
-      alignment:
-          numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
+      alignment: numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
       child: DefaultTextStyle(
         style: effectiveDataTextStyle.copyWith(
-          color: placeholder
-              ? effectiveDataTextStyle.color!.withOpacity(0.6)
-              : null,
+          color: placeholder ? effectiveDataTextStyle.color!.withOpacity(0.6) : null,
         ),
         child: DropdownButtonHideUnderline(child: label),
       ),
     );
-    if (onTap != null ||
-        onDoubleTap != null ||
-        onLongPress != null ||
-        onTapDown != null ||
-        onTapCancel != null) {
+    if (onTap != null || onDoubleTap != null || onLongPress != null || onTapDown != null || onTapCancel != null) {
       label = InkWell(
         onTap: onTap,
         onDoubleTap: onDoubleTap,
@@ -428,37 +409,27 @@ class DataTable2 extends DataTable {
     final ThemeData theme = Theme.of(context);
     final MaterialStateProperty<Color?>? effectiveHeadingRowColor =
         headingRowColor ?? theme.dataTableTheme.headingRowColor;
-    final MaterialStateProperty<Color?>? effectiveDataRowColor =
-        dataRowColor ?? theme.dataTableTheme.dataRowColor;
-    final MaterialStateProperty<Color?> defaultRowColor =
-        MaterialStateProperty.resolveWith(
+    final MaterialStateProperty<Color?>? effectiveDataRowColor = dataRowColor ?? theme.dataTableTheme.dataRowColor;
+    final MaterialStateProperty<Color?> defaultRowColor = MaterialStateProperty.resolveWith(
       (Set<MaterialState> states) {
-        if (states.contains(MaterialState.selected))
-          return theme.colorScheme.primary.withOpacity(0.08);
+        if (states.contains(MaterialState.selected)) return theme.colorScheme.primary.withOpacity(0.08);
         return null;
       },
     );
-    final bool anyRowSelectable =
-        rows.any((DataRow row) => row.onSelectChanged != null);
+    final bool anyRowSelectable = rows.any((DataRow row) => row.onSelectChanged != null);
     final bool displayCheckboxColumn = showCheckboxColumn && anyRowSelectable;
-    final Iterable<DataRow> rowsWithCheckbox = displayCheckboxColumn
-        ? rows.where((DataRow row) => row.onSelectChanged != null)
-        : <DataRow2>[];
-    final Iterable<DataRow> rowsChecked =
-        rowsWithCheckbox.where((DataRow row) => row.selected);
-    final bool allChecked =
-        displayCheckboxColumn && rowsChecked.length == rowsWithCheckbox.length;
+    final Iterable<DataRow> rowsWithCheckbox =
+        displayCheckboxColumn ? rows.where((DataRow row) => row.onSelectChanged != null) : <DataRow2>[];
+    final Iterable<DataRow> rowsChecked = rowsWithCheckbox.where((DataRow row) => row.selected);
+    final bool allChecked = displayCheckboxColumn && rowsChecked.length == rowsWithCheckbox.length;
     final bool anyChecked = displayCheckboxColumn && rowsChecked.isNotEmpty;
     final bool someChecked = anyChecked && !allChecked;
-    final double effectiveHorizontalMargin = horizontalMargin ??
-        theme.dataTableTheme.horizontalMargin ??
-        _horizontalMargin;
-    final double effectiveColumnSpacing =
-        columnSpacing ?? theme.dataTableTheme.columnSpacing ?? _columnSpacing;
+    final double effectiveHorizontalMargin =
+        horizontalMargin ?? theme.dataTableTheme.horizontalMargin ?? _horizontalMargin;
+    final double effectiveColumnSpacing = columnSpacing ?? theme.dataTableTheme.columnSpacing ?? _columnSpacing;
 
-    final List<TableColumnWidth> tableColumns = List<TableColumnWidth>.filled(
-        columns.length + (displayCheckboxColumn ? 1 : 0),
-        const _NullTableColumnWidth());
+    final List<TableColumnWidth> tableColumns =
+        List<TableColumnWidth>.filled(columns.length + (displayCheckboxColumn ? 1 : 0), const _NullTableColumnWidth());
 
     var headingRow = TableRow(
       key: _headingRowKey,
@@ -467,9 +438,7 @@ class DataTable2 extends DataTable {
             ? Border(
                 bottom: Divider.createBorderSide(
                 context,
-                width: dividerThickness ??
-                    theme.dataTableTheme.dividerThickness ??
-                    _dividerThickness,
+                width: dividerThickness ?? theme.dataTableTheme.dividerThickness ?? _dividerThickness,
               ))
             : null,
         color: effectiveHeadingRowColor?.resolve(<MaterialState>{}),
@@ -481,24 +450,18 @@ class DataTable2 extends DataTable {
       rows.length,
       (int index) {
         final bool isSelected = rows[index].selected;
-        final bool isDisabled =
-            anyRowSelectable && rows[index].onSelectChanged == null;
+        final bool isDisabled = anyRowSelectable && rows[index].onSelectChanged == null;
         final Set<MaterialState> states = <MaterialState>{
           if (isSelected) MaterialState.selected,
           if (isDisabled) MaterialState.disabled,
         };
-        final Color? resolvedDataRowColor =
-            (rows[index].color ?? effectiveDataRowColor)?.resolve(states);
+        final Color? resolvedDataRowColor = (rows[index].color ?? effectiveDataRowColor)?.resolve(states);
         final Color? rowColor = resolvedDataRowColor;
         final BorderSide borderSide = Divider.createBorderSide(
           context,
-          width: dividerThickness ??
-              theme.dataTableTheme.dividerThickness ??
-              _dividerThickness,
+          width: dividerThickness ?? theme.dataTableTheme.dividerThickness ?? _dividerThickness,
         );
-        final Border? _border = showBottomBorder
-            ? Border(bottom: borderSide)
-            : Border(top: borderSide);
+        final Border? _border = showBottomBorder ? Border(bottom: borderSide) : Border(top: borderSide);
         return TableRow(
           key: rows[index].key,
           decoration: border == null
@@ -507,8 +470,7 @@ class DataTable2 extends DataTable {
                   color: rowColor ?? defaultRowColor.resolve(states),
                 )
               : null,
-          children:
-              List<Widget>.filled(tableColumns.length, const _NullWidget()),
+          children: List<Widget>.filled(tableColumns.length, const _NullWidget()),
         );
       },
     );
@@ -520,16 +482,13 @@ class DataTable2 extends DataTable {
       double checkBoxWidth = 0;
       // size & build checkboxes in heading and leftmost column
       if (displayCheckboxColumn) {
-        checkBoxWidth = effectiveHorizontalMargin +
-            Checkbox.width +
-            effectiveHorizontalMargin / 2.0;
+        checkBoxWidth = effectiveHorizontalMargin + Checkbox.width + effectiveHorizontalMargin / 2.0;
         tableColumns[0] = FixedColumnWidth(checkBoxWidth);
         headingRow.children![0] = _buildCheckbox(
           context: context,
           checked: someChecked ? null : allChecked,
           onRowTap: null,
-          onCheckboxChanged: (bool? checked) =>
-              _handleSelectAll(checked, someChecked),
+          onCheckboxChanged: (bool? checked) => _handleSelectAll(checked, someChecked),
           overlayColor: null,
           tristate: true,
         );
@@ -538,9 +497,7 @@ class DataTable2 extends DataTable {
           tableRows[rowIndex].children![0] = _buildCheckbox(
             context: context,
             checked: row.selected,
-            onRowTap: () => row.onSelectChanged != null
-                ? row.onSelectChanged!(!row.selected)
-                : null,
+            onRowTap: () => row.onSelectChanged != null ? row.onSelectChanged!(!row.selected) : null,
             onCheckboxChanged: row.onSelectChanged,
             overlayColor: row.color ?? effectiveDataRowColor,
             tristate: false,
@@ -562,9 +519,7 @@ class DataTable2 extends DataTable {
       availableWidth -= checkBoxWidth;
       var totalColWidth = availableWidth -
           effectiveHorizontalMargin -
-          (displayCheckboxColumn
-              ? effectiveHorizontalMargin / 2
-              : effectiveHorizontalMargin);
+          (displayCheckboxColumn ? effectiveHorizontalMargin / 2 : effectiveHorizontalMargin);
 
       var columnWidth = totalColWidth / columns.length;
       var totalWidth = 0.0;
@@ -594,23 +549,14 @@ class DataTable2 extends DataTable {
             0,
             widths[0] +
                 effectiveHorizontalMargin +
-                (displayCheckboxColumn
-                    ? effectiveHorizontalMargin / 2
-                    : effectiveHorizontalMargin));
+                (displayCheckboxColumn ? effectiveHorizontalMargin / 2 : effectiveHorizontalMargin));
       } else if (widths.length > 1) {
         widths[0] = math.max(
-            0,
-            widths[0] +
-                (displayCheckboxColumn
-                    ? effectiveHorizontalMargin / 2
-                    : effectiveHorizontalMargin));
-        widths[widths.length - 1] =
-            math.max(0, widths[widths.length - 1] + effectiveHorizontalMargin);
+            0, widths[0] + (displayCheckboxColumn ? effectiveHorizontalMargin / 2 : effectiveHorizontalMargin));
+        widths[widths.length - 1] = math.max(0, widths[widths.length - 1] + effectiveHorizontalMargin);
       }
 
-      for (int dataColumnIndex = 0;
-          dataColumnIndex < columns.length;
-          dataColumnIndex++) {
+      for (int dataColumnIndex = 0; dataColumnIndex < columns.length; dataColumnIndex++) {
         final DataColumn column = columns[dataColumnIndex];
 
         final double paddingStart;
@@ -634,8 +580,7 @@ class DataTable2 extends DataTable {
           end: paddingEnd,
         );
 
-        tableColumns[displayColumnIndex] =
-            FixedColumnWidth(widths[dataColumnIndex]);
+        tableColumns[displayColumnIndex] = FixedColumnWidth(widths[dataColumnIndex]);
 
         headingRow.children![displayColumnIndex] = _buildHeadingCell(
           context: context,
@@ -644,8 +589,7 @@ class DataTable2 extends DataTable {
           tooltip: column.tooltip,
           numeric: column.numeric,
           onSort: column.onSort != null
-              ? () => column.onSort!(dataColumnIndex,
-                  sortColumnIndex != dataColumnIndex || !sortAscending)
+              ? () => column.onSort!(dataColumnIndex, sortColumnIndex != dataColumnIndex || !sortAscending)
               : null,
           sorted: dataColumnIndex == sortColumnIndex,
           ascending: sortAscending,
@@ -672,11 +616,8 @@ class DataTable2 extends DataTable {
             onRowDoubleTap: row is DataRow2 ? row.onDoubleTap : null,
             onRowLongPress: row is DataRow2 ? row.onLongPress : null,
             onRowSecondaryTap: row is DataRow2 ? row.onSecondaryTap : null,
-            onRowSecondaryTapDown:
-                row is DataRow2 ? row.onSecondaryTapDown : null,
-            onSelectChanged: () => row.onSelectChanged != null
-                ? row.onSelectChanged!(!row.selected)
-                : null,
+            onRowSecondaryTapDown: row is DataRow2 ? row.onSecondaryTapDown : null,
+            onSelectChanged: () => row.onSelectChanged != null ? row.onSelectChanged!(!row.selected) : null,
             overlayColor: row.color ?? effectiveDataRowColor,
           );
           rowIndex += 1;
@@ -711,24 +652,18 @@ class DataTable2 extends DataTable {
       );
 
       var marginedTable = bottomMargin != null && bottomMargin! > 0
-          ? Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [dataRows, SizedBox(height: bottomMargin!)])
+          ? Column(mainAxisSize: MainAxisSize.min, children: [dataRows, SizedBox(height: bottomMargin!)])
           : dataRows;
 
       var t = Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Table(
-              columnWidths: widthsAsMap,
-              children: [headingRow],
-              border: headingBorder),
+          Table(columnWidths: widthsAsMap, children: [headingRow], border: headingBorder),
           Flexible(
               fit: FlexFit.loose,
               child: tableRows.isEmpty
-                  ? empty ?? SizedBox()
-                  : SingleChildScrollView(
-                      child: marginedTable, controller: scrollController))
+                  ? empty ?? const SizedBox()
+                  : SingleChildScrollView(child: marginedTable, controller: scrollController))
         ],
       );
 
@@ -738,16 +673,14 @@ class DataTable2 extends DataTable {
               ? Scrollbar(
                   controller: _horizontalController,
                   child: SingleChildScrollView(
-                      controller: _horizontalController,
-                      scrollDirection: Axis.horizontal,
-                      child: t))
+                      controller: _horizontalController, scrollDirection: Axis.horizontal, child: t))
               : t);
 
       return w;
     });
 
     sw.stop();
-    if (!kReleaseMode) print('DataTable2 built: ${sw.elapsedMilliseconds}ms');
+    if (!kReleaseMode) debugPrint('DataTable2 built: ${sw.elapsedMilliseconds}ms');
     return builder;
   }
 }
@@ -767,13 +700,10 @@ class _SortArrow extends StatefulWidget {
   final Duration duration;
 
   @override
-  _SortArrowState createState() => _SortArrowState(up);
+  _SortArrowState createState() => _SortArrowState();
 }
 
 class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
-  _SortArrowState(bool? up) {
-    _up = up;
-  }
   late AnimationController _opacityController;
   late Animation<double> _opacityAnimation;
 
@@ -784,12 +714,12 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
   bool? _up;
 
   static final Animatable<double> _turnTween =
-      Tween<double>(begin: 0.0, end: math.pi)
-          .chain(CurveTween(curve: Curves.easeIn));
+      Tween<double>(begin: 0.0, end: math.pi).chain(CurveTween(curve: Curves.easeIn));
 
   @override
   void initState() {
     super.initState();
+    _up = widget.up;
     _opacityAnimation = CurvedAnimation(
       parent: _opacityController = AnimationController(
         duration: widget.duration,
@@ -828,8 +758,7 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
     bool skipArrow = false;
     final bool? newUp = widget.up ?? _up;
     if (oldWidget.visible != widget.visible) {
-      if (widget.visible &&
-          (_opacityController.status == AnimationStatus.dismissed)) {
+      if (widget.visible && (_opacityController.status == AnimationStatus.dismissed)) {
         _orientationController.stop();
         _orientationController.value = 0.0;
         _orientationOffset = newUp! ? 0.0 : math.pi;
@@ -866,9 +795,8 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
     return Opacity(
       opacity: _opacityAnimation.value,
       child: Transform(
-        transform:
-            Matrix4.rotationZ(_orientationOffset + _orientationAnimation.value)
-              ..setTranslationRaw(0.0, _arrowIconBaselineOffset, 0.0),
+        transform: Matrix4.rotationZ(_orientationOffset + _orientationAnimation.value)
+          ..setTranslationRaw(0.0, _arrowIconBaselineOffset, 0.0),
         alignment: Alignment.center,
         child: const Icon(
           Icons.arrow_upward,
@@ -883,12 +811,10 @@ class _NullTableColumnWidth extends TableColumnWidth {
   const _NullTableColumnWidth();
 
   @override
-  double maxIntrinsicWidth(Iterable<RenderBox> cells, double containerWidth) =>
-      throw UnimplementedError();
+  double maxIntrinsicWidth(Iterable<RenderBox> cells, double containerWidth) => throw UnimplementedError();
 
   @override
-  double minIntrinsicWidth(Iterable<RenderBox> cells, double containerWidth) =>
-      throw UnimplementedError();
+  double minIntrinsicWidth(Iterable<RenderBox> cells, double containerWidth) => throw UnimplementedError();
 }
 
 class _NullWidget extends Widget {

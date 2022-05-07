@@ -13,16 +13,16 @@ import 'screens/paginated_data_table.dart';
 import 'screens/paginated_data_table2.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 const String initialRoute = '/datatable2';
 
-Scaffold _getScaffold(BuildContext context, Widget body,
-    [List<String>? options]) {
+Scaffold _getScaffold(BuildContext context, Widget body, [List<String>? options]) {
   var defaultOption = getCurrentRouteOption(context);
-  if (defaultOption.isEmpty && options != null && options.isNotEmpty)
+  if (defaultOption.isEmpty && options != null && options.isNotEmpty) {
     defaultOption = options[0];
+  }
   return Scaffold(
     appBar: AppBar(
       backgroundColor: Colors.grey[200],
@@ -30,21 +30,18 @@ Scaffold _getScaffold(BuildContext context, Widget body,
       automaticallyImplyLeading: false,
       title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Container(
-            padding: EdgeInsets.fromLTRB(12, 4, 12, 4),
+            padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
             color: Colors.grey[850],
             //screen selection
             child: DropdownButton<String>(
-              icon: Icon(Icons.arrow_forward),
+              icon: const Icon(Icons.arrow_forward),
               dropdownColor: Colors.grey[800],
-              style: Theme.of(context)
-                  .textTheme
-                  .subtitle1!
-                  .copyWith(color: Colors.white),
+              style: Theme.of(context).textTheme.subtitle1!.copyWith(color: Colors.white),
               value: _getCurrentRoute(context),
               onChanged: (v) {
                 Navigator.of(context).pushNamed(v!);
               },
-              items: [
+              items: const [
                 DropdownMenuItem(
                   child: Text('DataTable2'),
                   value: '/datatable2',
@@ -82,28 +79,24 @@ Scaffold _getScaffold(BuildContext context, Widget body,
             )),
         options != null && options.isNotEmpty
             ? Container(
-                padding: EdgeInsets.fromLTRB(12, 4, 12, 4),
+                padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
                 // screen options
                 child: DropdownButton<String>(
-                    icon: SizedBox(),
+                    icon: const SizedBox(),
                     dropdownColor: Colors.grey[300],
-                    style: Theme.of(context)
-                        .textTheme
-                        .subtitle1!
-                        .copyWith(color: Colors.black),
+                    style: Theme.of(context).textTheme.subtitle1!.copyWith(color: Colors.black),
                     value: defaultOption,
                     onChanged: (v) {
                       var r = _getCurrentRoute(context);
                       Navigator.of(context).pushNamed(r, arguments: v);
                     },
                     items: options
-                        .map<DropdownMenuItem<String>>(
-                            (v) => DropdownMenuItem<String>(
-                                  child: Text(v),
-                                  value: v,
-                                ))
+                        .map<DropdownMenuItem<String>>((v) => DropdownMenuItem<String>(
+                              child: Text(v),
+                              value: v,
+                            ))
                         .toList()))
-            : SizedBox()
+            : const SizedBox()
       ]),
     ),
     body: body,
@@ -111,13 +104,14 @@ Scaffold _getScaffold(BuildContext context, Widget body,
 }
 
 String _getCurrentRoute(BuildContext context) {
-  return ModalRoute.of(context) != null &&
-          ModalRoute.of(context)!.settings.name != null
+  return ModalRoute.of(context) != null && ModalRoute.of(context)!.settings.name != null
       ? ModalRoute.of(context)!.settings.name!
       : initialRoute;
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -128,36 +122,29 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: initialRoute,
       routes: {
-        '/datatable2': (context) => _getScaffold(
-            context, DataTable2Demo(), getOptionsForRoute('/datatable2')),
-        '/datatable2simple': (context) =>
-            _getScaffold(context, DataTable2SimpleDemo()),
-        '/datatable2scrollup': (context) =>
-            _getScaffold(context, DataTable2ScrollupDemo()),
-        '/paginated2': (context) => _getScaffold(context,
-            PaginatedDataTable2Demo(), getOptionsForRoute('/paginated2')),
-        '/asyncpaginated2': (context) => _getScaffold(
-            context,
-            AsyncPaginatedDataTable2Demo(),
-            getOptionsForRoute('/asyncpaginated2')),
-        '/datatable': (context) => _getScaffold(context, DataTableDemo()),
-        '/paginated': (context) =>
-            _getScaffold(context, PaginatedDataTableDemo()),
-        '/datatable2tests': (context) =>
-            _getScaffold(context, DataTable2Tests()),
+        '/datatable2': (context) => _getScaffold(context, const DataTable2Demo(), getOptionsForRoute('/datatable2')),
+        '/datatable2simple': (context) => _getScaffold(context, const DataTable2SimpleDemo()),
+        '/datatable2scrollup': (context) => _getScaffold(context, const DataTable2ScrollupDemo()),
+        '/paginated2': (context) =>
+            _getScaffold(context, const PaginatedDataTable2Demo(), getOptionsForRoute('/paginated2')),
+        '/asyncpaginated2': (context) =>
+            _getScaffold(context, const AsyncPaginatedDataTable2Demo(), getOptionsForRoute('/asyncpaginated2')),
+        '/datatable': (context) => _getScaffold(context, const DataTableDemo()),
+        '/paginated': (context) => _getScaffold(context, const PaginatedDataTableDemo()),
+        '/datatable2tests': (context) => _getScaffold(context, const DataTable2Tests()),
       },
-      localizationsDelegates: [
+      localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: [
-        const Locale('en', ''),
-        const Locale('be', ''),
-        const Locale('ru', ''),
+      supportedLocales: const [
+        Locale('en', ''),
+        Locale('be', ''),
+        Locale('ru', ''),
       ],
       // change to see how PaginatedDataTable2 controls (e.g. Rows per page) get translated
-      locale: Locale('en', ''),
+      locale: const Locale('en', ''),
     );
   }
 }

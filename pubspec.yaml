@@ -10,11 +10,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  async: ^2.8.1
-
+  async: ^2.8.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  vector_math: ^2.1.0
+  vector_math: ^2.1.1
   intl: ^0.17.0
+  flutter_lints: ^1.0.4

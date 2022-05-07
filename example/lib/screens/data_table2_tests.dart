@@ -11,8 +11,7 @@ import 'package:flutter/material.dart';
 int _idCounter = 0;
 
 class Dessert {
-  Dessert(this.name, this.calories, this.fat, this.carbs, this.protein,
-      this.sodium, this.calcium, this.iron);
+  Dessert(this.name, this.calories, this.fat, this.carbs, this.protein, this.sodium, this.calcium, this.iron);
 
   final String name;
   final int calories;
@@ -41,10 +40,7 @@ final List<Dessert> kDesserts = <Dessert>[
 ];
 
 final testColumns = <DataColumn2>[
-  DataColumn2(
-      label: const Text('Name'),
-      tooltip: 'Name',
-      onSort: (int columnIndex, bool ascending) {}),
+  DataColumn2(label: const Text('Name'), tooltip: 'Name', onSort: (int columnIndex, bool ascending) {}),
   DataColumn2(
     label: const Text('Calories'),
     tooltip: 'Calories',
@@ -125,11 +121,7 @@ DataTable2 buildTable(
 }
 
 class TestDataSource extends DataTableSource {
-  TestDataSource(
-      {this.allowSelection = false,
-      this.showPage = true,
-      this.showGeneration = true,
-      this.noData = false});
+  TestDataSource({this.allowSelection = false, this.showPage = true, this.showGeneration = true, this.noData = false});
 
   final bool allowSelection;
   final bool showPage;
@@ -167,9 +159,7 @@ class TestDataSource extends DataTableSource {
         DataCell(Text('${dessert.calories}')),
         DataCell(Text(showGeneration ? '$generation' : '${dessert.carbs}')),
       ],
-      onSelectChanged: allowSelection
-          ? (bool? selected) => _handleSelected(index, selected)
-          : null,
+      onSelectChanged: allowSelection ? (bool? selected) => _handleSelected(index, selected) : null,
     );
   }
 
@@ -205,7 +195,7 @@ PaginatedDataTable2 buildPaginatedTable(
     horizontalMargin: 24,
     showCheckboxColumn: true,
     wrapInCard: wrapInCard,
-    header: showHeader ? Text('Header') : null,
+    header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
     onSelectAll: (bool? value) {},
@@ -219,14 +209,9 @@ PaginatedDataTable2 buildPaginatedTable(
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     autoRowsToHeight: autoRowsToHeight,
-    onRowsPerPageChanged: showPageSizeSelector || onRowsPerPageChanged != null
-        ? onRowsPerPageChanged ?? (int? rowsPerPage) {}
-        : null,
-    source: TestDataSource(
-        allowSelection: true,
-        showPage: showPage,
-        showGeneration: showGeneration,
-        noData: noData),
+    onRowsPerPageChanged:
+        showPageSizeSelector || onRowsPerPageChanged != null ? onRowsPerPageChanged ?? (int? rowsPerPage) {} : null,
+    source: TestDataSource(allowSelection: true, showPage: showPage, showGeneration: showGeneration, noData: noData),
   );
 }
 
@@ -252,7 +237,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     horizontalMargin: 24,
     showCheckboxColumn: true,
     wrapInCard: wrapInCard,
-    header: showHeader ? Text('Header') : null,
+    header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
     onSelectAll: (bool? value) {},
@@ -260,7 +245,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     showFirstLastButtons: true,
     controller: controller,
     empty: empty,
-    loading: Center(
+    loading: const Center(
         child: SizedBox(
             width: 32,
             height: 32,
@@ -274,14 +259,10 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     autoRowsToHeight: autoRowsToHeight,
-    onRowsPerPageChanged: showPageSizeSelector || onRowsPerPageChanged != null
-        ? onRowsPerPageChanged ?? (int? rowsPerPage) {}
-        : null,
+    onRowsPerPageChanged:
+        showPageSizeSelector || onRowsPerPageChanged != null ? onRowsPerPageChanged ?? (int? rowsPerPage) {} : null,
     source: DessertDataSourceAsync(
-        allowSelection: true,
-        showPage: showPage,
-        showGeneration: showGeneration,
-        noData: noData),
+        allowSelection: true, showPage: showPage, showGeneration: showGeneration, noData: noData),
   );
 }
 
@@ -308,7 +289,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     notifyListeners();
   }
 
-  bool _empty = false;
+  final bool _empty = false;
   int? _errorCounter;
 
   final DesertsFakeWebService _repo = DesertsFakeWebService();
@@ -323,23 +304,22 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
   }
 
   Future<int> getTotalRecors() {
-    return Future<int>.delayed(
-        Duration(milliseconds: 0), () => _empty ? 0 : _dessertsX3.length);
+    return Future<int>.delayed(const Duration(milliseconds: 0), () => _empty ? 0 : _dessertsX3.length);
   }
 
   @override
-  Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
-    print('getRows($startIndex, $count)');
+  Future<AsyncRowsResponse> getRows(int start, int end) async {
+    debugPrint('getRows($start, $end)');
     if (_errorCounter != null) {
       _errorCounter = _errorCounter! + 1;
 
       if (_errorCounter! % 2 == 1) {
-        await Future.delayed(Duration(milliseconds: 1000));
+        await Future.delayed(const Duration(milliseconds: 1000));
         throw 'Error #${((_errorCounter! - 1) / 2).round() + 1} has occured';
       }
     }
 
-    var index = startIndex;
+    var index = start;
     // final format = NumberFormat.decimalPercentPattern(
     //   locale: 'en',
     //   decimalDigits: 0,
@@ -347,10 +327,8 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     assert(index >= 0);
 
     var x = _empty
-        ? await Future.delayed(Duration(milliseconds: 2000),
-            () => DesertsFakeWebServiceResponse(0, []))
-        : await _repo.getData(startIndex, count, _sortColumn, _sortAscending,
-            noData, useKDeserts);
+        ? await Future.delayed(const Duration(milliseconds: 2000), () => DesertsFakeWebServiceResponse(0, []))
+        : await _repo.getData(start, end, _sortColumn, _sortAscending, noData, useKDeserts);
 
     var r = AsyncRowsResponse(
         x.totalRecords,
@@ -359,8 +337,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
             key: ValueKey<int>(dessert.id),
             selected: dessert.selected,
             onSelectChanged: (value) {
-              if (value != null)
-                setRowSelection(ValueKey<int>(dessert.id), value);
+              if (value != null) setRowSelection(ValueKey<int>(dessert.id), value);
             },
             cells: <DataCell>[
               DataCell(
@@ -395,8 +372,7 @@ class DesertsFakeWebServiceResponse {
 }
 
 class DesertsFakeWebService {
-  int Function(Dessert, Dessert)? _getComparisonFunction(
-      String column, bool ascending) {
+  int Function(Dessert, Dessert)? _getComparisonFunction(String column, bool ascending) {
     var coef = ascending ? 1 : -1;
     switch (column) {
       case 'name':
@@ -408,8 +384,7 @@ class DesertsFakeWebService {
       case 'carbs':
         return (Dessert d1, Dessert d2) => coef * (d1.carbs - d2.carbs);
       case 'protein':
-        return (Dessert d1, Dessert d2) =>
-            coef * (d1.protein - d2.protein).round();
+        return (Dessert d1, Dessert d2) => coef * (d1.protein - d2.protein).round();
       case 'sodium':
         return (Dessert d1, Dessert d2) => coef * (d1.sodium - d2.sodium);
       case 'calcium':
@@ -421,8 +396,7 @@ class DesertsFakeWebService {
     return null;
   }
 
-  Future<DesertsFakeWebServiceResponse> getData(
-      int startingAt, int count, String sortedBy, bool sortedAsc, bool noData,
+  Future<DesertsFakeWebServiceResponse> getData(int startingAt, int count, String sortedBy, bool sortedAsc, bool noData,
       [bool useKDesserts = false]) async {
     return Future.delayed(
         Duration(
@@ -435,14 +409,9 @@ class DesertsFakeWebService {
       return noData
           ? DesertsFakeWebServiceResponse(0, [])
           : (useKDesserts
-              ? DesertsFakeWebServiceResponse(
-                  50 * kDesserts.length,
-                  List.generate(
-                      count,
-                      (index) =>
-                          kDesserts[(startingAt + index) % kDesserts.length]))
-              : DesertsFakeWebServiceResponse(_dessertsX3.length,
-                  _dessertsX3.skip(startingAt).take(count).toList()));
+              ? DesertsFakeWebServiceResponse(50 * kDesserts.length,
+                  List.generate(count, (index) => kDesserts[(startingAt + index) % kDesserts.length]))
+              : DesertsFakeWebServiceResponse(_dessertsX3.length, _dessertsX3.skip(startingAt).take(count).toList()));
     });
   }
 }
@@ -450,13 +419,13 @@ class DesertsFakeWebService {
 List<Dessert> _desserts = kDesserts;
 
 List<Dessert> _dessertsX3 = _desserts.toList()
-  ..addAll(_desserts.map((i) => Dessert(i.name + ' x2', i.calories, i.fat,
-      i.carbs, i.protein, i.sodium, i.calcium, i.iron)))
-  ..addAll(_desserts.map((i) => Dessert(i.name + ' x3', i.calories, i.fat,
-      i.carbs, i.protein, i.sodium, i.calcium, i.iron)));
+  ..addAll(
+      _desserts.map((i) => Dessert(i.name + ' x2', i.calories, i.fat, i.carbs, i.protein, i.sodium, i.calcium, i.iron)))
+  ..addAll(_desserts
+      .map((i) => Dessert(i.name + ' x3', i.calories, i.fat, i.carbs, i.protein, i.sodium, i.calcium, i.iron)));
 
 class DataTable2Tests extends StatelessWidget {
-  const DataTable2Tests();
+  const DataTable2Tests({Key? key}) : super(key: key);
 
   static ScrollController sc = ScrollController();
   static PaginatorController pc = PaginatorController();
@@ -491,9 +460,6 @@ class DataTable2Tests extends StatelessWidget {
             // )
 
             buildAsyncPaginatedTable(
-                showPage: false,
-                showGeneration: false,
-                showPageSizeSelector: true,
-                controller: pc));
+                showPage: false, showGeneration: false, showPageSizeSelector: true, controller: pc));
   }
 }

@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 
 class PageNumber extends StatefulWidget {
   const PageNumber({
+    Key? key,
     required PaginatorController controller,
-  }) : _controller = controller;
+  })  : _controller = controller,
+        super(key: key);
 
   final PaginatorController _controller;
 
@@ -46,7 +48,7 @@ class _PageNumberState extends State<PageNumber> {
 }
 
 class CustomPager extends StatefulWidget {
-  const CustomPager(this.controller);
+  const CustomPager(this.controller, {Key? key}) : super(key: key);
 
   final PaginatorController controller;
 
@@ -68,21 +70,18 @@ class _CustomPagerState extends State<CustomPager> {
   @override
   Widget build(BuildContext context) {
     // skip this build pass
-    if (!widget.controller.isAttached) return SizedBox();
+    if (!widget.controller.isAttached) return const SizedBox();
     return Container(
       child: Theme(
           data: Theme.of(context).copyWith(
-              iconTheme: IconThemeData(color: Colors.white),
-              textTheme: TextTheme(subtitle1: TextStyle(color: Colors.white))),
+              iconTheme: const IconThemeData(color: Colors.white),
+              textTheme: const TextTheme(subtitle1: TextStyle(color: Colors.white))),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              IconButton(onPressed: () => widget.controller.goToFirstPage(), icon: const Icon(Icons.skip_previous)),
               IconButton(
-                  onPressed: () => widget.controller.goToFirstPage(),
-                  icon: Icon(Icons.skip_previous)),
-              IconButton(
-                  onPressed: () => widget.controller.goToPreviousPage(),
-                  icon: Icon(Icons.chevron_left_sharp)),
+                  onPressed: () => widget.controller.goToPreviousPage(), icon: const Icon(Icons.chevron_left_sharp)),
               DropdownButton<int>(
                   onChanged: (v) => widget.controller.setRowsPerPage(v!),
                   value: _availableSizes.contains(widget.controller.rowsPerPage)
@@ -96,11 +95,8 @@ class _CustomPagerState extends State<CustomPager> {
                           ))
                       .toList()),
               IconButton(
-                  onPressed: () => widget.controller.goToNextPage(),
-                  icon: Icon(Icons.chevron_right_sharp)),
-              IconButton(
-                  onPressed: () => widget.controller.goToLastPage(),
-                  icon: Icon(Icons.skip_next))
+                  onPressed: () => widget.controller.goToNextPage(), icon: const Icon(Icons.chevron_right_sharp)),
+              IconButton(onPressed: () => widget.controller.goToLastPage(), icon: const Icon(Icons.skip_next))
             ],
           )),
       width: 220,
@@ -112,7 +108,7 @@ class _CustomPagerState extends State<CustomPager> {
           BoxShadow(
             color: Colors.black.withAlpha(100),
             blurRadius: 4,
-            offset: Offset(4, 8), // Shadow position
+            offset: const Offset(4, 8), // Shadow position
           ),
         ],
       ),

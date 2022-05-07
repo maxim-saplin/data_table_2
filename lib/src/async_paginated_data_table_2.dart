@@ -42,7 +42,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
 
   SelectionState get selectionState => _selectionState;
 
-  Set<LocalKey> _selectionRowKeys = {};
+  final _selectionRowKeys = <LocalKey>{};
 
   /// Lists rows (their keys) which are treated as eitehr selected or deselected (see [selectionState])
   Set<LocalKey> get selectionRowKeys => _selectionRowKeys;
@@ -69,7 +69,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
     if (row is DataRow2) {
       return DataRow2(
           key: row.key,
-          selected: selected == null ? row.selected : selected,
+          selected: selected ?? row.selected,
           onSelectChanged: row.onSelectChanged,
           color: row.color,
           cells: row.cells,
@@ -80,7 +80,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
 
     return DataRow(
       key: row.key,
-      selected: selected == null ? row.selected : selected,
+      selected: selected ?? row.selected,
       onSelectChanged: row.onSelectChanged,
       color: row.color,
       cells: row.cells,
@@ -90,19 +90,15 @@ abstract class AsyncDataTableSource extends DataTableSource {
   // set row's seelcted property in accordance with included/excluded from selection items
   void _fixSelectedState(int rowIndex) {
     if (_selectionState == SelectionState.include) {
-      if (!_rows[rowIndex].selected &&
-          _selectionRowKeys.contains(_rows[rowIndex].key)) {
+      if (!_rows[rowIndex].selected && _selectionRowKeys.contains(_rows[rowIndex].key)) {
         _rows[rowIndex] = _clone(_rows[rowIndex], true);
-      } else if (_rows[rowIndex].selected &&
-          !_selectionRowKeys.contains(_rows[rowIndex].key)) {
+      } else if (_rows[rowIndex].selected && !_selectionRowKeys.contains(_rows[rowIndex].key)) {
         _rows[rowIndex] = _clone(_rows[rowIndex], false);
       }
     } else if (_selectionState == SelectionState.exclude) {
-      if (!_rows[rowIndex].selected &&
-          !_selectionRowKeys.contains(_rows[rowIndex].key)) {
+      if (!_rows[rowIndex].selected && !_selectionRowKeys.contains(_rows[rowIndex].key)) {
         _rows[rowIndex] = _clone(_rows[rowIndex], true);
-      } else if (_rows[rowIndex].selected &&
-          _selectionRowKeys.contains(_rows[rowIndex].key)) {
+      } else if (_rows[rowIndex].selected && _selectionRowKeys.contains(_rows[rowIndex].key)) {
         _rows[rowIndex] = _clone(_rows[rowIndex], false);
       }
     } else {
@@ -131,8 +127,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
       assert(r.key != null, 'Row key can\'t be null');
 
       if (r.key != null) {
-        if (_selectionState == SelectionState.none ||
-            _selectionState == SelectionState.include) {
+        if (_selectionState == SelectionState.none || _selectionState == SelectionState.include) {
           _selectionRowKeys.add(r.key!);
         } else {
           //exclude
@@ -141,8 +136,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
         if (!_rows[i].selected) _rows[i] = _clone(r, true);
       }
     }
-    if (_selectionState == SelectionState.none &&
-        _selectionRowKeys.isNotEmpty) {
+    if (_selectionState == SelectionState.none && _selectionRowKeys.isNotEmpty) {
       _selectionState = SelectionState.include;
     }
     notifyListeners();
@@ -160,8 +154,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
       var r = _rows[i];
       assert(r.key != null, 'Row key can\'t be null');
       if (r.key != null) {
-        if (_selectionState == SelectionState.none ||
-            _selectionState == SelectionState.include) {
+        if (_selectionState == SelectionState.none || _selectionState == SelectionState.include) {
           _selectionRowKeys.remove(r.key!);
         } else {
           // exclude
@@ -170,8 +163,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
         if (_rows[i].selected) _rows[i] = _clone(r, false);
       }
     }
-    if (_selectionState == SelectionState.include &&
-        _selectionRowKeys.isEmpty) {
+    if (_selectionState == SelectionState.include && _selectionRowKeys.isEmpty) {
       _selectionState = SelectionState.none;
     }
     notifyListeners();
@@ -224,19 +216,16 @@ abstract class AsyncDataTableSource extends DataTableSource {
 
   void _debounce(Function f, int milliseconds) {
     _debounceTimer?.cancel();
-    _debounceTimer =
-        Timer(Duration(milliseconds: milliseconds), f as void Function());
+    _debounceTimer = Timer(Duration(milliseconds: milliseconds), f as void Function());
   }
 
   // If previously loaded rows encompass requested row range and forceReload
   // is false than no actual fetch will happen
-  Future _fetchData(int startIndex, int count,
-      [bool forceReload = true]) async {
+  Future _fetchData(int startIndex, int count, [bool forceReload = true]) async {
     void fetch() async {
       try {
         _fetchOpp?.cancel();
-        _fetchOpp = CancelableOperation<AsyncRowsResponse>.fromFuture(
-            getRows(startIndex, count));
+        _fetchOpp = CancelableOperation<AsyncRowsResponse>.fromFuture(getRows(startIndex, count));
         var data = await _fetchOpp!.value;
         if (_fetchOpp!.isCanceled) return;
         //var data = await getRows(startIndex, count);
@@ -258,13 +247,8 @@ abstract class AsyncDataTableSource extends DataTableSource {
       notifyListeners();
     }
 
-    if (!_debouncable ||
-        _debounceTimer == null ||
-        (_debounceTimer != null && !_debounceTimer!.isActive)) {
-      if (!forceReload &&
-          _prevFetchSratIndex <= startIndex &&
-          _prevFetchCount >= count &&
-          _prevFetchCount > 0) {
+    if (!_debouncable || _debounceTimer == null || (_debounceTimer != null && !_debounceTimer!.isActive)) {
+      if (!forceReload && _prevFetchSratIndex <= startIndex && _prevFetchCount >= count && _prevFetchCount > 0) {
         _prevFetchSratIndex = startIndex;
         _prevFetchCount = count;
         _state = _SourceState.ok;
@@ -288,8 +272,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
 
   @override
   DataRow? getRow(int index) {
-    if (index - _firstRowAbsoluteIndex < 0 ||
-        index >= _rows.length + _firstRowAbsoluteIndex) return null;
+    if (index - _firstRowAbsoluteIndex < 0 || index >= _rows.length + _firstRowAbsoluteIndex) return null;
     index -= _firstRowAbsoluteIndex;
     _fixSelectedState(index);
 
@@ -414,8 +397,7 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
 enum _TableOperationInProgress { none, pageTo, pageSize }
 
 class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
-  _TableOperationInProgress _operationInProgress =
-      _TableOperationInProgress.none;
+  _TableOperationInProgress _operationInProgress = _TableOperationInProgress.none;
 
   int _rowIndexRequested = -1;
   int _rowsPerPageRequested = -1;
@@ -430,19 +412,17 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
       // if row requested happens to be outside the available range - change it to the last aligned page
       if (rowIndex > _rowCount - 1) {
         _rowIndexRequested = _lastAligned(rowIndex);
-      } else
-        _rowIndexRequested = align
-            ? _alignRowIndex(rowIndex, _effectiveRowsPerPage)
-            : math.max(math.min(_rowCount - 1, rowIndex), 0);
+      } else {
+        _rowIndexRequested =
+            align ? _alignRowIndex(rowIndex, _effectiveRowsPerPage) : math.max(math.min(_rowCount - 1, rowIndex), 0);
+      }
       var source = widget.source as AsyncDataTableSource;
       source._fetchData(_rowIndexRequested, _effectiveRowsPerPage);
     }
   }
 
   int _lastAligned(int rowIndex) {
-    return math.min(
-        ((rowIndex + 1) / _effectiveRowsPerPage).floor() *
-            _effectiveRowsPerPage,
+    return math.min(((rowIndex + 1) / _effectiveRowsPerPage).floor() * _effectiveRowsPerPage,
         (_rowCount / _effectiveRowsPerPage).floor() * _effectiveRowsPerPage);
   }
 
@@ -468,9 +448,7 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
         x,
         w.loading != null
             ? w.loading!
-            : Center(
-                child: SizedBox(
-                    width: 64, height: 16, child: LinearProgressIndicator())),
+            : const Center(child: SizedBox(width: 64, height: 16, child: LinearProgressIndicator())),
       ]);
     }
 
@@ -480,8 +458,7 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
       _showNothing = true;
       var x = super.build(context);
 
-      if (!widget.autoRowsToHeight)
-        source._fetchData(_firstRowIndex, _effectiveRowsPerPage);
+      if (!widget.autoRowsToHeight) source._fetchData(_firstRowIndex, _effectiveRowsPerPage);
 
       return x;
     } else if (source.state == _SourceState.loading) {
@@ -490,9 +467,7 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
       return loading();
     } else if (source.state == _SourceState.error) {
       _showNothing = true;
-      return w.errorBuilder != null
-          ? w.errorBuilder!(source._error)
-          : SizedBox();
+      return w.errorBuilder != null ? w.errorBuilder!(source._error) : const SizedBox();
     }
 
     // SourceState.ok
@@ -513,8 +488,7 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
       if (w.pageSyncApproach == PageSyncApproach.goToFirst) {
         pageTo(0);
       } else {
-        pageTo(((_rowCount - 1) / _effectiveRowsPerPage).floor() *
-            _effectiveRowsPerPage);
+        pageTo(((_rowCount - 1) / _effectiveRowsPerPage).floor() * _effectiveRowsPerPage);
       }
 
       return loading();

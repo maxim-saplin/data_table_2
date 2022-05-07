@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 /// Example without datasource
 class DataTable2SimpleDemo extends StatelessWidget {
-  const DataTable2SimpleDemo();
+  const DataTable2SimpleDemo({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class DataTable2SimpleDemo extends StatelessWidget {
           minWidth: 600,
           smRatio: 0.75,
           lmRatio: 1.5,
-          columns: [
+          columns: const [
             DataColumn2(
               size: ColumnSize.S,
               label: Text('Column A'),
