@@ -23,17 +23,35 @@ class DataColumn2 extends DataColumn {
   /// Creates the configuration for a column of a [DataTable2].
   ///
   /// The [label] argument must not be null.
-  const DataColumn2(
-      {required Widget label,
-      String? tooltip,
-      bool numeric = false,
-      Function(int, bool)? onSort,
-      this.size = ColumnSize.M})
-      : super(label: label, tooltip: tooltip, numeric: numeric, onSort: onSort);
+  const DataColumn2({
+    required Widget label,
+    String? tooltip,
+    bool numeric = false,
+    Function(int, bool)? onSort,
+    this.size = ColumnSize.M,
+    this.absoluteSize,
+    this.ratio,
+  }) :
+        // These asserts disable the const constructor for some odd reason, needs investigation.
+        // assert(
+        //   (absoluteSize != null && ratio == null) || (absoluteSize == null && ratio != null),
+        //   'Only one of absoluteSize or ratio can be set',
+        // ),
+        // assert(ratio == null || ratio > 0, 'ratio must be > 0'),
+        // assert(absoluteSize == null || absoluteSize > 0, 'absoluteSize must be > 0'),
+        super(label: label, tooltip: tooltip, numeric: numeric, onSort: onSort);
 
   /// Column sizes are determined based on available width by distributing it
   /// to individual columns accounting for their relative sizes (see [ColumnSize])
   final ColumnSize size;
+
+  //TODO: add test
+  /// Relative size of the column (if set, overrides [size])
+  final double? ratio;
+
+  //TODO: add test
+  /// Absolute size of the column in pixels (if set, overrides [size] and [ratio])
+  final double? absoluteSize;
 }
 
 /// Extension of standard [DataRow], adds row level tap events. Also there're
@@ -530,10 +548,16 @@ class DataTable2 extends DataTable {
         var w = columnWidth;
         var column = columns[i];
         if (column is DataColumn2) {
-          if (column.size == ColumnSize.S) {
-            w *= smRatio;
-          } else if (column.size == ColumnSize.L) {
-            w *= lmRatio;
+          if (column.absoluteSize != null) {
+            w = column.absoluteSize!;
+          } else if (column.ratio != null) {
+            w *= column.ratio!;
+          } else {
+            if (column.size == ColumnSize.S) {
+              w *= smRatio;
+            } else if (column.size == ColumnSize.L) {
+              w *= lmRatio;
+            }
           }
         }
         totalWidth += w;
