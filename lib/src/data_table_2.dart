@@ -358,7 +358,7 @@ class DataTable2 extends DataTable {
     required GestureLongPressCallback? onRowLongPress,
     required GestureTapCallback? onRowSecondaryTap,
     required GestureTapDownCallback? onRowSecondaryTapDown,
-    required VoidCallback onSelectChanged,
+    required VoidCallback? onSelectChanged,
     required MaterialStateProperty<Color?>? overlayColor,
   }) {
     final ThemeData themeData = Theme.of(context);
@@ -396,17 +396,15 @@ class DataTable2 extends DataTable {
         overlayColor: overlayColor,
         child: label,
       );
-    } else {
+    } else if (onRowTap != null || onSelectChanged != null) {
       label = GestureDetector(
         child: TableRowInkWell(
           child: label,
           overlayColor: overlayColor,
-          onTap: onRowTap == null
-              ? onSelectChanged
-              : () {
-                  onRowTap();
-                  onSelectChanged();
-                },
+          onTap: () {
+            onRowTap?.call();
+            onSelectChanged?.call();
+          },
           onDoubleTap: onRowDoubleTap,
           onLongPress: onRowLongPress,
         ),
@@ -643,7 +641,7 @@ class DataTable2 extends DataTable {
             onRowLongPress: row is DataRow2 ? row.onLongPress : null,
             onRowSecondaryTap: row is DataRow2 ? row.onSecondaryTap : null,
             onRowSecondaryTapDown: row is DataRow2 ? row.onSecondaryTapDown : null,
-            onSelectChanged: () => row.onSelectChanged != null ? row.onSelectChanged!(!row.selected) : null,
+            onSelectChanged: row.onSelectChanged != null ? () => row.onSelectChanged!(!row.selected) : null,
             overlayColor: row.color ?? effectiveDataRowColor,
           );
           rowIndex += 1;
