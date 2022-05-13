@@ -490,10 +490,30 @@ class DataTable2Tests extends StatelessWidget {
             //   ],
             // )
 
-            buildAsyncPaginatedTable(
-                showPage: false,
-                showGeneration: false,
-                showPageSizeSelector: true,
-                controller: pc));
+            // buildAsyncPaginatedTable(
+            //     showPage: false,
+            //     showGeneration: false,
+            //     showPageSizeSelector: true,
+            //     controller: pc)
+
+            buildTable(columns: <DataColumn2>[
+          DataColumn2(
+              label: const Text('Name'),
+              tooltip: 'Name',
+              fixedWidth: 100,
+              onSort: (int columnIndex, bool ascending) {}),
+          DataColumn2(
+            label: const Text('Calories'),
+            tooltip: 'Calories',
+            numeric: true,
+            onSort: (int columnIndex, bool ascending) {},
+          ),
+          DataColumn2(
+            label: const Text('Carbs'),
+            tooltip: 'Carbs',
+            numeric: true,
+            onSort: (int columnIndex, bool ascending) {},
+          ),
+        ]));
   }
 }
