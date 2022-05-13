@@ -2,12 +2,6 @@ import 'package:data_table_2/data_table_2.dart';
 
 import 'package:flutter/material.dart';
 
-// Copyright 2014 The Flutter Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-// Copyright 2021 Maxim Saplin - changes and modifications to original Flutter implementation of DataTable
-
 int _idCounter = 0;
 
 class Dessert {
@@ -496,24 +490,44 @@ class DataTable2Tests extends StatelessWidget {
             //     showPageSizeSelector: true,
             //     controller: pc)
 
-            buildTable(columns: <DataColumn2>[
-          DataColumn2(
+            //     buildTable(columns: <DataColumn2>[
+            //   DataColumn2(
+            //       label: const Text('Name'),
+            //       tooltip: 'Name',
+            //       fixedWidth: 100,
+            //       onSort: (int columnIndex, bool ascending) {}),
+            //   DataColumn2(
+            //     label: const Text('Calories'),
+            //     tooltip: 'Calories',
+            //     numeric: true,
+            //     onSort: (int columnIndex, bool ascending) {},
+            //   ),
+            //   DataColumn2(
+            //     label: const Text('Carbs'),
+            //     tooltip: 'Carbs',
+            //     numeric: true,
+            //     onSort: (int columnIndex, bool ascending) {},
+            //   ),
+            // ]));
+            DataTable2(
+          sortColumnIndex: 0,
+          sortAscending: true,
+          columns: <DataColumn2>[
+            DataColumn2(
               label: const Text('Name'),
               tooltip: 'Name',
-              fixedWidth: 100,
-              onSort: (int columnIndex, bool ascending) {}),
-          DataColumn2(
-            label: const Text('Calories'),
-            tooltip: 'Calories',
-            numeric: true,
-            onSort: (int columnIndex, bool ascending) {},
-          ),
-          DataColumn2(
-            label: const Text('Carbs'),
-            tooltip: 'Carbs',
-            numeric: true,
-            onSort: (int columnIndex, bool ascending) {},
-          ),
-        ]));
+              onSort: (int columnIndex, bool ascending) {},
+            ),
+          ],
+          rows: kDesserts.map<DataRow2>((Dessert dessert) {
+            return DataRow2(
+              cells: <DataCell>[
+                DataCell(
+                  Text(dessert.name),
+                ),
+              ],
+            );
+          }).toList(),
+        ));
   }
 }

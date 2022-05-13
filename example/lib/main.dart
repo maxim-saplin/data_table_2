@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'nav_helper.dart';
 import 'screens/async_paginated_data_table2.dart';
@@ -146,11 +145,6 @@ class MyApp extends StatelessWidget {
         '/datatable2tests': (context) =>
             _getScaffold(context, DataTable2Tests()),
       },
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
       supportedLocales: [
         const Locale('en', ''),
         const Locale('be', ''),
