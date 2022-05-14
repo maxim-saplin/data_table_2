@@ -1,7 +1,9 @@
 ## 2.2.2
 - Added PaginatedDataTable2.headingRowColor property
 - DataColumn2.fixedWidth - set column's width as absolute value
-- Upgrade to Flutter 3.0
+- Upgrade to Flutter 3.0 and Dart 2.17.0
+- Added flutter_lints
+- Changed constructors to inline super params
 
 ## 2.2.1
 - DataRow2.specificRowHeight allows overriding default row height for any row. The feature allows to have arbitrary heights of rows rather then same height for every row
