@@ -18,3 +18,4 @@ dev_dependencies:
     sdk: flutter
   vector_math: ^2.1.0
   intl: ^0.17.0
+  flutter_lints: ^2.0.1

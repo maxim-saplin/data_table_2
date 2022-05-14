@@ -1,6 +1,6 @@
 part of 'paginated_data_table_2.dart';
 
-enum _SourceState { none, ok, loading, error }
+enum SourceState { none, ok, loading, error }
 
 /// AsyncDataTableSource states:
 /// none -> toggle/selectAllOnPage -> include
@@ -22,9 +22,9 @@ class AsyncRowsResponse {
 /// Please overide [AsyncDataTableSource.getRows] and [DataTableSource.selectedRowCount]
 /// to make it legible as a data source.
 abstract class AsyncDataTableSource extends DataTableSource {
-  _SourceState _state = _SourceState.none;
+  SourceState _state = SourceState.none;
 
-  _SourceState get state => _state;
+  SourceState get state => _state;
 
   bool _debouncable = false;
 
@@ -42,7 +42,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
 
   SelectionState get selectionState => _selectionState;
 
-  Set<LocalKey> _selectionRowKeys = {};
+  final Set<LocalKey> _selectionRowKeys = {};
 
   /// Lists rows (their keys) which are treated as eitehr selected or deselected (see [selectionState])
   Set<LocalKey> get selectionRowKeys => _selectionRowKeys;
@@ -69,7 +69,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
     if (row is DataRow2) {
       return DataRow2(
           key: row.key,
-          selected: selected == null ? row.selected : selected,
+          selected: selected ?? row.selected,
           onSelectChanged: row.onSelectChanged,
           color: row.color,
           cells: row.cells,
@@ -80,7 +80,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
 
     return DataRow(
       key: row.key,
-      selected: selected == null ? row.selected : selected,
+      selected: selected ?? row.selected,
       onSelectChanged: row.onSelectChanged,
       color: row.color,
       cells: row.cells,
@@ -247,13 +247,13 @@ abstract class AsyncDataTableSource extends DataTableSource {
         _rows = [];
         _totalRows = 0;
         _firstRowAbsoluteIndex = 0;
-        _state = _SourceState.error;
+        _state = SourceState.error;
         _error = e;
         notifyListeners();
         return;
       }
 
-      _state = _SourceState.ok;
+      _state = SourceState.ok;
       _error = null;
       notifyListeners();
     }
@@ -267,13 +267,13 @@ abstract class AsyncDataTableSource extends DataTableSource {
           _prevFetchCount > 0) {
         _prevFetchSratIndex = startIndex;
         _prevFetchCount = count;
-        _state = _SourceState.ok;
+        _state = SourceState.ok;
         await Future(() => notifyListeners());
         return;
       }
       _prevFetchSratIndex = startIndex;
       _prevFetchCount = count;
-      _state = _SourceState.loading;
+      _state = SourceState.loading;
       await Future(() => notifyListeners());
     }
 
@@ -430,10 +430,11 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
       // if row requested happens to be outside the available range - change it to the last aligned page
       if (rowIndex > _rowCount - 1) {
         _rowIndexRequested = _lastAligned(rowIndex);
-      } else
+      } else {
         _rowIndexRequested = align
             ? _alignRowIndex(rowIndex, _effectiveRowsPerPage)
             : math.max(math.min(_rowCount - 1, rowIndex), 0);
+      }
       var source = widget.source as AsyncDataTableSource;
       source._fetchData(_rowIndexRequested, _effectiveRowsPerPage);
     }
@@ -468,7 +469,7 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
         x,
         w.loading != null
             ? w.loading!
-            : Center(
+            : const Center(
                 child: SizedBox(
                     width: 64, height: 16, child: LinearProgressIndicator())),
       ]);
@@ -476,23 +477,24 @@ class AsyncPaginatedDataTable2State extends PaginatedDataTable2State {
 
     source._debouncable = widget.autoRowsToHeight;
 
-    if (source.state == _SourceState.none) {
+    if (source.state == SourceState.none) {
       _showNothing = true;
       var x = super.build(context);
 
-      if (!widget.autoRowsToHeight)
+      if (!widget.autoRowsToHeight) {
         source._fetchData(_firstRowIndex, _effectiveRowsPerPage);
+      }
 
       return x;
-    } else if (source.state == _SourceState.loading) {
+    } else if (source.state == SourceState.loading) {
       //_showNothing = true;
 
       return loading();
-    } else if (source.state == _SourceState.error) {
+    } else if (source.state == SourceState.error) {
       _showNothing = true;
       return w.errorBuilder != null
           ? w.errorBuilder!(source._error)
-          : SizedBox();
+          : const SizedBox();
     }
 
     // SourceState.ok

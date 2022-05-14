@@ -919,10 +919,10 @@ void main() {
 
   testWidgets('DataTable2 custom horizontal padding - checkbox',
       (WidgetTester tester) async {
-    const double _defaultHorizontalMargin = 24.0;
-    const double _defaultColumnSpacing = 56.0;
-    const double _customHorizontalMargin = 10.0;
-    const double _customColumnSpacing = 15.0;
+    const double defaultHorizontalMargin = 24.0;
+    const double defaultColumnSpacing = 56.0;
+    const double customHorizontalMargin = 10.0;
+    const double customColumnSpacing = 15.0;
     Finder cellContent;
     Finder checkbox;
     Finder padding;
@@ -987,11 +987,11 @@ void main() {
     padding = find.ancestor(of: checkbox, matching: find.byType(Padding));
     expect(
       tester.getRect(checkbox).left - tester.getRect(padding).left,
-      _defaultHorizontalMargin,
+      defaultHorizontalMargin,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(checkbox).right,
-      _defaultHorizontalMargin / 2,
+      defaultHorizontalMargin / 2,
     );
 
     // default first column padding
@@ -1000,11 +1000,11 @@ void main() {
         'Frozen yogurt'); // DataTable2 wraps its DataCells in an Align widget
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _defaultHorizontalMargin / 2,
+      defaultHorizontalMargin / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _defaultColumnSpacing / 2,
+      defaultColumnSpacing / 2,
     );
 
     // default middle column padding
@@ -1012,11 +1012,11 @@ void main() {
     cellContent = find.widgetWithText(Align, '159');
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _defaultColumnSpacing / 2,
+      defaultColumnSpacing / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _defaultColumnSpacing / 2,
+      defaultColumnSpacing / 2,
     );
 
     // default last column padding
@@ -1024,11 +1024,11 @@ void main() {
     cellContent = find.widgetWithText(Align, '6.0');
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _defaultColumnSpacing / 2,
+      defaultColumnSpacing / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _defaultHorizontalMargin,
+      defaultHorizontalMargin,
     );
 
     Widget buildCustomTable({
@@ -1089,8 +1089,8 @@ void main() {
     await tester.pumpWidget(MaterialApp(
       home: Material(
           child: buildCustomTable(
-        horizontalMargin: _customHorizontalMargin,
-        columnSpacing: _customColumnSpacing,
+        horizontalMargin: customHorizontalMargin,
+        columnSpacing: customColumnSpacing,
       )),
     ));
 
@@ -1099,11 +1099,11 @@ void main() {
     padding = find.ancestor(of: checkbox, matching: find.byType(Padding));
     expect(
       tester.getRect(checkbox).left - tester.getRect(padding).left,
-      _customHorizontalMargin,
+      customHorizontalMargin,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(checkbox).right,
-      _customHorizontalMargin / 2,
+      customHorizontalMargin / 2,
     );
 
     // custom first column padding
@@ -1112,11 +1112,11 @@ void main() {
         'Frozen yogurt'); // DataTable2 wraps its DataCells in an Align widget
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _customHorizontalMargin / 2,
+      customHorizontalMargin / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _customColumnSpacing / 2,
+      customColumnSpacing / 2,
     );
 
     // custom middle column padding
@@ -1124,11 +1124,11 @@ void main() {
     cellContent = find.widgetWithText(Align, '159');
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _customColumnSpacing / 2,
+      customColumnSpacing / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _customColumnSpacing / 2,
+      customColumnSpacing / 2,
     );
 
     // custom last column padding
@@ -1136,20 +1136,20 @@ void main() {
     cellContent = find.widgetWithText(Align, '6.0');
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _customColumnSpacing / 2,
+      customColumnSpacing / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _customHorizontalMargin,
+      customHorizontalMargin,
     );
   });
 
   testWidgets('DataTable2 custom horizontal padding - no checkbox',
       (WidgetTester tester) async {
-    const double _defaultHorizontalMargin = 24.0;
-    const double _defaultColumnSpacing = 56.0;
-    const double _customHorizontalMargin = 10.0;
-    const double _customColumnSpacing = 15.0;
+    const double defaultHorizontalMargin = 24.0;
+    const double defaultColumnSpacing = 56.0;
+    const double customHorizontalMargin = 10.0;
+    const double customColumnSpacing = 15.0;
     Finder cellContent;
     Finder padding;
 
@@ -1212,11 +1212,11 @@ void main() {
         'Frozen yogurt'); // DataTable2 wraps its DataCells in an Align widget
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _defaultHorizontalMargin,
+      defaultHorizontalMargin,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _defaultColumnSpacing / 2,
+      defaultColumnSpacing / 2,
     );
 
     // default middle column padding
@@ -1224,11 +1224,11 @@ void main() {
     cellContent = find.widgetWithText(Align, '159');
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _defaultColumnSpacing / 2,
+      defaultColumnSpacing / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _defaultColumnSpacing / 2,
+      defaultColumnSpacing / 2,
     );
 
     // default last column padding
@@ -1236,11 +1236,11 @@ void main() {
     cellContent = find.widgetWithText(Align, '6.0');
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _defaultColumnSpacing / 2,
+      defaultColumnSpacing / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _defaultHorizontalMargin,
+      defaultHorizontalMargin,
     );
 
     Widget buildCustomTable({
@@ -1299,8 +1299,8 @@ void main() {
     await tester.pumpWidget(MaterialApp(
       home: Material(
           child: buildCustomTable(
-        horizontalMargin: _customHorizontalMargin,
-        columnSpacing: _customColumnSpacing,
+        horizontalMargin: customHorizontalMargin,
+        columnSpacing: customColumnSpacing,
       )),
     ));
 
@@ -1310,11 +1310,11 @@ void main() {
         'Frozen yogurt'); // DataTable2 wraps its DataCells in an Align widget
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _customHorizontalMargin,
+      customHorizontalMargin,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _customColumnSpacing / 2,
+      customColumnSpacing / 2,
     );
 
     // custom middle column padding
@@ -1322,11 +1322,11 @@ void main() {
     cellContent = find.widgetWithText(Align, '159');
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _customColumnSpacing / 2,
+      customColumnSpacing / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _customColumnSpacing / 2,
+      customColumnSpacing / 2,
     );
 
     // custom last column padding
@@ -1334,11 +1334,11 @@ void main() {
     cellContent = find.widgetWithText(Align, '6.0');
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _customColumnSpacing / 2,
+      customColumnSpacing / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _customHorizontalMargin,
+      customHorizontalMargin,
     );
   });
 
@@ -1448,7 +1448,7 @@ void main() {
     Widget buildTable({int? sortColumnIndex, bool sortEnabled = true}) {
       return DataTable2(sortColumnIndex: sortColumnIndex, columns: <DataColumn>[
         DataColumn(
-          label: Center(child: Text('Name')),
+          label: const Center(child: Text('Name')),
           tooltip: 'Name',
           onSort: sortEnabled ? (_, __) {} : null,
         ),
@@ -1530,7 +1530,7 @@ void main() {
           tooltip: 'Column1',
         ),
         DataColumn(
-          label: Center(child: Text('column2')),
+          label: const Center(child: Text('column2')),
           tooltip: 'Column2',
           onSort: (_, __) {},
         ),
@@ -1567,10 +1567,10 @@ void main() {
 
   testWidgets('DataRow2 renders default selected row colors',
       (WidgetTester tester) async {
-    final ThemeData _themeData = ThemeData.light();
+    final ThemeData themeData = ThemeData.light();
     Widget buildTable({bool selected = false}) {
       return MaterialApp(
-        theme: _themeData,
+        theme: themeData,
         home: Material(
           child: DataTable2(
             columns: const <DataColumn>[
@@ -1604,16 +1604,16 @@ void main() {
     await tester.pumpWidget(buildTable(selected: true));
     expect(
       lastTableRowBoxDecoration().color,
-      _themeData.colorScheme.primary.withOpacity(0.08),
+      themeData.colorScheme.primary.withOpacity(0.08),
     );
   });
 
   testWidgets('DataRow2 renders checkbox with colors from Theme',
       (WidgetTester tester) async {
-    final ThemeData _themeData = ThemeData.light();
+    final ThemeData themeData = ThemeData.light();
     Widget buildTable() {
       return MaterialApp(
-        theme: _themeData,
+        theme: themeData,
         home: Material(
           child: DataTable2(
             columns: const <DataColumn>[
@@ -1639,8 +1639,8 @@ void main() {
     }
 
     await tester.pumpWidget(buildTable());
-    expect(lastCheckbox().activeColor, _themeData.colorScheme.primary);
-    expect(lastCheckbox().checkColor, _themeData.colorScheme.onPrimary);
+    expect(lastCheckbox().activeColor, themeData.colorScheme.primary);
+    expect(lastCheckbox().checkColor, themeData.colorScheme.onPrimary);
   });
 
   testWidgets('DataRow2 renders custom colors when selected',
@@ -1661,8 +1661,9 @@ void main() {
               selected: selected,
               color: MaterialStateProperty.resolveWith<Color>(
                 (Set<MaterialState> states) {
-                  if (states.contains(MaterialState.selected))
+                  if (states.contains(MaterialState.selected)) {
                     return selectedColor;
+                  }
                   return defaultColor;
                 },
               ),
@@ -1715,8 +1716,9 @@ void main() {
             DataRow2(
               color: MaterialStateProperty.resolveWith<Color>(
                 (Set<MaterialState> states) {
-                  if (states.contains(MaterialState.disabled))
+                  if (states.contains(MaterialState.disabled)) {
                     return disabledColor;
+                  }
                   return defaultColor;
                 },
               ),

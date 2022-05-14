@@ -4,13 +4,15 @@
 
 // Copyright 2021 Maxim Saplin - changes and modifications to original Flutter implementation of DataTable
 
+// ignore_for_file: avoid_print
+
 import 'package:data_table_2/data_table_2.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Future wrapWidgetSetSurf(WidgetTester tester, Widget widget) async {
-  await tester.binding.setSurfaceSize(Size(1000, 200));
+  await tester.binding.setSurfaceSize(const Size(1000, 200));
   return tester.pumpWidget(MaterialApp(home: Material(child: widget)));
   // return tester.pumpWidget(
   //     MaterialApp(home: Material(child: widget)), Duration(seconds: 10));
@@ -223,7 +225,7 @@ PaginatedDataTable2 buildPaginatedTable(
     horizontalMargin: 24,
     showCheckboxColumn: true,
     wrapInCard: wrapInCard,
-    header: showHeader ? Text('Header') : null,
+    header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
     onSelectAll: (bool? value) {},
@@ -279,7 +281,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     showCheckboxColumn: showCheckboxColumn,
     wrapInCard: wrapInCard,
     initialFirstRowIndex: initialFirstRowIndex,
-    header: showHeader ? Text('Header') : null,
+    header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
     onSelectAll: (bool? value) {},
@@ -288,7 +290,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     controller: controller,
     rowsPerPage: rowsPerPage,
     loading: circularSpinner
-        ? Center(
+        ? const Center(
             child: SizedBox(
                 width: 32,
                 height: 32,
@@ -343,7 +345,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     notifyListeners();
   }
 
-  bool _empty = false;
+  final bool _empty = false;
   int? _errorCounter;
 
   final DesertsFakeWebService _repo = DesertsFakeWebService();
@@ -359,7 +361,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
 
   Future<int> getTotalRecors() {
     return Future<int>.delayed(
-        Duration(milliseconds: 0), () => _empty ? 0 : _dessertsX3.length);
+        const Duration(milliseconds: 0), () => _empty ? 0 : _dessertsX3.length);
   }
 
   @override
@@ -369,7 +371,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
       _errorCounter = _errorCounter! + 1;
 
       if (_errorCounter! % 2 == 1) {
-        await Future.delayed(Duration(milliseconds: 1000));
+        await Future.delayed(const Duration(milliseconds: 1000));
         throw 'Error #${((_errorCounter! - 1) / 2).round() + 1} has occured';
       }
     }
@@ -378,18 +380,19 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     assert(index >= 0);
 
     var x = _empty
-        ? await Future.delayed(Duration(milliseconds: 2000),
+        ? await Future.delayed(const Duration(milliseconds: 2000),
             () => DesertsFakeWebServiceResponse(0, []))
         : (_usefewerResultsAfterRefresh)
             ? await Future.delayed(
-                Duration(milliseconds: 2000),
+                const Duration(milliseconds: 2000),
                 () => DesertsFakeWebServiceResponse(
                     10, _dessertsX3.take(10).toList()))
             : await _repo.getData(startIndex, count, _sortColumn,
                 _sortAscending, noData, useKDeserts);
 
-    if (fewerResultsAfterRefresh && !_usefewerResultsAfterRefresh)
+    if (fewerResultsAfterRefresh && !_usefewerResultsAfterRefresh) {
       _usefewerResultsAfterRefresh = true;
+    }
 
     var r = AsyncRowsResponse(
         x.totalRecords,
@@ -398,8 +401,9 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
             key: ValueKey<int>(dessert.id),
             selected: dessert.selected,
             onSelectChanged: (value) {
-              if (value != null)
+              if (value != null) {
                 setRowSelection(ValueKey<int>(dessert.id), value);
+              }
             },
             cells: <DataCell>[
               DataCell(
@@ -489,7 +493,7 @@ class DesertsFakeWebService {
 List<Dessert> _desserts = kDesserts;
 
 List<Dessert> _dessertsX3 = _desserts.toList()
-  ..addAll(_desserts.map((i) => Dessert(i.name + ' x2', i.calories, i.fat,
+  ..addAll(_desserts.map((i) => Dessert('${i.name} x2', i.calories, i.fat,
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)))
-  ..addAll(_desserts.map((i) => Dessert(i.name + ' x3', i.calories, i.fat,
+  ..addAll(_desserts.map((i) => Dessert('${i.name} x3', i.calories, i.fat,
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)));

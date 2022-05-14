@@ -175,8 +175,9 @@ class DataTable2 extends DataTable {
       onSelectAll!(effectiveChecked);
     } else {
       for (final DataRow row in rows) {
-        if (row.onSelectChanged != null && row.selected != effectiveChecked)
+        if (row.onSelectChanged != null && row.selected != effectiveChecked) {
           row.onSelectChanged!(effectiveChecked);
+        }
       }
     }
   }
@@ -267,8 +268,8 @@ class DataTable2 extends DataTable {
     if (onRowTap != null) {
       contents = TableRowInkWell(
         onTap: onRowTap,
-        child: contents,
         overlayColor: overlayColor,
+        child: contents,
       );
     }
     return TableCell(
@@ -405,8 +406,9 @@ class DataTable2 extends DataTable {
       );
     } else {
       label = GestureDetector(
+        onSecondaryTap: onRowSecondaryTap,
+        onSecondaryTapDown: onRowSecondaryTapDown,
         child: TableRowInkWell(
-          child: label,
           overlayColor: overlayColor,
           onTap: onRowTap == null
               ? onSelectChanged
@@ -416,9 +418,8 @@ class DataTable2 extends DataTable {
                 },
           onDoubleTap: onRowDoubleTap,
           onLongPress: onRowLongPress,
+          child: label,
         ),
-        onSecondaryTap: onRowSecondaryTap,
-        onSecondaryTapDown: onRowSecondaryTapDown,
       );
     }
     return label;
@@ -438,8 +439,9 @@ class DataTable2 extends DataTable {
         dataRowColor ?? theme.dataTableTheme.dataRowColor;
     final defaultRowColor = MaterialStateProperty.resolveWith(
       (Set<MaterialState> states) {
-        if (states.contains(MaterialState.selected))
+        if (states.contains(MaterialState.selected)) {
           return theme.colorScheme.primary.withOpacity(0.08);
+        }
         return null;
       },
     );
@@ -610,9 +612,9 @@ class DataTable2 extends DataTable {
           Flexible(
               fit: FlexFit.loose,
               child: tableRows.isEmpty
-                  ? empty ?? SizedBox()
+                  ? empty ?? const SizedBox()
                   : SingleChildScrollView(
-                      child: marginedTable, controller: scrollController))
+                      controller: scrollController, child: marginedTable))
         ],
       );
 
@@ -629,7 +631,7 @@ class DataTable2 extends DataTable {
     });
 
     sw.stop();
-    if (!kReleaseMode) print('DataTable2 built: ${sw.elapsedMilliseconds}ms');
+    if (kDebugMode) print('DataTable2 built: ${sw.elapsedMilliseconds}ms');
     return builder;
   }
 
@@ -791,17 +793,15 @@ class DataTable2 extends DataTable {
               theme.dataTableTheme.dividerThickness ??
               _dividerThickness,
         );
-        final Border? _border = showBottomBorder
+        final Border border = showBottomBorder
             ? Border(bottom: borderSide)
             : Border(top: borderSide);
         return TableRow(
           key: rows[index].key,
-          decoration: border == null
-              ? BoxDecoration(
-                  border: _border,
-                  color: rowColor ?? defaultRowColor.resolve(states),
-                )
-              : null,
+          decoration: BoxDecoration(
+            border: border,
+            color: rowColor ?? defaultRowColor.resolve(states),
+          ),
           children:
               List<Widget>.filled(tableColumns.length, const _NullWidget()),
         );

@@ -29,7 +29,7 @@ void main() {
         source: source,
         rowsPerPage: 2,
         showFirstLastButtons: true,
-        loading: Center(
+        loading: const Center(
             child: SizedBox(
                 width: 32,
                 height: 32,
@@ -156,7 +156,7 @@ void main() {
         onPageChanged: (int rowIndex) {
           log.add('page-changed: $rowIndex');
         },
-        loading: Center(
+        loading: const Center(
             child: SizedBox(
                 width: 32,
                 height: 32,
@@ -231,7 +231,7 @@ void main() {
         header: const Text('HEADER'),
         source: DessertDataSourceAsync(useKDeserts: true),
         rowsPerPage: 8,
-        loading: Center(
+        loading: const Center(
             child: SizedBox(
                 width: 32,
                 height: 32,
@@ -271,7 +271,7 @@ void main() {
             actions: actions,
             source: DessertDataSourceAsync(allowSelection: true),
             showCheckboxColumn: true,
-            loading: Center(
+            loading: const Center(
                 child: SizedBox(
                     width: 32,
                     height: 32,
@@ -515,19 +515,19 @@ void main() {
 
   testWidgets('AsyncPaginatedDataTable2 custom horizontal padding - checkbox',
       (WidgetTester tester) async {
-    const double _defaultHorizontalMargin = 24.0;
-    const double _defaultColumnSpacing = 56.0;
-    const double _customHorizontalMargin = 10.0;
-    const double _customColumnSpacing = 15.0;
+    const double defaultHorizontalMargin = 24.0;
+    const double defaultColumnSpacing = 56.0;
+    const double customHorizontalMargin = 10.0;
+    const double customColumnSpacing = 15.0;
 
-    const double _width = 400;
-    const double _height = 400;
+    const double width = 400;
+    const double height = 400;
 
     final Size originalSize = binding.renderView.size;
 
     // Ensure the containing Card is small enough that we don't expand too
     // much, resulting in our custom margin being ignored.
-    await binding.setSurfaceSize(const Size(_width, _height));
+    await binding.setSurfaceSize(const Size(width, height));
 
     final DessertDataSourceAsync source =
         DessertDataSourceAsync(allowSelection: true, useKDeserts: true);
@@ -563,11 +563,11 @@ void main() {
     padding = find.ancestor(of: checkbox, matching: find.byType(Padding)).first;
     expect(
       tester.getRect(checkbox).left - tester.getRect(padding).left,
-      _defaultHorizontalMargin,
+      defaultHorizontalMargin,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(checkbox).right,
-      _defaultHorizontalMargin / 2,
+      defaultHorizontalMargin / 2,
     );
 
     // default first column padding
@@ -576,11 +576,11 @@ void main() {
         'Frozen yogurt'); // DataTable wraps its DataCells in an Align widget
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _defaultHorizontalMargin / 2,
+      defaultHorizontalMargin / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _defaultColumnSpacing / 2,
+      defaultColumnSpacing / 2,
     );
 
     // default middle column padding
@@ -588,11 +588,11 @@ void main() {
     cellContent = find.widgetWithText(Align, '159');
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _defaultColumnSpacing / 2,
+      defaultColumnSpacing / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _defaultColumnSpacing / 2,
+      defaultColumnSpacing / 2,
     );
 
     // default last column padding
@@ -618,8 +618,8 @@ void main() {
             DataColumn2(label: Text('Calories'), numeric: true),
             DataColumn2(label: Text('Generation')),
           ],
-          horizontalMargin: _customHorizontalMargin,
-          columnSpacing: _customColumnSpacing,
+          horizontalMargin: customHorizontalMargin,
+          columnSpacing: customColumnSpacing,
         ),
       ),
     ));
@@ -629,11 +629,11 @@ void main() {
     padding = find.ancestor(of: checkbox, matching: find.byType(Padding)).first;
     expect(
       tester.getRect(checkbox).left - tester.getRect(padding).left,
-      _customHorizontalMargin,
+      customHorizontalMargin,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(checkbox).right,
-      _customHorizontalMargin / 2,
+      customHorizontalMargin / 2,
     );
 
     // custom first column padding
@@ -642,11 +642,11 @@ void main() {
         'Frozen yogurt'); // DataTable wraps its DataCells in an Align widget
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _customHorizontalMargin / 2,
+      customHorizontalMargin / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _customColumnSpacing / 2,
+      customColumnSpacing / 2,
     );
 
     // custom middle column padding
@@ -654,11 +654,11 @@ void main() {
     cellContent = find.widgetWithText(Align, '159');
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _customColumnSpacing / 2,
+      customColumnSpacing / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _customColumnSpacing / 2,
+      customColumnSpacing / 2,
     );
 
     // Reset the surface size.
@@ -668,10 +668,10 @@ void main() {
   testWidgets(
       'AsyncPaginatedDataTable2 custom horizontal padding - no checkbox',
       (WidgetTester tester) async {
-    const double _defaultHorizontalMargin = 24.0;
-    const double _defaultColumnSpacing = 56.0;
-    const double _customHorizontalMargin = 10.0;
-    const double _customColumnSpacing = 15.0;
+    const double defaultHorizontalMargin = 24.0;
+    const double defaultColumnSpacing = 56.0;
+    const double customHorizontalMargin = 10.0;
+    const double customColumnSpacing = 15.0;
 
     final DessertDataSourceAsync source =
         DessertDataSourceAsync(useKDeserts: true);
@@ -708,11 +708,11 @@ void main() {
         'Frozen yogurt'); // DataTable wraps its DataCells in an Align widget
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _defaultHorizontalMargin / 2,
+      defaultHorizontalMargin / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _defaultColumnSpacing / 2,
+      defaultColumnSpacing / 2,
     );
 
     // default middle column padding
@@ -720,11 +720,11 @@ void main() {
     cellContent = find.widgetWithText(Align, '159');
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _defaultColumnSpacing / 2,
+      defaultColumnSpacing / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _defaultColumnSpacing / 2,
+      defaultColumnSpacing / 2,
     );
 
     // CUSTOM VALUES
@@ -747,8 +747,8 @@ void main() {
             DataColumn2(label: Text('Calories'), numeric: true),
             DataColumn2(label: Text('Generation')),
           ],
-          horizontalMargin: _customHorizontalMargin,
-          columnSpacing: _customColumnSpacing,
+          horizontalMargin: customHorizontalMargin,
+          columnSpacing: customColumnSpacing,
         ),
       ),
     ));
@@ -760,11 +760,11 @@ void main() {
     cellContent = find.widgetWithText(Align, 'Frozen yogurt');
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _customHorizontalMargin / 2,
+      customHorizontalMargin / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _customColumnSpacing / 2,
+      customColumnSpacing / 2,
     );
 
     // custom middle column padding
@@ -772,11 +772,11 @@ void main() {
     cellContent = find.widgetWithText(Align, '159');
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _customColumnSpacing / 2,
+      customColumnSpacing / 2,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(cellContent).right,
-      _customColumnSpacing / 2,
+      customColumnSpacing / 2,
     );
   });
 
@@ -789,9 +789,9 @@ void main() {
     // Card. The DataTable can be larger than its containing Card, but this test
     // is only concerned with ensuring the DataTable is at least as wide as the
     // Card.
-    const double _originalWidth = 800;
-    const double _expandedWidth = 1600;
-    const double _height = 400;
+    const double originalWidth = 800;
+    const double expandedWidth = 1600;
+    const double height = 400;
 
     final Size originalSize = binding.renderView.size;
 
@@ -816,9 +816,9 @@ void main() {
           ),
         );
 
-    await binding.setSurfaceSize(const Size(_originalWidth, _height));
+    await binding.setSurfaceSize(const Size(originalWidth, height));
     await tester.pumpWidget(buildWidget());
-    await tester.pumpAndSettle(Duration(minutes: 1));
+    await tester.pumpAndSettle(const Duration(minutes: 1));
 
     // // Widths should be equal before we resize...
     // expect(
@@ -828,9 +828,9 @@ void main() {
     //         .size
     //         .width));
 
-    await binding.setSurfaceSize(const Size(_expandedWidth, _height));
+    await binding.setSurfaceSize(const Size(expandedWidth, height));
     await tester.pumpWidget(buildWidget());
-    await tester.pumpAndSettle(Duration(minutes: 1));
+    await tester.pumpAndSettle(const Duration(minutes: 1));
 
     final double cardWidth =
         tester.renderObject<RenderBox>(find.byType(Card).first).size.width;
@@ -841,7 +841,7 @@ void main() {
     //     moreOrLessEquals(cardWidth));
 
     // Double check to ensure we actually resized the surface properly.
-    expect(cardWidth, moreOrLessEquals(_expandedWidth));
+    expect(cardWidth, moreOrLessEquals(expandedWidth));
 
     // Reset the surface size.
     await binding.setSurfaceSize(originalSize);
@@ -915,17 +915,17 @@ void main() {
   testWidgets(
       'AsyncPaginatedDataTable2 custom checkboxHorizontalMargin properly applied',
       (WidgetTester tester) async {
-    const double _customCheckboxHorizontalMargin = 15.0;
-    const double _customHorizontalMargin = 10.0;
+    const double customCheckboxHorizontalMargin = 15.0;
+    const double customHorizontalMargin = 10.0;
 
-    const double _width = 400;
-    const double _height = 400;
+    const double width = 400;
+    const double height = 400;
 
     final Size originalSize = binding.renderView.size;
 
     // Ensure the containing Card is small enough that we don't expand too
     // much, resulting in our custom margin being ignored.
-    await binding.setSurfaceSize(const Size(_width, _height));
+    await binding.setSurfaceSize(const Size(width, height));
 
     final DessertDataSourceAsync source =
         DessertDataSourceAsync(allowSelection: true, useKDeserts: true);
@@ -953,8 +953,8 @@ void main() {
             DataColumn2(label: Text('Calories'), numeric: true),
             DataColumn2(label: Text('Generation')),
           ],
-          horizontalMargin: _customHorizontalMargin,
-          checkboxHorizontalMargin: _customCheckboxHorizontalMargin,
+          horizontalMargin: customHorizontalMargin,
+          checkboxHorizontalMargin: customCheckboxHorizontalMargin,
         ),
       ),
     ));
@@ -966,11 +966,11 @@ void main() {
     padding = find.ancestor(of: checkbox, matching: find.byType(Padding)).first;
     expect(
       tester.getRect(checkbox).left - tester.getRect(padding).left,
-      _customCheckboxHorizontalMargin,
+      customCheckboxHorizontalMargin,
     );
     expect(
       tester.getRect(padding).right - tester.getRect(checkbox).right,
-      _customCheckboxHorizontalMargin / 2, // half of margin goes to data cell
+      customCheckboxHorizontalMargin / 2, // half of margin goes to data cell
     );
 
     // Custom first column padding.
@@ -979,7 +979,7 @@ void main() {
         'Frozen yogurt'); // DataTable wraps its DataCells in an Align widget.
     expect(
       tester.getRect(cellContent).left - tester.getRect(padding).left,
-      _customHorizontalMargin / 2,
+      customHorizontalMargin / 2,
     );
 
     // Reset the surface size.

@@ -608,8 +608,9 @@ abstract class _TestRecordingCanvasMatcher extends Matcher {
     if (!result) {
       if (canvas.invocations.isNotEmpty) {
         description.write('The complete display list was:');
-        for (final RecordedInvocation call in canvas.invocations)
+        for (final RecordedInvocation call in canvas.invocations) {
           description.write('\n  * $call');
+        }
       }
       matchState[this] = '$prefixMessage\n$description';
     }
@@ -722,8 +723,9 @@ class _TestRecordingCanvasPaintsAssertionMatcher extends Matcher {
     if (!result) {
       if (canvas.invocations.isNotEmpty) {
         description.write('The complete display list was:');
-        for (final RecordedInvocation call in canvas.invocations)
+        for (final RecordedInvocation call in canvas.invocations) {
           description.write('\n  * $call');
+        }
       }
       matchState[this] = '$prefixMessage\n$description';
     }
@@ -985,8 +987,9 @@ class _TestRecordingCanvasPatternMatcher extends _TestRecordingCanvasMatcher
 
   @override
   Description describe(Description description) {
-    if (_predicates.isEmpty)
+    if (_predicates.isEmpty) {
       return description.add('An object or closure and a paint pattern.');
+    }
     description.add('Object or closure painting: ');
     return description.addAll(
       '',
@@ -1042,7 +1045,7 @@ abstract class _PaintPredicate {
     while (!call.current.invocation.isMethod ||
         call.current.invocation.memberName != symbol) {
       others += 1;
-      if (!call.moveNext())
+      if (!call.moveNext()) {
         throw _MismatchedCall(
           'It called $others other method${others == 1 ? "" : "s"} on the canvas, '
               'the first of which was $firstCall, but did not '
@@ -1051,6 +1054,7 @@ abstract class _PaintPredicate {
               'was expected, $firstCall, was called with the following stack:',
           firstCall,
         );
+      }
     }
   }
 
@@ -1088,8 +1092,9 @@ abstract class _DrawCommandPaintPredicate extends _PaintPredicate {
     checkMethod(call, symbol);
     final int actualArgumentCount =
         call.current.invocation.positionalArguments.length;
-    if (actualArgumentCount != argumentCount)
+    if (actualArgumentCount != argumentCount) {
       throw 'It called $methodName with $actualArgumentCount argument${actualArgumentCount == 1 ? "" : "s"}; expected $argumentCount.';
+    }
     verifyArguments(call.current.invocation.positionalArguments);
     call.moveNext();
   }
@@ -1098,19 +1103,23 @@ abstract class _DrawCommandPaintPredicate extends _PaintPredicate {
   @mustCallSuper
   void verifyArguments(List<dynamic> arguments) {
     final Paint paintArgument = arguments[paintArgumentIndex] as Paint;
-    if (color != null && paintArgument.color != color)
+    if (color != null && paintArgument.color != color) {
       throw 'It called $methodName with a paint whose color, ${paintArgument.color}, was not exactly the expected color ($color).';
-    if (strokeWidth != null && paintArgument.strokeWidth != strokeWidth)
+    }
+    if (strokeWidth != null && paintArgument.strokeWidth != strokeWidth) {
       throw 'It called $methodName with a paint whose strokeWidth, ${paintArgument.strokeWidth}, was not exactly the expected strokeWidth ($strokeWidth).';
+    }
     if (hasMaskFilter != null &&
         (paintArgument.maskFilter != null) != hasMaskFilter) {
-      if (hasMaskFilter!)
+      if (hasMaskFilter!) {
         throw 'It called $methodName with a paint that did not have a mask filter, despite expecting one.';
-      else
+      } else {
         throw 'It called $methodName with a paint that did have a mask filter, despite not expecting one.';
+      }
     }
-    if (style != null && paintArgument.style != style)
+    if (style != null && paintArgument.style != style) {
       throw 'It called $methodName with a paint whose style, ${paintArgument.style}, was not exactly the expected style ($style).';
+    }
   }
 
   @override
@@ -1127,8 +1136,9 @@ abstract class _DrawCommandPaintPredicate extends _PaintPredicate {
   void debugFillDescription(List<String> description) {
     if (color != null) description.add('$color');
     if (strokeWidth != null) description.add('strokeWidth: $strokeWidth');
-    if (hasMaskFilter != null)
+    if (hasMaskFilter != null) {
       description.add(hasMaskFilter! ? 'a mask filter' : 'no mask filter');
+    }
     if (style != null) description.add('$style');
   }
 }
@@ -1154,8 +1164,9 @@ class _OneParameterPaintPredicate<T> extends _DrawCommandPaintPredicate {
   void verifyArguments(List<dynamic> arguments) {
     super.verifyArguments(arguments);
     final T actual = arguments[0] as T;
-    if (expected != null && actual != expected)
+    if (expected != null && actual != expected) {
       throw 'It called $methodName with $T, $actual, which was not exactly the expected $T ($expected).';
+    }
   }
 
   @override
@@ -1195,11 +1206,13 @@ class _TwoParameterPaintPredicate<T1, T2> extends _DrawCommandPaintPredicate {
   void verifyArguments(List<dynamic> arguments) {
     super.verifyArguments(arguments);
     final T1 actual1 = arguments[0] as T1;
-    if (expected1 != null && actual1 != expected1)
+    if (expected1 != null && actual1 != expected1) {
       throw 'It called $methodName with its first argument (a $T1), $actual1, which was not exactly the expected $T1 ($expected1).';
+    }
     final T2 actual2 = arguments[1] as T2;
-    if (expected2 != null && actual2 != expected2)
+    if (expected2 != null && actual2 != expected2) {
       throw 'It called $methodName with its second argument (a $T2), $actual2, which was not exactly the expected $T2 ($expected2).';
+    }
   }
 
   @override
@@ -1341,17 +1354,21 @@ class _CirclePaintPredicate extends _DrawCommandPaintPredicate {
     final Offset pointArgument = arguments[0] as Offset;
     if (x != null && y != null) {
       final Offset point = Offset(x!, y!);
-      if (point != pointArgument)
+      if (point != pointArgument) {
         throw 'It called $methodName with a center coordinate, $pointArgument, which was not exactly the expected coordinate ($point).';
+      }
     } else {
-      if (x != null && pointArgument.dx != x)
+      if (x != null && pointArgument.dx != x) {
         throw 'It called $methodName with a center coordinate, $pointArgument, whose x-coordinate not exactly the expected coordinate (${x!.toStringAsFixed(1)}).';
-      if (y != null && pointArgument.dy != y)
+      }
+      if (y != null && pointArgument.dy != y) {
         throw 'It called $methodName with a center coordinate, $pointArgument, whose y-coordinate not exactly the expected coordinate (${y!.toStringAsFixed(1)}).';
+      }
     }
     final double radiusArgument = arguments[1] as double;
-    if (radius != null && radiusArgument != radius)
+    if (radius != null && radiusArgument != radius) {
       throw 'It called $methodName with radius, ${radiusArgument.toStringAsFixed(1)}, which was not exactly the expected radius (${radius!.toStringAsFixed(1)}).';
+    }
   }
 
   @override
@@ -1395,14 +1412,16 @@ class _PathPaintPredicate extends _DrawCommandPaintPredicate {
     final Path pathArgument = arguments[0] as Path;
     if (includes != null) {
       for (final Offset offset in includes!) {
-        if (!pathArgument.contains(offset))
+        if (!pathArgument.contains(offset)) {
           throw 'It called $methodName with a path that unexpectedly did not contain $offset.';
+        }
       }
     }
     if (excludes != null) {
       for (final Offset offset in excludes!) {
-        if (pathArgument.contains(offset))
+        if (pathArgument.contains(offset)) {
           throw 'It called $methodName with a path that unexpectedly contained $offset.';
+        }
       }
     }
   }
@@ -1445,8 +1464,9 @@ class _LinePaintPredicate extends _DrawCommandPaintPredicate {
   @override
   void verifyArguments(List<dynamic> arguments) {
     super.verifyArguments(arguments); // Checks the 3rd argument, a Paint
-    if (arguments.length != 3)
+    if (arguments.length != 3) {
       throw 'It called $methodName with ${arguments.length} arguments; expected 3.';
+    }
     final Offset p1Argument = arguments[0] as Offset;
     final Offset p2Argument = arguments[1] as Offset;
     if (p1 != null && p1Argument != p1) {
@@ -1502,31 +1522,37 @@ class _ShadowPredicate extends _PaintPredicate {
 
   @protected
   void verifyArguments(List<dynamic> arguments) {
-    if (arguments.length != 4)
+    if (arguments.length != 4) {
       throw 'It called $methodName with ${arguments.length} arguments; expected 4.';
+    }
     final Path pathArgument = arguments[0] as Path;
     if (includes != null) {
       for (final Offset offset in includes!) {
-        if (!pathArgument.contains(offset))
+        if (!pathArgument.contains(offset)) {
           throw 'It called $methodName with a path that unexpectedly did not contain $offset.';
+        }
       }
     }
     if (excludes != null) {
       for (final Offset offset in excludes!) {
-        if (pathArgument.contains(offset))
+        if (pathArgument.contains(offset)) {
           throw 'It called $methodName with a path that unexpectedly contained $offset.';
+        }
       }
     }
     final Color actualColor = arguments[1] as Color;
-    if (color != null && actualColor != color)
+    if (color != null && actualColor != color) {
       throw 'It called $methodName with a color, $actualColor, which was not exactly the expected color ($color).';
+    }
     final double actualElevation = arguments[2] as double;
-    if (elevation != null && actualElevation != elevation)
+    if (elevation != null && actualElevation != elevation) {
       throw 'It called $methodName with an elevation, $actualElevation, which was not exactly the expected value ($elevation).';
+    }
     final bool actualTransparentOccluder = arguments[3] as bool;
     if (transparentOccluder != null &&
-        actualTransparentOccluder != transparentOccluder)
+        actualTransparentOccluder != transparentOccluder) {
       throw 'It called $methodName with a transparentOccluder value, $actualTransparentOccluder, which was not exactly the expected value ($transparentOccluder).';
+    }
   }
 
   @override
@@ -1547,8 +1573,9 @@ class _ShadowPredicate extends _PaintPredicate {
     }
     if (color != null) description.add('$color');
     if (elevation != null) description.add('elevation: $elevation');
-    if (transparentOccluder != null)
+    if (transparentOccluder != null) {
       description.add('transparentOccluder: $transparentOccluder');
+    }
   }
 
   @override
@@ -1589,18 +1616,22 @@ class _DrawImagePaintPredicate extends _DrawCommandPaintPredicate {
   void verifyArguments(List<dynamic> arguments) {
     super.verifyArguments(arguments);
     final ui.Image imageArgument = arguments[0] as ui.Image;
-    if (image != null && !image!.isCloneOf(imageArgument))
+    if (image != null && !image!.isCloneOf(imageArgument)) {
       throw 'It called $methodName with an image, $imageArgument, which was not exactly the expected image ($image).';
+    }
     final Offset pointArgument = arguments[0] as Offset;
     if (x != null && y != null) {
       final Offset point = Offset(x!, y!);
-      if (point != pointArgument)
+      if (point != pointArgument) {
         throw 'It called $methodName with an offset coordinate, $pointArgument, which was not exactly the expected coordinate ($point).';
+      }
     } else {
-      if (x != null && pointArgument.dx != x)
+      if (x != null && pointArgument.dx != x) {
         throw 'It called $methodName with an offset coordinate, $pointArgument, whose x-coordinate not exactly the expected coordinate (${x!.toStringAsFixed(1)}).';
-      if (y != null && pointArgument.dy != y)
+      }
+      if (y != null && pointArgument.dy != y) {
         throw 'It called $methodName with an offset coordinate, $pointArgument, whose y-coordinate not exactly the expected coordinate (${y!.toStringAsFixed(1)}).';
+      }
     }
   }
 
@@ -1645,14 +1676,17 @@ class _DrawImageRectPaintPredicate extends _DrawCommandPaintPredicate {
   void verifyArguments(List<dynamic> arguments) {
     super.verifyArguments(arguments);
     final ui.Image imageArgument = arguments[0] as ui.Image;
-    if (image != null && !image!.isCloneOf(imageArgument))
+    if (image != null && !image!.isCloneOf(imageArgument)) {
       throw 'It called $methodName with an image, $imageArgument, which was not exactly the expected image ($image).';
+    }
     final Rect sourceArgument = arguments[1] as Rect;
-    if (source != null && sourceArgument != source)
+    if (source != null && sourceArgument != source) {
       throw 'It called $methodName with a source rectangle, $sourceArgument, which was not exactly the expected rectangle ($source).';
+    }
     final Rect destinationArgument = arguments[2] as Rect;
-    if (destination != null && destinationArgument != destination)
+    if (destination != null && destinationArgument != destination) {
       throw 'It called $methodName with a destination rectangle, $destinationArgument, which was not exactly the expected rectangle ($destination).';
+    }
   }
 
   @override
@@ -1674,8 +1708,9 @@ class _SomethingPaintPredicate extends _PaintPredicate {
     RecordedInvocation currentCall;
     do {
       currentCall = call.current;
-      if (!currentCall.invocation.isMethod)
+      if (!currentCall.invocation.isMethod) {
         throw 'It called $currentCall, which was not a method, when the paint pattern expected a method call';
+      }
       call.moveNext();
     } while (!_runPredicate(currentCall.invocation.memberName,
         currentCall.invocation.positionalArguments));
@@ -1703,8 +1738,9 @@ class _EverythingPaintPredicate extends _PaintPredicate {
   void match(Iterator<RecordedInvocation> call) {
     while (call.moveNext()) {
       final RecordedInvocation currentCall = call.current;
-      if (!currentCall.invocation.isMethod)
+      if (!currentCall.invocation.isMethod) {
         throw 'It called $currentCall, which was not a method, when the paint pattern expected a method call';
+      }
       if (!_runPredicate(currentCall.invocation.memberName,
           currentCall.invocation.positionalArguments)) return;
     }
@@ -1733,8 +1769,10 @@ class _FunctionPaintPredicate extends _PaintPredicate {
   @override
   void match(Iterator<RecordedInvocation> call) {
     checkMethod(call, symbol);
-    if (call.current.invocation.positionalArguments.length != arguments.length)
+    if (call.current.invocation.positionalArguments.length !=
+        arguments.length) {
       throw 'It called ${_symbolName(symbol)} with ${call.current.invocation.positionalArguments.length} arguments; expected ${arguments.length}.';
+    }
     for (int index = 0; index < arguments.length; index += 1) {
       final dynamic actualArgument =
           call.current.invocation.positionalArguments[index];
@@ -1765,12 +1803,15 @@ class _SaveRestorePairPaintPredicate extends _PaintPredicate {
     checkMethod(call, #save);
     int depth = 1;
     while (depth > 0) {
-      if (!call.moveNext())
+      if (!call.moveNext()) {
         throw 'It did not have a matching restore() for the save() that was found where $this was expected.';
+      }
       if (call.current.invocation.isMethod) {
-        if (call.current.invocation.memberName == #save)
+        if (call.current.invocation.memberName == #save) {
           depth += 1;
-        else if (call.current.invocation.memberName == #restore) depth -= 1;
+        } else if (call.current.invocation.memberName == #restore) {
+          depth -= 1;
+        }
       }
     }
     call.moveNext();

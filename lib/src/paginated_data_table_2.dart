@@ -49,8 +49,9 @@ class PaginatorController extends ChangeNotifier {
   }
 
   void _checkAttachedAndThrow() {
-    if (_state == null)
+    if (_state == null) {
       throw 'PaginatorController is not attached to any PaginatedDataTable2 and can\'t be used';
+    }
   }
 
   void _assertIfNotAttached() {
@@ -201,8 +202,9 @@ class PaginatedDataTable2 extends StatefulWidget {
             (sortColumnIndex >= 0 && sortColumnIndex < columns.length)),
         assert(rowsPerPage > 0),
         assert(() {
-          if (onRowsPerPageChanged != null && autoRowsToHeight == false)
+          if (onRowsPerPageChanged != null && autoRowsToHeight == false) {
             assert(availableRowsPerPage.contains(rowsPerPage));
+          }
           return true;
         }()),
         super(key: key);
@@ -430,9 +432,10 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     // Notifying listeners in the next message queue pass
     // Doing that in the current call somehow messes with update
     // lifecycle when using async table
-    if (widget.controller != null)
-      Future.delayed(Duration(milliseconds: 0),
+    if (widget.controller != null) {
+      Future.delayed(const Duration(milliseconds: 0),
           () => widget.controller?._notifyListeners());
+    }
     //widget.controller?._notifyListeners();
     super.setState(fn);
   }
@@ -495,8 +498,10 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           ? _alignRowIndex(rowIndex, _effectiveRowsPerPage)
           : math.max(math.min(_rowCount - 1, rowIndex), 0);
     });
-    if ((widget.onPageChanged != null) && (oldFirstRowIndex != _firstRowIndex))
+    if ((widget.onPageChanged != null) &&
+        (oldFirstRowIndex != _firstRowIndex)) {
       widget.onPageChanged!(_firstRowIndex);
+    }
   }
 
   DataRow _getBlankRowFor(int index) {
@@ -534,8 +539,9 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   List<DataRow> _getRows(int firstRowIndex, int rowsPerPage) {
     final List<DataRow> result = <DataRow>[];
 
-    if ((widget.empty != null && widget.source.rowCount < 1) || _showNothing)
-      return result; // If empty placeholder is provided - don't create blank rows
+    if ((widget.empty != null && widget.source.rowCount < 1) || _showNothing) {
+      return result;
+    } // If empty placeholder is provided - don't create blank rows
 
     final int nextPageFirstRowIndex = firstRowIndex + rowsPerPage;
     bool haveProgressIndicator = false;
@@ -790,10 +796,11 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           widget.onRowsPerPageChanged!(r);
         }
       };
-      if (wrapInSetState)
+      if (wrapInSetState) {
         setState(f);
-      else
+      } else {
         f();
+      }
     }
   }
 
