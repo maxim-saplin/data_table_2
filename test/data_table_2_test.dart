@@ -595,8 +595,8 @@ void main() {
       home: Material(child: buildTable(sortAscending: true)),
     ));
     // The `tester.widget` ensures that there is exactly one upward arrow.
-    Transform transformOfArrow = tester
-        .widget<Transform>(find.widgetWithIcon(Transform, Icons.arrow_upward));
+    Transform transformOfArrow = tester.widget<Transform>(
+        find.widgetWithIcon(Transform, Icons.arrow_upward).first);
     expect(
         transformOfArrow.transform.getRotation(), equals(Matrix3.identity()));
 
@@ -606,8 +606,8 @@ void main() {
     ));
     await tester.pumpAndSettle();
     // The `tester.widget` ensures that there is exactly one upward arrow.
-    transformOfArrow = tester
-        .widget<Transform>(find.widgetWithIcon(Transform, Icons.arrow_upward));
+    transformOfArrow = tester.widget<Transform>(
+        find.widgetWithIcon(Transform, Icons.arrow_upward).first);
     expect(transformOfArrow.transform.getRotation(),
         equals(Matrix3.rotationZ(math.pi)));
   });
@@ -839,30 +839,45 @@ void main() {
   });
 
   testWidgets('DataColumn2 fixed width', (WidgetTester tester) async {
-    Widget buildCustomTable({
-      double? dataRowHeight,
-      double? specificRowHeight,
-    }) {
-      return DataTable2(
+    // The finder matches with the Container of the cell content, as well as the
+    // Container wrapping the whole table. The first one is used to test row
+    // heights.
+    Finder findFirstContainerFor(String text) =>
+        find.widgetWithText(Container, text).first;
+
+    await tester.pumpWidget(MaterialApp(
+      home: Material(
+          child: DataTable2(
+        showCheckboxColumn: true,
         onSelectAll: (bool? value) {},
-        dataRowHeight: dataRowHeight,
+        horizontalMargin: 20,
         columns: <DataColumn>[
           const DataColumn2(
               label: Text('Name'), tooltip: 'Name', fixedWidth: 100),
           DataColumn2(
             label: const Text('Calories'),
             tooltip: 'Calories',
-            size: ColumnSize.L,
             numeric: true,
             onSort: (int columnIndex, bool ascending) {},
           ),
+          DataColumn2(
+            label: const Text('Carbs'),
+            tooltip: 'Carbs',
+            numeric: true,
+            fixedWidth: 50,
+            onSort: (int columnIndex, bool ascending) {},
+          ),
+          DataColumn2(
+            label: const Text('Fat'),
+            tooltip: 'Fat',
+            fixedWidth: 100,
+            onSort: (int columnIndex, bool ascending) {},
+          )
         ],
         rows: kDesserts.map<DataRow2>((Dessert dessert) {
           return DataRow2(
             key: ValueKey<String>(dessert.name),
             onSelectChanged: (bool? selected) {},
-            specificRowHeight:
-                dessert.name == 'Donut' ? specificRowHeight : null,
             cells: <DataCell>[
               DataCell(
                 Text(dessert.name),
@@ -872,46 +887,34 @@ void main() {
                 showEditIcon: true,
                 onTap: () {},
               ),
+              DataCell(
+                Text('${dessert.carbs}'),
+                showEditIcon: true,
+                onTap: () {},
+              ),
+              DataCell(
+                Text('${dessert.fat}'),
+                showEditIcon: true,
+                onTap: () {},
+              ),
             ],
           );
         }).toList(),
-      );
-    }
-
-    // The finder matches with the Container of the cell content, as well as the
-    // Container wrapping the whole table. The first one is used to test row
-    // heights.
-    Finder findFirstContainerFor(String text) =>
-        find.widgetWithText(Container, text).first;
-
-    // DEFAULT VALUES
-    await tester.pumpWidget(MaterialApp(
-      home: Material(child: buildCustomTable()),
+      )),
     ));
-    expect(tester.getSize(findFirstContainerFor('Frozen yogurt')).width, 100);
-    expect(tester.getSize(findFirstContainerFor('Donut')).width, 100);
 
-    // CUSTOM VALUES
-    await tester.pumpWidget(MaterialApp(
-      home: Material(child: buildCustomTable(dataRowHeight: 50)),
-    ));
-    expect(tester.getSize(findFirstContainerFor('Frozen yogurt')).height, 50.0);
-    expect(tester.getSize(findFirstContainerFor('Donut')).height, 50.0);
+    // 1st column is checkbox,
+    // 2nd column is 100 width + half of horizontal margin (20/2) since anothert half is used in checkbox column
+    expect(tester.getSize(findFirstContainerFor('Frozen yogurt')).width, 110);
+    expect(tester.getSize(findFirstContainerFor('Donut')).width, 110);
 
-    await tester.pumpWidget(MaterialApp(
-      home: Material(child: buildCustomTable(specificRowHeight: 100.0)),
-    ));
-    expect(tester.getSize(findFirstContainerFor('Frozen yogurt')).height,
-        kMinInteractiveDimension);
-    expect(tester.getSize(findFirstContainerFor('Donut')).height, 100.0);
+    // 4th column
+    expect(tester.getSize(findFirstContainerFor('24')).width, 50);
+    expect(tester.getSize(findFirstContainerFor('51')).width, 50);
 
-    await tester.pumpWidget(MaterialApp(
-      home: Material(
-          child:
-              buildCustomTable(dataRowHeight: 30.0, specificRowHeight: 60.0)),
-    ));
-    expect(tester.getSize(findFirstContainerFor('Frozen yogurt')).height, 30.0);
-    expect(tester.getSize(findFirstContainerFor('Donut')).height, 60.0);
+    // 5nd column is 100 width + full horizontal margin (20)
+    expect(tester.getSize(findFirstContainerFor('6.0')).width, 120);
+    expect(tester.getSize(findFirstContainerFor('25.0')).width, 120);
   });
 
   testWidgets('DataTable2 custom horizontal padding - checkbox',

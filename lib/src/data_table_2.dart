@@ -489,8 +489,8 @@ class DataTable2 extends DataTable {
       if (checkBoxWidth > 0) displayColumnIndex += 1;
 
       // size data columns
-      final widths = _calculateDataColumnSizes(constraints, checkBoxWidth,
-          effectiveHorizontalMargin, displayCheckboxColumn);
+      final widths = _calculateDataColumnSizes(
+          constraints, checkBoxWidth, effectiveHorizontalMargin);
 
       for (int dataColumnIndex = 0;
           dataColumnIndex < columns.length;
@@ -677,23 +677,21 @@ class DataTable2 extends DataTable {
     return checkBoxWidth;
   }
 
-  List<double> _calculateDataColumnSizes(
-      BoxConstraints constraints,
-      double checkBoxWidth,
-      double effectiveHorizontalMargin,
-      bool displayCheckboxColumn) {
-    var availableWidth = constraints.maxWidth;
-    if (minWidth != null && availableWidth < minWidth!) {
-      availableWidth = minWidth!;
+  List<double> _calculateDataColumnSizes(BoxConstraints constraints,
+      double checkBoxWidth, double effectiveHorizontalMargin) {
+    var totalColAvailableWidth = constraints.maxWidth;
+    if (minWidth != null && totalColAvailableWidth < minWidth!) {
+      totalColAvailableWidth = minWidth!;
     }
 
     // full margins are added to side column widths when no check box column is
     // present, half-margin added to first data column width is check box column
     // is present and full margin added to the right
-    availableWidth -= checkBoxWidth;
-    var totalColAvailableWidth = availableWidth -
+
+    totalColAvailableWidth = totalColAvailableWidth -
+        checkBoxWidth -
         effectiveHorizontalMargin -
-        (displayCheckboxColumn
+        (checkBoxWidth > 0
             ? effectiveHorizontalMargin / 2
             : effectiveHorizontalMargin);
 
@@ -713,6 +711,7 @@ class DataTable2 extends DataTable {
     totalColAvailableWidth =
         math.max(0.0, totalColAvailableWidth - totalFixedWidth);
 
+    // adjust column sizes relative to S, M, L
     final widths = List<double>.generate(columns.length, (i) {
       var w = columnWidth;
       var column = columns[i];
@@ -725,29 +724,39 @@ class DataTable2 extends DataTable {
           w *= lmRatio;
         }
       }
-      totalColCalculatedWidth += w;
+
+      // skip fixed width columns
+      if (!(column is DataColumn2 && column.fixedWidth != null)) {
+        totalColCalculatedWidth += w;
+      }
       return w;
     });
 
-    var ratio = totalColAvailableWidth / totalColCalculatedWidth;
+    // scale columns to fit the total lemnght into available width
 
+    var ratio = totalColAvailableWidth / totalColCalculatedWidth;
     for (var i = 0; i < widths.length; i++) {
-      widths[i] *= ratio;
+      // skip fixed width column
+      if (!(columns[i] is DataColumn2 &&
+          (columns[i] as DataColumn2).fixedWidth != null)) {
+        widths[i] *= ratio;
+      }
     }
 
+    // add margins to side columns
     if (widths.length == 1) {
       widths[0] = math.max(
           0,
           widths[0] +
               effectiveHorizontalMargin +
-              (displayCheckboxColumn
+              (checkBoxWidth > 0
                   ? effectiveHorizontalMargin / 2
                   : effectiveHorizontalMargin));
     } else if (widths.length > 1) {
       widths[0] = math.max(
           0,
           widths[0] +
-              (displayCheckboxColumn
+              (checkBoxWidth > 0
                   ? effectiveHorizontalMargin / 2
                   : effectiveHorizontalMargin));
       widths[widths.length - 1] =
