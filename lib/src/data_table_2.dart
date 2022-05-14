@@ -214,6 +214,8 @@ class DataTable2 extends DataTable {
   /// NOTE: setting this field will disable standard horizontal dividers which are controlled by
   /// themes and [dividerThickness] property
   // TODO: Add test
+  @override
+  // ignore: overridden_fields
   final TableBorder? border;
 
   /// Determines ratio of Small column's width to Medium column's width.
@@ -839,13 +841,10 @@ class _SortArrow extends StatefulWidget {
   final Duration duration;
 
   @override
-  _SortArrowState createState() => _SortArrowState(up);
+  _SortArrowState createState() => _SortArrowState();
 }
 
 class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
-  _SortArrowState(bool? up) {
-    _up = up;
-  }
   late AnimationController _opacityController;
   late Animation<double> _opacityAnimation;
 
@@ -862,6 +861,7 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    _up = widget.up;
     _opacityAnimation = CurvedAnimation(
       parent: _opacityController = AnimationController(
         duration: widget.duration,
