@@ -534,6 +534,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   }
 
   // Flag to be used by AsyncDataTable to show empty table when loading data
+  // ignore: prefer_final_fields
   bool _showNothing = false;
 
   List<DataRow> _getRows(int firstRowIndex, int rowsPerPage) {
@@ -790,12 +791,13 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
 
   void _setRowsPerPage(int? r, [bool wrapInSetState = true]) {
     if (r != null) {
-      var f = () {
+      f() {
         _effectiveRowsPerPage = r;
         if (widget.onRowsPerPageChanged != null) {
           widget.onRowsPerPageChanged!(r);
         }
-      };
+      }
+
       if (wrapInSetState) {
         setState(f);
       } else {

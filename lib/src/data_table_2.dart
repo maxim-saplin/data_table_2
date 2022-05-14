@@ -53,42 +53,31 @@ class DataRow2 extends DataRow {
   ///
   /// The [cells] argument must not be null.
   const DataRow2(
-      {LocalKey? key,
-      bool selected = false,
-      ValueChanged<bool?>? onSelectChanged,
-      MaterialStateProperty<Color?>? color,
-      required List<DataCell> cells,
+      {super.key,
+      super.selected = false,
+      super.onSelectChanged,
+      super.color,
+      required super.cells,
       this.specificRowHeight,
       this.onTap,
       this.onDoubleTap,
-      this.onLongPress,
+      super.onLongPress,
       this.onSecondaryTap,
-      this.onSecondaryTapDown})
-      : super(
-            key: key,
-            selected: selected,
-            onSelectChanged: onSelectChanged,
-            color: color,
-            cells: cells);
+      this.onSecondaryTapDown});
 
   DataRow2.byIndex(
       {int? index,
-      bool selected = false,
-      ValueChanged<bool?>? onSelectChanged,
-      MaterialStateProperty<Color?>? color,
-      required List<DataCell> cells,
+      super.selected = false,
+      super.onSelectChanged,
+      super.color,
+      required super.cells,
       this.specificRowHeight,
       this.onTap,
       this.onDoubleTap,
-      this.onLongPress,
+      super.onLongPress,
       this.onSecondaryTap,
       this.onSecondaryTapDown})
-      : super.byIndex(
-            index: index,
-            selected: selected,
-            onSelectChanged: onSelectChanged,
-            color: color,
-            cells: cells);
+      : super.byIndex(index: index);
 
   /// Specific row height, which will be used only if provided.
   /// If not provided, dataRowHeight will be applied.
@@ -106,8 +95,8 @@ class DataRow2 extends DataRow {
   /// Row double tap handler, won't be called if tapped cell has any tap event handlers
   final GestureTapCallback? onDoubleTap;
 
-  /// Row long press handler, won't be called if tapped cell has any tap event handlers
-  final GestureLongPressCallback? onLongPress;
+  // /// Row long press handler, won't be called if tapped cell has any tap event handlers
+  // final GestureLongPressCallback? onLongPress;
 }
 
 /// In-place replacement of standard [DataTable] widget, mimics it API.
