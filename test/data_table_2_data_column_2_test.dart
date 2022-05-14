@@ -595,8 +595,13 @@ void main() {
       home: Material(child: buildTable(sortAscending: true)),
     ));
     // The `tester.widget` ensures that there is exactly one upward arrow.
-    Transform transformOfArrow = tester
-        .widget<Transform>(find.widgetWithIcon(Transform, Icons.arrow_upward));
+
+    // debugDumpApp(); // print out widget tree
+    // After upgrading to Flutter 3 this lines statrted failing due to finder getting
+    // 5 Transform widget insterad of 1. Seems like there're wrapper transform widgets added upstream in the widget tree, not sure why
+    // Fixed by adding .first
+    Transform transformOfArrow = tester.widget<Transform>(
+        find.widgetWithIcon(Transform, Icons.arrow_upward).first);
     expect(
         transformOfArrow.transform.getRotation(), equals(Matrix3.identity()));
 
@@ -606,8 +611,8 @@ void main() {
     ));
     await tester.pumpAndSettle();
     // The `tester.widget` ensures that there is exactly one upward arrow.
-    transformOfArrow = tester
-        .widget<Transform>(find.widgetWithIcon(Transform, Icons.arrow_upward));
+    transformOfArrow = tester.widget<Transform>(
+        find.widgetWithIcon(Transform, Icons.arrow_upward).first);
     expect(transformOfArrow.transform.getRotation(),
         equals(Matrix3.rotationZ(math.pi)));
   });

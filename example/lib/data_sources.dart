@@ -100,8 +100,10 @@ class DessertDataSource extends DataTableSource {
 
   final BuildContext context;
   late List<Dessert> desserts;
-  late bool hasRowTaps;
-  late bool hasRowHeightOverrides;
+  // Add row tap handlers and show snackbar
+  bool hasRowTaps = false;
+  // Override height values for certain rows
+  bool hasRowHeightOverrides = false;
 
   void sort<T>(Comparable<T> Function(Dessert d) getField, bool ascending) {
     desserts.sort((a, b) {

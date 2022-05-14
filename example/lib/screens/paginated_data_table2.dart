@@ -1,10 +1,10 @@
-import 'package:example/custom_pager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 
 import '../data_sources.dart';
 import '../nav_helper.dart';
+import '../custom_pager.dart';
 
 // Copyright 2019 The Flutter team. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be

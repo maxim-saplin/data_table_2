@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:example/custom_pager.dart';
-import 'package:example/data_sources.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 
 import '../nav_helper.dart';
+import '../custom_pager.dart';
+import '../data_sources.dart';
 
 class AsyncPaginatedDataTable2Demo extends StatefulWidget {
   const AsyncPaginatedDataTable2Demo();
