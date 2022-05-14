@@ -94,7 +94,7 @@ class _DataTable2DemoState extends State<DataTable2Demo> {
             size: ColumnSize.S,
             // example of fixed 1st row
             fixedWidth:
-                getCurrentRouteOption(context) == fixedColumnWidth ? 44 : null,
+                getCurrentRouteOption(context) == fixedColumnWidth ? 200 : null,
             onSort: (columnIndex, ascending) =>
                 _sort<String>((d) => d.name, columnIndex, ascending),
           ),
