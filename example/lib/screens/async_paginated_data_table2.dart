@@ -303,14 +303,13 @@ class _TitledRangeSelector extends StatefulWidget {
       required this.onChanged,
       this.title = "",
       this.caption = "",
-      this.range = const RangeValues(0, 100),
-      this.titleToSelectorSwitch = const Duration(seconds: 2)});
+      this.range = const RangeValues(0, 100)});
 
   final Key? key;
 
   final String title;
   final String caption;
-  final Duration titleToSelectorSwitch;
+  final Duration titleToSelectorSwitch = const Duration(seconds: 2);
   final RangeValues range;
   final Function(RangeValues) onChanged;
 

@@ -15,8 +15,7 @@ import 'test_utils.dart';
 
 void main() {
   final TestWidgetsFlutterBinding binding =
-      TestWidgetsFlutterBinding.ensureInitialized()
-          as TestWidgetsFlutterBinding;
+      TestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('AsyncPaginatedDataTable2 paging', (WidgetTester tester) async {
     final DessertDataSourceAsync source =

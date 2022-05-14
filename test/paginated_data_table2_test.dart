@@ -14,8 +14,7 @@ import 'test_utils.dart';
 
 void main() {
   final TestWidgetsFlutterBinding binding =
-      TestWidgetsFlutterBinding.ensureInitialized()
-          as TestWidgetsFlutterBinding;
+      TestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('PaginatedDataTable2 paging', (WidgetTester tester) async {
     final TestDataSource source = TestDataSource(allowSelection: true);

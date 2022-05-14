@@ -193,12 +193,10 @@ class TestRecordingPaintingContext extends ClipContext
 }
 
 class _MethodCall implements Invocation {
-  _MethodCall(this._name,
-      [this._arguments = const <dynamic>[],
-      this._typeArguments = const <Type>[]]);
+  _MethodCall(this._name, [this._arguments = const <dynamic>[]]);
   final Symbol _name;
   final List<dynamic> _arguments;
-  final List<Type> _typeArguments;
+  final List<Type> _typeArguments = const <Type>[];
   @override
   bool get isAccessor => false;
   @override

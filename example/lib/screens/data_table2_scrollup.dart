@@ -64,7 +64,7 @@ class _DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
               // is displayed then vertical migh be hidden as it will go out of viewport
               data: ThemeData(
                   scrollbarTheme: ScrollbarThemeData(
-                      isAlwaysShown: true,
+                      thumbVisibility: MaterialStateProperty.all(true),
                       thumbColor:
                           MaterialStateProperty.all<Color>(Colors.black))),
               child: DataTable2(
