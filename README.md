@@ -17,6 +17,7 @@ If you've been using (or considered using) standard Flutter's widgets for displa
 - All columns are fixed width, table automatically stretches horizontally, individual column's width is determined as **(Width)/(Number of Columns)**
   - Should you want to adjust sizes of columns, you can replace `DataColumn` definitions with `DataColumn2` (which is a descendant of DataColumn). The class provides `size` property which can be set to one of 3 relative sizes (S, M and L)
   - Width ratios between Small and Medium, Large and Medium columns are defined by `smRatio` and `lmRatio` params
+  - `fixedWidth` parameter allows to define absolute value for column width
   - You can limit the minimal width of the control and scroll it horizontally if the viewport is narrower (by setting `minWidth` property) which is useful in portrait orientations with multiple columns not fitting the screen
   - You can add bottom margin (by setting `bottomMargin` property) to allow slight over-scroll
   - Fixed width columns are faster than default implementation of DataTable which does 2 passes to determine contents size and justify column widths

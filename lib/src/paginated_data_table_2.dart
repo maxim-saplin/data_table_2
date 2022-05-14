@@ -158,7 +158,7 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// Check out [PaginatedDataTable] for the API decription.
   /// Key differences are [minWidth] and [fit] properties.
   PaginatedDataTable2({
-    Key? key,
+    super.key,
     this.header,
     this.actions,
     required this.columns,
@@ -206,8 +206,7 @@ class PaginatedDataTable2 extends StatefulWidget {
             assert(availableRowsPerPage.contains(rowsPerPage));
           }
           return true;
-        }()),
-        super(key: key);
+        }());
 
   final bool wrapInCard;
 

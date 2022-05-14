@@ -24,13 +24,12 @@ class DataColumn2 extends DataColumn {
   ///
   /// The [label] argument must not be null.
   const DataColumn2(
-      {required Widget label,
-      String? tooltip,
-      bool numeric = false,
-      Function(int, bool)? onSort,
+      {required super.label,
+      super.tooltip,
+      super.numeric = false,
+      super.onSort,
       this.size = ColumnSize.M,
-      this.fixedWidth})
-      : super(label: label, tooltip: tooltip, numeric: numeric, onSort: onSort);
+      this.fixedWidth});
 
   /// Column sizes are determined based on available width by distributing it
   /// to individual columns accounting for their relative sizes (see [ColumnSize])
@@ -107,52 +106,33 @@ class DataRow2 extends DataRow {
 /// row-level tap event handlers.
 class DataTable2 extends DataTable {
   DataTable2({
-    Key? key,
-    required List<DataColumn> columns,
-    int? sortColumnIndex,
-    bool sortAscending = true,
-    ValueSetter<bool?>? onSelectAll,
-    Decoration? decoration,
-    MaterialStateProperty<Color?>? dataRowColor,
-    double? dataRowHeight,
-    TextStyle? dataTextStyle,
-    MaterialStateProperty<Color?>? headingRowColor,
-    double? headingRowHeight,
-    TextStyle? headingTextStyle,
-    double? horizontalMargin,
-    double? checkboxHorizontalMargin,
+    super.key,
+    required super.columns,
+    super.sortColumnIndex,
+    super.sortAscending = true,
+    super.onSelectAll,
+    super.decoration,
+    super.dataRowColor,
+    super.dataRowHeight,
+    super.dataTextStyle,
+    super.headingRowColor,
+    super.headingRowHeight,
+    super.headingTextStyle,
+    super.horizontalMargin,
+    super.checkboxHorizontalMargin,
     this.bottomMargin,
-    double? columnSpacing,
-    bool showCheckboxColumn = true,
-    bool showBottomBorder = false,
-    double? dividerThickness,
+    super.columnSpacing,
+    super.showCheckboxColumn = true,
+    super.showBottomBorder = false,
+    super.dividerThickness,
     this.minWidth,
     this.scrollController,
     this.empty,
     this.border,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
-    required List<DataRow> rows,
-  }) : super(
-            key: key,
-            columns: columns,
-            sortColumnIndex: sortColumnIndex,
-            sortAscending: sortAscending,
-            onSelectAll: onSelectAll,
-            decoration: decoration,
-            dataRowColor: dataRowColor,
-            dataRowHeight: dataRowHeight,
-            dataTextStyle: dataTextStyle,
-            headingRowColor: headingRowColor,
-            headingRowHeight: headingRowHeight,
-            headingTextStyle: headingTextStyle,
-            horizontalMargin: horizontalMargin,
-            checkboxHorizontalMargin: checkboxHorizontalMargin,
-            columnSpacing: columnSpacing,
-            showCheckboxColumn: showCheckboxColumn,
-            showBottomBorder: showBottomBorder,
-            dividerThickness: dividerThickness,
-            rows: rows);
+    required super.rows,
+  });
 
   static final LocalKey _headingRowKey = UniqueKey();
 
@@ -828,11 +808,11 @@ class DataTable2 extends DataTable {
 
 class _SortArrow extends StatefulWidget {
   const _SortArrow({
-    Key? key,
+    super.key,
     required this.visible,
     required this.up,
     required this.duration,
-  }) : super(key: key);
+  });
 
   final bool visible;
 
