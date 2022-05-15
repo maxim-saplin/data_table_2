@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
@@ -14,14 +16,13 @@ import '../custom_pager.dart';
 // Changes and modifications by Maxim Saplin, 2021
 
 class PaginatedDataTable2Demo extends StatefulWidget {
-  const PaginatedDataTable2Demo();
+  const PaginatedDataTable2Demo({super.key});
 
   @override
-  _PaginatedDataTable2DemoState createState() =>
-      _PaginatedDataTable2DemoState();
+  PaginatedDataTable2DemoState createState() => PaginatedDataTable2DemoState();
 }
 
-class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
+class PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   bool _sortAscending = true;
   int? _sortColumnIndex;
@@ -66,48 +67,48 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
   List<DataColumn> get _columns {
     return [
       DataColumn(
-        label: Text('Desert'),
+        label: const Text('Desert'),
         onSort: (columnIndex, ascending) =>
             sort<String>((d) => d.name, columnIndex, ascending),
       ),
       DataColumn(
-        label: Text('Calories'),
+        label: const Text('Calories'),
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.calories, columnIndex, ascending),
       ),
       DataColumn(
-        label: Text('Fat (gm)'),
+        label: const Text('Fat (gm)'),
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.fat, columnIndex, ascending),
       ),
       DataColumn(
-        label: Text('Carbs (gm)'),
+        label: const Text('Carbs (gm)'),
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.carbs, columnIndex, ascending),
       ),
       DataColumn(
-        label: Text('Protein (gm)'),
+        label: const Text('Protein (gm)'),
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.protein, columnIndex, ascending),
       ),
       DataColumn(
-        label: Text('Sodium (mg)'),
+        label: const Text('Sodium (mg)'),
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.sodium, columnIndex, ascending),
       ),
       DataColumn(
-        label: Text('Calcium (%)'),
+        label: const Text('Calcium (%)'),
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.calcium, columnIndex, ascending),
       ),
       DataColumn(
-        label: Text('Iron (%)'),
+        label: const Text('Iron (%)'),
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.iron, columnIndex, ascending),
@@ -127,15 +128,15 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
             MaterialStateColor.resolveWith((states) => Colors.grey[200]!),
         header:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('PaginatedDataTable2'),
+          const Text('PaginatedDataTable2'),
           if (kDebugMode && getCurrentRouteOption(context) == custPager)
             Row(children: [
               OutlinedButton(
                   onPressed: () => _controller!.goToPageWithRow(25),
-                  child: Text('Go to row 25')),
+                  child: const Text('Go to row 25')),
               OutlinedButton(
                   onPressed: () => _controller!.goToRow(5),
-                  child: Text('Go to row 5'))
+                  child: const Text('Go to row 5'))
             ]),
           if (getCurrentRouteOption(context) == custPager &&
               _controller != null)
@@ -146,12 +147,12 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
         minWidth: 800,
         fit: FlexFit.tight,
         border: TableBorder(
-            top: BorderSide(color: Colors.black),
+            top: const BorderSide(color: Colors.black),
             bottom: BorderSide(color: Colors.grey[300]!),
             left: BorderSide(color: Colors.grey[300]!),
             right: BorderSide(color: Colors.grey[300]!),
             verticalInside: BorderSide(color: Colors.grey[300]!),
-            horizontalInside: BorderSide(color: Colors.grey, width: 1)),
+            horizontalInside: const BorderSide(color: Colors.grey, width: 1)),
         onRowsPerPageChanged: (value) {
           // No need to wrap into setState, it will be called inside the widget
           // and trigger rebuild
@@ -173,9 +174,9 @@ class _PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
         columns: _columns,
         empty: Center(
             child: Container(
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 color: Colors.grey[200],
-                child: Text('No data'))),
+                child: const Text('No data'))),
         source: getCurrentRouteOption(context) == noData
             ? DessertDataSource.empty(context)
             : _dessertsDataSource,

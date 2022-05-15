@@ -11,18 +11,18 @@ import '../data_sources.dart';
 // Changes and modifications by Maxim Saplin, 2021
 
 class DataTable2ScrollupDemo extends StatefulWidget {
-  const DataTable2ScrollupDemo();
+  const DataTable2ScrollupDemo({super.key});
 
   @override
-  _DataTable2ScrollupDemoState createState() => _DataTable2ScrollupDemoState();
+  DataTable2ScrollupDemoState createState() => DataTable2ScrollupDemoState();
 }
 
-class _DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
+class DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
   bool _sortAscending = true;
   int? _sortColumnIndex;
   late DessertDataSource _dessertsDataSource;
   bool _initialized = false;
-  ScrollController _controller = ScrollController();
+  final ScrollController _controller = ScrollController();
 
   @override
   void didChangeDependencies() {
@@ -79,55 +79,55 @@ class _DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
                       setState(() => _dessertsDataSource.selectAll(val)),
                   columns: [
                     DataColumn2(
-                      label: Text('Desert'),
+                      label: const Text('Desert'),
                       size: ColumnSize.S,
                       onSort: (columnIndex, ascending) =>
                           _sort<String>((d) => d.name, columnIndex, ascending),
                     ),
                     DataColumn2(
-                      label: Text('Calories'),
+                      label: const Text('Calories'),
                       size: ColumnSize.S,
                       numeric: true,
                       onSort: (columnIndex, ascending) =>
                           _sort<num>((d) => d.calories, columnIndex, ascending),
                     ),
                     DataColumn2(
-                      label: Text('Fat (gm)'),
+                      label: const Text('Fat (gm)'),
                       size: ColumnSize.S,
                       numeric: true,
                       onSort: (columnIndex, ascending) =>
                           _sort<num>((d) => d.fat, columnIndex, ascending),
                     ),
                     DataColumn2(
-                      label: Text('Carbs (gm)'),
+                      label: const Text('Carbs (gm)'),
                       size: ColumnSize.S,
                       numeric: true,
                       onSort: (columnIndex, ascending) =>
                           _sort<num>((d) => d.carbs, columnIndex, ascending),
                     ),
                     DataColumn2(
-                      label: Text('Protein (gm)'),
+                      label: const Text('Protein (gm)'),
                       size: ColumnSize.S,
                       numeric: true,
                       onSort: (columnIndex, ascending) =>
                           _sort<num>((d) => d.protein, columnIndex, ascending),
                     ),
                     DataColumn2(
-                      label: Text('Sodium (mg)'),
+                      label: const Text('Sodium (mg)'),
                       size: ColumnSize.S,
                       numeric: true,
                       onSort: (columnIndex, ascending) =>
                           _sort<num>((d) => d.sodium, columnIndex, ascending),
                     ),
                     DataColumn2(
-                      label: Text('Calcium (%)'),
+                      label: const Text('Calcium (%)'),
                       size: ColumnSize.S,
                       numeric: true,
                       onSort: (columnIndex, ascending) =>
                           _sort<num>((d) => d.calcium, columnIndex, ascending),
                     ),
                     DataColumn2(
-                      label: Text('Iron (%)'),
+                      label: const Text('Iron (%)'),
                       size: ColumnSize.S,
                       numeric: true,
                       onSort: (columnIndex, ascending) =>
@@ -142,7 +142,7 @@ class _DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
 }
 
 class _ScrollUpButton extends StatefulWidget {
-  _ScrollUpButton(this.controller);
+  const _ScrollUpButton(this.controller);
 
   final ScrollController controller;
 
@@ -183,13 +183,14 @@ class _ScrollUpButtonState extends State<_ScrollUpButton> {
             right: 10,
             bottom: 10,
             child: OutlinedButton(
-              child: Text('↑↑ go up ↑↑'),
               onPressed: () => widget.controller.animateTo(0,
-                  duration: Duration(milliseconds: 300), curve: Curves.easeIn),
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeIn),
               style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(Colors.grey[800]),
                   foregroundColor: MaterialStateProperty.all(Colors.white)),
+              child: const Text('↑↑ go up ↑↑'),
             ))
-        : SizedBox();
+        : const SizedBox();
   }
 }

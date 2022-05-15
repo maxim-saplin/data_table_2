@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print, prefer_interpolation_to_compose_strings
+
 import 'package:data_table_2/data_table_2.dart';
 
 import 'package:flutter/material.dart';
@@ -199,7 +201,7 @@ PaginatedDataTable2 buildPaginatedTable(
     horizontalMargin: 24,
     showCheckboxColumn: true,
     wrapInCard: wrapInCard,
-    header: showHeader ? Text('Header') : null,
+    header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
     onSelectAll: (bool? value) {},
@@ -246,7 +248,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     horizontalMargin: 24,
     showCheckboxColumn: true,
     wrapInCard: wrapInCard,
-    header: showHeader ? Text('Header') : null,
+    header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
     onSelectAll: (bool? value) {},
@@ -254,7 +256,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     showFirstLastButtons: true,
     controller: controller,
     empty: empty,
-    loading: Center(
+    loading: const Center(
         child: SizedBox(
             width: 32,
             height: 32,
@@ -302,7 +304,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     notifyListeners();
   }
 
-  bool _empty = false;
+  final bool _empty = false;
   int? _errorCounter;
 
   final DesertsFakeWebService _repo = DesertsFakeWebService();
@@ -318,22 +320,22 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
 
   Future<int> getTotalRecors() {
     return Future<int>.delayed(
-        Duration(milliseconds: 0), () => _empty ? 0 : _dessertsX3.length);
+        const Duration(milliseconds: 0), () => _empty ? 0 : _dessertsX3.length);
   }
 
   @override
-  Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
-    print('getRows($startIndex, $count)');
+  Future<AsyncRowsResponse> getRows(int start, int end) async {
+    print('getRows($start, $end)');
     if (_errorCounter != null) {
       _errorCounter = _errorCounter! + 1;
 
       if (_errorCounter! % 2 == 1) {
-        await Future.delayed(Duration(milliseconds: 1000));
+        await Future.delayed(const Duration(milliseconds: 1000));
         throw 'Error #${((_errorCounter! - 1) / 2).round() + 1} has occured';
       }
     }
 
-    var index = startIndex;
+    var index = start;
     // final format = NumberFormat.decimalPercentPattern(
     //   locale: 'en',
     //   decimalDigits: 0,
@@ -341,10 +343,10 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     assert(index >= 0);
 
     var x = _empty
-        ? await Future.delayed(Duration(milliseconds: 2000),
+        ? await Future.delayed(const Duration(milliseconds: 2000),
             () => DesertsFakeWebServiceResponse(0, []))
-        : await _repo.getData(startIndex, count, _sortColumn, _sortAscending,
-            noData, useKDeserts);
+        : await _repo.getData(
+            start, end, _sortColumn, _sortAscending, noData, useKDeserts);
 
     var r = AsyncRowsResponse(
         x.totalRecords,
@@ -353,8 +355,9 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
             key: ValueKey<int>(dessert.id),
             selected: dessert.selected,
             onSelectChanged: (value) {
-              if (value != null)
+              if (value != null) {
                 setRowSelection(ValueKey<int>(dessert.id), value);
+              }
             },
             cells: <DataCell>[
               DataCell(
@@ -450,7 +453,7 @@ List<Dessert> _dessertsX3 = _desserts.toList()
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)));
 
 class DataTable2Tests extends StatelessWidget {
-  const DataTable2Tests();
+  const DataTable2Tests({super.key});
 
   static ScrollController sc = ScrollController();
   static PaginatorController pc = PaginatorController();

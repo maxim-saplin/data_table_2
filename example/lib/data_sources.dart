@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:data_table_2/data_table_2.dart';
@@ -155,26 +157,26 @@ class DessertDataSource extends DataTableSource {
             },
       onTap: hasRowTaps
           ? () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                duration: Duration(seconds: 1),
+                duration: const Duration(seconds: 1),
                 content: Text('Tapped on ${dessert.name}'),
               ))
           : null,
       onDoubleTap: hasRowTaps
           ? () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                duration: Duration(seconds: 1),
+                duration: const Duration(seconds: 1),
                 backgroundColor: Theme.of(context).focusColor,
                 content: Text('Double Tapped on ${dessert.name}'),
               ))
           : null,
       onSecondaryTap: hasRowTaps
           ? () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                duration: Duration(seconds: 1),
+                duration: const Duration(seconds: 1),
                 backgroundColor: Theme.of(context).errorColor,
                 content: Text('Right clicked on ${dessert.name}'),
               ))
           : null,
       specificRowHeight:
-          this.hasRowHeightOverrides && dessert.fat >= 25 ? 100 : null,
+          hasRowHeightOverrides && dessert.fat >= 25 ? 100 : null,
       cells: [
         DataCell(Text(dessert.name)),
         DataCell(Text('${dessert.calories}')),
@@ -182,8 +184,8 @@ class DessertDataSource extends DataTableSource {
         DataCell(Text('${dessert.carbs}')),
         DataCell(Text(dessert.protein.toStringAsFixed(1))),
         DataCell(Text('${dessert.sodium}')),
-        DataCell(Text('${format.format(dessert.calcium / 100)}')),
-        DataCell(Text('${format.format(dessert.iron / 100)}')),
+        DataCell(Text(format.format(dessert.calcium / 100))),
+        DataCell(Text(format.format(dessert.iron / 100))),
       ],
     );
   }
@@ -248,22 +250,22 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
 
   Future<int> getTotalRecords() {
     return Future<int>.delayed(
-        Duration(milliseconds: 0), () => _empty ? 0 : _dessertsX3.length);
+        const Duration(milliseconds: 0), () => _empty ? 0 : _dessertsX3.length);
   }
 
   @override
-  Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
-    print('getRows($startIndex, $count)');
+  Future<AsyncRowsResponse> getRows(int start, int end) async {
+    print('getRows($start, $end)');
     if (_errorCounter != null) {
       _errorCounter = _errorCounter! + 1;
 
       if (_errorCounter! % 2 == 1) {
-        await Future.delayed(Duration(milliseconds: 1000));
+        await Future.delayed(const Duration(milliseconds: 1000));
         throw 'Error #${((_errorCounter! - 1) / 2).round() + 1} has occured';
       }
     }
 
-    var index = startIndex;
+    var index = start;
     final format = NumberFormat.decimalPercentPattern(
       locale: 'en',
       decimalDigits: 0,
@@ -272,10 +274,10 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
 
     // List returned will be empty is there're fewer items than startingAt
     var x = _empty
-        ? await Future.delayed(Duration(milliseconds: 2000),
+        ? await Future.delayed(const Duration(milliseconds: 2000),
             () => DesertsFakeWebServiceResponse(0, []))
         : await _repo.getData(
-            startIndex, count, _caloriesFilter, _sortColumn, _sortAscending);
+            start, end, _caloriesFilter, _sortColumn, _sortAscending);
 
     var r = AsyncRowsResponse(
         x.totalRecords,
@@ -284,8 +286,9 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
             key: ValueKey<int>(dessert.id),
             selected: dessert.selected,
             onSelectChanged: (value) {
-              if (value != null)
+              if (value != null) {
                 setRowSelection(ValueKey<int>(dessert.id), value);
+              }
             },
             cells: [
               DataCell(Text(dessert.name)),
@@ -294,8 +297,8 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
               DataCell(Text('${dessert.carbs}')),
               DataCell(Text(dessert.protein.toStringAsFixed(1))),
               DataCell(Text('${dessert.sodium}')),
-              DataCell(Text('${format.format(dessert.calcium / 100)}')),
-              DataCell(Text('${format.format(dessert.iron / 100)}')),
+              DataCell(Text(format.format(dessert.calcium / 100))),
+              DataCell(Text(format.format(dessert.iron / 100))),
             ],
           );
         }).toList());
@@ -671,7 +674,7 @@ List<Dessert> _desserts = <Dessert>[
 ];
 
 List<Dessert> _dessertsX3 = _desserts.toList()
-  ..addAll(_desserts.map((i) => Dessert(i.name + ' x2', i.calories, i.fat,
+  ..addAll(_desserts.map((i) => Dessert('${i.name} x2', i.calories, i.fat,
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)))
-  ..addAll(_desserts.map((i) => Dessert(i.name + ' x3', i.calories, i.fat,
+  ..addAll(_desserts.map((i) => Dessert('${i.name} x3', i.calories, i.fat,
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)));

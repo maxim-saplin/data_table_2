@@ -20,8 +20,9 @@ const String initialRoute = '/datatable2';
 Scaffold _getScaffold(BuildContext context, Widget body,
     [List<String>? options]) {
   var defaultOption = getCurrentRouteOption(context);
-  if (defaultOption.isEmpty && options != null && options.isNotEmpty)
+  if (defaultOption.isEmpty && options != null && options.isNotEmpty) {
     defaultOption = options[0];
+  }
   return Scaffold(
     appBar: AppBar(
       backgroundColor: Colors.grey[200],
@@ -29,11 +30,11 @@ Scaffold _getScaffold(BuildContext context, Widget body,
       automaticallyImplyLeading: false,
       title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Container(
-            padding: EdgeInsets.fromLTRB(12, 4, 12, 4),
+            padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
             color: Colors.grey[850],
             //screen selection
             child: DropdownButton<String>(
-              icon: Icon(Icons.arrow_forward),
+              icon: const Icon(Icons.arrow_forward),
               dropdownColor: Colors.grey[800],
               style: Theme.of(context)
                   .textTheme
@@ -43,48 +44,48 @@ Scaffold _getScaffold(BuildContext context, Widget body,
               onChanged: (v) {
                 Navigator.of(context).pushNamed(v!);
               },
-              items: [
+              items: const [
                 DropdownMenuItem(
-                  child: Text('DataTable2'),
                   value: '/datatable2',
+                  child: Text('DataTable2'),
                 ),
                 DropdownMenuItem(
-                  child: Text('DataTable2 Simple'),
                   value: '/datatable2simple',
+                  child: Text('DataTable2 Simple'),
                 ),
                 DropdownMenuItem(
-                  child: Text('DataTable2 Scroll-up'),
                   value: '/datatable2scrollup',
+                  child: Text('DataTable2 Scroll-up'),
                 ),
                 DropdownMenuItem(
-                  child: Text('PaginatedDataTable2'),
                   value: '/paginated2',
+                  child: Text('PaginatedDataTable2'),
                 ),
                 DropdownMenuItem(
-                  child: Text('AsyncPaginatedDataTable2'),
                   value: '/asyncpaginated2',
+                  child: Text('AsyncPaginatedDataTable2'),
                 ),
                 DropdownMenuItem(
-                  child: Text('DataTable'),
                   value: '/datatable',
+                  child: Text('DataTable'),
                 ),
                 DropdownMenuItem(
-                  child: Text('PaginatedDataTable'),
                   value: '/paginated',
+                  child: Text('PaginatedDataTable'),
                 ),
                 if (kDebugMode)
                   DropdownMenuItem(
-                    child: Text('Unit Tests Preview'),
                     value: '/datatable2tests',
+                    child: Text('Unit Tests Preview'),
                   ),
               ],
             )),
         options != null && options.isNotEmpty
             ? Container(
-                padding: EdgeInsets.fromLTRB(12, 4, 12, 4),
+                padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
                 // screen options
                 child: DropdownButton<String>(
-                    icon: SizedBox(),
+                    icon: const SizedBox(),
                     dropdownColor: Colors.grey[300],
                     style: Theme.of(context)
                         .textTheme
@@ -98,11 +99,11 @@ Scaffold _getScaffold(BuildContext context, Widget body,
                     items: options
                         .map<DropdownMenuItem<String>>(
                             (v) => DropdownMenuItem<String>(
-                                  child: Text(v),
                                   value: v,
+                                  child: Text(v),
                                 ))
                         .toList()))
-            : SizedBox()
+            : const SizedBox()
       ]),
     ),
     body: body,
@@ -116,6 +117,7 @@ String _getCurrentRoute(BuildContext context) {
       : initialRoute;
 }
 
+// ignore: use_key_in_widget_constructors
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -128,30 +130,30 @@ class MyApp extends StatelessWidget {
       initialRoute: initialRoute,
       routes: {
         '/datatable2': (context) => _getScaffold(
-            context, DataTable2Demo(), getOptionsForRoute('/datatable2')),
+            context, const DataTable2Demo(), getOptionsForRoute('/datatable2')),
         '/datatable2simple': (context) =>
-            _getScaffold(context, DataTable2SimpleDemo()),
+            _getScaffold(context, const DataTable2SimpleDemo()),
         '/datatable2scrollup': (context) =>
-            _getScaffold(context, DataTable2ScrollupDemo()),
+            _getScaffold(context, const DataTable2ScrollupDemo()),
         '/paginated2': (context) => _getScaffold(context,
-            PaginatedDataTable2Demo(), getOptionsForRoute('/paginated2')),
+            const PaginatedDataTable2Demo(), getOptionsForRoute('/paginated2')),
         '/asyncpaginated2': (context) => _getScaffold(
             context,
-            AsyncPaginatedDataTable2Demo(),
+            const AsyncPaginatedDataTable2Demo(),
             getOptionsForRoute('/asyncpaginated2')),
-        '/datatable': (context) => _getScaffold(context, DataTableDemo()),
+        '/datatable': (context) => _getScaffold(context, const DataTableDemo()),
         '/paginated': (context) =>
-            _getScaffold(context, PaginatedDataTableDemo()),
+            _getScaffold(context, const PaginatedDataTableDemo()),
         '/datatable2tests': (context) =>
-            _getScaffold(context, DataTable2Tests()),
+            _getScaffold(context, const DataTable2Tests()),
       },
-      supportedLocales: [
-        const Locale('en', ''),
-        const Locale('be', ''),
-        const Locale('ru', ''),
+      supportedLocales: const [
+        Locale('en', ''),
+        Locale('be', ''),
+        Locale('ru', ''),
       ],
       // change to see how PaginatedDataTable2 controls (e.g. Rows per page) get translated
-      locale: Locale('en', ''),
+      locale: const Locale('en', ''),
     );
   }
 }
