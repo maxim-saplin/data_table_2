@@ -83,6 +83,79 @@ void main() {
       expect(find.text('Name'), findsOneWidget);
       expect(find.text('No data'), findsOneWidget);
     });
+
+    testWidgets('DataTable2.border', (WidgetTester tester) async {
+      const columns = <DataColumn>[
+        DataColumn2(label: Text('col1')),
+        DataColumn(label: Text('col2')),
+      ];
+
+      const cells = <DataCell>[
+        DataCell(Text('cell1')),
+        DataCell(Text('cell2')),
+      ];
+
+      const rows = <DataRow>[
+        DataRow2(cells: cells),
+        DataRow(cells: cells),
+      ];
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: DataTable2(
+              border: TableBorder.all(color: Colors.red),
+              columns: columns,
+              rows: rows,
+            ),
+          ),
+        ),
+      );
+
+      var i = 0;
+      for (var t in find.byType(Table).evaluate()) {
+        expect(true, i < 2, reason: '2 tables expected, found more');
+        var table = t.widget as Table;
+        // two tables, 1st is header, 2nd is data cells
+        var tableBorder = table.border!;
+        if (i == 0) {
+          // header
+          expect(tableBorder.top.color, Colors.red);
+          expect(tableBorder.top.width, 1);
+        } else {
+          // data cells
+          expect(tableBorder.top, BorderSide.none);
+        }
+        expect(tableBorder.bottom.color, Colors.red);
+        expect(tableBorder.bottom.width, 1);
+        expect(tableBorder.left.color, Colors.red);
+        expect(tableBorder.left.width, 1);
+        expect(tableBorder.right.color, Colors.red);
+        expect(tableBorder.right.width, 1);
+
+        i++;
+      }
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: DataTable2(
+              columns: columns,
+              rows: rows,
+            ),
+          ),
+        ),
+      );
+
+      i = 0;
+      for (var t in find.byType(Table).evaluate()) {
+        expect(true, i < 2, reason: '2 tables expected, found more');
+        var table = t.widget as Table;
+        // two tables, 1st is header, 2nd is data cells
+        expect(table.border, null);
+        i++;
+      }
+    });
   });
 
   group('PaginatedDataTable2', () {
@@ -303,6 +376,44 @@ void main() {
       expect(find.text('No data'), findsOneWidget);
     });
 
+    testWidgets('headingRowColor is applied', (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          buildPaginatedTable(
+              headingRowColor: MaterialStateProperty.all(Colors.yellow)));
+
+      var t = tester.widget(find.byType(DataTable2)) as DataTable2;
+      expect(
+          t.headingRowColor!.resolve({MaterialState.focused}), Colors.yellow);
+
+      await wrapWidgetSetSurf(tester, buildPaginatedTable());
+
+      t = tester.widget(find.byType(DataTable2)) as DataTable2;
+      expect(t.headingRowColor, null);
+    });
+
+    testWidgets('"FlexFit fit" is applied', (WidgetTester tester) async {
+      await wrapWidgetSetSurf(tester, buildPaginatedTable());
+
+      var t = tester.widget(find
+          .descendant(
+              of: find.byType(PaginatedDataTable2),
+              matching: find.byType(Flexible))
+          .first) as Flexible;
+
+      expect(t.fit, FlexFit.tight);
+
+      await wrapWidgetSetSurf(tester, buildPaginatedTable(fit: FlexFit.loose));
+
+      t = tester.widget(find
+          .descendant(
+              of: find.byType(PaginatedDataTable2),
+              matching: find.byType(Flexible))
+          .first) as Flexible;
+
+      expect(t.fit, FlexFit.loose);
+    });
+
     testWidgets('hidePaginator hides paginator', (WidgetTester tester) async {
       await tester.binding.setSurfaceSize(const Size(1000, 300));
       await tester.pumpWidget(MaterialApp(
@@ -379,7 +490,8 @@ void main() {
       expect(controller.rowCount, 500);
     });
 
-    testWidgets('DataTable2 initial sort indicator orientation not spoiled',
+    testWidgets(
+        'PaginatedDataTable2 initial sort indicator orientation not spoiled',
         (WidgetTester tester) async {
       // Check for ascending list
       await tester.pumpWidget(MaterialApp(
@@ -440,6 +552,49 @@ void main() {
       //  [0] [-1.0,-1.2246467991473532e-16,0.0]
       // [1] [1.2246467991473532e-16,-1.0,0.0]
       // [2] [0.0,0.0,1.0]
+    });
+
+    testWidgets('PaginatedDataTable2.border', (WidgetTester tester) async {
+      await tester.pumpWidget(MaterialApp(
+          home: Material(
+              child: buildPaginatedTable(
+                  border: TableBorder.all(color: Colors.red)))));
+
+      var i = 0;
+      for (var t in find.byType(Table).evaluate()) {
+        expect(true, i < 2, reason: '2 tables expected, found more');
+        var table = t.widget as Table;
+        // two tables, 1st is header, 2nd is data cells
+        var tableBorder = table.border!;
+        if (i == 0) {
+          // header
+          expect(tableBorder.top.color, Colors.red);
+          expect(tableBorder.top.width, 1);
+        } else {
+          // data cells
+          expect(tableBorder.top, BorderSide.none);
+        }
+        expect(tableBorder.bottom.color, Colors.red);
+        expect(tableBorder.bottom.width, 1);
+        expect(tableBorder.left.color, Colors.red);
+        expect(tableBorder.left.width, 1);
+        expect(tableBorder.right.color, Colors.red);
+        expect(tableBorder.right.width, 1);
+
+        i++;
+      }
+
+      await tester.pumpWidget(
+          MaterialApp(home: Material(child: buildPaginatedTable())));
+
+      i = 0;
+      for (var t in find.byType(Table).evaluate()) {
+        expect(true, i < 2, reason: '2 tables expected, found more');
+        var table = t.widget as Table;
+        // two tables, 1st is header, 2nd is data cells
+        expect(table.border, null);
+        i++;
+      }
     });
   });
 

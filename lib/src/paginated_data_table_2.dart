@@ -290,7 +290,6 @@ class PaginatedDataTable2 extends StatefulWidget {
   ///    match a component's state:
   ///    <https://material.io/design/interaction/states.html#anatomy>.
   /// {@endtemplate}
-  //TODO: add test
   final MaterialStateProperty<Color?>? headingRowColor;
 
   /// The horizontal margin between the edges of the table and the content
@@ -374,13 +373,11 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// you want the paginator to stick to the bottom when there're few rows) or
   /// of you want to have the table to take minimal space and do not have bottom
   /// pager stick to the bottom (FlexFit.loose)
-  // TODO: add test
   final FlexFit fit;
 
   /// Set vertical and horizontal borders between cells, as well as outside borders around table.
   /// NOTE: setting this field will disable standard horizontal dividers which are controlled by
   /// themes and [dividerThickness] property
-  // TODO: add test
   final TableBorder? border;
 
   ///If true rows per page is set to fill available height so that no scroll bar is ever displayed.

@@ -193,7 +193,6 @@ class DataTable2 extends DataTable {
   /// Set vertical and horizontal borders between cells, as well as outside borders around table.
   /// NOTE: setting this field will disable standard horizontal dividers which are controlled by
   /// themes and [dividerThickness] property
-  // TODO: Add test
   @override
   // keep field in order to keep doc
   // ignore: overridden_fields
