@@ -8,7 +8,7 @@ If you've been using (or considered using) standard Flutter's widgets for displa
 
 [<img width="866" alt="image" src="https://user-images.githubusercontent.com/7947027/115952188-48c4e600-a4ed-11eb-9ff9-e5b4deaf9580.png">](https://maxim-saplin.github.io/data_table_2/)
 
-\- please check the [example folder](https://github.com/maxim-saplin/data_table_2/tree/main/example) which demos  various features of the widgets as well as contains few screens with original DataTable and PaginatedDataTable widgets for a reference. There's also a [DataGrid Sample](https://maxim-saplin.github.io/flutter_web_spa_sample/canvaskit/) in separate repo which is based on `DataTable2`.
+Please check the [example folder](https://github.com/maxim-saplin/data_table_2/tree/main/example) which demonstrates various features of the widgets. There's also a [DataGrid Sample](https://maxim-saplin.github.io/flutter_web_spa_sample/canvaskit/) in separate repo which is based on `DataTable2`.
 
 ## Extra Features
 - Sticky headers and paginator (when using `PaginatedDataTable2`)
@@ -29,7 +29,7 @@ If you've been using (or considered using) standard Flutter's widgets for displa
 - `empty` property which allows defining a placeholder widget to be displayed when data source is empty
 - `border` allows drawing inner and outer vertical and horizontal borders (e.g. outlining individual cells) - stock widgets only allow drawing horizontal row splitters
 - `PaginatorController` allows to externally control `PaginatedDataTable2` state (e.g. switch pages, change page size etc.)
-- Experimental `AsynPaginatedDataTable2` widget is built for asynchronous scenarios (such a requesting data from web service) and relies on `AsyncDataTableSource` returning rows in a `Future`
+- **Experimental `AsynPaginatedDataTable2` widget built for asynchronous scenarios (such a requesting data from a web service) and relies on `AsyncDataTableSource` returning rows in a `Future`**
 
 
 ## Usage
@@ -106,3 +106,4 @@ If you're already using the standard widgets you can reference the package and a
                   ? Colors.red
                   : Colors.amber)`
 - Cell tap events disabling any row level events. If both a row and a cell within that row happen to have tap events, tapping on a cell won't raise any row events
+- When using `minWidth` and scrolling vertically and horizontally becomes available, one of the scroll bars might be out of sight (https://github.com/maxim-saplin/data_table_2/issues/83)
