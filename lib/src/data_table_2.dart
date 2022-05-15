@@ -196,6 +196,7 @@ class DataTable2 extends DataTable {
   // TODO: Add test
   @override
   // ignore: overridden_fields
+  // keep field in order to keep doc
   final TableBorder? border;
 
   /// Determines ratio of Small column's width to Medium column's width.
@@ -808,7 +809,6 @@ class DataTable2 extends DataTable {
 
 class _SortArrow extends StatefulWidget {
   const _SortArrow({
-    super.key,
     required this.visible,
     required this.up,
     required this.duration,
