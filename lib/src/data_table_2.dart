@@ -195,8 +195,8 @@ class DataTable2 extends DataTable {
   /// themes and [dividerThickness] property
   // TODO: Add test
   @override
-  // ignore: overridden_fields
   // keep field in order to keep doc
+  // ignore: overridden_fields
   final TableBorder? border;
 
   /// Determines ratio of Small column's width to Medium column's width.
