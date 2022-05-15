@@ -29,7 +29,7 @@ Please check the [example folder](https://github.com/maxim-saplin/data_table_2/t
 - `empty` property which allows defining a placeholder widget to be displayed when data source is empty
 - `border` allows drawing inner and outer vertical and horizontal borders (e.g. outlining individual cells) - stock widgets only allow drawing horizontal row splitters
 - `PaginatorController` allows to externally control `PaginatedDataTable2` state (e.g. switch pages, change page size etc.)
-- Experimental `AsynPaginatedDataTable2` widget is built for asynchronous scenarios (such a requesting data from web service) and relies on `AsyncDataTableSource` returning rows in a `Future`
+- **Experimental `AsynPaginatedDataTable2` widget built for asynchronous scenarios (such a requesting data from a web service) and relies on `AsyncDataTableSource` returning rows in a `Future`**
 
 
 ## Usage
