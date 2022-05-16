@@ -131,6 +131,7 @@ class DataTable2 extends DataTable {
     this.border,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
+    this.disableHover = false,
     required super.rows,
   });
 
@@ -205,6 +206,10 @@ class DataTable2 extends DataTable {
   /// Determines ratio of Large column's width to Medium column's width.
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
+
+  /// Disables the Row's higlight behaviour when no onRowTap event handlers are provided.
+  /// This is overriden if any [DataRow2] tap events are set.
+  final bool disableHover;
 
   Widget _buildCheckbox({
     required BuildContext context,
@@ -327,7 +332,7 @@ class DataTable2 extends DataTable {
     required GestureLongPressCallback? onRowLongPress,
     required GestureTapCallback? onRowSecondaryTap,
     required GestureTapDownCallback? onRowSecondaryTapDown,
-    required VoidCallback onSelectChanged,
+    required VoidCallback? onSelectChanged,
     required MaterialStateProperty<Color?>? overlayColor,
   }) {
     final ThemeData themeData = Theme.of(context);
@@ -375,7 +380,13 @@ class DataTable2 extends DataTable {
         overlayColor: overlayColor,
         child: label,
       );
-    } else {
+    } else if (!disableHover ||
+        onSelectChanged != null ||
+        onRowTap != null ||
+        onRowDoubleTap != null ||
+        onRowLongPress != null ||
+        onRowSecondaryTap != null ||
+        onRowSecondaryTapDown != null) {
       label = GestureDetector(
         onSecondaryTap: onRowSecondaryTap,
         onSecondaryTapDown: onRowSecondaryTapDown,
@@ -531,8 +542,8 @@ class DataTable2 extends DataTable {
             onRowSecondaryTap: row is DataRow2 ? row.onSecondaryTap : null,
             onRowSecondaryTapDown:
                 row is DataRow2 ? row.onSecondaryTapDown : null,
-            onSelectChanged: () => row.onSelectChanged != null
-                ? row.onSelectChanged!(!row.selected)
+            onSelectChanged: row.onSelectChanged != null
+                ? () => row.onSelectChanged!(!row.selected)
                 : null,
             overlayColor: row.color ?? effectiveDataRowColor,
           );
