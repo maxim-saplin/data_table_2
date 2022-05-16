@@ -16,6 +16,7 @@ const dflt = 'Default';
 const noData = 'No data';
 const autoRows = 'Auto rows';
 const showBorders = 'Borders';
+const showBordersWithZebraStripes = 'Borders with Zebra';
 const custPager = 'Custom pager';
 const defaultSorting = 'Default sorting';
 const selectAllPage = 'Select all at page';
@@ -35,6 +36,7 @@ const Map<String, List<String>> routeOptions = {
     dflt,
     noData,
     showBorders,
+    showBordersWithZebraStripes,
     fixedColumnWidth,
     rowTaps,
     rowHeightOverrides
