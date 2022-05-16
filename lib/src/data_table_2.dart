@@ -392,12 +392,10 @@ class DataTable2 extends DataTable {
         onSecondaryTapDown: onRowSecondaryTapDown,
         child: TableRowInkWell(
           overlayColor: overlayColor,
-          onTap: onRowTap == null
-              ? onSelectChanged
-              : () {
-                  onRowTap();
-                  onSelectChanged();
-                },
+          onTap: () {
+            onRowTap?.call();
+            onSelectChanged?.call();
+          },
           onDoubleTap: onRowDoubleTap,
           onLongPress: onRowLongPress,
           child: label,
