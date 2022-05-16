@@ -30,10 +30,12 @@ class DataTable2DemoState extends State<DataTable2Demo> {
     if (!_initialized) {
       final currentRouteOption = getCurrentRouteOption(context);
       _dessertsDataSource = DessertDataSource(
-          context,
-          false,
-          currentRouteOption == rowTaps,
-          currentRouteOption == rowHeightOverrides);
+        context,
+        false,
+        currentRouteOption == rowTaps,
+        currentRouteOption == rowHeightOverrides,
+        currentRouteOption == rowDisabledHover,
+      );
       // Default sorting sample. Set __sortColumnIndex to 0 and uncoment the lines below
       // if (_sortColumnIndex == 0) {
       //   _sort<String>((d) => d.name, _sortColumnIndex!, _sortAscending);
@@ -70,6 +72,7 @@ class DataTable2DemoState extends State<DataTable2Demo> {
       child: DataTable2(
         columnSpacing: 12,
         horizontalMargin: 12,
+        disableHover: getCurrentRouteOption(context) == rowDisabledHover,
         border: getCurrentRouteOption(context) == showBorders ||
                 getCurrentRouteOption(context) == fixedColumnWidth
             ? TableBorder(
@@ -87,8 +90,9 @@ class DataTable2DemoState extends State<DataTable2Demo> {
         minWidth: 900,
         sortColumnIndex: _sortColumnIndex,
         sortAscending: _sortAscending,
-        onSelectAll: (val) =>
-            setState(() => _dessertsDataSource.selectAll(val)),
+        onSelectAll: getCurrentRouteOption(context) == rowDisabledHover
+            ? null
+            : (val) => setState(() => _dessertsDataSource.selectAll(val)),
         columns: [
           DataColumn2(
             label: const Text('Desert'),

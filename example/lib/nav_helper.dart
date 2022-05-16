@@ -20,6 +20,7 @@ const custPager = 'Custom pager';
 const defaultSorting = 'Default sorting';
 const selectAllPage = 'Select all at page';
 const rowTaps = 'Row Taps';
+const rowDisabledHover = 'Row DisabledHover';
 const rowHeightOverrides = 'Row height overrides';
 const fixedColumnWidth = 'Fixed column width';
 
@@ -37,6 +38,7 @@ const Map<String, List<String>> routeOptions = {
     showBorders,
     fixedColumnWidth,
     rowTaps,
+    rowDisabledHover,
     rowHeightOverrides
   ],
   '/paginated2': [dflt, noData, autoRows, custPager, defaultSorting],

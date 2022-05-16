@@ -93,7 +93,8 @@ class DessertDataSource extends DataTableSource {
   DessertDataSource(this.context,
       [sortedByCalories = false,
       this.hasRowTaps = false,
-      this.hasRowHeightOverrides = false]) {
+      this.hasRowHeightOverrides = false,
+      this.disableAllGestures = false]) {
     desserts = _desserts;
     if (sortedByCalories) {
       sort((d) => d.calories, true);
@@ -104,6 +105,8 @@ class DessertDataSource extends DataTableSource {
   late List<Dessert> desserts;
   // Add row tap handlers and show snackbar
   bool hasRowTaps = false;
+  // Disable all gestures on rows
+  bool disableAllGestures = false;
   // Override height values for certain rows
   bool hasRowHeightOverrides = false;
 
@@ -145,7 +148,7 @@ class DessertDataSource extends DataTableSource {
     return DataRow2.byIndex(
       index: index,
       selected: dessert.selected,
-      onSelectChanged: hasRowTaps
+      onSelectChanged: hasRowTaps || disableAllGestures
           ? null
           : (value) {
               if (dessert.selected != value) {
@@ -155,20 +158,20 @@ class DessertDataSource extends DataTableSource {
                 notifyListeners();
               }
             },
-      onTap: hasRowTaps
+      onTap: hasRowTaps && !disableAllGestures
           ? () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 duration: const Duration(seconds: 1),
                 content: Text('Tapped on ${dessert.name}'),
               ))
           : null,
-      onDoubleTap: hasRowTaps
+      onDoubleTap: hasRowTaps && !disableAllGestures
           ? () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 duration: const Duration(seconds: 1),
                 backgroundColor: Theme.of(context).focusColor,
                 content: Text('Double Tapped on ${dessert.name}'),
               ))
           : null,
-      onSecondaryTap: hasRowTaps
+      onSecondaryTap: hasRowTaps && !disableAllGestures
           ? () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 duration: const Duration(seconds: 1),
                 backgroundColor: Theme.of(context).errorColor,
