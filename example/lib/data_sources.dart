@@ -93,7 +93,8 @@ class DessertDataSource extends DataTableSource {
   DessertDataSource(this.context,
       [sortedByCalories = false,
       this.hasRowTaps = false,
-      this.hasRowHeightOverrides = false]) {
+      this.hasRowHeightOverrides = false,
+      this.hasZebraStripes = false]) {
     desserts = _desserts;
     if (sortedByCalories) {
       sort((d) => d.calories, true);
@@ -106,6 +107,8 @@ class DessertDataSource extends DataTableSource {
   bool hasRowTaps = false;
   // Override height values for certain rows
   bool hasRowHeightOverrides = false;
+  // Color each Row by index's parity
+  bool hasZebraStripes = false;
 
   void sort<T>(Comparable<T> Function(Dessert d) getField, bool ascending) {
     desserts.sort((a, b) {
@@ -145,6 +148,9 @@ class DessertDataSource extends DataTableSource {
     return DataRow2.byIndex(
       index: index,
       selected: dessert.selected,
+      color: hasZebraStripes && index.isEven
+          ? MaterialStateProperty.all(Theme.of(context).highlightColor)
+          : null,
       onSelectChanged: hasRowTaps
           ? null
           : (value) {
