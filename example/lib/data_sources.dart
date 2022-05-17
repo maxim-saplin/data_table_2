@@ -94,6 +94,7 @@ class DessertDataSource extends DataTableSource {
       [sortedByCalories = false,
       this.hasRowTaps = false,
       this.hasRowHeightOverrides = false,
+      this.hasZebraStripes = false,
       this.disableAllGestures = false]) {
     desserts = _desserts;
     if (sortedByCalories) {
@@ -105,10 +106,12 @@ class DessertDataSource extends DataTableSource {
   late List<Dessert> desserts;
   // Add row tap handlers and show snackbar
   bool hasRowTaps = false;
-  // Disable all gestures on rows
-  bool disableAllGestures = false;
   // Override height values for certain rows
   bool hasRowHeightOverrides = false;
+  // Color each Row by index's parity
+  bool hasZebraStripes = false;
+  // Disable all gestures on rows
+  bool disableAllGestures = false;
 
   void sort<T>(Comparable<T> Function(Dessert d) getField, bool ascending) {
     desserts.sort((a, b) {
@@ -148,6 +151,9 @@ class DessertDataSource extends DataTableSource {
     return DataRow2.byIndex(
       index: index,
       selected: dessert.selected,
+      color: hasZebraStripes && index.isEven
+          ? MaterialStateProperty.all(Theme.of(context).highlightColor)
+          : null,
       onSelectChanged: hasRowTaps || disableAllGestures
           ? null
           : (value) {

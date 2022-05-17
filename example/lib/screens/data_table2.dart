@@ -30,12 +30,12 @@ class DataTable2DemoState extends State<DataTable2Demo> {
     if (!_initialized) {
       final currentRouteOption = getCurrentRouteOption(context);
       _dessertsDataSource = DessertDataSource(
-        context,
-        false,
-        currentRouteOption == rowTaps,
-        currentRouteOption == rowHeightOverrides,
-        currentRouteOption == rowDisabledHover,
-      );
+          context,
+          false,
+          currentRouteOption == rowTaps,
+          currentRouteOption == rowHeightOverrides,
+          currentRouteOption == showBordersWithZebraStripes,
+          currentRouteOption == rowDisabledHover);
       // Default sorting sample. Set __sortColumnIndex to 0 and uncoment the lines below
       // if (_sortColumnIndex == 0) {
       //   _sort<String>((d) => d.name, _sortColumnIndex!, _sortAscending);
@@ -73,8 +73,7 @@ class DataTable2DemoState extends State<DataTable2Demo> {
         columnSpacing: 12,
         horizontalMargin: 12,
         disableHover: getCurrentRouteOption(context) == rowDisabledHover,
-        border: getCurrentRouteOption(context) == showBorders ||
-                getCurrentRouteOption(context) == fixedColumnWidth
+        border: getCurrentRouteOption(context) == fixedColumnWidth
             ? TableBorder(
                 top: const BorderSide(color: Colors.black),
                 bottom: BorderSide(color: Colors.grey[300]!),
@@ -83,7 +82,9 @@ class DataTable2DemoState extends State<DataTable2Demo> {
                 verticalInside: BorderSide(color: Colors.grey[300]!),
                 horizontalInside:
                     const BorderSide(color: Colors.grey, width: 1))
-            : null,
+            : (getCurrentRouteOption(context) == showBordersWithZebraStripes
+                ? TableBorder.all()
+                : null),
         dividerThickness:
             1, // this one will be ignored if [border] is set above
         bottomMargin: 10,

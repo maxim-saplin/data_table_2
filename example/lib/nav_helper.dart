@@ -15,7 +15,7 @@ String getCurrentRouteOption(BuildContext context) {
 const dflt = 'Default';
 const noData = 'No data';
 const autoRows = 'Auto rows';
-const showBorders = 'Borders';
+const showBordersWithZebraStripes = 'Borders with Zebra';
 const custPager = 'Custom pager';
 const defaultSorting = 'Default sorting';
 const selectAllPage = 'Select all at page';
@@ -35,7 +35,7 @@ const Map<String, List<String>> routeOptions = {
   '/datatable2': [
     dflt,
     noData,
-    showBorders,
+    showBordersWithZebraStripes,
     fixedColumnWidth,
     rowTaps,
     rowDisabledHover,
