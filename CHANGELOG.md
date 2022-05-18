@@ -1,3 +1,6 @@
+## 2.2.3
+- Added Border and Zebra stripes sample, removed Borders sample
+
 ## 2.2.2
 - Added PaginatedDataTable2.headingRowColor property
 - DataColumn2.fixedWidth - set column's width as absolute value
