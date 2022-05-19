@@ -327,7 +327,7 @@ class DataTable2 extends DataTable {
     required GestureLongPressCallback? onRowLongPress,
     required GestureTapCallback? onRowSecondaryTap,
     required GestureTapDownCallback? onRowSecondaryTapDown,
-    required VoidCallback onSelectChanged,
+    required VoidCallback? onSelectChanged,
     required MaterialStateProperty<Color?>? overlayColor,
   }) {
     final ThemeData themeData = Theme.of(context);
@@ -361,37 +361,66 @@ class DataTable2 extends DataTable {
         child: DropdownButtonHideUnderline(child: label),
       ),
     );
+
+    // Wrap label intro InkResponse if there're cell or row level tap events
     if (onTap != null ||
         onDoubleTap != null ||
         onLongPress != null ||
         onTapDown != null ||
         onTapCancel != null) {
+      // cell only
       label = InkWell(
-        onTap: onTap,
-        onDoubleTap: onDoubleTap,
-        onLongPress: onLongPress,
+        onTap: () {
+          onTap?.call();
+          onRowTap?.call();
+        },
+        onDoubleTap: () {
+          onDoubleTap?.call();
+          onRowDoubleTap?.call();
+        },
+        onLongPress: () {
+          onLongPress?.call();
+          onRowLongPress?.call();
+        },
         onTapDown: onTapDown,
         onTapCancel: onTapCancel,
         overlayColor: overlayColor,
         child: label,
       );
-    } else {
-      label = GestureDetector(
-        onSecondaryTap: onRowSecondaryTap,
-        onSecondaryTapDown: onRowSecondaryTapDown,
-        child: TableRowInkWell(
-          overlayColor: overlayColor,
-          onTap: onRowTap == null
-              ? onSelectChanged
-              : () {
-                  onRowTap();
-                  onSelectChanged();
-                },
-          onDoubleTap: onRowDoubleTap,
-          onLongPress: onRowLongPress,
-          child: label,
-        ),
+      label =
+          _addSecondaryTaps(onRowSecondaryTap, onRowSecondaryTapDown, label);
+    } else if (onSelectChanged != null ||
+        onRowTap != null ||
+        onRowDoubleTap != null ||
+        onRowLongPress != null ||
+        onRowSecondaryTap != null ||
+        onRowSecondaryTapDown != null) {
+      label = TableRowInkWell(
+        onTap: onRowTap == null && onSelectChanged == null
+            ? null
+            : () {
+                onRowTap?.call();
+                onSelectChanged?.call();
+              },
+        onDoubleTap: onRowDoubleTap,
+        onLongPress: onRowLongPress,
+        overlayColor: overlayColor,
+        child: label,
       );
+
+      label =
+          _addSecondaryTaps(onRowSecondaryTap, onRowSecondaryTapDown, label);
+    }
+    return label;
+  }
+
+  Widget _addSecondaryTaps(GestureTapCallback? onRowSecondaryTap,
+      GestureTapDownCallback? onRowSecondaryTapDown, Widget label) {
+    if (onRowSecondaryTap != null || onRowSecondaryTapDown != null) {
+      label = GestureDetector(
+          onSecondaryTap: onRowSecondaryTap,
+          onSecondaryTapDown: onRowSecondaryTapDown,
+          child: label);
     }
     return label;
   }
@@ -531,8 +560,8 @@ class DataTable2 extends DataTable {
             onRowSecondaryTap: row is DataRow2 ? row.onSecondaryTap : null,
             onRowSecondaryTapDown:
                 row is DataRow2 ? row.onSecondaryTapDown : null,
-            onSelectChanged: () => row.onSelectChanged != null
-                ? row.onSelectChanged!(!row.selected)
+            onSelectChanged: row.onSelectChanged != null
+                ? () => row.onSelectChanged!(!row.selected)
                 : null,
             overlayColor: row.color ?? effectiveDataRowColor,
           );
