@@ -41,11 +41,14 @@ void main() {
             },
           ),
         ],
-        rows: kDesserts.map<DataRow2>((Dessert dessert) {
-          return DataRow2(
+        rows: kDesserts.map<DataRow>((Dessert dessert) {
+          return DataRow(
             key: ValueKey<String>(dessert.name),
             onSelectChanged: (bool? selected) {
               log.add('row-selected: ${dessert.name}');
+            },
+            onLongPress: () {
+              log.add('onLongPress: ${dessert.name}');
             },
             cells: <DataCell>[
               DataCell(
@@ -90,6 +93,11 @@ void main() {
     expect(log, <String>['row-selected: Cupcake']);
     log.clear();
 
+    await tester.longPress(find.text('Cupcake'));
+
+    expect(log, <String>['onLongPress: Cupcake']);
+    log.clear();
+
     await tester.tap(find.text('Calories'));
 
     expect(log, <String>['column-sort: 1 true']);
@@ -111,13 +119,6 @@ void main() {
     await tester.pumpAndSettle(const Duration(milliseconds: 200));
 
     await tester.tap(find.text('375'));
-    // Wait 500ms to get tap registered instead of double tap
-    await tester.pump(const Duration(milliseconds: 500));
-
-    expect(log, <String>['cell-tap: 375']);
-    log.clear();
-
-    await tester.tap(find.text('375'));
     await tester.pump(const Duration(milliseconds: 100));
     await tester.tap(find.text('375'));
 
@@ -132,7 +133,8 @@ void main() {
     expect(log, <String>[
       'cell-tapDown: 375',
       'cell-tapCancel: 375',
-      'cell-longPress: 375'
+      'cell-longPress: 375',
+      'onLongPress: Jelly bean'
     ]);
     log.clear();
 
@@ -164,7 +166,6 @@ void main() {
     expect(log, <String>['row-selected: KitKat']);
     log.clear();
   });
-
   testWidgets('DataTable2 control test - tristate',
       (WidgetTester tester) async {
     final List<String> log = <String>[];

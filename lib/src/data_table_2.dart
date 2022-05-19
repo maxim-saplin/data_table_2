@@ -556,7 +556,7 @@ class DataTable2 extends DataTable {
             onTapCancel: cell.onTapCancel,
             onRowTap: row is DataRow2 ? row.onTap : null,
             onRowDoubleTap: row is DataRow2 ? row.onDoubleTap : null,
-            onRowLongPress: row is DataRow2 ? row.onLongPress : null,
+            onRowLongPress: row.onLongPress,
             onRowSecondaryTap: row is DataRow2 ? row.onSecondaryTap : null,
             onRowSecondaryTapDown:
                 row is DataRow2 ? row.onSecondaryTapDown : null,
