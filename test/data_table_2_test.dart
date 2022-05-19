@@ -114,10 +114,7 @@ void main() {
     // Wait 500ms to get tap registered instead of double tap
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(
-        log.contains('cell-tap: 375') &&
-            log.contains('row-selected: Jelly bean'),
-        true);
+    expect(log, <String>['cell-tap: 375']);
     log.clear();
 
     await tester.tap(find.text('375'));

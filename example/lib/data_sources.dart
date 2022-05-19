@@ -121,7 +121,6 @@ class DessertDataSource extends DataTableSource {
     notifyListeners();
   }
 
-  int _selectedCount = 0;
   void updateSelectedDesserts(RestorableDessertSelections selectedRows) {
     _selectedCount = 0;
     for (var i = 0; i < desserts.length; i += 1) {
@@ -373,6 +372,8 @@ class DesertsFakeWebService {
     });
   }
 }
+
+int _selectedCount = 0;
 
 List<Dessert> _desserts = <Dessert>[
   Dessert(
