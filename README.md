@@ -96,5 +96,4 @@ If you're already using the standard widgets you can reference the package and a
 
 ##  Know issues/limitations
 - There's no capability to size data table cells to fit contents. Column width's adapt to available width (either to parent width or `minWidth`), data rows width are predefined by constructor params. Content that doesn't fit a cell gets clipped
-- Cell tap events disable any row level events. If both a row and a cell within that row happen to have tap events, tapping on a cell won't raise any row events
 - When using `minWidth` and scrolling vertically and horizontally becomes available, one of the scroll bars might be out of sight (https://github.com/maxim-saplin/data_table_2/issues/83)
