@@ -1,5 +1,6 @@
 ## 2.2.3
 - Added Border and Zebra stripes sample, removed Borders sample
+- Refactored row/cell tap events, event bubling added, no hovering effect is visible if there're no tap events in the tables
 
 ## 2.2.2
 - Added PaginatedDataTable2.headingRowColor property
