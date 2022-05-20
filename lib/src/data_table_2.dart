@@ -23,13 +23,16 @@ class DataColumn2 extends DataColumn {
   /// Creates the configuration for a column of a [DataTable2].
   ///
   /// The [label] argument must not be null.
-  const DataColumn2(
-      {required super.label,
-      super.tooltip,
-      super.numeric = false,
-      super.onSort,
-      this.size = ColumnSize.M,
-      this.fixedWidth});
+  const DataColumn2({
+    required super.label,
+    super.tooltip,
+    super.numeric = false,
+    super.onSort,
+    this.size = ColumnSize.M,
+    this.fixedWidth,
+    this.resizeable = false,
+    this.extraWidth = 0,
+  });
 
   /// Column sizes are determined based on available width by distributing it
   /// to individual columns accounting for their relative sizes (see [ColumnSize])
@@ -39,6 +42,12 @@ class DataColumn2 extends DataColumn {
   /// Warning, if the width happens to be larger than available total width other
   /// columns can be clipped
   final double? fixedWidth;
+
+  /// If set to true, a resize handler will apper on the column header
+  final bool resizeable;
+
+  /// Adds an extra width to the column regardless it's width is set by [fixedWidth] or [size]
+  final double extraWidth;
 }
 
 /// Extension of standard [DataRow], adds row level tap events. Also there're
@@ -132,6 +141,7 @@ class DataTable2 extends DataTable {
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
     required super.rows,
+    this.onColumnResized,
   });
 
   static final LocalKey _headingRowKey = UniqueKey();
@@ -206,6 +216,12 @@ class DataTable2 extends DataTable {
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
 
+  /// Called when the column is resized
+  final void Function(DataColumn2, double)? onColumnResized;
+
+  late final double totalColAvailableWidth;
+  late final double totalFixedWidth;
+
   Widget _buildCheckbox({
     required BuildContext context,
     required bool? checked,
@@ -259,6 +275,7 @@ class DataTable2 extends DataTable {
     required bool sorted,
     required bool ascending,
     required MaterialStateProperty<Color?>? overlayColor,
+    DataColumn2? dc2,
   }) {
     final ThemeData themeData = Theme.of(context);
     label = Row(
@@ -300,7 +317,27 @@ class DataTable2 extends DataTable {
         child: label,
       );
     }
-
+    if (dc2 != null && dc2.resizeable) {
+      label = Row(
+        children: [
+          Expanded(child: label),
+          Draggable(
+            onDragUpdate: (d) {
+              if (onColumnResized != null &&
+                  dc2.resizeable &&
+                  totalFixedWidth + d.delta.dx < totalColAvailableWidth) {
+                onColumnResized!(dc2, d.delta.dx);
+              }
+            },
+            feedback: const RotatedBox(
+              quarterTurns: 1,
+              child: Icon(Icons.vertical_align_center),
+            ),
+            child: const Icon(Icons.drag_indicator),
+          ),
+        ],
+      );
+    }
     label = InkWell(
       onTap: onSort,
       overlayColor: overlayColor,
@@ -507,6 +544,7 @@ class DataTable2 extends DataTable {
           sorted: dataColumnIndex == sortColumnIndex,
           ascending: sortAscending,
           overlayColor: effectiveHeadingRowColor,
+          dc2: column is DataColumn2 ? column : null,
         );
 
         var rowIndex = 0;
@@ -660,24 +698,23 @@ class DataTable2 extends DataTable {
     // full margins are added to side column widths when no check box column is
     // present, half-margin added to first data column width is check box column
     // is present and full margin added to the right
-
-    totalColAvailableWidth = totalColAvailableWidth -
-        checkBoxWidth -
-        effectiveHorizontalMargin -
+    var minColWidth = checkBoxWidth +
+        effectiveHorizontalMargin +
         (checkBoxWidth > 0
             ? effectiveHorizontalMargin / 2
             : effectiveHorizontalMargin);
+    totalColAvailableWidth = totalColAvailableWidth - minColWidth;
 
     var columnWidth = totalColAvailableWidth / columns.length;
     var totalColCalculatedWidth = 0.0;
-    var totalFixedWidth = columns.fold<double>(
+    totalFixedWidth = columns.fold<double>(
         0.0,
         (previousValue, element) =>
             previousValue +
             (element is DataColumn2 && element.fixedWidth != null
                 ? element.fixedWidth!
                 : 0.0));
-
+    this.totalColAvailableWidth = totalColAvailableWidth;
     assert(totalFixedWidth < totalColAvailableWidth,
         "DataTable2, combined width of columns of fixed width is greater than availble parent width. Table will be clipped");
 
@@ -696,11 +733,16 @@ class DataTable2 extends DataTable {
         } else if (column.size == ColumnSize.L) {
           w *= lmRatio;
         }
+        w += column.extraWidth;
       }
 
       // skip fixed width columns
       if (!(column is DataColumn2 && column.fixedWidth != null)) {
         totalColCalculatedWidth += w;
+      }
+
+      if (w < minColWidth) {
+        w = minColWidth;
       }
       return w;
     });

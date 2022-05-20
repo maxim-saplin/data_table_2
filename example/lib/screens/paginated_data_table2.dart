@@ -66,49 +66,57 @@ class PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
 
   List<DataColumn> get _columns {
     return [
-      DataColumn(
+      DataColumn2(
         label: const Text('Desert'),
+        resizeable: true,
         onSort: (columnIndex, ascending) =>
             sort<String>((d) => d.name, columnIndex, ascending),
       ),
-      DataColumn(
+      DataColumn2(
         label: const Text('Calories'),
+        resizeable: true,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.calories, columnIndex, ascending),
       ),
-      DataColumn(
+      DataColumn2(
         label: const Text('Fat (gm)'),
+        resizeable: true,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.fat, columnIndex, ascending),
       ),
-      DataColumn(
+      DataColumn2(
         label: const Text('Carbs (gm)'),
+        resizeable: true,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.carbs, columnIndex, ascending),
       ),
-      DataColumn(
+      DataColumn2(
         label: const Text('Protein (gm)'),
+        resizeable: true,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.protein, columnIndex, ascending),
       ),
-      DataColumn(
+      DataColumn2(
         label: const Text('Sodium (mg)'),
+        resizeable: true,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.sodium, columnIndex, ascending),
       ),
-      DataColumn(
+      DataColumn2(
         label: const Text('Calcium (%)'),
+        resizeable: true,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.calcium, columnIndex, ascending),
       ),
-      DataColumn(
+      DataColumn2(
         label: const Text('Iron (%)'),
+        resizeable: true,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.iron, columnIndex, ascending),

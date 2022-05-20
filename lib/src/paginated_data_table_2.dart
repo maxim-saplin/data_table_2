@@ -644,6 +644,26 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     );
   }
 
+  void _onColumnresized(DataColumn2 dc2, double delta) {
+    int idx = widget.columns.indexOf(dc2);
+    double ew = dc2.extraWidth + delta;
+    if (idx >= 0) {
+      DataColumn2 dcn = DataColumn2(
+        label: dc2.label,
+        fixedWidth: dc2.fixedWidth,
+        numeric: dc2.numeric,
+        onSort: dc2.onSort,
+        resizeable: dc2.resizeable,
+        extraWidth: (ew) > 0 ? ew : 0,
+        size: dc2.size,
+        tooltip: dc2.tooltip,
+      );
+      setState(() {
+        widget.columns[idx] = dcn;
+      });
+    }
+  }
+
   Widget _getTable(BoxConstraints constraints) {
     return Flexible(
       fit: widget.fit,
@@ -673,6 +693,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           border: widget.border,
           smRatio: widget.smRatio,
           lmRatio: widget.lmRatio,
+          onColumnResized: _onColumnresized,
         ),
       ),
     );
