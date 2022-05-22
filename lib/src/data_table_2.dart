@@ -219,9 +219,6 @@ class DataTable2 extends DataTable {
   /// Called when the column is resized
   final void Function(DataColumn2, double)? onColumnResized;
 
-  late final double totalColAvailableWidth;
-  late final double totalFixedWidth;
-
   Widget _buildCheckbox({
     required BuildContext context,
     required bool? checked,
@@ -323,9 +320,7 @@ class DataTable2 extends DataTable {
           Expanded(child: label),
           Draggable(
             onDragUpdate: (d) {
-              if (onColumnResized != null &&
-                  dc2.resizeable &&
-                  totalFixedWidth + d.delta.dx < totalColAvailableWidth) {
+              if (onColumnResized != null && dc2.resizeable) {
                 onColumnResized!(dc2, d.delta.dx);
               }
             },
@@ -694,17 +689,16 @@ class DataTable2 extends DataTable {
       double checkBoxWidth, double effectiveHorizontalMargin) {
     var totalColAvailableWidth = constraints.maxWidth;
     double totalExtraWidth = 0;
-    double tFW = 0;
+    double totalFixedWidth = 0;
     for (var c in columns) {
       if (c is DataColumn2) {
         totalColAvailableWidth += c.extraWidth;
         totalExtraWidth += c.extraWidth;
         if (c.fixedWidth != null) {
-          tFW += c.fixedWidth!;
+          totalFixedWidth += c.fixedWidth!;
         }
       }
     }
-    totalFixedWidth = tFW;
     if (minWidth != null && totalColAvailableWidth < minWidth!) {
       totalColAvailableWidth = minWidth!;
     }
@@ -722,7 +716,6 @@ class DataTable2 extends DataTable {
     var columnWidth =
         (totalColAvailableWidth - totalExtraWidth) / columns.length;
     var totalColCalculatedWidth = 0.0;
-    this.totalColAvailableWidth = totalColAvailableWidth;
     assert(totalFixedWidth < totalColAvailableWidth,
         "DataTable2, combined width of columns of fixed width is greater than availble parent width. Table will be clipped");
 
@@ -747,10 +740,6 @@ class DataTable2 extends DataTable {
       // skip fixed width columns
       if (!(column is DataColumn2 && column.fixedWidth != null)) {
         totalColCalculatedWidth += w;
-      }
-
-      if (w < minColWidth) {
-        w = minColWidth;
       }
       return w;
     });
