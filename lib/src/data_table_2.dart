@@ -329,10 +329,12 @@ class DataTable2 extends DataTable {
                 onColumnResized!(dc2, d.delta.dx);
               }
             },
-            feedback: const RotatedBox(
+            axis: Axis.horizontal,
+            childWhenDragging: const RotatedBox(
               quarterTurns: 1,
               child: Icon(Icons.vertical_align_center),
             ),
+            feedback: const SizedBox.shrink(),
             child: const Icon(Icons.drag_indicator),
           ),
         ],
@@ -691,6 +693,18 @@ class DataTable2 extends DataTable {
   List<double> _calculateDataColumnSizes(BoxConstraints constraints,
       double checkBoxWidth, double effectiveHorizontalMargin) {
     var totalColAvailableWidth = constraints.maxWidth;
+    double totalExtraWidth = 0;
+    double tFW = 0;
+    for (var c in columns) {
+      if (c is DataColumn2) {
+        totalColAvailableWidth += c.extraWidth;
+        totalExtraWidth += c.extraWidth;
+        if (c.fixedWidth != null) {
+          tFW += c.fixedWidth!;
+        }
+      }
+    }
+    totalFixedWidth = tFW;
     if (minWidth != null && totalColAvailableWidth < minWidth!) {
       totalColAvailableWidth = minWidth!;
     }
@@ -705,15 +719,9 @@ class DataTable2 extends DataTable {
             : effectiveHorizontalMargin);
     totalColAvailableWidth = totalColAvailableWidth - minColWidth;
 
-    var columnWidth = totalColAvailableWidth / columns.length;
+    var columnWidth =
+        (totalColAvailableWidth - totalExtraWidth) / columns.length;
     var totalColCalculatedWidth = 0.0;
-    totalFixedWidth = columns.fold<double>(
-        0.0,
-        (previousValue, element) =>
-            previousValue +
-            (element is DataColumn2 && element.fixedWidth != null
-                ? element.fixedWidth!
-                : 0.0));
     this.totalColAvailableWidth = totalColAvailableWidth;
     assert(totalFixedWidth < totalColAvailableWidth,
         "DataTable2, combined width of columns of fixed width is greater than availble parent width. Table will be clipped");

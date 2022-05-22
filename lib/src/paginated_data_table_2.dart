@@ -644,9 +644,10 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     );
   }
 
-  void _onColumnresized(DataColumn2 dc2, double delta) {
+  void _onColumnResized(DataColumn2 dc2, double delta) {
     int idx = widget.columns.indexOf(dc2);
     double ew = dc2.extraWidth + delta;
+
     if (idx >= 0) {
       DataColumn2 dcn = DataColumn2(
         label: dc2.label,
@@ -693,7 +694,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           border: widget.border,
           smRatio: widget.smRatio,
           lmRatio: widget.lmRatio,
-          onColumnResized: _onColumnresized,
+          onColumnResized: _onColumnResized,
         ),
       ),
     );
