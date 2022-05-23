@@ -94,6 +94,7 @@ class DataTable2DemoState extends State<DataTable2Demo> {
         columns: [
           DataColumn2(
             label: const Text('Desert'),
+            resizeable: getCurrentRouteOption(context) == resizableCols,
             size: ColumnSize.S,
             // example of fixed 1st row
             fixedWidth:
@@ -103,6 +104,7 @@ class DataTable2DemoState extends State<DataTable2Demo> {
           ),
           DataColumn2(
             label: const Text('Calories'),
+            resizeable: getCurrentRouteOption(context) == resizableCols,
             size: ColumnSize.S,
             numeric: true,
             onSort: (columnIndex, ascending) =>
@@ -110,6 +112,7 @@ class DataTable2DemoState extends State<DataTable2Demo> {
           ),
           DataColumn2(
             label: const Text('Fat (gm)'),
+            resizeable: getCurrentRouteOption(context) == resizableCols,
             size: ColumnSize.S,
             numeric: true,
             onSort: (columnIndex, ascending) =>
@@ -117,6 +120,7 @@ class DataTable2DemoState extends State<DataTable2Demo> {
           ),
           DataColumn2(
             label: const Text('Carbs (gm)'),
+            resizeable: getCurrentRouteOption(context) == resizableCols,
             size: ColumnSize.S,
             numeric: true,
             onSort: (columnIndex, ascending) =>
@@ -124,6 +128,7 @@ class DataTable2DemoState extends State<DataTable2Demo> {
           ),
           DataColumn2(
             label: const Text('Protein (gm)'),
+            resizeable: getCurrentRouteOption(context) == resizableCols,
             size: ColumnSize.S,
             numeric: true,
             onSort: (columnIndex, ascending) =>
@@ -131,6 +136,7 @@ class DataTable2DemoState extends State<DataTable2Demo> {
           ),
           DataColumn2(
             label: const Text('Sodium (mg)'),
+            resizeable: getCurrentRouteOption(context) == resizableCols,
             size: ColumnSize.S,
             numeric: true,
             onSort: (columnIndex, ascending) =>
@@ -145,6 +151,7 @@ class DataTable2DemoState extends State<DataTable2Demo> {
           ),
           DataColumn2(
             label: const Text('Iron (%)'),
+            resizeable: getCurrentRouteOption(context) == resizableCols,
             size: ColumnSize.S,
             numeric: true,
             onSort: (columnIndex, ascending) =>

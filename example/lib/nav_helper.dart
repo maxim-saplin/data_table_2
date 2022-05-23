@@ -22,6 +22,7 @@ const selectAllPage = 'Select all at page';
 const rowTaps = 'Row Taps';
 const rowHeightOverrides = 'Row height overrides';
 const fixedColumnWidth = 'Fixed column width';
+const resizableCols = "Resizable columns";
 
 /// Async sample that emulates network error and allow retrying load operation
 const asyncErrors = "Errors/Retries";
@@ -37,7 +38,8 @@ const Map<String, List<String>> routeOptions = {
     showBordersWithZebraStripes,
     fixedColumnWidth,
     rowTaps,
-    rowHeightOverrides
+    rowHeightOverrides,
+    resizableCols
   ],
   '/paginated2': [dflt, noData, autoRows, custPager, defaultSorting],
   '/asyncpaginated2': [
