@@ -130,11 +130,14 @@ class DataTable2 extends DataTable {
     this.empty,
     this.border,
     this.smRatio = 0.67,
+    this.fixedTopRows = 1,
     this.lmRatio = 1.2,
     required super.rows,
   });
 
   static final LocalKey _headingRowKey = UniqueKey();
+
+  final int fixedTopRows;
 
   void _handleSelectAll(bool? checked, bool someChecked) {
     // If some checkboxes are checked, all checkboxes are selected. Otherwise,
@@ -469,7 +472,7 @@ class DataTable2 extends DataTable {
     final headingRow = _buildHeadingRow(
         context, theme, effectiveHeadingRowColor, tableColumns);
 
-    final tableRows = _buildTableRows(anyRowSelectable, effectiveDataRowColor,
+    final dataRows = _buildTableRows(anyRowSelectable, effectiveDataRowColor,
         context, theme, defaultRowColor, tableColumns);
 
     var builder = LayoutBuilder(builder: (context, constraints) {
@@ -485,7 +488,7 @@ class DataTable2 extends DataTable {
           context,
           someChecked,
           allChecked,
-          tableRows,
+          dataRows,
           effectiveDataRowColor);
 
       if (checkBoxWidth > 0) displayColumnIndex += 1;
@@ -541,7 +544,7 @@ class DataTable2 extends DataTable {
         var rowIndex = 0;
         for (final DataRow row in rows) {
           final DataCell cell = row.cells[dataColumnIndex];
-          tableRows[rowIndex].children![displayColumnIndex] = _buildDataCell(
+          dataRows[rowIndex].children![displayColumnIndex] = _buildDataCell(
             context: context,
             padding: padding,
             specificRowHeight: row is DataRow2 ? row.specificRowHeight : null,
@@ -590,28 +593,34 @@ class DataTable2 extends DataTable {
             horizontalInside: border!.horizontalInside);
       }
 
-      var dataRows = Table(
+      // TODO, don't create extra list, create tcorrect ones right away and add checks to avoid fixedfTopRow > total rows
+      var dataRowsTable = Table(
         columnWidths: widthsAsMap,
-        children: tableRows,
+        children: fixedTopRows > 1
+            ? dataRows.skip(fixedTopRows - 1).toList()
+            : dataRows,
         border: dataRowsBorder,
       );
 
       var marginedTable = bottomMargin != null && bottomMargin! > 0
           ? Column(
               mainAxisSize: MainAxisSize.min,
-              children: [dataRows, SizedBox(height: bottomMargin!)])
-          : dataRows;
+              children: [dataRowsTable, SizedBox(height: bottomMargin!)])
+          : dataRowsTable;
 
       var t = Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Table(
               columnWidths: widthsAsMap,
-              children: [headingRow],
+              children: [
+                headingRow,
+                if (fixedTopRows > 1) ...dataRows.take(fixedTopRows - 1)
+              ],
               border: headingBorder),
           Flexible(
               fit: FlexFit.loose,
-              child: tableRows.isEmpty
+              child: dataRows.isEmpty
                   ? empty ?? const SizedBox()
                   : SingleChildScrollView(
                       controller: scrollController, child: marginedTable))
