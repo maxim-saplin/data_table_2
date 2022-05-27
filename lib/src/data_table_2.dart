@@ -133,7 +133,34 @@ class DataTable2 extends DataTable {
     this.fixedTopRows = 1,
     this.lmRatio = 1.2,
     required super.rows,
-  });
+  }) {
+    if (scrollController != null) {
+      _scrollControllerCoreVertical = scrollController!;
+    } else {
+      _scrollControllerCoreVertical = ScrollController();
+    }
+    _headerHorizontalController
+        .removeListener(_headerHorizontalControllerListener);
+    _headerHorizontalController
+        .addListener(_headerHorizontalControllerListener);
+    _scrollControllerCoreVertical
+        .removeListener(_scrollControllerCoreVerticalListener);
+    _scrollControllerCoreVertical
+        .addListener(_scrollControllerCoreVerticalListener);
+    _scrollControllerCoreHorizontal
+        .removeListener(_scrollControllerCoreHorizontalListener);
+    _scrollControllerCoreHorizontal
+        .addListener(_scrollControllerCoreHorizontalListener);
+  }
+
+  void _headerHorizontalControllerListener() {
+    _scrollControllerCoreHorizontal.jumpTo(_headerHorizontalController.offset);
+  }
+
+  void _scrollControllerCoreVerticalListener() {}
+  void _scrollControllerCoreHorizontalListener() {
+    _headerHorizontalController.jumpTo(_scrollControllerCoreHorizontal.offset);
+  }
 
   static final LocalKey _headingRowKey = UniqueKey();
 
@@ -186,8 +213,11 @@ class DataTable2 extends DataTable {
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? scrollController;
 
+  late ScrollController _scrollControllerCoreVertical;
+  final ScrollController _scrollControllerCoreHorizontal = ScrollController();
+
   // https://github.com/maxim-saplin/data_table_2/issues/42
-  final ScrollController _horizontalController = ScrollController();
+  final ScrollController _headerHorizontalController = ScrollController();
 
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
@@ -608,33 +638,37 @@ class DataTable2 extends DataTable {
               children: [dataRowsTable, SizedBox(height: bottomMargin!)])
           : dataRowsTable;
 
-      var t = Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Table(
-              columnWidths: widthsAsMap,
-              children: [
-                headingRow,
-                if (fixedTopRows > 1) ...dataRows.take(fixedTopRows - 1)
-              ],
-              border: headingBorder),
-          Flexible(
-              fit: FlexFit.loose,
-              child: dataRows.isEmpty
-                  ? empty ?? const SizedBox()
-                  : SingleChildScrollView(
-                      controller: scrollController, child: marginedTable))
-        ],
-      );
-
       var w = Container(
           decoration: decoration ?? theme.dataTableTheme.decoration,
           child: Scrollbar(
-              controller: _horizontalController,
-              child: SingleChildScrollView(
-                  controller: _horizontalController,
-                  scrollDirection: Axis.horizontal,
-                  child: t)));
+              controller: _headerHorizontalController,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SingleChildScrollView(
+                      controller: _headerHorizontalController,
+                      scrollDirection: Axis.horizontal,
+                      child: Table(
+                          columnWidths: widthsAsMap,
+                          children: [
+                            headingRow,
+                            if (fixedTopRows > 1)
+                              ...dataRows.take(fixedTopRows - 1)
+                          ],
+                          border: headingBorder)),
+                  Flexible(
+                      fit: FlexFit.loose,
+                      child: dataRows.isEmpty
+                          ? empty ?? const SizedBox()
+                          : SingleChildScrollView(
+                              controller: _scrollControllerCoreVertical,
+                              scrollDirection: Axis.vertical,
+                              child: SingleChildScrollView(
+                                  controller: _scrollControllerCoreHorizontal,
+                                  scrollDirection: Axis.horizontal,
+                                  child: marginedTable)))
+                ],
+              )));
 
       return w;
     });
