@@ -72,6 +72,7 @@ class DataTable2DemoState extends State<DataTable2Demo> {
         columnSpacing: 12,
         horizontalMargin: 12,
         fixedTopRows: 2,
+        fixedLeftColumns: 2,
         border: getCurrentRouteOption(context) == fixedColumnWidth
             ? TableBorder(
                 top: const BorderSide(color: Colors.black),

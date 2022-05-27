@@ -131,40 +131,55 @@ class DataTable2 extends DataTable {
     this.border,
     this.smRatio = 0.67,
     this.fixedTopRows = 1,
+    this.fixedLeftColumns = 0,
     this.lmRatio = 1.2,
     required super.rows,
   }) {
     if (scrollController != null) {
-      _scrollControllerCoreVertical = scrollController!;
+      _coreVerticalController = scrollController!;
     } else {
-      _scrollControllerCoreVertical = ScrollController();
+      _coreVerticalController = ScrollController();
     }
     _headerHorizontalController
         .removeListener(_headerHorizontalControllerListener);
     _headerHorizontalController
         .addListener(_headerHorizontalControllerListener);
-    _scrollControllerCoreVertical
+
+    _leftColumnVerticalContoller
+        .removeListener(_leftColumnVerticalContollerListener);
+    _leftColumnVerticalContoller
+        .addListener(_leftColumnVerticalContollerListener);
+
+    _coreVerticalController
         .removeListener(_scrollControllerCoreVerticalListener);
-    _scrollControllerCoreVertical
-        .addListener(_scrollControllerCoreVerticalListener);
-    _scrollControllerCoreHorizontal
+    _coreVerticalController.addListener(_scrollControllerCoreVerticalListener);
+    _coreHorizontalController
         .removeListener(_scrollControllerCoreHorizontalListener);
-    _scrollControllerCoreHorizontal
+    _coreHorizontalController
         .addListener(_scrollControllerCoreHorizontalListener);
   }
 
   void _headerHorizontalControllerListener() {
-    _scrollControllerCoreHorizontal.jumpTo(_headerHorizontalController.offset);
+    _coreHorizontalController.jumpTo(_headerHorizontalController.offset);
   }
 
-  void _scrollControllerCoreVerticalListener() {}
   void _scrollControllerCoreHorizontalListener() {
-    _headerHorizontalController.jumpTo(_scrollControllerCoreHorizontal.offset);
+    _headerHorizontalController.jumpTo(_coreHorizontalController.offset);
+  }
+
+  void _scrollControllerCoreVerticalListener() {
+    _leftColumnVerticalContoller.jumpTo(_coreVerticalController.offset);
+  }
+
+  void _leftColumnVerticalContollerListener() {
+    _coreVerticalController.jumpTo(_leftColumnVerticalContoller.offset);
   }
 
   static final LocalKey _headingRowKey = UniqueKey();
 
   final int fixedTopRows;
+
+  final int fixedLeftColumns;
 
   void _handleSelectAll(bool? checked, bool someChecked) {
     // If some checkboxes are checked, all checkboxes are selected. Otherwise,
@@ -213,11 +228,13 @@ class DataTable2 extends DataTable {
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? scrollController;
 
-  late ScrollController _scrollControllerCoreVertical;
-  final ScrollController _scrollControllerCoreHorizontal = ScrollController();
+  late ScrollController _coreVerticalController;
+  final ScrollController _coreHorizontalController = ScrollController();
 
   // https://github.com/maxim-saplin/data_table_2/issues/42
   final ScrollController _headerHorizontalController = ScrollController();
+
+  final ScrollController _leftColumnVerticalContoller = ScrollController();
 
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
@@ -623,14 +640,38 @@ class DataTable2 extends DataTable {
             horizontalInside: border!.horizontalInside);
       }
 
-      // TODO, don't create extra list, create tcorrect ones right away and add checks to avoid fixedfTopRow > total rows
+      // TODO, don't create extra list, create correct ones right away
+      // TODO, add range checks to avoid fixedfTopRow > total rows
       var dataRowsTable = Table(
         columnWidths: widthsAsMap,
         children: fixedTopRows > 1
-            ? dataRows.skip(fixedTopRows - 1).toList()
+            ? (fixedLeftColumns > 0
+                ? dataRows
+                    .skip(fixedTopRows - 1)
+                    .toList()
+                    .map((dr) => TableRow(
+                        children: dr.children!.skip(fixedLeftColumns).toList()))
+                    .toList()
+                : dataRows.skip(fixedTopRows - 1).toList())
             : dataRows,
         border: dataRowsBorder,
       );
+
+      Table? leftmostColumnsTable;
+
+      // TODO, range checks
+      if (fixedLeftColumns > 0) {
+        leftmostColumnsTable = Table(
+          columnWidths: tableColumns.take(fixedLeftColumns).toList().asMap(),
+          children: dataRows
+              .skip(fixedTopRows - 1)
+              .toList()
+              .map((dr) => TableRow(
+                  children: dr.children!.take(fixedLeftColumns).toList()))
+              .toList(),
+          border: dataRowsBorder,
+        );
+      }
 
       var marginedTable = bottomMargin != null && bottomMargin! > 0
           ? Column(
@@ -638,39 +679,50 @@ class DataTable2 extends DataTable {
               children: [dataRowsTable, SizedBox(height: bottomMargin!)])
           : dataRowsTable;
 
-      var w = Container(
-          decoration: decoration ?? theme.dataTableTheme.decoration,
-          child: Scrollbar(
-              controller: _headerHorizontalController,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SingleChildScrollView(
-                      controller: _headerHorizontalController,
-                      scrollDirection: Axis.horizontal,
-                      child: Table(
-                          columnWidths: widthsAsMap,
-                          children: [
-                            headingRow,
-                            if (fixedTopRows > 1)
-                              ...dataRows.take(fixedTopRows - 1)
-                          ],
-                          border: headingBorder)),
-                  Flexible(
-                      fit: FlexFit.loose,
-                      child: dataRows.isEmpty
-                          ? empty ?? const SizedBox()
-                          : SingleChildScrollView(
-                              controller: _scrollControllerCoreVertical,
-                              scrollDirection: Axis.vertical,
-                              child: SingleChildScrollView(
-                                  controller: _scrollControllerCoreHorizontal,
-                                  scrollDirection: Axis.horizontal,
-                                  child: marginedTable)))
-                ],
-              )));
+      var tableCore = SingleChildScrollView(
+          controller: _coreVerticalController,
+          scrollDirection: Axis.vertical,
+          child: SingleChildScrollView(
+              controller: _coreHorizontalController,
+              scrollDirection: Axis.horizontal,
+              child: marginedTable));
 
-      return w;
+      var tableCoreAndLeftmostColumn = dataRows.isEmpty
+          ? Flexible(fit: FlexFit.loose, child: empty ?? const SizedBox())
+          : Flexible(
+              fit: FlexFit.loose,
+              child: (leftmostColumnsTable != null
+                  ? Row(
+                      children: [
+                        SingleChildScrollView(
+                            controller: _leftColumnVerticalContoller,
+                            scrollDirection: Axis.vertical,
+                            child: leftmostColumnsTable),
+                        Flexible(fit: FlexFit.loose, child: tableCore)
+                      ],
+                    )
+                  : tableCore));
+
+      var completeWidget = Container(
+          decoration: decoration ?? theme.dataTableTheme.decoration,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SingleChildScrollView(
+                  controller: _headerHorizontalController,
+                  scrollDirection: Axis.horizontal,
+                  child: Table(
+                      columnWidths: widthsAsMap,
+                      children: [
+                        headingRow,
+                        if (fixedTopRows > 1) ...dataRows.take(fixedTopRows - 1)
+                      ],
+                      border: headingBorder)),
+              tableCoreAndLeftmostColumn
+            ],
+          ));
+
+      return completeWidget;
     });
 
     sw.stop();
