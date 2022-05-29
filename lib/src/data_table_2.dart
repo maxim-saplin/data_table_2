@@ -140,10 +140,10 @@ class DataTable2 extends DataTable {
     } else {
       _coreVerticalController = ScrollController();
     }
-    _headerHorizontalController
-        .removeListener(_headerHorizontalControllerListener);
-    _headerHorizontalController
-        .addListener(_headerHorizontalControllerListener);
+    _fixedRowsHorizontalController
+        .removeListener(_fixedRowsHorizontalControllerListener);
+    _fixedRowsHorizontalController
+        .addListener(_fixedRowsHorizontalControllerListener);
 
     _leftColumnVerticalContoller
         .removeListener(_leftColumnVerticalContollerListener);
@@ -159,20 +159,28 @@ class DataTable2 extends DataTable {
         .addListener(_scrollControllerCoreHorizontalListener);
   }
 
-  void _headerHorizontalControllerListener() {
-    _coreHorizontalController.jumpTo(_headerHorizontalController.offset);
+  void _fixedRowsHorizontalControllerListener() {
+    if (_fixedRowsHorizontalController.hasClients) {
+      _coreHorizontalController.jumpTo(_fixedRowsHorizontalController.offset);
+    }
   }
 
   void _scrollControllerCoreHorizontalListener() {
-    _headerHorizontalController.jumpTo(_coreHorizontalController.offset);
+    if (_fixedRowsHorizontalController.hasClients) {
+      _fixedRowsHorizontalController.jumpTo(_coreHorizontalController.offset);
+    }
   }
 
   void _scrollControllerCoreVerticalListener() {
-    _leftColumnVerticalContoller.jumpTo(_coreVerticalController.offset);
+    if (_leftColumnVerticalContoller.hasClients) {
+      _leftColumnVerticalContoller.jumpTo(_coreVerticalController.offset);
+    }
   }
 
   void _leftColumnVerticalContollerListener() {
-    _coreVerticalController.jumpTo(_leftColumnVerticalContoller.offset);
+    if (_coreVerticalController.hasClients) {
+      _coreVerticalController.jumpTo(_leftColumnVerticalContoller.offset);
+    }
   }
 
   static final LocalKey _headingRowKey = UniqueKey();
@@ -232,7 +240,7 @@ class DataTable2 extends DataTable {
   final ScrollController _coreHorizontalController = ScrollController();
 
   // https://github.com/maxim-saplin/data_table_2/issues/42
-  final ScrollController _headerHorizontalController = ScrollController();
+  final ScrollController _fixedRowsHorizontalController = ScrollController();
 
   final ScrollController _leftColumnVerticalContoller = ScrollController();
 
@@ -268,9 +276,12 @@ class DataTable2 extends DataTable {
     final double effectiveHorizontalMargin = horizontalMargin ??
         themeData.dataTableTheme.horizontalMargin ??
         _horizontalMargin;
+
     Widget contents = Semantics(
       container: true,
-      child: Padding(
+      child: Container(
+        // TODO, fixed to actual height
+        height: 48,
         padding: EdgeInsetsDirectional.only(
           start: checkboxHorizontalMargin ?? effectiveHorizontalMargin,
           end: (checkboxHorizontalMargin ?? effectiveHorizontalMargin) / 2.0,
@@ -293,10 +304,12 @@ class DataTable2 extends DataTable {
         child: contents,
       );
     }
-    return TableCell(
-      verticalAlignment: TableCellVerticalAlignment.fill,
-      child: contents,
-    );
+
+    return contents;
+    // return TableCell(
+    //   verticalAlignment: TableCellVerticalAlignment.fill,
+    //   child: contents,
+    // );
   }
 
   Widget _buildHeadingCell({
@@ -652,21 +665,20 @@ class DataTable2 extends DataTable {
       // TODO, fix Zebra rows sample
       var coreTable = Table(
         columnWidths: fixedLeftColumns > 0 ? rightWidthsAsMap : widthsAsMap,
-        children: (fixedLeftColumns > 0 && fixedTopRows > 1)
-            ? dataRows
-                .skip(fixedTopRows - 1)
-                .map((dr) => TableRow(
-                    children: dr.children!.skip(fixedLeftColumns).toList()))
-                .toList()
-            : (fixedLeftColumns < 1 && fixedTopRows > 1)
-                ? dataRows.skip(fixedTopRows - 1).toList()
-                : (fixedLeftColumns < 1 && fixedTopRows < 1)
-                    ? [headingRow, ...dataRows].toList()
-                    : [headingRow, ...dataRows]
-                        .map((dr) => TableRow(
-                            children:
-                                dr.children!.skip(fixedLeftColumns).toList()))
-                        .toList(),
+        children: fixedLeftColumns > 0
+            ? [
+                if (fixedTopRows < 1)
+                  TableRow(
+                      children:
+                          headingRow.children!.skip(fixedLeftColumns).toList()),
+                ...dataRows.skip(fixedTopRows < 1 ? 0 : fixedTopRows - 1).map(
+                    (dr) => TableRow(
+                        children: dr.children!.skip(fixedLeftColumns).toList()))
+              ]
+            : [
+                if (fixedTopRows < 1) headingRow,
+                ...dataRows.skip(fixedTopRows < 1 ? 0 : fixedTopRows - 1)
+              ],
         border: border,
       );
 
@@ -697,10 +709,18 @@ class DataTable2 extends DataTable {
       // TODO, range checks
       if (fixedLeftColumns > 0) {
         var rows = dataRows
-            .skip(fixedTopRows - 1)
+            .skip(fixedTopRows < 1 ? 0 : fixedTopRows - 1)
             .map((dr) => TableRow(
                 children: dr.children!.take(fixedLeftColumns).toList()))
             .toList();
+
+        if (fixedTopRows < 1) {
+          rows.insert(
+              0,
+              TableRow(
+                  children:
+                      headingRow.children!.take(fixedLeftColumns).toList()));
+        }
 
         fixedColumnsTable = Table(
           columnWidths: leftWidthsAsMap,
@@ -734,67 +754,73 @@ class DataTable2 extends DataTable {
                   children: [t, SizedBox(height: bottomMargin!)])
               : t;
 
-      var coreWidget = Flexible(
-          fit: FlexFit.loose,
-          child: SingleChildScrollView(
-              controller: _coreVerticalController,
-              scrollDirection: Axis.vertical,
-              child: SingleChildScrollView(
-                  controller: _coreHorizontalController,
-                  scrollDirection: Axis.horizontal,
-                  child: _addBottomMargin(coreTable))));
+      // var x = SingleChildScrollView(
+      //     controller: _coreVerticalController,
+      //     scrollDirection: Axis.vertical,
+      //     child: SingleChildScrollView(
+      //         controller: _coreHorizontalController,
+      //         scrollDirection: Axis.horizontal,
+      //         child: _addBottomMargin(coreTable)));
 
-      var fixedRowsAndCoreCol = fixedRowsTabel != null
-          ? Column(mainAxisSize: MainAxisSize.min, children: [
-              ScrollConfiguration(
-                  behavior: ScrollConfiguration.of(context)
-                      .copyWith(scrollbars: false),
-                  child: SingleChildScrollView(
-                      controller: _headerHorizontalController,
-                      scrollDirection: Axis.horizontal,
-                      child: fixedRowsTabel)),
-              coreWidget
-            ])
-          : coreWidget;
+      // // avoid assertion when no fixed sections
+      // var coreWidget = fixedLeftColumns > 0 || fixedTopRows > 0
+      //     ? Flexible(fit: FlexFit.loose, child: x)
+      //     : x;
+
+// TODO, fix scroll bar out of sight
+      var fixedRowsAndCoreCol =
+          Column(mainAxisSize: MainAxisSize.min, children: [
+        if (fixedRowsTabel != null)
+          ScrollConfiguration(
+              behavior:
+                  ScrollConfiguration.of(context).copyWith(scrollbars: false),
+              child: SingleChildScrollView(
+                  controller: _fixedRowsHorizontalController,
+                  scrollDirection: Axis.horizontal,
+                  child: fixedRowsTabel)),
+        Flexible(
+            fit: FlexFit.tight,
+            child: SingleChildScrollView(
+                controller: _coreVerticalController,
+                scrollDirection: Axis.vertical,
+                child: SingleChildScrollView(
+                    controller: _coreHorizontalController,
+                    scrollDirection: Axis.horizontal,
+                    child: _addBottomMargin(coreTable))))
+      ]);
 
       Widget? fixedColumnAndCornerCol = fixedColumnsTable == null
           ? null
-          : fixedTopLeftCornerTable != null
-              ? Column(mainAxisSize: MainAxisSize.min, children: [
-                  fixedTopLeftCornerTable,
-                  Flexible(
-                      fit: FlexFit.loose,
-                      child: ScrollConfiguration(
-                          behavior: ScrollConfiguration.of(context)
-                              .copyWith(scrollbars: false),
-                          child: SingleChildScrollView(
-                              controller: _leftColumnVerticalContoller,
-                              scrollDirection: Axis.vertical,
-                              child: _addBottomMargin(fixedColumnsTable))))
-                ])
-              : Flexible(
+          : Column(mainAxisSize: MainAxisSize.min, children: [
+              if (fixedTopLeftCornerTable != null) fixedTopLeftCornerTable,
+              Flexible(
                   fit: FlexFit.loose,
-                  child: SingleChildScrollView(
-                      controller: _leftColumnVerticalContoller,
-                      scrollDirection: Axis.vertical,
-                      child: _addBottomMargin(fixedColumnsTable)));
+                  child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context)
+                          .copyWith(scrollbars: false),
+                      child: SingleChildScrollView(
+                          controller: _leftColumnVerticalContoller,
+                          scrollDirection: Axis.vertical,
+                          child: _addBottomMargin(fixedColumnsTable))))
+            ]);
 
       var completeWidget = Container(
           decoration: decoration ?? theme.dataTableTheme.decoration,
           child: dataRows.isEmpty
               ? Column(children: [
                   Table(children: [headingRow]),
-                  Flexible(fit: FlexFit.loose, child: empty ?? const SizedBox())
+                  Flexible(fit: FlexFit.tight, child: empty ?? const SizedBox())
                 ])
-              : (fixedColumnAndCornerCol != null
-                  ? Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        fixedColumnAndCornerCol,
-                        Flexible(fit: FlexFit.loose, child: fixedRowsAndCoreCol)
-                      ],
-                    )
-                  : fixedRowsAndCoreCol));
+              : Row(
+                  children: [
+                    if (fixedColumnAndCornerCol != null)
+                      fixedColumnAndCornerCol,
+                    Flexible(
+                        fit: FlexFit.tight,
+                        //flex: 555,
+                        child: fixedRowsAndCoreCol)
+                  ],
+                ));
 
       //var completeWidget = fixedColumnAndCornerCol!;
 
@@ -823,6 +849,7 @@ class DataTable2 extends DataTable {
           Checkbox.width +
           effectiveHorizontalMargin / 2.0;
       tableColumns[0] = FixedColumnWidth(checkBoxWidth);
+
       headingRow.children![0] = _buildCheckbox(
         context: context,
         checked: someChecked ? null : allChecked,
