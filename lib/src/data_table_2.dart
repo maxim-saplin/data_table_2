@@ -31,7 +31,6 @@ class DataColumn2 extends DataColumn {
     this.size = ColumnSize.M,
     this.fixedWidth,
     this.resizeable = false,
-    this.extraWidth = 0,
   });
 
   /// Column sizes are determined based on available width by distributing it
@@ -45,9 +44,6 @@ class DataColumn2 extends DataColumn {
 
   /// If set to true, a resize handler will apper on the column header
   final bool resizeable;
-
-  /// Adds an extra width to the column regardless it's width is set by [fixedWidth] or [size]
-  final double extraWidth;
 }
 
 /// Extension of standard [DataRow], adds row level tap events. Also there're
@@ -107,6 +103,58 @@ class DataRow2 extends DataRow {
   // final GestureLongPressCallback? onLongPress;
 }
 
+/// Controller to store and calculate columns resizing
+class ColumnDataController extends ChangeNotifier {
+  /// Minimum size for a column
+  /// TODO: find a way to calculate minimum column or just leave it hardcoded
+  static double minColWidth = 50;
+
+  Map<int, double> colsExtraWidth = {};
+  Map<int, double> colsWidthNoExtra = {};
+
+  double getExtraWidth(int idCol) {
+    return colsExtraWidth[idCol] ?? 0.0;
+  }
+
+  double getCurrentWidth(int idCol) {
+    return (colsWidthNoExtra[idCol] ?? 0.0) + getExtraWidth(idCol);
+  }
+
+  void updateDataColumn(int idCol, double delta) {
+    colsExtraWidth[idCol] = getExtraWidth(idCol) + delta;
+  }
+
+  bool isFixedWidth(DataColumn dc, int colIdx) {
+    return dc is! DataColumn2 ||
+        (dc.fixedWidth != null || getExtraWidth(colIdx) != 0);
+  }
+
+  /// Returns the proportion of not fixed width columns left of [colLimit]
+  /// with respect the total of not fixed width columns
+  double getPropLeftNotFixedColumns(
+      List<DataColumn> columns, DataColumn colLimit) {
+    double res = 1;
+    int t = 0;
+    int l = 0;
+    bool left = true;
+    for (var c in columns) {
+      if (c == colLimit) {
+        left = false;
+      }
+      if (c != colLimit && !isFixedWidth(c, columns.indexOf(c))) {
+        if (left) {
+          l++;
+        }
+        t++;
+      }
+    }
+    if (t > 0) {
+      res = l / t;
+    }
+    return res;
+  }
+}
+
 /// In-place replacement of standard [DataTable] widget, mimics it API.
 /// Has the header row always fixed and core of the table (with data rows)
 /// scrollable and stretching to max width/height of it's container.
@@ -142,6 +190,7 @@ class DataTable2 extends DataTable {
     this.lmRatio = 1.2,
     required super.rows,
     this.onColumnResized,
+    this.columnDataController,
   });
 
   static final LocalKey _headingRowKey = UniqueKey();
@@ -218,6 +267,8 @@ class DataTable2 extends DataTable {
 
   /// Called when the column is resized
   final void Function(DataColumn2, double)? onColumnResized;
+
+  final ColumnDataController? columnDataController;
 
   Widget _buildCheckbox({
     required BuildContext context,
@@ -692,10 +743,15 @@ class DataTable2 extends DataTable {
     double totalFixedWidth = 0;
     for (var c in columns) {
       if (c is DataColumn2) {
-        totalColAvailableWidth += c.extraWidth;
-        totalExtraWidth += c.extraWidth;
+        var extraWidth = columnDataController != null
+            ? columnDataController!.getExtraWidth(columns.indexOf(c))
+            : 0.0;
+        totalExtraWidth += extraWidth;
         if (c.fixedWidth != null) {
           totalFixedWidth += c.fixedWidth!;
+        } else if (columnDataController != null && extraWidth != 0) {
+          totalFixedWidth +=
+              columnDataController!.colsWidthNoExtra[columns.indexOf(c)]!;
         }
       }
     }
@@ -713,45 +769,67 @@ class DataTable2 extends DataTable {
             : effectiveHorizontalMargin);
     totalColAvailableWidth = totalColAvailableWidth - minColWidth;
 
-    var columnWidth =
-        (totalColAvailableWidth - totalExtraWidth) / columns.length;
+    // We only check fixed width if there are no resisable columns
+    if (totalExtraWidth == 0) {
+      assert(totalFixedWidth < totalColAvailableWidth,
+          "DataTable2, combined width of columns of fixed width is greater than availble parent width. Table will be clipped");
+    }
+    totalColAvailableWidth = math.max(
+        0.0, totalColAvailableWidth - totalFixedWidth - totalExtraWidth);
+    var columnWidth = totalColAvailableWidth / columns.length;
     var totalColCalculatedWidth = 0.0;
-    assert(totalFixedWidth < totalColAvailableWidth,
-        "DataTable2, combined width of columns of fixed width is greater than availble parent width. Table will be clipped");
-
-    totalColAvailableWidth =
-        math.max(0.0, totalColAvailableWidth - totalFixedWidth);
-
     // adjust column sizes relative to S, M, L
     final widths = List<double>.generate(columns.length, (i) {
       var w = columnWidth;
       var column = columns[i];
+      var extraWidth = 0.0;
       if (column is DataColumn2) {
-        if (column.fixedWidth != null) {
+        extraWidth = columnDataController != null
+            ? columnDataController!.getExtraWidth(i)
+            : 0.0;
+        if (extraWidth != 0) {
+          w = columnDataController!.colsWidthNoExtra[i]!;
+        } else if (column.fixedWidth != null) {
           w = column.fixedWidth!;
         } else if (column.size == ColumnSize.S) {
           w *= smRatio;
         } else if (column.size == ColumnSize.L) {
           w *= lmRatio;
         }
-        w += column.extraWidth;
       }
 
-      // skip fixed width columns
-      if (!(column is DataColumn2 && column.fixedWidth != null)) {
+      //skip fixed width columns
+      if (!(column is DataColumn2 && column.fixedWidth != null) &&
+          extraWidth == 0) {
         totalColCalculatedWidth += w;
       }
       return w;
     });
 
-    // scale columns to fit the total lemnght into available width
+    // scale columns to fit the total lenght into available width
 
-    var ratio = totalColAvailableWidth / totalColCalculatedWidth;
+    var ratio = totalColCalculatedWidth != 0
+        ? totalColAvailableWidth / totalColCalculatedWidth
+        : 0;
     for (var i = 0; i < widths.length; i++) {
+      double extraWidth = columnDataController != null
+          ? columnDataController!.getExtraWidth(i)
+          : 0.0;
       // skip fixed width column
       if (!(columns[i] is DataColumn2 &&
-          (columns[i] as DataColumn2).fixedWidth != null)) {
+              (columns[i] as DataColumn2).fixedWidth != null) &&
+          extraWidth == 0) {
         widths[i] *= ratio;
+      }
+      if (columnDataController != null) {
+        columnDataController!.colsWidthNoExtra[i] = widths[i];
+      }
+      widths[i] += extraWidth;
+      if (columnDataController != null) {
+        if (widths[i] < ColumnDataController.minColWidth) {
+          widths[i] = ColumnDataController.minColWidth;
+          columnDataController!.colsWidthNoExtra[i] = widths[i];
+        }
       }
     }
 

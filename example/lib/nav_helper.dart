@@ -38,10 +38,16 @@ const Map<String, List<String>> routeOptions = {
     showBordersWithZebraStripes,
     fixedColumnWidth,
     rowTaps,
-    rowHeightOverrides,
+    rowHeightOverrides
+  ],
+  '/paginated2': [
+    dflt,
+    noData,
+    autoRows,
+    custPager,
+    defaultSorting,
     resizableCols
   ],
-  '/paginated2': [dflt, noData, autoRows, custPager, defaultSorting],
   '/asyncpaginated2': [
     dflt,
     noData,

@@ -422,6 +422,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   final Map<int, DataRow?> _rows = <int, DataRow?>{};
   int _effectiveRowsPerPage = -1;
   int _prevRowsPerPageForAutoRows = -1;
+  ColumnDataController columnDataController = ColumnDataController();
 
   @override
   void setState(VoidCallback fn) {
@@ -465,6 +466,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   @override
   void dispose() {
     widget.source.removeListener(_handleDataSourceChanged);
+    columnDataController.dispose();
     super.dispose();
   }
 
@@ -645,22 +647,16 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   }
 
   void _onColumnResized(DataColumn2 dc2, double delta) {
-    int idx = widget.columns.indexOf(dc2);
-    double ew = dc2.extraWidth + delta;
+    var idx = widget.columns.indexOf(dc2);
 
-    if (idx >= 0) {
-      DataColumn2 dcn = DataColumn2(
-        label: dc2.label,
-        fixedWidth: dc2.fixedWidth,
-        numeric: dc2.numeric,
-        onSort: dc2.onSort,
-        resizeable: dc2.resizeable,
-        extraWidth: (ew) > 0 ? ew : 0,
-        size: dc2.size,
-        tooltip: dc2.tooltip,
-      );
+    /// Compensate delta when there are columns with not fixed width to the left
+    var cl =
+        columnDataController.getPropLeftNotFixedColumns(widget.columns, dc2);
+    delta = delta / (1 - cl);
+    if ((columnDataController.getCurrentWidth(idx) + delta) >=
+        ColumnDataController.minColWidth) {
       setState(() {
-        widget.columns[idx] = dcn;
+        columnDataController.updateDataColumn(idx, delta);
       });
     }
   }
@@ -695,6 +691,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           smRatio: widget.smRatio,
           lmRatio: widget.lmRatio,
           onColumnResized: _onColumnResized,
+          columnDataController: columnDataController,
         ),
       ),
     );
