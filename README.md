@@ -96,4 +96,6 @@ If you're already using the standard widgets you can reference the package and a
 
 ##  Know issues/limitations
 - There's no capability to size data table cells to fit contents. Column width's adapt to available width (either to parent width or `minWidth`), data rows width are predefined by constructor params. Content that doesn't fit a cell gets clipped
-- When using `minWidth` and scrolling vertically and horizontally becomes available, one of the scroll bars might be out of sight (https://github.com/maxim-saplin/data_table_2/issues/83)
+- There're no data grid capabilities, such as: expanding/collapsing rows (drill-down scenarios), manually moving or resizing columns or rows, merging cells (i.e. CSS's colspan, rowspan)
+- When fixing left columns, hovering over rows doesn't highlight entire row (should there be any tap handlers standard behavior is hovering a row changes it background)
+ - With fixed top rows and left columns hovering over actionable data rows their highlighted background can be displayed behind fixed sections

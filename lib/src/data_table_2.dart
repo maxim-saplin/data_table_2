@@ -512,15 +512,15 @@ class DataTable2 extends DataTable {
     final effectiveColumnSpacing =
         columnSpacing ?? theme.dataTableTheme.columnSpacing ?? _columnSpacing;
 
-    final tableColumns = List<TableColumnWidth>.filled(
+    final tableColumnWidths = List<TableColumnWidth>.filled(
         columns.length + (displayCheckboxColumn ? 1 : 0),
         const _NullTableColumnWidth());
 
     final headingRow = _buildHeadingRow(
-        context, theme, effectiveHeadingRowColor, tableColumns);
+        context, theme, effectiveHeadingRowColor, tableColumnWidths);
 
     final dataRows = _buildTableRows(anyRowSelectable, effectiveDataRowColor,
-        context, theme, defaultRowColor, tableColumns);
+        context, theme, defaultRowColor, tableColumnWidths);
 
     var builder = LayoutBuilder(builder: (context, constraints) {
       var displayColumnIndex = 0;
@@ -530,7 +530,7 @@ class DataTable2 extends DataTable {
       double checkBoxWidth = _addCheckBoxes(
           displayCheckboxColumn,
           effectiveHorizontalMargin,
-          tableColumns,
+          tableColumnWidths,
           headingRow,
           context,
           someChecked,
@@ -570,7 +570,7 @@ class DataTable2 extends DataTable {
           end: paddingEnd,
         );
 
-        tableColumns[displayColumnIndex] =
+        tableColumnWidths[displayColumnIndex] =
             FixedColumnWidth(widths[dataColumnIndex]);
 
         headingRow.children![displayColumnIndex] = _buildHeadingCell(
@@ -620,107 +620,183 @@ class DataTable2 extends DataTable {
         displayColumnIndex += 1;
       }
 
-      var widthsAsMap = tableColumns.asMap();
+      var widthsAsMap = tableColumnWidths.asMap();
+      Map<int, TableColumnWidth>? leftWidthsAsMap = fixedLeftColumns > 0
+          ? tableColumnWidths.take(fixedLeftColumns).toList().asMap()
+          : null;
+      Map<int, TableColumnWidth>? rightWidthsAsMap = fixedLeftColumns > 0
+          ? tableColumnWidths.skip(fixedLeftColumns).toList().asMap()
+          : null;
 
-      TableBorder? headingBorder;
-      TableBorder? dataRowsBorder;
+      // TableBorder? headingBorder;
+      // TableBorder? dataRowsBorder;
 
-      if (border != null) {
-        headingBorder = TableBorder(
-            top: border!.top,
-            left: border!.left,
-            right: border!.right,
-            bottom: border!.horizontalInside,
-            verticalInside: border!.verticalInside);
-        dataRowsBorder = TableBorder(
-            left: border!.left,
-            right: border!.right,
-            bottom: border!.bottom,
-            verticalInside: border!.verticalInside,
-            horizontalInside: border!.horizontalInside);
-      }
+      // TODO fix borders
+      // if (border != null) {
+      //   headingBorder = TableBorder(
+      //       top: border!.top,
+      //       left: border!.left,
+      //       right: border!.right,
+      //       bottom: border!.horizontalInside,
+      //       verticalInside: border!.verticalInside);
+      //   dataRowsBorder = TableBorder(
+      //       left: border!.left,
+      //       right: border!.right,
+      //       bottom: border!.bottom,
+      //       verticalInside: border!.verticalInside,
+      //       horizontalInside: border!.horizontalInside);
+      // }
 
       // TODO, don't create extra list, create correct ones right away
       // TODO, add range checks to avoid fixedfTopRow > total rows
-      var dataRowsTable = Table(
-        columnWidths: widthsAsMap,
-        children: fixedTopRows > 1
-            ? (fixedLeftColumns > 0
-                ? dataRows
-                    .skip(fixedTopRows - 1)
-                    .toList()
-                    .map((dr) => TableRow(
-                        children: dr.children!.skip(fixedLeftColumns).toList()))
-                    .toList()
-                : dataRows.skip(fixedTopRows - 1).toList())
-            : dataRows,
-        border: dataRowsBorder,
+      // TODO, fix Zebra rows sample
+      var coreTable = Table(
+        columnWidths: fixedLeftColumns > 0 ? rightWidthsAsMap : widthsAsMap,
+        children: (fixedLeftColumns > 0 && fixedTopRows > 1)
+            ? dataRows
+                .skip(fixedTopRows - 1)
+                .map((dr) => TableRow(
+                    children: dr.children!.skip(fixedLeftColumns).toList()))
+                .toList()
+            : (fixedLeftColumns < 1 && fixedTopRows > 1)
+                ? dataRows.skip(fixedTopRows - 1).toList()
+                : (fixedLeftColumns < 1 && fixedTopRows < 1)
+                    ? [headingRow, ...dataRows].toList()
+                    : [headingRow, ...dataRows]
+                        .map((dr) => TableRow(
+                            children:
+                                dr.children!.skip(fixedLeftColumns).toList()))
+                        .toList(),
+        border: border,
       );
 
-      Table? leftmostColumnsTable;
+      Table? fixedRowsTabel;
+      Table? fixedColumnsTable;
+      Table? fixedTopLeftCornerTable;
+
+      if (fixedTopRows > 0) {
+        fixedRowsTabel = Table(
+            columnWidths: fixedLeftColumns > 0 ? rightWidthsAsMap : widthsAsMap,
+            children: [
+              if (fixedLeftColumns < 1)
+                headingRow
+              else
+                TableRow(
+                    children:
+                        headingRow.children!.skip(fixedLeftColumns).toList()),
+              if (fixedTopRows > 1 && fixedLeftColumns < 1)
+                ...dataRows.take(fixedTopRows - 1)
+              else if (fixedTopRows > 1 && fixedLeftColumns > 0)
+                ...dataRows.take(fixedTopRows - 1).map((dr) => TableRow(
+                    children: dr.children!.skip(fixedLeftColumns).toList()))
+            ],
+            // TODO, fix border
+            border: border);
+      }
 
       // TODO, range checks
       if (fixedLeftColumns > 0) {
-        leftmostColumnsTable = Table(
-          columnWidths: tableColumns.take(fixedLeftColumns).toList().asMap(),
-          children: dataRows
-              .skip(fixedTopRows - 1)
-              .toList()
-              .map((dr) => TableRow(
-                  children: dr.children!.take(fixedLeftColumns).toList()))
-              .toList(),
-          border: dataRowsBorder,
+        var rows = dataRows
+            .skip(fixedTopRows - 1)
+            .map((dr) => TableRow(
+                children: dr.children!.take(fixedLeftColumns).toList()))
+            .toList();
+
+        fixedColumnsTable = Table(
+          columnWidths: leftWidthsAsMap,
+          children: rows,
+          border: border,
         );
       }
 
-      var marginedTable = bottomMargin != null && bottomMargin! > 0
-          ? Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [dataRowsTable, SizedBox(height: bottomMargin!)])
-          : dataRowsTable;
+      if (fixedTopRows > 0 && fixedLeftColumns > 0) {
+        var rows = [
+          headingRow,
+          if (fixedTopRows > 1) ...dataRows.take(fixedTopRows - 1)
+        ]
+            .map((dr) => TableRow(
+                children: dr.children!.take(fixedLeftColumns).toList()))
+            .toList();
 
-      var tableCore = SingleChildScrollView(
-          controller: _coreVerticalController,
-          scrollDirection: Axis.vertical,
+        fixedTopLeftCornerTable = Table(
+          columnWidths: leftWidthsAsMap,
+          children: rows,
+          border: border,
+        );
+      }
+
+      // TODO, check how that works, might also use on leftmost colum
+
+      Widget _addBottomMargin(Table t) =>
+          bottomMargin != null && bottomMargin! > 0
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [t, SizedBox(height: bottomMargin!)])
+              : t;
+
+      var coreWidget = Flexible(
+          fit: FlexFit.loose,
           child: SingleChildScrollView(
-              controller: _coreHorizontalController,
-              scrollDirection: Axis.horizontal,
-              child: marginedTable));
+              controller: _coreVerticalController,
+              scrollDirection: Axis.vertical,
+              child: SingleChildScrollView(
+                  controller: _coreHorizontalController,
+                  scrollDirection: Axis.horizontal,
+                  child: _addBottomMargin(coreTable))));
 
-      var tableCoreAndLeftmostColumn = dataRows.isEmpty
-          ? Flexible(fit: FlexFit.loose, child: empty ?? const SizedBox())
-          : Flexible(
-              fit: FlexFit.loose,
-              child: (leftmostColumnsTable != null
-                  ? Row(
-                      children: [
-                        SingleChildScrollView(
-                            controller: _leftColumnVerticalContoller,
-                            scrollDirection: Axis.vertical,
-                            child: leftmostColumnsTable),
-                        Flexible(fit: FlexFit.loose, child: tableCore)
-                      ],
-                    )
-                  : tableCore));
+      var fixedRowsAndCoreCol = fixedRowsTabel != null
+          ? Column(mainAxisSize: MainAxisSize.min, children: [
+              ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context)
+                      .copyWith(scrollbars: false),
+                  child: SingleChildScrollView(
+                      controller: _headerHorizontalController,
+                      scrollDirection: Axis.horizontal,
+                      child: fixedRowsTabel)),
+              coreWidget
+            ])
+          : coreWidget;
+
+      Widget? fixedColumnAndCornerCol = fixedColumnsTable == null
+          ? null
+          : fixedTopLeftCornerTable != null
+              ? Column(mainAxisSize: MainAxisSize.min, children: [
+                  fixedTopLeftCornerTable,
+                  Flexible(
+                      fit: FlexFit.loose,
+                      child: ScrollConfiguration(
+                          behavior: ScrollConfiguration.of(context)
+                              .copyWith(scrollbars: false),
+                          child: SingleChildScrollView(
+                              controller: _leftColumnVerticalContoller,
+                              scrollDirection: Axis.vertical,
+                              child: _addBottomMargin(fixedColumnsTable))))
+                ])
+              : Flexible(
+                  fit: FlexFit.loose,
+                  child: SingleChildScrollView(
+                      controller: _leftColumnVerticalContoller,
+                      scrollDirection: Axis.vertical,
+                      child: _addBottomMargin(fixedColumnsTable)));
 
       var completeWidget = Container(
           decoration: decoration ?? theme.dataTableTheme.decoration,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SingleChildScrollView(
-                  controller: _headerHorizontalController,
-                  scrollDirection: Axis.horizontal,
-                  child: Table(
-                      columnWidths: widthsAsMap,
+          child: dataRows.isEmpty
+              ? Column(children: [
+                  Table(children: [headingRow]),
+                  Flexible(fit: FlexFit.loose, child: empty ?? const SizedBox())
+                ])
+              : (fixedColumnAndCornerCol != null
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        headingRow,
-                        if (fixedTopRows > 1) ...dataRows.take(fixedTopRows - 1)
+                        fixedColumnAndCornerCol,
+                        Flexible(fit: FlexFit.loose, child: fixedRowsAndCoreCol)
                       ],
-                      border: headingBorder)),
-              tableCoreAndLeftmostColumn
-            ],
-          ));
+                    )
+                  : fixedRowsAndCoreCol));
+
+      //var completeWidget = fixedColumnAndCornerCol!;
 
       return completeWidget;
     });
