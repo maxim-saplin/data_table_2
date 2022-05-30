@@ -536,29 +536,102 @@ class DataTable2 extends DataTable {
         const _NullTableColumnWidth());
 
     final headingRow = _buildHeadingRow(
-        context, theme, effectiveHeadingRowColor, tableColumnWidths);
+        context, theme, effectiveHeadingRowColor, tableColumnWidths.length);
 
     final dataRows = _buildTableRows(anyRowSelectable, effectiveDataRowColor,
-        context, theme, defaultRowColor, tableColumnWidths);
+        context, theme, tableColumnWidths.length, defaultRowColor);
+
+    //TODO, test with number of rows less than fixed rows, number of columns less than fixed columns
+
+    final coreRows = _buildTableRows(
+        anyRowSelectable,
+        effectiveDataRowColor,
+        context,
+        theme,
+        tableColumnWidths.length - fixedLeftColumns,
+        defaultRowColor,
+        fixedTopRows);
+
+    List<TableRow>? fixedTopRowsRows = fixedTopRows > 0
+        ? (fixedTopRows == 1
+            ? [
+                _buildHeadingRow(context, theme, effectiveHeadingRowColor,
+                    tableColumnWidths.length)
+              ]
+            : [
+                _buildHeadingRow(context, theme, effectiveHeadingRowColor,
+                    tableColumnWidths.length),
+                ..._buildTableRows(
+                    anyRowSelectable,
+                    effectiveDataRowColor,
+                    context,
+                    theme,
+                    tableColumnWidths.length,
+                    defaultRowColor,
+                    0,
+                    fixedTopRows - 1)
+              ])
+        : null;
+
+    List<TableRow>? fixedCornerRows = fixedLeftColumns > 0 && fixedTopRows > 0
+        ? (fixedTopRows == 1
+            ? [
+                _buildHeadingRow(
+                    context, theme, effectiveHeadingRowColor, fixedLeftColumns)
+              ]
+            : [
+                _buildHeadingRow(
+                    context, theme, effectiveHeadingRowColor, fixedLeftColumns),
+                ..._buildTableRows(
+                    anyRowSelectable,
+                    effectiveDataRowColor,
+                    context,
+                    theme,
+                    fixedLeftColumns,
+                    defaultRowColor,
+                    0,
+                    fixedTopRows - 1)
+              ])
+        : null;
+
+    List<TableRow>? fixedColumnsRows = fixedLeftColumns > 0
+        ? (fixedTopRows < 1
+            ? [
+                _buildHeadingRow(
+                    context, theme, effectiveHeadingRowColor, fixedLeftColumns),
+                ..._buildTableRows(anyRowSelectable, effectiveDataRowColor,
+                    context, theme, fixedLeftColumns, defaultRowColor)
+              ]
+            : _buildTableRows(
+                anyRowSelectable,
+                effectiveDataRowColor,
+                context,
+                theme,
+                fixedLeftColumns,
+                defaultRowColor,
+                fixedTopRows - 1,
+              ))
+        : null;
+
+    double checkBoxWidth = _addCheckBoxes(
+        displayCheckboxColumn,
+        effectiveHorizontalMargin,
+        tableColumnWidths,
+        headingRow,
+        effectiveHeadingRowHeight,
+        context,
+        someChecked,
+        allChecked,
+        dataRows,
+        rows,
+        defaultDataRowHeight,
+        effectiveDataRowColor);
 
     var builder = LayoutBuilder(builder: (context, constraints) {
       var displayColumnIndex = 0;
 
       // size & build checkboxes in heading and leftmost column
       // to be substracted from total width available to columns
-      double checkBoxWidth = _addCheckBoxes(
-          displayCheckboxColumn,
-          effectiveHorizontalMargin,
-          tableColumnWidths,
-          headingRow,
-          effectiveHeadingRowHeight,
-          context,
-          someChecked,
-          allChecked,
-          dataRows,
-          rows,
-          defaultDataRowHeight,
-          effectiveDataRowColor);
 
       if (checkBoxWidth > 0) displayColumnIndex += 1;
 
@@ -987,20 +1060,24 @@ class DataTable2 extends DataTable {
       MaterialStateProperty<Color?>? effectiveDataRowColor,
       BuildContext context,
       ThemeData theme,
+      int numberOfCols,
       MaterialStateProperty<Color?> defaultRowColor,
-      List<TableColumnWidth> tableColumns) {
+      [int skipRows = 0,
+      int takeRows = 0]) {
+    final rowStartIndex = skipRows;
     final List<TableRow> tableRows = List<TableRow>.generate(
-      rows.length,
+      takeRows <= 0 ? rows.length - skipRows : takeRows,
       (int index) {
-        final bool isSelected = rows[index].selected;
-        final bool isDisabled =
-            anyRowSelectable && rows[index].onSelectChanged == null;
+        final bool isSelected = rows[rowStartIndex + index].selected;
+        final bool isDisabled = anyRowSelectable &&
+            rows[rowStartIndex + index].onSelectChanged == null;
         final Set<MaterialState> states = <MaterialState>{
           if (isSelected) MaterialState.selected,
           if (isDisabled) MaterialState.disabled,
         };
         final Color? resolvedDataRowColor =
-            (rows[index].color ?? effectiveDataRowColor)?.resolve(states);
+            (rows[rowStartIndex + index].color ?? effectiveDataRowColor)
+                ?.resolve(states);
         final Color? rowColor = resolvedDataRowColor;
         final BorderSide borderSide = Divider.createBorderSide(
           context,
@@ -1012,13 +1089,14 @@ class DataTable2 extends DataTable {
             ? Border(bottom: borderSide)
             : Border(top: borderSide);
         return TableRow(
-          key: rows[index].key,
+          key: rows[rowStartIndex + index].key,
           decoration: BoxDecoration(
             border: border,
             color: rowColor ?? defaultRowColor.resolve(states),
           ),
-          children:
-              List<Widget>.filled(tableColumns.length, const _NullWidget()),
+          children: List<Widget>.filled(
+              numberOfCols <= 0 ? numberOfCols : numberOfCols,
+              const _NullWidget()),
         );
       },
     );
@@ -1029,7 +1107,7 @@ class DataTable2 extends DataTable {
       BuildContext context,
       ThemeData theme,
       MaterialStateProperty<Color?>? effectiveHeadingRowColor,
-      List<TableColumnWidth> tableColumns) {
+      int numberOfCols) {
     var headingRow = TableRow(
       key: _headingRowKey,
       decoration: BoxDecoration(
@@ -1044,7 +1122,7 @@ class DataTable2 extends DataTable {
             : null,
         color: effectiveHeadingRowColor?.resolve(<MaterialState>{}),
       ),
-      children: List<Widget>.filled(tableColumns.length, const _NullWidget()),
+      children: List<Widget>.filled(numberOfCols, const _NullWidget()),
     );
     return headingRow;
   }
