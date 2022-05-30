@@ -133,16 +133,17 @@ class ColumnDataController extends ChangeNotifier {
   /// with respect the total of not fixed width columns
   double getPropLeftNotFixedColumns(
       List<DataColumn> columns, DataColumn colLimit) {
-    double res = 1;
+    double res = 0;
     int t = 0;
     int l = 0;
-    bool left = true;
+    var idxLimit = columns.indexOf(colLimit);
     for (var c in columns) {
-      if (c == colLimit) {
-        left = false;
-      }
-      if (c != colLimit && !isFixedWidth(c, columns.indexOf(c))) {
-        if (left) {
+      var idx = columns.indexOf(c);
+      if (c != colLimit &&
+          !isFixedWidth(c, idx) &&
+          (colsWidthNoExtra[idx] == null ||
+              colsWidthNoExtra[idx]! > ColumnDataController.minColWidth)) {
+        if (idx < idxLimit) {
           l++;
         }
         t++;

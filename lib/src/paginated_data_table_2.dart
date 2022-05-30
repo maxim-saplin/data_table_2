@@ -652,7 +652,9 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     /// Compensate delta when there are columns with not fixed width to the left
     var cl =
         columnDataController.getPropLeftNotFixedColumns(widget.columns, dc2);
-    delta = delta / (1 - cl);
+    if (cl < 1) {
+      delta = delta / (1 - cl);
+    }
     if ((columnDataController.getCurrentWidth(idx) + delta) >=
         ColumnDataController.minColWidth) {
       setState(() {
