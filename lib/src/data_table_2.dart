@@ -264,14 +264,14 @@ class DataTable2 extends DataTable {
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
 
-  Widget _buildCheckbox({
-    required BuildContext context,
-    required bool? checked,
-    required VoidCallback? onRowTap,
-    required ValueChanged<bool?>? onCheckboxChanged,
-    required MaterialStateProperty<Color?>? overlayColor,
-    required bool tristate,
-  }) {
+  Widget _buildCheckbox(
+      {required BuildContext context,
+      required bool? checked,
+      required VoidCallback? onRowTap,
+      required ValueChanged<bool?>? onCheckboxChanged,
+      required MaterialStateProperty<Color?>? overlayColor,
+      required bool tristate,
+      required double rowHeight}) {
     final ThemeData themeData = Theme.of(context);
     final double effectiveHorizontalMargin = horizontalMargin ??
         themeData.dataTableTheme.horizontalMargin ??
@@ -280,8 +280,7 @@ class DataTable2 extends DataTable {
     Widget contents = Semantics(
       container: true,
       child: Container(
-        // TODO, fixed to actual height
-        height: 48,
+        height: rowHeight,
         padding: EdgeInsetsDirectional.only(
           start: checkboxHorizontalMargin ?? effectiveHorizontalMargin,
           end: (checkboxHorizontalMargin ?? effectiveHorizontalMargin) / 2.0,
@@ -321,6 +320,7 @@ class DataTable2 extends DataTable {
     required VoidCallback? onSort,
     required bool sorted,
     required bool ascending,
+    required double effectiveHeadingRowHeight,
     required MaterialStateProperty<Color?>? overlayColor,
   }) {
     final ThemeData themeData = Theme.of(context);
@@ -342,9 +342,7 @@ class DataTable2 extends DataTable {
     final TextStyle effectiveHeadingTextStyle = headingTextStyle ??
         themeData.dataTableTheme.headingTextStyle ??
         themeData.textTheme.subtitle2!;
-    final double effectiveHeadingRowHeight = headingRowHeight ??
-        themeData.dataTableTheme.headingRowHeight ??
-        _headingRowHeight;
+
     label = Container(
       padding: padding,
       height: effectiveHeadingRowHeight,
@@ -380,6 +378,7 @@ class DataTable2 extends DataTable {
     required bool numeric,
     required bool placeholder,
     required bool showEditIcon,
+    required double defaultDataRowHeight,
     required GestureTapCallback? onTap,
     required GestureTapCallback? onDoubleTap,
     required GestureLongPressCallback? onLongPress,
@@ -406,10 +405,9 @@ class DataTable2 extends DataTable {
     final TextStyle effectiveDataTextStyle = dataTextStyle ??
         themeData.dataTableTheme.dataTextStyle ??
         themeData.textTheme.bodyText2!;
-    final double effectiveDataRowHeight = specificRowHeight ??
-        dataRowHeight ??
-        themeData.dataTableTheme.dataRowHeight ??
-        kMinInteractiveDimension;
+    final double effectiveDataRowHeight =
+        specificRowHeight ?? defaultDataRowHeight;
+
     label = Container(
       padding: padding,
       height: effectiveDataRowHeight,
@@ -525,6 +523,14 @@ class DataTable2 extends DataTable {
     final effectiveColumnSpacing =
         columnSpacing ?? theme.dataTableTheme.columnSpacing ?? _columnSpacing;
 
+    final double effectiveHeadingRowHeight = headingRowHeight ??
+        theme.dataTableTheme.headingRowHeight ??
+        _headingRowHeight;
+
+    final double defaultDataRowHeight = dataRowHeight ??
+        theme.dataTableTheme.dataRowHeight ??
+        kMinInteractiveDimension;
+
     final tableColumnWidths = List<TableColumnWidth>.filled(
         columns.length + (displayCheckboxColumn ? 1 : 0),
         const _NullTableColumnWidth());
@@ -545,10 +551,13 @@ class DataTable2 extends DataTable {
           effectiveHorizontalMargin,
           tableColumnWidths,
           headingRow,
+          effectiveHeadingRowHeight,
           context,
           someChecked,
           allChecked,
           dataRows,
+          rows,
+          defaultDataRowHeight,
           effectiveDataRowColor);
 
       if (checkBoxWidth > 0) displayColumnIndex += 1;
@@ -589,6 +598,7 @@ class DataTable2 extends DataTable {
         headingRow.children![displayColumnIndex] = _buildHeadingCell(
           context: context,
           padding: padding,
+          effectiveHeadingRowHeight: effectiveHeadingRowHeight,
           label: column.label,
           tooltip: column.tooltip,
           numeric: column.numeric,
@@ -607,6 +617,7 @@ class DataTable2 extends DataTable {
           dataRows[rowIndex].children![displayColumnIndex] = _buildDataCell(
             context: context,
             padding: padding,
+            defaultDataRowHeight: defaultDataRowHeight,
             specificRowHeight: row is DataRow2 ? row.specificRowHeight : null,
             label: cell.child,
             numeric: column.numeric,
@@ -837,10 +848,13 @@ class DataTable2 extends DataTable {
       double effectiveHorizontalMargin,
       List<TableColumnWidth> tableColumns,
       TableRow headingRow,
+      double headingHeight,
       BuildContext context,
       bool someChecked,
       bool allChecked,
       List<TableRow> tableRows,
+      List<DataRow> rows,
+      double defaultDataRowHeight,
       MaterialStateProperty<Color?>? effectiveDataRowColor) {
     double checkBoxWidth = 0;
 
@@ -851,26 +865,29 @@ class DataTable2 extends DataTable {
       tableColumns[0] = FixedColumnWidth(checkBoxWidth);
 
       headingRow.children![0] = _buildCheckbox(
-        context: context,
-        checked: someChecked ? null : allChecked,
-        onRowTap: null,
-        onCheckboxChanged: (bool? checked) =>
-            _handleSelectAll(checked, someChecked),
-        overlayColor: null,
-        tristate: true,
-      );
+          context: context,
+          checked: someChecked ? null : allChecked,
+          onRowTap: null,
+          onCheckboxChanged: (bool? checked) =>
+              _handleSelectAll(checked, someChecked),
+          overlayColor: null,
+          tristate: true,
+          rowHeight: headingHeight);
       var rowIndex = 0;
       for (final DataRow row in rows) {
         tableRows[rowIndex].children![0] = _buildCheckbox(
-          context: context,
-          checked: row.selected,
-          onRowTap: () => row.onSelectChanged != null
-              ? row.onSelectChanged!(!row.selected)
-              : null,
-          onCheckboxChanged: row.onSelectChanged,
-          overlayColor: row.color ?? effectiveDataRowColor,
-          tristate: false,
-        );
+            context: context,
+            checked: row.selected,
+            onRowTap: () => row.onSelectChanged != null
+                ? row.onSelectChanged!(!row.selected)
+                : null,
+            onCheckboxChanged: row.onSelectChanged,
+            overlayColor: row.color ?? effectiveDataRowColor,
+            tristate: false,
+            rowHeight: ((rows[rowIndex] is DataRow2) &&
+                    (rows[rowIndex] as DataRow2).specificRowHeight != null)
+                ? (rows[rowIndex] as DataRow2).specificRowHeight!
+                : defaultDataRowHeight);
         rowIndex += 1;
       }
     }
