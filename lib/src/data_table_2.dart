@@ -134,7 +134,8 @@ class DataTable2 extends DataTable {
     this.fixedLeftColumns = 0,
     this.lmRatio = 1.2,
     required super.rows,
-  }) {
+  })  : assert(fixedLeftColumns >= 0),
+        assert(fixedTopRows >= 0) {
     if (scrollController != null) {
       _coreVerticalController = scrollController!;
     } else {
@@ -538,8 +539,8 @@ class DataTable2 extends DataTable {
     final headingRow = _buildHeadingRow(
         context, theme, effectiveHeadingRowColor, tableColumnWidths.length);
 
-    final dataRows = _buildTableRows(anyRowSelectable, effectiveDataRowColor,
-        context, theme, tableColumnWidths.length, defaultRowColor);
+    // final dataRows = _buildTableRows(anyRowSelectable, effectiveDataRowColor,
+    //     context, theme, tableColumnWidths.length, defaultRowColor);
 
     //TODO, test with number of rows less than fixed rows, number of columns less than fixed columns
 
@@ -550,9 +551,9 @@ class DataTable2 extends DataTable {
         theme,
         tableColumnWidths.length - fixedLeftColumns,
         defaultRowColor,
-        fixedTopRows);
+        fixedTopRows > 0 ? fixedTopRows - 1 : 0);
 
-    List<TableRow>? fixedTopRowsRows = fixedTopRows > 0
+    List<TableRow>? fixedRows = fixedTopRows > 0
         ? (fixedTopRows == 1
             ? [
                 _buildHeadingRow(context, theme, effectiveHeadingRowColor,
@@ -622,7 +623,10 @@ class DataTable2 extends DataTable {
         context,
         someChecked,
         allChecked,
-        dataRows,
+        coreRows,
+        fixedRows,
+        fixedCornerRows,
+        fixedColumnsRows,
         rows,
         defaultDataRowHeight,
         effectiveDataRowColor);
@@ -639,6 +643,7 @@ class DataTable2 extends DataTable {
       final widths = _calculateDataColumnSizes(
           constraints, checkBoxWidth, effectiveHorizontalMargin);
 
+      // File empty cells in created rows with actual widgets
       for (int dataColumnIndex = 0;
           dataColumnIndex < columns.length;
           dataColumnIndex++) {
@@ -668,7 +673,9 @@ class DataTable2 extends DataTable {
         tableColumnWidths[displayColumnIndex] =
             FixedColumnWidth(widths[dataColumnIndex]);
 
-        headingRow.children![displayColumnIndex] = _buildHeadingCell(
+        //headingRow.children![displayColumnIndex]
+
+        var h = _buildHeadingCell(
           context: context,
           padding: padding,
           effectiveHeadingRowHeight: effectiveHeadingRowHeight,
@@ -684,10 +691,26 @@ class DataTable2 extends DataTable {
           overlayColor: effectiveHeadingRowColor,
         );
 
+        if (displayColumnIndex < fixedLeftColumns) {
+          if (fixedTopRows < 1) {
+            fixedColumnsRows![0].children![displayColumnIndex] = h;
+          } else if (fixedTopRows > 0) {
+            fixedCornerRows![0].children![displayColumnIndex] = h;
+          }
+        } else {
+          if (fixedTopRows < 1) {
+            coreRows[0].children![displayColumnIndex - fixedLeftColumns] = h;
+          } else if (fixedTopRows > 0) {
+            fixedRows![0].children![displayColumnIndex - fixedLeftColumns] = h;
+          }
+        }
+
         var rowIndex = 0;
         for (final DataRow row in rows) {
           final DataCell cell = row.cells[dataColumnIndex];
-          dataRows[rowIndex].children![displayColumnIndex] = _buildDataCell(
+          //dataRows[rowIndex].children![displayColumnIndex]
+
+          var c = _buildDataCell(
             context: context,
             padding: padding,
             defaultDataRowHeight: defaultDataRowHeight,
@@ -712,6 +735,25 @@ class DataTable2 extends DataTable {
                 : null,
             overlayColor: row.color ?? effectiveDataRowColor,
           );
+
+          // TODO, test with invisible checkbox col
+          if (displayColumnIndex < fixedLeftColumns) {
+            if (fixedTopRows > rowIndex) {
+              fixedCornerRows![rowIndex].children![displayColumnIndex] = c;
+            } else {
+              fixedColumnsRows![rowIndex - fixedTopRows + 1]
+                  .children![displayColumnIndex] = c;
+            }
+          } else {
+            if (fixedTopRows > rowIndex + 1) {
+              fixedRows![rowIndex]
+                  .children![displayColumnIndex - fixedLeftColumns] = c;
+            } else {
+              coreRows[rowIndex - fixedTopRows + 1]
+                  .children![displayColumnIndex - fixedLeftColumns] = c;
+            }
+          }
+
           rowIndex += 1;
         }
         displayColumnIndex += 1;
@@ -749,20 +791,7 @@ class DataTable2 extends DataTable {
       // TODO, fix Zebra rows sample
       var coreTable = Table(
         columnWidths: fixedLeftColumns > 0 ? rightWidthsAsMap : widthsAsMap,
-        children: fixedLeftColumns > 0
-            ? [
-                if (fixedTopRows < 1)
-                  TableRow(
-                      children:
-                          headingRow.children!.skip(fixedLeftColumns).toList()),
-                ...dataRows.skip(fixedTopRows < 1 ? 0 : fixedTopRows - 1).map(
-                    (dr) => TableRow(
-                        children: dr.children!.skip(fixedLeftColumns).toList()))
-              ]
-            : [
-                if (fixedTopRows < 1) headingRow,
-                ...dataRows.skip(fixedTopRows < 1 ? 0 : fixedTopRows - 1)
-              ],
+        children: coreRows,
         border: border,
       );
 
@@ -770,61 +799,27 @@ class DataTable2 extends DataTable {
       Table? fixedColumnsTable;
       Table? fixedTopLeftCornerTable;
 
-      if (fixedTopRows > 0) {
+      if (fixedRows != null) {
         fixedRowsTabel = Table(
             columnWidths: fixedLeftColumns > 0 ? rightWidthsAsMap : widthsAsMap,
-            children: [
-              if (fixedLeftColumns < 1)
-                headingRow
-              else
-                TableRow(
-                    children:
-                        headingRow.children!.skip(fixedLeftColumns).toList()),
-              if (fixedTopRows > 1 && fixedLeftColumns < 1)
-                ...dataRows.take(fixedTopRows - 1)
-              else if (fixedTopRows > 1 && fixedLeftColumns > 0)
-                ...dataRows.take(fixedTopRows - 1).map((dr) => TableRow(
-                    children: dr.children!.skip(fixedLeftColumns).toList()))
-            ],
+            children: fixedRows,
             // TODO, fix border
             border: border);
       }
 
       // TODO, range checks
-      if (fixedLeftColumns > 0) {
-        var rows = dataRows
-            .skip(fixedTopRows < 1 ? 0 : fixedTopRows - 1)
-            .map((dr) => TableRow(
-                children: dr.children!.take(fixedLeftColumns).toList()))
-            .toList();
-
-        if (fixedTopRows < 1) {
-          rows.insert(
-              0,
-              TableRow(
-                  children:
-                      headingRow.children!.take(fixedLeftColumns).toList()));
-        }
-
+      if (fixedColumnsRows != null) {
         fixedColumnsTable = Table(
           columnWidths: leftWidthsAsMap,
-          children: rows,
+          children: fixedColumnsRows,
           border: border,
         );
       }
 
-      if (fixedTopRows > 0 && fixedLeftColumns > 0) {
-        var rows = [
-          headingRow,
-          if (fixedTopRows > 1) ...dataRows.take(fixedTopRows - 1)
-        ]
-            .map((dr) => TableRow(
-                children: dr.children!.take(fixedLeftColumns).toList()))
-            .toList();
-
+      if (fixedCornerRows != null) {
         fixedTopLeftCornerTable = Table(
           columnWidths: leftWidthsAsMap,
-          children: rows,
+          children: fixedCornerRows,
           border: border,
         );
       }
@@ -890,7 +885,7 @@ class DataTable2 extends DataTable {
 
       var completeWidget = Container(
           decoration: decoration ?? theme.dataTableTheme.decoration,
-          child: dataRows.isEmpty
+          child: rows.isEmpty
               ? Column(children: [
                   Table(children: [headingRow]),
                   Flexible(fit: FlexFit.tight, child: empty ?? const SizedBox())
@@ -925,7 +920,10 @@ class DataTable2 extends DataTable {
       BuildContext context,
       bool someChecked,
       bool allChecked,
-      List<TableRow> tableRows,
+      List<TableRow> coreRows,
+      List<TableRow>? fixedRows,
+      List<TableRow>? fixedCornerRows,
+      List<TableRow>? fixedColumnRows,
       List<DataRow> rows,
       double defaultDataRowHeight,
       MaterialStateProperty<Color?>? effectiveDataRowColor) {
@@ -937,6 +935,7 @@ class DataTable2 extends DataTable {
           effectiveHorizontalMargin / 2.0;
       tableColumns[0] = FixedColumnWidth(checkBoxWidth);
 
+      // Create heading twice, in the heading row used as back-up for the case of no data and any of the xxx_rows table
       headingRow.children![0] = _buildCheckbox(
           context: context,
           checked: someChecked ? null : allChecked,
@@ -946,9 +945,22 @@ class DataTable2 extends DataTable {
           overlayColor: null,
           tristate: true,
           rowHeight: headingHeight);
+
+      if (fixedCornerRows != null) {
+        fixedCornerRows[0].children![0] = headingRow.children![0];
+      } else if (fixedColumnRows != null) {
+        fixedColumnRows[0].children![0] = headingRow.children![0];
+      } else if (fixedRows != null) {
+        fixedRows[0].children![0] = headingRow.children![0];
+      } else {
+        coreRows[0].children![0] = headingRow.children![0];
+      }
+
+      var skipRows = fixedTopRows > 1 ? fixedTopRows - 1 : 0;
+
       var rowIndex = 0;
       for (final DataRow row in rows) {
-        tableRows[rowIndex].children![0] = _buildCheckbox(
+        var x = _buildCheckbox(
             context: context,
             checked: row.selected,
             onRowTap: () => row.onSelectChanged != null
@@ -961,6 +973,17 @@ class DataTable2 extends DataTable {
                     (rows[rowIndex] as DataRow2).specificRowHeight != null)
                 ? (rows[rowIndex] as DataRow2).specificRowHeight!
                 : defaultDataRowHeight);
+
+        if (fixedCornerRows != null && rowIndex < fixedCornerRows.length - 1) {
+          fixedCornerRows[rowIndex].children![0] = x;
+        } else if (fixedColumnRows != null) {
+          fixedColumnRows[rowIndex - skipRows].children![0] = x;
+        } else if (fixedRows != null && rowIndex < fixedRows.length - 1) {
+          fixedRows[rowIndex].children![0] = x;
+        } else {
+          coreRows[rowIndex - skipRows].children![0] = x;
+        }
+
         rowIndex += 1;
       }
     }
