@@ -544,31 +544,38 @@ class DataTable2 extends DataTable {
 
     //TODO, test with number of rows less than fixed rows, number of columns less than fixed columns
 
-    final coreRows = _buildTableRows(
-        anyRowSelectable,
-        effectiveDataRowColor,
-        context,
-        theme,
-        tableColumnWidths.length - fixedLeftColumns,
-        defaultRowColor,
-        fixedTopRows > 0 ? fixedTopRows - 1 : 0);
+    List<TableRow>? coreRows = rows.isEmpty
+        ? null
+        : _buildTableRows(
+            anyRowSelectable,
+            effectiveDataRowColor,
+            context,
+            theme,
+            tableColumnWidths.length - fixedLeftColumns,
+            defaultRowColor,
+            fixedTopRows == 0
+                ? _buildHeadingRow(context, theme, effectiveHeadingRowColor,
+                    tableColumnWidths.length - fixedLeftColumns)
+                : null,
+            fixedTopRows > 0 ? fixedTopRows - 1 : 0);
 
     List<TableRow>? fixedRows = fixedTopRows > 0
         ? (fixedTopRows == 1
             ? [
                 _buildHeadingRow(context, theme, effectiveHeadingRowColor,
-                    tableColumnWidths.length)
+                    tableColumnWidths.length - fixedLeftColumns)
               ]
             : [
                 _buildHeadingRow(context, theme, effectiveHeadingRowColor,
-                    tableColumnWidths.length),
+                    tableColumnWidths.length - fixedLeftColumns),
                 ..._buildTableRows(
                     anyRowSelectable,
                     effectiveDataRowColor,
                     context,
                     theme,
-                    tableColumnWidths.length,
+                    tableColumnWidths.length - fixedLeftColumns,
                     defaultRowColor,
+                    null,
                     0,
                     fixedTopRows - 1)
               ])
@@ -590,6 +597,7 @@ class DataTable2 extends DataTable {
                     theme,
                     fixedLeftColumns,
                     defaultRowColor,
+                    null,
                     0,
                     fixedTopRows - 1)
               ])
@@ -601,7 +609,7 @@ class DataTable2 extends DataTable {
                 _buildHeadingRow(
                     context, theme, effectiveHeadingRowColor, fixedLeftColumns),
                 ..._buildTableRows(anyRowSelectable, effectiveDataRowColor,
-                    context, theme, fixedLeftColumns, defaultRowColor)
+                    context, theme, fixedLeftColumns, defaultRowColor, null)
               ]
             : _buildTableRows(
                 anyRowSelectable,
@@ -610,6 +618,7 @@ class DataTable2 extends DataTable {
                 theme,
                 fixedLeftColumns,
                 defaultRowColor,
+                null,
                 fixedTopRows - 1,
               ))
         : null;
@@ -699,13 +708,20 @@ class DataTable2 extends DataTable {
           }
         } else {
           if (fixedTopRows < 1) {
-            coreRows[0].children![displayColumnIndex - fixedLeftColumns] = h;
+            coreRows![0].children![displayColumnIndex - fixedLeftColumns] = h;
           } else if (fixedTopRows > 0) {
             fixedRows![0].children![displayColumnIndex - fixedLeftColumns] = h;
           }
         }
 
+        // TODO, test, 0x0, 1x0, 2x0, 1x0, 2x0, 1x1, 1x2, 2x3
         var rowIndex = 0;
+        var skipRows = fixedTopRows == 1
+            ? 0
+            : fixedTopRows > 1
+                ? fixedTopRows - 1
+                : -1;
+
         for (final DataRow row in rows) {
           final DataCell cell = row.cells[dataColumnIndex];
           //dataRows[rowIndex].children![displayColumnIndex]
@@ -738,18 +754,18 @@ class DataTable2 extends DataTable {
 
           // TODO, test with invisible checkbox col
           if (displayColumnIndex < fixedLeftColumns) {
-            if (fixedTopRows > rowIndex) {
-              fixedCornerRows![rowIndex].children![displayColumnIndex] = c;
+            if (rowIndex + 1 < fixedTopRows) {
+              fixedCornerRows![rowIndex + 1].children![displayColumnIndex] = c;
             } else {
-              fixedColumnsRows![rowIndex - fixedTopRows + 1]
+              fixedColumnsRows![rowIndex - skipRows]
                   .children![displayColumnIndex] = c;
             }
           } else {
-            if (fixedTopRows > rowIndex + 1) {
-              fixedRows![rowIndex]
+            if (rowIndex + 1 < fixedTopRows) {
+              fixedRows![rowIndex + 1]
                   .children![displayColumnIndex - fixedLeftColumns] = c;
             } else {
-              coreRows[rowIndex - fixedTopRows + 1]
+              coreRows![rowIndex - skipRows]
                   .children![displayColumnIndex - fixedLeftColumns] = c;
             }
           }
@@ -791,7 +807,7 @@ class DataTable2 extends DataTable {
       // TODO, fix Zebra rows sample
       var coreTable = Table(
         columnWidths: fixedLeftColumns > 0 ? rightWidthsAsMap : widthsAsMap,
-        children: coreRows,
+        children: coreRows ?? [],
         border: border,
       );
 
@@ -832,19 +848,6 @@ class DataTable2 extends DataTable {
                   mainAxisSize: MainAxisSize.min,
                   children: [t, SizedBox(height: bottomMargin!)])
               : t;
-
-      // var x = SingleChildScrollView(
-      //     controller: _coreVerticalController,
-      //     scrollDirection: Axis.vertical,
-      //     child: SingleChildScrollView(
-      //         controller: _coreHorizontalController,
-      //         scrollDirection: Axis.horizontal,
-      //         child: _addBottomMargin(coreTable)));
-
-      // // avoid assertion when no fixed sections
-      // var coreWidget = fixedLeftColumns > 0 || fixedTopRows > 0
-      //     ? Flexible(fit: FlexFit.loose, child: x)
-      //     : x;
 
 // TODO, fix scroll bar out of sight
       var fixedRowsAndCoreCol =
@@ -920,7 +923,7 @@ class DataTable2 extends DataTable {
       BuildContext context,
       bool someChecked,
       bool allChecked,
-      List<TableRow> coreRows,
+      List<TableRow>? coreRows,
       List<TableRow>? fixedRows,
       List<TableRow>? fixedCornerRows,
       List<TableRow>? fixedColumnRows,
@@ -953,10 +956,14 @@ class DataTable2 extends DataTable {
       } else if (fixedRows != null) {
         fixedRows[0].children![0] = headingRow.children![0];
       } else {
-        coreRows[0].children![0] = headingRow.children![0];
+        coreRows![0].children![0] = headingRow.children![0];
       }
 
-      var skipRows = fixedTopRows > 1 ? fixedTopRows - 1 : 0;
+      var skipRows = fixedTopRows == 1
+          ? 0
+          : fixedTopRows > 1
+              ? fixedTopRows - 1
+              : -1;
 
       var rowIndex = 0;
       for (final DataRow row in rows) {
@@ -975,13 +982,13 @@ class DataTable2 extends DataTable {
                 : defaultDataRowHeight);
 
         if (fixedCornerRows != null && rowIndex < fixedCornerRows.length - 1) {
-          fixedCornerRows[rowIndex].children![0] = x;
+          fixedCornerRows[rowIndex + 1].children![0] = x;
         } else if (fixedColumnRows != null) {
           fixedColumnRows[rowIndex - skipRows].children![0] = x;
         } else if (fixedRows != null && rowIndex < fixedRows.length - 1) {
-          fixedRows[rowIndex].children![0] = x;
+          fixedRows[rowIndex + 1].children![0] = x;
         } else {
-          coreRows[rowIndex - skipRows].children![0] = x;
+          coreRows![rowIndex - skipRows].children![0] = x;
         }
 
         rowIndex += 1;
@@ -1085,44 +1092,52 @@ class DataTable2 extends DataTable {
       ThemeData theme,
       int numberOfCols,
       MaterialStateProperty<Color?> defaultRowColor,
+      TableRow? headingRow,
       [int skipRows = 0,
       int takeRows = 0]) {
     final rowStartIndex = skipRows;
     final List<TableRow> tableRows = List<TableRow>.generate(
-      takeRows <= 0 ? rows.length - skipRows : takeRows,
+      (takeRows <= 0 ? rows.length - skipRows : takeRows) +
+          (headingRow == null ? 0 : 1),
       (int index) {
-        final bool isSelected = rows[rowStartIndex + index].selected;
-        final bool isDisabled = anyRowSelectable &&
-            rows[rowStartIndex + index].onSelectChanged == null;
-        final Set<MaterialState> states = <MaterialState>{
-          if (isSelected) MaterialState.selected,
-          if (isDisabled) MaterialState.disabled,
-        };
-        final Color? resolvedDataRowColor =
-            (rows[rowStartIndex + index].color ?? effectiveDataRowColor)
-                ?.resolve(states);
-        final Color? rowColor = resolvedDataRowColor;
-        final BorderSide borderSide = Divider.createBorderSide(
-          context,
-          width: dividerThickness ??
-              theme.dataTableTheme.dividerThickness ??
-              _dividerThickness,
-        );
-        final Border border = showBottomBorder
-            ? Border(bottom: borderSide)
-            : Border(top: borderSide);
-        return TableRow(
-          key: rows[rowStartIndex + index].key,
-          decoration: BoxDecoration(
-            border: border,
-            color: rowColor ?? defaultRowColor.resolve(states),
-          ),
-          children: List<Widget>.filled(
-              numberOfCols <= 0 ? numberOfCols : numberOfCols,
-              const _NullWidget()),
-        );
+        var _index = headingRow == null ? index : index - 1;
+        if (headingRow != null && index == 0) {
+          return headingRow;
+        } else {
+          final bool isSelected = rows[rowStartIndex + _index].selected;
+          final bool isDisabled = anyRowSelectable &&
+              rows[rowStartIndex + _index].onSelectChanged == null;
+          final Set<MaterialState> states = <MaterialState>{
+            if (isSelected) MaterialState.selected,
+            if (isDisabled) MaterialState.disabled,
+          };
+          final Color? resolvedDataRowColor =
+              (rows[rowStartIndex + _index].color ?? effectiveDataRowColor)
+                  ?.resolve(states);
+          final Color? rowColor = resolvedDataRowColor;
+          final BorderSide borderSide = Divider.createBorderSide(
+            context,
+            width: dividerThickness ??
+                theme.dataTableTheme.dividerThickness ??
+                _dividerThickness,
+          );
+          final Border border = showBottomBorder
+              ? Border(bottom: borderSide)
+              : Border(top: borderSide);
+          return TableRow(
+            key: rows[rowStartIndex + _index].key,
+            decoration: BoxDecoration(
+              border: border,
+              color: rowColor ?? defaultRowColor.resolve(states),
+            ),
+            children: List<Widget>.filled(
+                numberOfCols <= 0 ? numberOfCols : numberOfCols,
+                const _NullWidget()),
+          );
+        }
       },
     );
+
     return tableRows;
   }
 
