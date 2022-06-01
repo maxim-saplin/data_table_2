@@ -539,6 +539,11 @@ class DataTable2 extends DataTable {
     final headingRow = _buildHeadingRow(
         context, theme, effectiveHeadingRowColor, tableColumnWidths.length);
 
+    final actualFixedRows =
+        rows.isEmpty ? 0 : math.min(fixedTopRows, rows.length);
+    final actualFixedColumns =
+        rows.isEmpty ? 0 : math.min(fixedLeftColumns, columns.length);
+
     // final dataRows = _buildTableRows(anyRowSelectable, effectiveDataRowColor,
     //     context, theme, tableColumnWidths.length, defaultRowColor);
 
@@ -551,77 +556,86 @@ class DataTable2 extends DataTable {
             effectiveDataRowColor,
             context,
             theme,
-            tableColumnWidths.length - fixedLeftColumns,
+            tableColumnWidths.length - actualFixedColumns,
             defaultRowColor,
-            fixedTopRows == 0
+            actualFixedRows == 0
                 ? _buildHeadingRow(context, theme, effectiveHeadingRowColor,
-                    tableColumnWidths.length - fixedLeftColumns)
+                    tableColumnWidths.length - actualFixedColumns)
                 : null,
-            fixedTopRows > 0 ? fixedTopRows - 1 : 0);
+            actualFixedRows > 0 ? actualFixedRows - 1 : 0);
 
-    List<TableRow>? fixedRows = fixedTopRows > 0
-        ? (fixedTopRows == 1
+    List<TableRow>? fixedColumnsRows = rows.isEmpty
+        ? null
+        : actualFixedColumns > 0
+            ? (actualFixedRows < 1
+                ? [
+                    _buildHeadingRow(context, theme, effectiveHeadingRowColor,
+                        actualFixedColumns),
+                    ..._buildTableRows(
+                        anyRowSelectable,
+                        effectiveDataRowColor,
+                        context,
+                        theme,
+                        actualFixedColumns,
+                        defaultRowColor,
+                        null)
+                  ]
+                : _buildTableRows(
+                    anyRowSelectable,
+                    effectiveDataRowColor,
+                    context,
+                    theme,
+                    actualFixedColumns,
+                    defaultRowColor,
+                    null,
+                    actualFixedRows - 1,
+                  ))
+            : null;
+
+    List<TableRow>? fixedRows = actualFixedRows > 0
+        ? (actualFixedRows == 1
             ? [
                 _buildHeadingRow(context, theme, effectiveHeadingRowColor,
-                    tableColumnWidths.length - fixedLeftColumns)
+                    tableColumnWidths.length - actualFixedColumns)
               ]
             : [
                 _buildHeadingRow(context, theme, effectiveHeadingRowColor,
-                    tableColumnWidths.length - fixedLeftColumns),
+                    tableColumnWidths.length - actualFixedColumns),
                 ..._buildTableRows(
                     anyRowSelectable,
                     effectiveDataRowColor,
                     context,
                     theme,
-                    tableColumnWidths.length - fixedLeftColumns,
+                    tableColumnWidths.length - actualFixedColumns,
                     defaultRowColor,
                     null,
                     0,
-                    fixedTopRows - 1)
+                    actualFixedRows - 1)
               ])
         : null;
 
-    List<TableRow>? fixedCornerRows = fixedLeftColumns > 0 && fixedTopRows > 0
-        ? (fixedTopRows == 1
-            ? [
-                _buildHeadingRow(
-                    context, theme, effectiveHeadingRowColor, fixedLeftColumns)
-              ]
-            : [
-                _buildHeadingRow(
-                    context, theme, effectiveHeadingRowColor, fixedLeftColumns),
-                ..._buildTableRows(
-                    anyRowSelectable,
-                    effectiveDataRowColor,
-                    context,
-                    theme,
-                    fixedLeftColumns,
-                    defaultRowColor,
-                    null,
-                    0,
-                    fixedTopRows - 1)
-              ])
-        : null;
-
-    List<TableRow>? fixedColumnsRows = fixedLeftColumns > 0
-        ? (fixedTopRows < 1
-            ? [
-                _buildHeadingRow(
-                    context, theme, effectiveHeadingRowColor, fixedLeftColumns),
-                ..._buildTableRows(anyRowSelectable, effectiveDataRowColor,
-                    context, theme, fixedLeftColumns, defaultRowColor, null)
-              ]
-            : _buildTableRows(
-                anyRowSelectable,
-                effectiveDataRowColor,
-                context,
-                theme,
-                fixedLeftColumns,
-                defaultRowColor,
-                null,
-                fixedTopRows - 1,
-              ))
-        : null;
+    List<TableRow>? fixedCornerRows =
+        actualFixedColumns > 0 && actualFixedRows > 0
+            ? (actualFixedRows == 1
+                ? [
+                    _buildHeadingRow(context, theme, effectiveHeadingRowColor,
+                        actualFixedColumns)
+                  ]
+                : [
+                    _buildHeadingRow(context, theme, effectiveHeadingRowColor,
+                        actualFixedColumns),
+                    ..._buildTableRows(
+                        anyRowSelectable,
+                        effectiveDataRowColor,
+                        context,
+                        theme,
+                        actualFixedColumns,
+                        defaultRowColor,
+                        null,
+                        0,
+                        actualFixedRows - 1)
+                  ])
+            : null;
 
     double checkBoxWidth = _addCheckBoxes(
         displayCheckboxColumn,
@@ -637,6 +651,7 @@ class DataTable2 extends DataTable {
         fixedCornerRows,
         fixedColumnsRows,
         rows,
+        actualFixedRows,
         defaultDataRowHeight,
         effectiveDataRowColor);
 
@@ -682,8 +697,6 @@ class DataTable2 extends DataTable {
         tableColumnWidths[displayColumnIndex] =
             FixedColumnWidth(widths[dataColumnIndex]);
 
-        //headingRow.children![displayColumnIndex]
-
         var h = _buildHeadingCell(
           context: context,
           padding: padding,
@@ -700,26 +713,30 @@ class DataTable2 extends DataTable {
           overlayColor: effectiveHeadingRowColor,
         );
 
-        if (displayColumnIndex < fixedLeftColumns) {
-          if (fixedTopRows < 1) {
+        headingRow.children![displayColumnIndex] =
+            h; // heading row alone is used to display table header should there be no data rows
+
+        if (displayColumnIndex < actualFixedColumns) {
+          if (actualFixedRows < 1) {
             fixedColumnsRows![0].children![displayColumnIndex] = h;
-          } else if (fixedTopRows > 0) {
+          } else if (actualFixedRows > 0) {
             fixedCornerRows![0].children![displayColumnIndex] = h;
           }
         } else {
-          if (fixedTopRows < 1) {
-            coreRows![0].children![displayColumnIndex - fixedLeftColumns] = h;
-          } else if (fixedTopRows > 0) {
-            fixedRows![0].children![displayColumnIndex - fixedLeftColumns] = h;
+          if (actualFixedRows < 1 && coreRows != null) {
+            coreRows[0].children![displayColumnIndex - actualFixedColumns] = h;
+          } else if (actualFixedRows > 0) {
+            fixedRows![0].children![displayColumnIndex - actualFixedColumns] =
+                h;
           }
         }
 
         // TODO, test, 0x0, 1x0, 2x0, 1x0, 2x0, 1x1, 1x2, 2x3
         var rowIndex = 0;
-        var skipRows = fixedTopRows == 1
+        var skipRows = actualFixedRows == 1
             ? 0
-            : fixedTopRows > 1
-                ? fixedTopRows - 1
+            : actualFixedRows > 1
+                ? actualFixedRows - 1
                 : -1;
 
         for (final DataRow row in rows) {
@@ -753,20 +770,20 @@ class DataTable2 extends DataTable {
           );
 
           // TODO, test with invisible checkbox col
-          if (displayColumnIndex < fixedLeftColumns) {
-            if (rowIndex + 1 < fixedTopRows) {
+          if (displayColumnIndex < actualFixedColumns) {
+            if (rowIndex + 1 < actualFixedRows) {
               fixedCornerRows![rowIndex + 1].children![displayColumnIndex] = c;
             } else {
               fixedColumnsRows![rowIndex - skipRows]
                   .children![displayColumnIndex] = c;
             }
           } else {
-            if (rowIndex + 1 < fixedTopRows) {
+            if (rowIndex + 1 < actualFixedRows) {
               fixedRows![rowIndex + 1]
-                  .children![displayColumnIndex - fixedLeftColumns] = c;
+                  .children![displayColumnIndex - actualFixedColumns] = c;
             } else {
               coreRows![rowIndex - skipRows]
-                  .children![displayColumnIndex - fixedLeftColumns] = c;
+                  .children![displayColumnIndex - actualFixedColumns] = c;
             }
           }
 
@@ -776,11 +793,11 @@ class DataTable2 extends DataTable {
       }
 
       var widthsAsMap = tableColumnWidths.asMap();
-      Map<int, TableColumnWidth>? leftWidthsAsMap = fixedLeftColumns > 0
-          ? tableColumnWidths.take(fixedLeftColumns).toList().asMap()
+      Map<int, TableColumnWidth>? leftWidthsAsMap = actualFixedColumns > 0
+          ? tableColumnWidths.take(actualFixedColumns).toList().asMap()
           : null;
-      Map<int, TableColumnWidth>? rightWidthsAsMap = fixedLeftColumns > 0
-          ? tableColumnWidths.skip(fixedLeftColumns).toList().asMap()
+      Map<int, TableColumnWidth>? rightWidthsAsMap = actualFixedColumns > 0
+          ? tableColumnWidths.skip(actualFixedColumns).toList().asMap()
           : null;
 
       // TableBorder? headingBorder;
@@ -806,7 +823,7 @@ class DataTable2 extends DataTable {
       // TODO, add range checks to avoid fixedfTopRow > total rows
       // TODO, fix Zebra rows sample
       var coreTable = Table(
-        columnWidths: fixedLeftColumns > 0 ? rightWidthsAsMap : widthsAsMap,
+        columnWidths: actualFixedColumns > 0 ? rightWidthsAsMap : widthsAsMap,
         children: coreRows ?? [],
         border: border,
       );
@@ -817,7 +834,8 @@ class DataTable2 extends DataTable {
 
       if (fixedRows != null) {
         fixedRowsTabel = Table(
-            columnWidths: fixedLeftColumns > 0 ? rightWidthsAsMap : widthsAsMap,
+            columnWidths:
+                actualFixedColumns > 0 ? rightWidthsAsMap : widthsAsMap,
             children: fixedRows,
             // TODO, fix border
             border: border);
@@ -928,6 +946,7 @@ class DataTable2 extends DataTable {
       List<TableRow>? fixedCornerRows,
       List<TableRow>? fixedColumnRows,
       List<DataRow> rows,
+      int actualFixedRows,
       double defaultDataRowHeight,
       MaterialStateProperty<Color?>? effectiveDataRowColor) {
     double checkBoxWidth = 0;
@@ -959,10 +978,10 @@ class DataTable2 extends DataTable {
         coreRows![0].children![0] = headingRow.children![0];
       }
 
-      var skipRows = fixedTopRows == 1
+      var skipRows = actualFixedRows == 1
           ? 0
-          : fixedTopRows > 1
-              ? fixedTopRows - 1
+          : actualFixedRows > 1
+              ? actualFixedRows - 1
               : -1;
 
       var rowIndex = 0;
