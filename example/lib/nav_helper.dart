@@ -12,6 +12,7 @@ String getCurrentRouteOption(BuildContext context) {
   return isEmpty;
 }
 
+// Route options
 const dflt = 'Default';
 const noData = 'No data';
 const autoRows = 'Auto rows';

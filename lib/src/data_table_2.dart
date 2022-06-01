@@ -821,7 +821,6 @@ class DataTable2 extends DataTable {
 
       // TODO, don't create extra list, create correct ones right away
       // TODO, add range checks to avoid fixedfTopRow > total rows
-      // TODO, fix Zebra rows sample
       var coreTable = Table(
         columnWidths: actualFixedColumns > 0 ? rightWidthsAsMap : widthsAsMap,
         children: coreRows ?? [],
@@ -883,10 +882,13 @@ class DataTable2 extends DataTable {
             child: SingleChildScrollView(
                 controller: _coreVerticalController,
                 scrollDirection: Axis.vertical,
-                child: SingleChildScrollView(
+                child: Scrollbar(
                     controller: _coreHorizontalController,
-                    scrollDirection: Axis.horizontal,
-                    child: _addBottomMargin(coreTable))))
+                    //thumbVisibility: true,
+                    child: SingleChildScrollView(
+                        controller: _coreHorizontalController,
+                        scrollDirection: Axis.horizontal,
+                        child: _addBottomMargin(coreTable)))))
       ]);
 
       Widget? fixedColumnAndCornerCol = fixedColumnsTable == null
