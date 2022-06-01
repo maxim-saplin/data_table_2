@@ -134,13 +134,9 @@ class DataTable2 extends DataTable {
     this.fixedLeftColumns = 0,
     this.lmRatio = 1.2,
     required super.rows,
-  })  : assert(fixedLeftColumns >= 0),
+  })  : _coreVerticalController = scrollController ?? ScrollController(),
+        assert(fixedLeftColumns >= 0),
         assert(fixedTopRows >= 0) {
-    if (scrollController != null) {
-      _coreVerticalController = scrollController!;
-    } else {
-      _coreVerticalController = ScrollController();
-    }
     _fixedRowsHorizontalController
         .removeListener(_fixedRowsHorizontalControllerListener);
     _fixedRowsHorizontalController
@@ -237,7 +233,7 @@ class DataTable2 extends DataTable {
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? scrollController;
 
-  late ScrollController _coreVerticalController;
+  final ScrollController _coreVerticalController;
   final ScrollController _coreHorizontalController = ScrollController();
 
   // https://github.com/maxim-saplin/data_table_2/issues/42
