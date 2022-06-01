@@ -866,30 +866,27 @@ class DataTable2 extends DataTable {
                   children: [t, SizedBox(height: bottomMargin!)])
               : t;
 
-// TODO, fix scroll bar out of sight
-      var fixedRowsAndCoreCol =
-          Column(mainAxisSize: MainAxisSize.min, children: [
-        if (fixedRowsTabel != null)
-          ScrollConfiguration(
-              behavior:
-                  ScrollConfiguration.of(context).copyWith(scrollbars: false),
-              child: SingleChildScrollView(
-                  controller: _fixedRowsHorizontalController,
-                  scrollDirection: Axis.horizontal,
-                  child: fixedRowsTabel)),
-        Flexible(
-            fit: FlexFit.tight,
-            child: SingleChildScrollView(
-                controller: _coreVerticalController,
-                scrollDirection: Axis.vertical,
-                child: Scrollbar(
-                    controller: _coreHorizontalController,
-                    //thumbVisibility: true,
+      var fixedRowsAndCoreCol = Scrollbar(
+          controller: _coreHorizontalController,
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            if (fixedRowsTabel != null)
+              ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context)
+                      .copyWith(scrollbars: false),
+                  child: SingleChildScrollView(
+                      controller: _fixedRowsHorizontalController,
+                      scrollDirection: Axis.horizontal,
+                      child: fixedRowsTabel)),
+            Flexible(
+                fit: FlexFit.tight,
+                child: SingleChildScrollView(
+                    controller: _coreVerticalController,
+                    scrollDirection: Axis.vertical,
                     child: SingleChildScrollView(
                         controller: _coreHorizontalController,
                         scrollDirection: Axis.horizontal,
-                        child: _addBottomMargin(coreTable)))))
-      ]);
+                        child: _addBottomMargin(coreTable))))
+          ]));
 
       Widget? fixedColumnAndCornerCol = fixedColumnsTable == null
           ? null

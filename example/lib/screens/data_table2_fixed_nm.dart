@@ -24,8 +24,8 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
   bool _initialized = false;
   final ScrollController _controller = ScrollController();
 
-  int _fixedRows = 0;
-  int _fixedCols = 0;
+  int _fixedRows = 1;
+  int _fixedCols = 1;
   int _dataItems = 30;
 
   @override
