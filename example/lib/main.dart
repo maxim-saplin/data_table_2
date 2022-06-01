@@ -87,8 +87,9 @@ Scaffold _getScaffold(BuildContext context, Widget body,
               ],
             )),
         options != null && options.isNotEmpty
-            ? Container(
+            ? Padding(
                 padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+
                 // screen options
                 child: DropdownButton<String>(
                     icon: const SizedBox(),

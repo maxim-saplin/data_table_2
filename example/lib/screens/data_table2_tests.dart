@@ -512,25 +512,7 @@ class DataTable2Tests extends StatelessWidget {
             //     onSort: (int columnIndex, bool ascending) {},
             //   ),
             // ]));
-            DataTable2(
-          sortColumnIndex: 0,
-          sortAscending: true,
-          columns: <DataColumn2>[
-            DataColumn2(
-              label: const Text('Name'),
-              tooltip: 'Name',
-              onSort: (int columnIndex, bool ascending) {},
-            ),
-          ],
-          rows: kDesserts.map<DataRow2>((Dessert dessert) {
-            return DataRow2(
-              cells: <DataCell>[
-                DataCell(
-                  Text(dessert.name),
-                ),
-              ],
-            );
-          }).toList(),
-        ));
+            buildAsyncPaginatedTable(
+                showPage: false, showGeneration: false, minWidth: 350));
   }
 }

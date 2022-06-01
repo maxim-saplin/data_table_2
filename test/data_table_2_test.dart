@@ -532,9 +532,9 @@ void main() {
       ),
     );
     expect(tester.renderObject<RenderBox>(find.byType(Text).first).size.width,
-        lessThan(800.0));
+        lessThanOrEqualTo(800.0));
     expect(tester.renderObject<RenderBox>(find.byType(Row).first).size.width,
-        lessThan(800.0));
+        lessThanOrEqualTo(800.0));
     expect(tester.takeException(), isNull);
   });
 

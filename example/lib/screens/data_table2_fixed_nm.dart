@@ -209,7 +209,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
                               _sort<num>((d) => d.iron, columnIndex, ascending),
                         ),
                       ],
-                      rows: List<DataRow>.generate(_dessertsDataSource.rowCount,
+                      rows: List<DataRow>.generate(_dataItems,
                           (index) => _dessertsDataSource.getRow(index)))))
         ]));
   }
