@@ -136,7 +136,7 @@ class DessertDataSource extends DataTableSource {
   }
 
   @override
-  DataRow getRow(int index) {
+  DataRow getRow(int index, [Color? color]) {
     final format = NumberFormat.decimalPercentPattern(
       locale: 'en',
       decimalDigits: 0,
@@ -147,9 +147,11 @@ class DessertDataSource extends DataTableSource {
     return DataRow2.byIndex(
       index: index,
       selected: dessert.selected,
-      color: hasZebraStripes && index.isEven
-          ? MaterialStateProperty.all(Theme.of(context).highlightColor)
-          : null,
+      color: color != null
+          ? MaterialStateProperty.all(color)
+          : (hasZebraStripes && index.isEven
+              ? MaterialStateProperty.all(Theme.of(context).highlightColor)
+              : null),
       onSelectChanged: hasRowTaps
           ? null
           : (value) {

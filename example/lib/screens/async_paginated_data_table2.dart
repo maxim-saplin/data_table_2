@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 
+import '../helper.dart';
 import '../nav_helper.dart';
 import '../custom_pager.dart';
 import '../data_sources.dart';
@@ -348,15 +349,7 @@ class _TitledRangeSelectorState extends State<_TitledRangeSelector> {
           child: SizedBox(
               width: 340,
               child: Theme(
-                  data: Theme.of(context).copyWith(
-                      sliderTheme: SliderThemeData(
-                          rangeThumbShape: const RoundRangeSliderThumbShape(
-                              enabledThumbRadius: 8),
-                          thumbColor: Colors.black,
-                          activeTrackColor: Colors.grey[700],
-                          inactiveTrackColor: Colors.grey[400],
-                          activeTickMarkColor: Colors.white,
-                          inactiveTickMarkColor: Colors.white)),
+                  data: blackSlider(context),
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.max,

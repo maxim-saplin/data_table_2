@@ -116,6 +116,7 @@ class DataTable2 extends DataTable {
     super.dataRowHeight,
     super.dataTextStyle,
     super.headingRowColor,
+    this.fixedColumnsColor,
     super.headingRowHeight,
     super.headingTextStyle,
     super.horizontalMargin,
@@ -182,8 +183,16 @@ class DataTable2 extends DataTable {
 
   static final LocalKey _headingRowKey = UniqueKey();
 
+  /// The number of sticky rows fixed at the top of the table.
+  /// The heading row is counted/included.
+  /// By defult the value is 1 which means header row is fixed.
+  /// Set to 0 in order to unstick the header,
+  /// set to >1 in order to fix data rows
+  /// (i.e. in order to fix both header and the first data row use value of 2)
   final int fixedTopRows;
 
+  /// Number of sticky columns fixed at the left side of the table.
+  /// Check box column (if enabled) is also counted
   final int fixedLeftColumns;
 
   void _handleSelectAll(bool? checked, bool someChecked) {
@@ -260,6 +269,11 @@ class DataTable2 extends DataTable {
   /// Determines ratio of Large column's width to Medium column's width.
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
+
+  // TODO, add test
+  // TODO, add fixed corner color
+  /// Backgound color of the sticky columns fixed via [fixedLeftColumns]
+  Color? fixedColumnsColor;
 
   Widget _buildCheckbox(
       {required BuildContext context,
@@ -388,6 +402,7 @@ class DataTable2 extends DataTable {
     required GestureTapDownCallback? onRowSecondaryTapDown,
     required VoidCallback? onSelectChanged,
     required MaterialStateProperty<Color?>? overlayColor,
+    required Color? backgroundColor,
   }) {
     final ThemeData themeData = Theme.of(context);
     if (showEditIcon) {
@@ -408,6 +423,7 @@ class DataTable2 extends DataTable {
     label = Container(
       padding: padding,
       height: effectiveDataRowHeight,
+      color: backgroundColor,
       alignment:
           numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
       child: DefaultTextStyle(
@@ -740,30 +756,32 @@ class DataTable2 extends DataTable {
           //dataRows[rowIndex].children![displayColumnIndex]
 
           var c = _buildDataCell(
-            context: context,
-            padding: padding,
-            defaultDataRowHeight: defaultDataRowHeight,
-            specificRowHeight: row is DataRow2 ? row.specificRowHeight : null,
-            label: cell.child,
-            numeric: column.numeric,
-            placeholder: cell.placeholder,
-            showEditIcon: cell.showEditIcon,
-            onTap: cell.onTap,
-            onDoubleTap: cell.onDoubleTap,
-            onLongPress: cell.onLongPress,
-            onTapDown: cell.onTapDown,
-            onTapCancel: cell.onTapCancel,
-            onRowTap: row is DataRow2 ? row.onTap : null,
-            onRowDoubleTap: row is DataRow2 ? row.onDoubleTap : null,
-            onRowLongPress: row.onLongPress,
-            onRowSecondaryTap: row is DataRow2 ? row.onSecondaryTap : null,
-            onRowSecondaryTapDown:
-                row is DataRow2 ? row.onSecondaryTapDown : null,
-            onSelectChanged: row.onSelectChanged != null
-                ? () => row.onSelectChanged!(!row.selected)
-                : null,
-            overlayColor: row.color ?? effectiveDataRowColor,
-          );
+              context: context,
+              padding: padding,
+              defaultDataRowHeight: defaultDataRowHeight,
+              specificRowHeight: row is DataRow2 ? row.specificRowHeight : null,
+              label: cell.child,
+              numeric: column.numeric,
+              placeholder: cell.placeholder,
+              showEditIcon: cell.showEditIcon,
+              onTap: cell.onTap,
+              onDoubleTap: cell.onDoubleTap,
+              onLongPress: cell.onLongPress,
+              onTapDown: cell.onTapDown,
+              onTapCancel: cell.onTapCancel,
+              onRowTap: row is DataRow2 ? row.onTap : null,
+              onRowDoubleTap: row is DataRow2 ? row.onDoubleTap : null,
+              onRowLongPress: row.onLongPress,
+              onRowSecondaryTap: row is DataRow2 ? row.onSecondaryTap : null,
+              onRowSecondaryTapDown:
+                  row is DataRow2 ? row.onSecondaryTapDown : null,
+              onSelectChanged: row.onSelectChanged != null
+                  ? () => row.onSelectChanged!(!row.selected)
+                  : null,
+              overlayColor: row.color ?? effectiveDataRowColor,
+              backgroundColor: actualFixedColumns > displayColumnIndex
+                  ? fixedColumnsColor
+                  : null);
 
           // TODO, test with invisible checkbox col
           if (displayColumnIndex < actualFixedColumns) {
@@ -907,6 +925,7 @@ class DataTable2 extends DataTable {
                   Flexible(fit: FlexFit.tight, child: empty ?? const SizedBox())
                 ])
               : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (fixedColumnAndCornerCol != null)
                       fixedColumnAndCornerCol,
