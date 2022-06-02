@@ -117,6 +117,7 @@ class DataTable2 extends DataTable {
     super.dataTextStyle,
     super.headingRowColor,
     this.fixedColumnsColor,
+    this.fixedCornerColor,
     super.headingRowHeight,
     super.headingTextStyle,
     super.horizontalMargin,
@@ -182,18 +183,6 @@ class DataTable2 extends DataTable {
   }
 
   static final LocalKey _headingRowKey = UniqueKey();
-
-  /// The number of sticky rows fixed at the top of the table.
-  /// The heading row is counted/included.
-  /// By defult the value is 1 which means header row is fixed.
-  /// Set to 0 in order to unstick the header,
-  /// set to >1 in order to fix data rows
-  /// (i.e. in order to fix both header and the first data row use value of 2)
-  final int fixedTopRows;
-
-  /// Number of sticky columns fixed at the left side of the table.
-  /// Check box column (if enabled) is also counted
-  final int fixedLeftColumns;
 
   void _handleSelectAll(bool? checked, bool someChecked) {
     // If some checkboxes are checked, all checkboxes are selected. Otherwise,
@@ -270,10 +259,28 @@ class DataTable2 extends DataTable {
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
 
+  /// The number of sticky rows fixed at the top of the table.
+  /// The heading row is counted/included.
+  /// By defult the value is 1 which means header row is fixed.
+  /// Set to 0 in order to unstick the header,
+  /// set to >1 in order to fix data rows
+  /// (i.e. in order to fix both header and the first data row use value of 2)
+  final int fixedTopRows;
+
+  /// Number of sticky columns fixed at the left side of the table.
+  /// Check box column (if enabled) is also counted
+  final int fixedLeftColumns;
+
   // TODO, add test
   // TODO, add fixed corner color
-  /// Backgound color of the sticky columns fixed via [fixedLeftColumns]
+  /// Backgound color of the sticky columns fixed via [fixedLeftColumns].
+  /// Note: to change background color of fixed data rows use [DataTable2.headingRowColor] and
+  /// individual row colors of data rows provided via [rows]
   Color? fixedColumnsColor;
+
+  /// Backgound color of the top left corner which is fixed whenere both [fixedTopRows]
+  /// and [fixedLeftColumns] are greater than 0
+  Color? fixedCornerColor;
 
   Widget _buildCheckbox(
       {required BuildContext context,
@@ -282,7 +289,8 @@ class DataTable2 extends DataTable {
       required ValueChanged<bool?>? onCheckboxChanged,
       required MaterialStateProperty<Color?>? overlayColor,
       required bool tristate,
-      required double rowHeight}) {
+      required double rowHeight,
+      Color? backgroundColor}) {
     final ThemeData themeData = Theme.of(context);
     final double effectiveHorizontalMargin = horizontalMargin ??
         themeData.dataTableTheme.horizontalMargin ??
@@ -292,6 +300,7 @@ class DataTable2 extends DataTable {
       container: true,
       child: Container(
         height: rowHeight,
+        color: backgroundColor,
         padding: EdgeInsetsDirectional.only(
           start: checkboxHorizontalMargin ?? effectiveHorizontalMargin,
           end: (checkboxHorizontalMargin ?? effectiveHorizontalMargin) / 2.0,
@@ -322,18 +331,18 @@ class DataTable2 extends DataTable {
     // );
   }
 
-  Widget _buildHeadingCell({
-    required BuildContext context,
-    required EdgeInsetsGeometry padding,
-    required Widget label,
-    required String? tooltip,
-    required bool numeric,
-    required VoidCallback? onSort,
-    required bool sorted,
-    required bool ascending,
-    required double effectiveHeadingRowHeight,
-    required MaterialStateProperty<Color?>? overlayColor,
-  }) {
+  Widget _buildHeadingCell(
+      {required BuildContext context,
+      required EdgeInsetsGeometry padding,
+      required Widget label,
+      required String? tooltip,
+      required bool numeric,
+      required VoidCallback? onSort,
+      required bool sorted,
+      required bool ascending,
+      required double effectiveHeadingRowHeight,
+      required MaterialStateProperty<Color?>? overlayColor,
+      Color? backgroundColor}) {
     final ThemeData themeData = Theme.of(context);
     label = Row(
       textDirection: numeric ? TextDirection.rtl : null,
@@ -357,6 +366,7 @@ class DataTable2 extends DataTable {
     label = Container(
       padding: padding,
       height: effectiveHeadingRowHeight,
+      color: backgroundColor,
       alignment:
           numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
       child: AnimatedDefaultTextStyle(
@@ -402,7 +412,7 @@ class DataTable2 extends DataTable {
     required GestureTapDownCallback? onRowSecondaryTapDown,
     required VoidCallback? onSelectChanged,
     required MaterialStateProperty<Color?>? overlayColor,
-    required Color? backgroundColor,
+    Color? backgroundColor,
   }) {
     final ThemeData themeData = Theme.of(context);
     if (showEditIcon) {
@@ -710,20 +720,24 @@ class DataTable2 extends DataTable {
             FixedColumnWidth(widths[dataColumnIndex]);
 
         var h = _buildHeadingCell(
-          context: context,
-          padding: padding,
-          effectiveHeadingRowHeight: effectiveHeadingRowHeight,
-          label: column.label,
-          tooltip: column.tooltip,
-          numeric: column.numeric,
-          onSort: column.onSort != null
-              ? () => column.onSort!(dataColumnIndex,
-                  sortColumnIndex != dataColumnIndex || !sortAscending)
-              : null,
-          sorted: dataColumnIndex == sortColumnIndex,
-          ascending: sortAscending,
-          overlayColor: effectiveHeadingRowColor,
-        );
+            context: context,
+            padding: padding,
+            effectiveHeadingRowHeight: effectiveHeadingRowHeight,
+            label: column.label,
+            tooltip: column.tooltip,
+            numeric: column.numeric,
+            onSort: column.onSort != null
+                ? () => column.onSort!(dataColumnIndex,
+                    sortColumnIndex != dataColumnIndex || !sortAscending)
+                : null,
+            sorted: dataColumnIndex == sortColumnIndex,
+            ascending: sortAscending,
+            overlayColor: effectiveHeadingRowColor,
+            backgroundColor: displayColumnIndex < actualFixedColumns
+                ? (actualFixedRows < 1
+                    ? fixedColumnsColor
+                    : (actualFixedRows > 0 ? fixedCornerColor : null))
+                : null);
 
         headingRow.children![displayColumnIndex] =
             h; // heading row alone is used to display table header should there be no data rows
@@ -779,8 +793,10 @@ class DataTable2 extends DataTable {
                   ? () => row.onSelectChanged!(!row.selected)
                   : null,
               overlayColor: row.color ?? effectiveDataRowColor,
-              backgroundColor: actualFixedColumns > displayColumnIndex
-                  ? fixedColumnsColor
+              backgroundColor: displayColumnIndex < actualFixedColumns
+                  ? (rowIndex + 1 < actualFixedRows
+                      ? fixedCornerColor
+                      : fixedColumnsColor)
                   : null);
 
           // TODO, test with invisible checkbox col
@@ -980,7 +996,12 @@ class DataTable2 extends DataTable {
               _handleSelectAll(checked, someChecked),
           overlayColor: null,
           tristate: true,
-          rowHeight: headingHeight);
+          rowHeight: headingHeight,
+          backgroundColor: fixedCornerRows != null
+              ? fixedCornerColor
+              : fixedColumnRows != null
+                  ? fixedColumnsColor
+                  : null);
 
       if (fixedCornerRows != null) {
         fixedCornerRows[0].children![0] = headingRow.children![0];
@@ -1012,7 +1033,13 @@ class DataTable2 extends DataTable {
             rowHeight: ((rows[rowIndex] is DataRow2) &&
                     (rows[rowIndex] as DataRow2).specificRowHeight != null)
                 ? (rows[rowIndex] as DataRow2).specificRowHeight!
-                : defaultDataRowHeight);
+                : defaultDataRowHeight,
+            backgroundColor:
+                fixedCornerRows != null && rowIndex < fixedCornerRows.length - 1
+                    ? fixedCornerColor
+                    : fixedColumnRows != null
+                        ? fixedColumnsColor
+                        : null);
 
         if (fixedCornerRows != null && rowIndex < fixedCornerRows.length - 1) {
           fixedCornerRows[rowIndex + 1].children![0] = x;

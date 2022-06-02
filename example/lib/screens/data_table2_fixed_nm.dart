@@ -119,9 +119,10 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
                       dividerThickness: 0,
                       headingRowColor: MaterialStateProperty.resolveWith(
                           (states) => _fixedRows > 0
-                              ? Colors.grey[300]
+                              ? Colors.grey[200]
                               : Colors.transparent),
-                      fixedColumnsColor: Colors.grey[350],
+                      fixedColumnsColor: Colors.grey[300],
+                      fixedCornerColor: Colors.grey[400],
                       minWidth: 800,
                       fixedTopRows: _fixedRows,
                       fixedLeftColumns: _fixedCols,
@@ -191,7 +192,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
                               index,
                               index + 1 <
                                       _fixedRows // header row is also treated as fixed row
-                                  ? Colors.grey[300]
+                                  ? Colors.grey[200]
                                   : null)))))
         ]));
   }
