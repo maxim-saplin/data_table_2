@@ -20,7 +20,7 @@ class RectRangeSliderThumbShape extends RangeSliderThumbShape {
     this.disabledThumbRadius,
     this.elevation = 1.0,
     this.pressedElevation = 6.0,
-  }) : assert(enabledThumbRadius != null);
+  });
 
   final double enabledThumbRadius;
 

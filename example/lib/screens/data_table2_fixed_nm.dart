@@ -108,7 +108,8 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
               child: Theme(
                   data: ThemeData(
                       scrollbarTheme: ScrollbarThemeData(
-                          thumbVisibility: MaterialStateProperty.all(true),
+                          thumbVisibility: MaterialStateProperty.all(_dataItems >
+                              0), // hide scrollbars and avoid exception when no data rows
                           thumbColor:
                               MaterialStateProperty.all<Color>(Colors.black))),
                   child: DataTable2(
