@@ -145,9 +145,10 @@ class DataTable2 extends DataTable {
     //     .removeListener(_fixedRowsHorizontalControllerListener);
     _fixedRowsHorizontalController
         .addListener(_fixedRowsHorizontalControllerListener);
-
-    _leftColumnVerticalContoller
-        .addListener(_leftColumnVerticalContollerListener);
+    if (fixedLeftColumns < columns.length + (showCheckboxColumn ? 1 : 0)) {
+      _leftColumnVerticalContoller
+          .addListener(_leftColumnVerticalContollerListener);
+    }
 
     _coreHorizontalController
         .addListener(_scrollControllerCoreHorizontalListener);
@@ -588,16 +589,19 @@ class DataTable2 extends DataTable {
         context, theme, effectiveHeadingRowColor, tableColumnWidths.length);
 
     final actualFixedRows =
-        rows.isEmpty ? 0 : math.min(fixedTopRows, rows.length);
-    final actualFixedColumns =
-        rows.isEmpty ? 0 : math.min(fixedLeftColumns, columns.length);
+        rows.isEmpty ? 0 : math.min(fixedTopRows, rows.length + 1);
+    final actualFixedColumns = rows.isEmpty
+        ? 0
+        : math.min(
+            fixedLeftColumns, columns.length + (showCheckboxColumn ? 1 : 0));
 
     // final dataRows = _buildTableRows(anyRowSelectable, effectiveDataRowColor,
     //     context, theme, tableColumnWidths.length, defaultRowColor);
 
     //TODO, test with number of rows less than fixed rows, number of columns less than fixed columns
 
-    List<TableRow>? coreRows = rows.isEmpty
+    List<TableRow>? coreRows = rows.isEmpty ||
+            actualFixedColumns >= columns.length + (showCheckboxColumn ? 1 : 0)
         ? null
         : _buildTableRows(
             anyRowSelectable,
@@ -890,7 +894,9 @@ class DataTable2 extends DataTable {
       Widget? fixedRowsAndCoreCol;
 
       if (rows.isNotEmpty) {
-        if (fixedRows != null) {
+        if (fixedRows != null &&
+            actualFixedColumns <
+                columns.length + (showCheckboxColumn ? 1 : 0)) {
           fixedRowsTabel = Table(
               columnWidths:
                   actualFixedColumns > 0 ? rightWidthsAsMap : widthsAsMap,
