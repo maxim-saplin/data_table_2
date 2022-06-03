@@ -118,6 +118,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
                       horizontalMargin: 12,
                       bottomMargin: 10,
                       dividerThickness: 0,
+                      //border: TableBorder.all(),
                       headingRowColor: MaterialStateProperty.resolveWith(
                           (states) => _fixedRows > 0
                               ? Colors.grey[200]

@@ -589,11 +589,13 @@ class DataTable2 extends DataTable {
         context, theme, effectiveHeadingRowColor, tableColumnWidths.length);
 
     final actualFixedRows =
-        rows.isEmpty ? 0 : math.min(fixedTopRows, rows.length + 1);
-    final actualFixedColumns = rows.isEmpty
-        ? 0
-        : math.min(
-            fixedLeftColumns, columns.length + (showCheckboxColumn ? 1 : 0));
+        math.max(0, rows.isEmpty ? 0 : math.min(fixedTopRows, rows.length + 1));
+    final actualFixedColumns = math.max(
+        0,
+        rows.isEmpty
+            ? 0
+            : math.min(fixedLeftColumns,
+                columns.length + (showCheckboxColumn ? 1 : 0)));
 
     // final dataRows = _buildTableRows(anyRowSelectable, effectiveDataRowColor,
     //     context, theme, tableColumnWidths.length, defaultRowColor);
@@ -1192,19 +1194,19 @@ class DataTable2 extends DataTable {
       (takeRows <= 0 ? rows.length - skipRows : takeRows) +
           (headingRow == null ? 0 : 1),
       (int index) {
-        var _index = headingRow == null ? index : index - 1;
+        var actualIndex = headingRow == null ? index : index - 1;
         if (headingRow != null && index == 0) {
           return headingRow;
         } else {
-          final bool isSelected = rows[rowStartIndex + _index].selected;
+          final bool isSelected = rows[rowStartIndex + actualIndex].selected;
           final bool isDisabled = anyRowSelectable &&
-              rows[rowStartIndex + _index].onSelectChanged == null;
+              rows[rowStartIndex + actualIndex].onSelectChanged == null;
           final Set<MaterialState> states = <MaterialState>{
             if (isSelected) MaterialState.selected,
             if (isDisabled) MaterialState.disabled,
           };
           final Color? resolvedDataRowColor =
-              (rows[rowStartIndex + _index].color ?? effectiveDataRowColor)
+              (rows[rowStartIndex + actualIndex].color ?? effectiveDataRowColor)
                   ?.resolve(states);
           final Color? rowColor = resolvedDataRowColor;
           final BorderSide borderSide = Divider.createBorderSide(
@@ -1217,9 +1219,13 @@ class DataTable2 extends DataTable {
               ? Border(bottom: borderSide)
               : Border(top: borderSide);
           return TableRow(
-            key: rows[rowStartIndex + _index].key,
+            key: rows[rowStartIndex + actualIndex].key,
             decoration: BoxDecoration(
-              border: border,
+              // Changed standard behaviour to never add border should the thickness be 0
+              border: dividerThickness == null ||
+                      (dividerThickness != null && dividerThickness != 0.0)
+                  ? border
+                  : null,
               color: rowColor ?? defaultRowColor.resolve(states),
             ),
             children: List<Widget>.filled(
@@ -1241,7 +1247,11 @@ class DataTable2 extends DataTable {
     var headingRow = TableRow(
       key: _headingRowKey,
       decoration: BoxDecoration(
-        border: showBottomBorder && border == null
+        // Changed standard behaviour to never add border should the thickness be 0
+        border: showBottomBorder &&
+                border == null &&
+                (dividerThickness == null ||
+                    (dividerThickness != null && dividerThickness != 0.0))
             ? Border(
                 bottom: Divider.createBorderSide(
                 context,
