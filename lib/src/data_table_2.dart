@@ -126,7 +126,6 @@ class DataTable2 extends DataTable {
     super.columnSpacing,
     super.showCheckboxColumn = true,
     super.showBottomBorder = false,
-    // TODO, check why it is still visible when thickness is set to 0
     super.dividerThickness,
     this.minWidth,
     this.scrollController,
@@ -299,15 +298,21 @@ class DataTable2 extends DataTable {
   final int fixedLeftColumns;
 
   // TODO, add test
-  // TODO, add fixed corner color
   /// Backgound color of the sticky columns fixed via [fixedLeftColumns].
+  /// Note: unlike data rows which can change their colors depending on material state (e.g. selected, hovered)
+  /// this color is static and doesn't repond to state change
   /// Note: to change background color of fixed data rows use [DataTable2.headingRowColor] and
   /// individual row colors of data rows provided via [rows]
-  Color? fixedColumnsColor;
+  final Color? fixedColumnsColor;
 
+  // TODO, add test
   /// Backgound color of the top left corner which is fixed whenere both [fixedTopRows]
   /// and [fixedLeftColumns] are greater than 0
-  Color? fixedCornerColor;
+  /// Note: unlike data rows which can change their colors depending on material state (e.g. selected, hovered)
+  /// this color is static and doesn't repond to state change
+  /// Note: to change background color of fixed data rows use [DataTable2.headingRowColor] and
+  /// individual row colors of data rows provided via [rows]
+  final Color? fixedCornerColor;
 
   Widget _buildCheckbox(
       {required BuildContext context,
@@ -597,9 +602,6 @@ class DataTable2 extends DataTable {
             : math.min(fixedLeftColumns,
                 columns.length + (showCheckboxColumn ? 1 : 0)));
 
-    // final dataRows = _buildTableRows(anyRowSelectable, effectiveDataRowColor,
-    //     context, theme, tableColumnWidths.length, defaultRowColor);
-
     //TODO, test with number of rows less than fixed rows, number of columns less than fixed columns
 
     List<TableRow>? coreRows = rows.isEmpty ||
@@ -881,13 +883,43 @@ class DataTable2 extends DataTable {
       //       horizontalInside: border!.horizontalInside);
       // }
 
-      // TODO, don't create extra list, create correct ones right away
-      // TODO, add range checks to avoid fixedfTopRow > total rows
+      bool _isRowsEmpty(List<TableRow>? rows) {
+        return rows == null || rows.isEmpty || rows[0].children!.isEmpty;
+      }
+
       var coreTable = Table(
-        columnWidths: actualFixedColumns > 0 ? rightWidthsAsMap : widthsAsMap,
-        children: coreRows ?? [],
-        border: border,
-      );
+          columnWidths: actualFixedColumns > 0 ? rightWidthsAsMap : widthsAsMap,
+          children: coreRows ?? [],
+          border: border == null
+              ? null
+              : _isRowsEmpty(fixedRows) && _isRowsEmpty(fixedColumnsRows)
+                  ? border
+                  : !_isRowsEmpty(fixedRows) && !_isRowsEmpty(fixedColumnsRows)
+                      ? TableBorder(
+                          //top: border!.top,
+                          //left: border!.left,
+                          right: border!.right,
+                          bottom: border!.bottom,
+                          verticalInside: border!.verticalInside,
+                          horizontalInside: border!.horizontalInside,
+                          borderRadius: border!.borderRadius)
+                      : _isRowsEmpty(fixedRows)
+                          ? TableBorder(
+                              top: border!.top,
+                              //left: border!.left,
+                              right: border!.right,
+                              bottom: border!.bottom,
+                              verticalInside: border!.verticalInside,
+                              horizontalInside: border!.horizontalInside,
+                              borderRadius: border!.borderRadius)
+                          : TableBorder(
+                              //top: border!.top,
+                              left: border!.left,
+                              right: border!.right,
+                              bottom: border!.bottom,
+                              verticalInside: border!.verticalInside,
+                              horizontalInside: border!.horizontalInside,
+                              borderRadius: border!.borderRadius));
 
       Table? fixedRowsTabel;
       Table? fixedColumnsTable;
@@ -897,31 +929,50 @@ class DataTable2 extends DataTable {
 
       if (rows.isNotEmpty) {
         if (fixedRows != null &&
+            !_isRowsEmpty(fixedRows) &&
             actualFixedColumns <
                 columns.length + (showCheckboxColumn ? 1 : 0)) {
           fixedRowsTabel = Table(
               columnWidths:
                   actualFixedColumns > 0 ? rightWidthsAsMap : widthsAsMap,
               children: fixedRows,
-              // TODO, fix border
-              border: border);
+              border: border == null
+                  ? null
+                  : _isRowsEmpty(fixedCornerRows)
+                      ? border
+                      : TableBorder(
+                          top: border!.top,
+                          //left: border!.left,
+                          right: border!.right,
+                          bottom: border!.bottom,
+                          verticalInside: border!.verticalInside,
+                          horizontalInside: border!.horizontalInside,
+                          borderRadius: border!.borderRadius));
         }
 
-        // TODO, range checks
-        if (fixedColumnsRows != null) {
+        if (fixedColumnsRows != null && !_isRowsEmpty(fixedColumnsRows)) {
           fixedColumnsTable = Table(
-            columnWidths: leftWidthsAsMap,
-            children: fixedColumnsRows,
-            border: border,
-          );
+              columnWidths: leftWidthsAsMap,
+              children: fixedColumnsRows,
+              border: border == null
+                  ? null
+                  : _isRowsEmpty(fixedCornerRows)
+                      ? border
+                      : TableBorder(
+                          //top: border!.top,
+                          left: border!.left,
+                          right: border!.right,
+                          bottom: border!.bottom,
+                          verticalInside: border!.verticalInside,
+                          horizontalInside: border!.horizontalInside,
+                          borderRadius: border!.borderRadius));
         }
 
-        if (fixedCornerRows != null) {
+        if (fixedCornerRows != null && !_isRowsEmpty(fixedCornerRows)) {
           fixedTopLeftCornerTable = Table(
-            columnWidths: leftWidthsAsMap,
-            children: fixedCornerRows,
-            border: border,
-          );
+              columnWidths: leftWidthsAsMap,
+              children: fixedCornerRows,
+              border: border);
         }
 
         // TODO, check how that works, might also use on leftmost colum
@@ -955,20 +1006,23 @@ class DataTable2 extends DataTable {
                           child: _addBottomMargin(coreTable))))
             ]));
 
-        fixedColumnAndCornerCol = fixedColumnsTable == null
-            ? null
-            : Column(mainAxisSize: MainAxisSize.min, children: [
-                if (fixedTopLeftCornerTable != null) fixedTopLeftCornerTable,
-                Flexible(
-                    fit: FlexFit.loose,
-                    child: ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(context)
-                            .copyWith(scrollbars: false),
-                        child: SingleChildScrollView(
-                            controller: _leftColumnVerticalContoller,
-                            scrollDirection: Axis.vertical,
-                            child: _addBottomMargin(fixedColumnsTable))))
-              ]);
+        fixedColumnAndCornerCol =
+            fixedTopLeftCornerTable == null && fixedColumnsTable == null
+                ? null
+                : Column(mainAxisSize: MainAxisSize.min, children: [
+                    if (fixedTopLeftCornerTable != null)
+                      fixedTopLeftCornerTable,
+                    if (fixedColumnsTable != null)
+                      Flexible(
+                          fit: FlexFit.loose,
+                          child: ScrollConfiguration(
+                              behavior: ScrollConfiguration.of(context)
+                                  .copyWith(scrollbars: false),
+                              child: SingleChildScrollView(
+                                  controller: _leftColumnVerticalContoller,
+                                  scrollDirection: Axis.vertical,
+                                  child: _addBottomMargin(fixedColumnsTable))))
+                  ]);
       }
 
       var completeWidget = Container(

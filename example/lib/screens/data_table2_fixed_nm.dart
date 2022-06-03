@@ -116,16 +116,16 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
                       scrollController: _controller,
                       columnSpacing: 0,
                       horizontalMargin: 12,
-                      bottomMargin: 10,
+                      bottomMargin: 20,
                       dividerThickness: 0,
-                      //border: TableBorder.all(),
+                      border: TableBorder.all(width: 1.5),
                       headingRowColor: MaterialStateProperty.resolveWith(
                           (states) => _fixedRows > 0
                               ? Colors.grey[200]
                               : Colors.transparent),
                       fixedColumnsColor: Colors.grey[300],
                       fixedCornerColor: Colors.grey[400],
-                      minWidth: 800,
+                      minWidth: 1000,
                       fixedTopRows: _fixedRows,
                       fixedLeftColumns: _fixedCols,
                       sortColumnIndex: _sortColumnIndex,
