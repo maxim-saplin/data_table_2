@@ -136,11 +136,12 @@ DataTable2 buildTable(
     Color? fixedColumnsColor,
     Color? fixedCornerColor,
     Widget? empty,
+    bool showCheckboxColumn = true,
     ScrollController? scrollController,
     List<DataColumn2>? columns}) {
   return DataTable2(
     horizontalMargin: 24,
-    showCheckboxColumn: true,
+    showCheckboxColumn: showCheckboxColumn,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
     minWidth: minWidth,

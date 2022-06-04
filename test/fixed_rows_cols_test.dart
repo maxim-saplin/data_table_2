@@ -54,12 +54,42 @@ void main() {
       expect(_isVisibleInTable(find.text('65'), tester), isTrue);
     });
 
-    testWidgets('Fixed rows greater than number of columns',
+    testWidgets('Fixed rows greater than number of rows',
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester, buildTable(fixedTopRows: 11), const Size(500, 800));
 
       _verifyDataTable2InitialState(tester, true, false);
+
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('65'), tester), isTrue);
+    });
+
+    testWidgets('Fixed rows/columns greater than number of rows/columns',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(fixedTopRows: 12, fixedLeftColumns: 5),
+          const Size(500, 800));
+
+      _verifyDataTable2InitialState(tester, true, false);
+
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('65'), tester), isTrue);
+    });
+
+    testWidgets(
+        'Fixed rows/columns greater than number of rows/columns, no checkbox column',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+              fixedTopRows: 12, fixedLeftColumns: 5, showCheckboxColumn: false),
+          const Size(500, 800));
+
+      _verifyDataTable2InitialState(tester, true, false, false);
 
       expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
       expect(_isVisibleInTable(find.text('518'), tester), isTrue);
@@ -538,6 +568,34 @@ void main() {
     });
 
     testWidgets(
+        '3 fixed rows, 1 fixed columns, with minWidth, no checkboxes, scroll to bottom right',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+              fixedTopRows: 3,
+              fixedLeftColumns: 1,
+              showCheckboxColumn: false,
+              minWidth: 850),
+          const Size(500, 300));
+
+      _verifyDataTable2InitialState(tester, false, true, false);
+      expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
+      expect(_isVisibleInTable(find.text('24'), tester), isFalse);
+
+      await tester.ensureVisible(find.text('65'));
+      expect(_isVisibleInTable(find.text('Carbs'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('159'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('237'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('65'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
+
+      expect(_isVisibleInTable(find.text('Name'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('Eclair'), tester), isFalse);
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+    });
+
+    testWidgets(
         '3 fixed rows, 2 fixed columns, with minWidth, scroll to bottom right',
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
@@ -576,7 +634,9 @@ bool _isVisibleInTable(Finder widget, WidgetTester tester) {
 }
 
 void _verifyDataTable2InitialState(WidgetTester tester,
-    [includeCarbsHeader = true, includeKitKat = true]) {
+    [includeCarbsHeader = true,
+    includeKitKat = true,
+    bool checkboxesPresent = true]) {
   expect(_isVisibleInTable(find.text('Name'), tester), isTrue);
   expect(_isVisibleInTable(find.text('Calories'), tester), isTrue);
   if (includeCarbsHeader) {
@@ -597,5 +657,6 @@ void _verifyDataTable2InitialState(WidgetTester tester,
     expect(_isVisibleInTable(find.text('65'), tester), isFalse);
   }
 
-  expect(find.byType(Checkbox), findsNWidgets(11));
+  expect(find.byType(Checkbox),
+      checkboxesPresent ? findsNWidgets(11) : findsNothing);
 }

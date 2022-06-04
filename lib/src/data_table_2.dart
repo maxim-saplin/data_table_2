@@ -602,8 +602,6 @@ class DataTable2 extends DataTable {
             : math.min(fixedLeftColumns,
                 columns.length + (showCheckboxColumn ? 1 : 0)));
 
-    //TODO, test with number of rows less than fixed rows, number of columns less than fixed columns
-
     List<TableRow>? coreRows = rows.isEmpty ||
             actualFixedColumns >= columns.length + (showCheckboxColumn ? 1 : 0)
         ? null
@@ -791,7 +789,6 @@ class DataTable2 extends DataTable {
           }
         }
 
-        // TODO, test, 0x0, 1x0, 2x0, 1x0, 2x0, 1x1, 1x2, 2x3
         var rowIndex = 0;
         var skipRows = actualFixedRows == 1
             ? 0
