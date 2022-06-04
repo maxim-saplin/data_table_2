@@ -512,7 +512,6 @@ class DataTable2Tests extends StatelessWidget {
             //     onSort: (int columnIndex, bool ascending) {},
             //   ),
             // ]));
-            buildAsyncPaginatedTable(
-                showPage: false, showGeneration: false, minWidth: 350));
+            buildTable());
   }
 }

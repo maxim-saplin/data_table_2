@@ -11,11 +11,17 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Future wrapWidgetSetSurf(WidgetTester tester, Widget widget) async {
-  await tester.binding.setSurfaceSize(const Size(1000, 200));
+Future wrapWidgetSetSurf(WidgetTester tester, Widget widget,
+    [Size? size]) async {
+  await tester.binding.setSurfaceSize(size ?? const Size(1000, 200));
+
+  // tester.binding.window.physicalSizeTestValue = size != null
+  //     ? Size(size.width * tester.binding.window.devicePixelRatio,
+  //         size.height * tester.binding.window.devicePixelRatio)
+  //     : Size(1000 * tester.binding.window.devicePixelRatio,
+  //         200 * tester.binding.window.devicePixelRatio);
+
   return tester.pumpWidget(MaterialApp(home: Material(child: widget)));
-  // return tester.pumpWidget(
-  //     MaterialApp(home: Material(child: widget)), Duration(seconds: 10));
 }
 
 Finder findFirstContainerFor(String text) =>
@@ -125,6 +131,10 @@ DataTable2 buildTable(
     bool overrideSizes = false,
     double? minWidth,
     bool noData = false,
+    int fixedTopRows = 1,
+    int fixedLeftColumns = 0,
+    Color? fixedColumnsColor,
+    Color? fixedCornerColor,
     Widget? empty,
     ScrollController? scrollController,
     List<DataColumn2>? columns}) {
@@ -134,6 +144,10 @@ DataTable2 buildTable(
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
     minWidth: minWidth,
+    fixedTopRows: fixedTopRows,
+    fixedLeftColumns: fixedLeftColumns,
+    fixedColumnsColor: fixedColumnsColor,
+    fixedCornerColor: fixedCornerColor,
     empty: empty,
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
