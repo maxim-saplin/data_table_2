@@ -121,7 +121,6 @@ class DessertDataSource extends DataTableSource {
     notifyListeners();
   }
 
-  int _selectedCount = 0;
   void updateSelectedDesserts(RestorableDessertSelections selectedRows) {
     _selectedCount = 0;
     for (var i = 0; i < desserts.length; i += 1) {
@@ -137,7 +136,7 @@ class DessertDataSource extends DataTableSource {
   }
 
   @override
-  DataRow getRow(int index) {
+  DataRow getRow(int index, [Color? color]) {
     final format = NumberFormat.decimalPercentPattern(
       locale: 'en',
       decimalDigits: 0,
@@ -148,9 +147,11 @@ class DessertDataSource extends DataTableSource {
     return DataRow2.byIndex(
       index: index,
       selected: dessert.selected,
-      color: hasZebraStripes && index.isEven
-          ? MaterialStateProperty.all(Theme.of(context).highlightColor)
-          : null,
+      color: color != null
+          ? MaterialStateProperty.all(color)
+          : (hasZebraStripes && index.isEven
+              ? MaterialStateProperty.all(Theme.of(context).highlightColor)
+              : null),
       onSelectChanged: hasRowTaps
           ? null
           : (value) {
@@ -162,30 +163,28 @@ class DessertDataSource extends DataTableSource {
               }
             },
       onTap: hasRowTaps
-          ? () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                duration: const Duration(seconds: 1),
-                content: Text('Tapped on ${dessert.name}'),
-              ))
+          ? () => _showSnackbar(context, 'Tapped on row ${dessert.name}')
           : null,
       onDoubleTap: hasRowTaps
-          ? () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                duration: const Duration(seconds: 1),
-                backgroundColor: Theme.of(context).focusColor,
-                content: Text('Double Tapped on ${dessert.name}'),
-              ))
+          ? () => _showSnackbar(context, 'Double Tapped on row ${dessert.name}')
+          : null,
+      onLongPress: hasRowTaps
+          ? () => _showSnackbar(context, 'Long pressed on row ${dessert.name}')
           : null,
       onSecondaryTap: hasRowTaps
-          ? () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                duration: const Duration(seconds: 1),
-                backgroundColor: Theme.of(context).errorColor,
-                content: Text('Right clicked on ${dessert.name}'),
-              ))
+          ? () => _showSnackbar(context, 'Right clicked on row ${dessert.name}')
+          : null,
+      onSecondaryTapDown: hasRowTaps
+          ? (d) =>
+              _showSnackbar(context, 'Right button down on row ${dessert.name}')
           : null,
       specificRowHeight:
           hasRowHeightOverrides && dessert.fat >= 25 ? 100 : null,
       cells: [
         DataCell(Text(dessert.name)),
-        DataCell(Text('${dessert.calories}')),
+        DataCell(Text('${dessert.calories}'),
+            onTap: () => _showSnackbar(context,
+                'Tapped on a cell with "${dessert.calories}"', Colors.red)),
         DataCell(Text(dessert.fat.toStringAsFixed(1))),
         DataCell(Text('${dessert.carbs}')),
         DataCell(Text(dessert.protein.toStringAsFixed(1))),
@@ -375,6 +374,8 @@ class DesertsFakeWebService {
     });
   }
 }
+
+int _selectedCount = 0;
 
 List<Dessert> _desserts = <Dessert>[
   Dessert(
@@ -684,3 +685,11 @@ List<Dessert> _dessertsX3 = _desserts.toList()
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)))
   ..addAll(_desserts.map((i) => Dessert('${i.name} x3', i.calories, i.fat,
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)));
+
+_showSnackbar(BuildContext context, String text, [Color? color]) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    backgroundColor: color,
+    duration: const Duration(seconds: 1),
+    content: Text(text),
+  ));
+}

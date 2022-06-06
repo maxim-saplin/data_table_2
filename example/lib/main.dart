@@ -1,3 +1,4 @@
+import 'package:example/screens/data_table2_fixed_nm.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -58,6 +59,10 @@ Scaffold _getScaffold(BuildContext context, Widget body,
                   child: Text('DataTable2 Scroll-up'),
                 ),
                 DropdownMenuItem(
+                  value: '/datatable2fixedmn',
+                  child: Text('DataTable2 Fixed Rows/Cols'),
+                ),
+                DropdownMenuItem(
                   value: '/paginated2',
                   child: Text('PaginatedDataTable2'),
                 ),
@@ -81,8 +86,9 @@ Scaffold _getScaffold(BuildContext context, Widget body,
               ],
             )),
         options != null && options.isNotEmpty
-            ? Container(
+            ? Padding(
                 padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+
                 // screen options
                 child: DropdownButton<String>(
                     icon: const SizedBox(),
@@ -135,6 +141,8 @@ class MyApp extends StatelessWidget {
             _getScaffold(context, const DataTable2SimpleDemo()),
         '/datatable2scrollup': (context) =>
             _getScaffold(context, const DataTable2ScrollupDemo()),
+        '/datatable2fixedmn': (context) =>
+            _getScaffold(context, const DataTable2FixedNMDemo()),
         '/paginated2': (context) => _getScaffold(context,
             const PaginatedDataTable2Demo(), getOptionsForRoute('/paginated2')),
         '/asyncpaginated2': (context) => _getScaffold(

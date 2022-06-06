@@ -1,5 +1,11 @@
+## 2.3.0
+- Added fixed columns (DataTable2.fixedLeftColumns)
+- Number of fixed rows can now be changed (DataTable2.fixedTopRows)
+- Background color of fixed columns and fixed corner (when both fixed cols and rows are used)
+
 ## 2.2.3
 - Added Border and Zebra stripes sample, removed Borders sample
+- Refactored row/cell tap events, event bubbling added, no hovering effect is visible if there're no tap events in the tables
 
 ## 2.2.2
 - Added PaginatedDataTable2.headingRowColor property

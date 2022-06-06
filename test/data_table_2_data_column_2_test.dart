@@ -27,7 +27,7 @@ void main() {
         onSelectAll: (bool? value) {
           log.add('select-all: $value');
         },
-        columns: <DataColumn2>[
+        columns: <DataColumn>[
           const DataColumn2(
             label: Text('Name'),
             tooltip: 'Name',
@@ -41,11 +41,14 @@ void main() {
             },
           ),
         ],
-        rows: kDesserts.map<DataRow2>((Dessert dessert) {
+        rows: kDesserts.map<DataRow>((Dessert dessert) {
           return DataRow2(
             key: ValueKey<String>(dessert.name),
             onSelectChanged: (bool? selected) {
               log.add('row-selected: ${dessert.name}');
+            },
+            onLongPress: () {
+              log.add('onLongPress: ${dessert.name}');
             },
             cells: <DataCell>[
               DataCell(
@@ -90,6 +93,11 @@ void main() {
     expect(log, <String>['row-selected: Cupcake']);
     log.clear();
 
+    await tester.longPress(find.text('Cupcake'));
+
+    expect(log, <String>['onLongPress: Cupcake']);
+    log.clear();
+
     await tester.tap(find.text('Calories'));
 
     expect(log, <String>['column-sort: 1 true']);
@@ -111,13 +119,6 @@ void main() {
     await tester.pumpAndSettle(const Duration(milliseconds: 200));
 
     await tester.tap(find.text('375'));
-    // Wait 500ms to get tap registered instead of double tap
-    await tester.pump(const Duration(milliseconds: 500));
-
-    expect(log, <String>['cell-tapDown: 375', 'cell-tap: 375']);
-    log.clear();
-
-    await tester.tap(find.text('375'));
     await tester.pump(const Duration(milliseconds: 100));
     await tester.tap(find.text('375'));
 
@@ -132,7 +133,8 @@ void main() {
     expect(log, <String>[
       'cell-tapDown: 375',
       'cell-tapCancel: 375',
-      'cell-longPress: 375'
+      'cell-longPress: 375',
+      'onLongPress: Jelly bean'
     ]);
     log.clear();
 
@@ -164,7 +166,6 @@ void main() {
     expect(log, <String>['row-selected: KitKat']);
     log.clear();
   });
-
   testWidgets('DataTable2 control test - tristate',
       (WidgetTester tester) async {
     final List<String> log = <String>[];
@@ -333,27 +334,17 @@ void main() {
         rows: kDesserts.map<DataRow2>((Dessert dessert) {
           return DataRow2(
             key: ValueKey<String>(dessert.name),
-            onSelectChanged: (bool? selected) {
-              log.add('row-selected: ${dessert.name}');
-            },
-            onTap: () {
-              log.add('row-tap: ${dessert.name}');
-            },
-            onSecondaryTap: () {
-              log.add('row-secondaryTap: ${dessert.name}');
-            },
-            onSecondaryTapDown: (_) {
-              log.add('row-secondaryTapDown: ${dessert.name}');
-            },
-            onDoubleTap: () {
-              log.add('row-doubleTap: ${dessert.name}');
-            },
-            onLongPress: () {
-              log.add('row-longPress: ${dessert.name}');
-            },
+            onSelectChanged: (_) => log.add('row-selected: ${dessert.name}'),
+            onTap: () => log.add('row-tap: ${dessert.name}'),
+            onSecondaryTap: () => log.add('row-secondaryTap: ${dessert.name}'),
+            onSecondaryTapDown: (_) =>
+                log.add('row-secondaryTapDown: ${dessert.name}'),
+            onDoubleTap: () => log.add('row-doubleTap: ${dessert.name}'),
+            onLongPress: () => log.add('row-longPress: ${dessert.name}'),
             cells: <DataCell>[
               DataCell(
                 Text(dessert.name),
+                onTap: () => log.add('cell-tap: ${dessert.name}'),
               ),
               DataCell(
                 Text('${dessert.calories}'),
@@ -368,11 +359,19 @@ void main() {
       home: Material(child: buildTable()),
     ));
 
-    await tester.tap(find.text('Cupcake'));
+    await tester.tap(find.text('305'));
     // Wait 500ms to get tap registered instead of double tap
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(log, <String>['row-tap: Cupcake', 'row-selected: Cupcake']);
+    log.clear();
+
+    // Since cell has tap events row won't be se;lected
+    await tester.tap(find.text('Cupcake'));
+    // Wait 500ms to get tap registered instead of double tap
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(log, <String>['cell-tap: Cupcake', 'row-tap: Cupcake']);
     log.clear();
 
     await tester.tap(find.text('305'));
@@ -531,9 +530,9 @@ void main() {
       ),
     );
     expect(tester.renderObject<RenderBox>(find.byType(Text).first).size.width,
-        lessThan(800.0));
+        lessThanOrEqualTo(800.0));
     expect(tester.renderObject<RenderBox>(find.byType(Row).first).size.width,
-        lessThan(800.0));
+        lessThanOrEqualTo(800.0));
     expect(tester.takeException(), isNull);
   });
 

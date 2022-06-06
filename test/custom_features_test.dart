@@ -58,7 +58,7 @@ void main() {
       await tester.binding.setSurfaceSize(const Size(250, 500));
       await tester.pumpAndSettle();
 
-      var s1 = tester.getSize(find.byType(Column).last);
+      var s1 = tester.getSize(find.byType(Table).last);
       print('${s1.width} ${s1.height} ');
 
       expect(s1.width > 349 && s1.width < 351, true);
@@ -347,7 +347,7 @@ void main() {
       await tester.binding.setSurfaceSize(const Size(200, 300));
       await tester.pumpAndSettle();
 
-      var s1 = tester.getSize(find.byType(Column).last);
+      var s1 = tester.getSize(find.byType(Table).last);
       print('${s1.width} ${s1.height} ');
 
       expect(s1.width > 349 && s1.width < 351, true);
@@ -786,10 +786,11 @@ void main() {
           buildAsyncPaginatedTable(
               showPage: false, showGeneration: false, minWidth: 350));
 
+      await tester.pumpAndSettle();
       await tester.binding.setSurfaceSize(const Size(200, 300));
       await tester.pumpAndSettle();
 
-      var s1 = tester.getSize(find.byType(Column).last);
+      var s1 = tester.getSize(find.byType(Table).last);
       print('${s1.width} ${s1.height} ');
 
       expect(s1.width > 349 && s1.width < 351, true);
