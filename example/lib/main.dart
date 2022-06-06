@@ -16,8 +16,7 @@ void main() {
   runApp(MyApp());
 }
 
-// TODO, change
-const String initialRoute = '/datatable2fixedmn'; // '/datatable2';
+const String initialRoute = '/datatable2';
 
 Scaffold _getScaffold(BuildContext context, Widget body,
     [List<String>? options]) {

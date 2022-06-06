@@ -297,7 +297,6 @@ class DataTable2 extends DataTable {
   /// Check box column (if enabled) is also counted
   final int fixedLeftColumns;
 
-  // TODO, add test
   /// Backgound color of the sticky columns fixed via [fixedLeftColumns].
   /// Note: unlike data rows which can change their colors depending on material state (e.g. selected, hovered)
   /// this color is static and doesn't repond to state change
@@ -305,7 +304,6 @@ class DataTable2 extends DataTable {
   /// individual row colors of data rows provided via [rows]
   final Color? fixedColumnsColor;
 
-  // TODO, add test
   /// Backgound color of the top left corner which is fixed whenere both [fixedTopRows]
   /// and [fixedLeftColumns] are greater than 0
   /// Note: unlike data rows which can change their colors depending on material state (e.g. selected, hovered)
@@ -830,7 +828,6 @@ class DataTable2 extends DataTable {
                       : fixedColumnsColor)
                   : null);
 
-          // TODO, test with invisible checkbox col
           if (displayColumnIndex < actualFixedColumns) {
             if (rowIndex + 1 < actualFixedRows) {
               fixedCornerRows![rowIndex + 1].children![displayColumnIndex] = c;
@@ -860,25 +857,6 @@ class DataTable2 extends DataTable {
       Map<int, TableColumnWidth>? rightWidthsAsMap = actualFixedColumns > 0
           ? tableColumnWidths.skip(actualFixedColumns).toList().asMap()
           : null;
-
-      // TableBorder? headingBorder;
-      // TableBorder? dataRowsBorder;
-
-      // TODO fix borders
-      // if (border != null) {
-      //   headingBorder = TableBorder(
-      //       top: border!.top,
-      //       left: border!.left,
-      //       right: border!.right,
-      //       bottom: border!.horizontalInside,
-      //       verticalInside: border!.verticalInside);
-      //   dataRowsBorder = TableBorder(
-      //       left: border!.left,
-      //       right: border!.right,
-      //       bottom: border!.bottom,
-      //       verticalInside: border!.verticalInside,
-      //       horizontalInside: border!.horizontalInside);
-      // }
 
       bool _isRowsEmpty(List<TableRow>? rows) {
         return rows == null || rows.isEmpty || rows[0].children!.isEmpty;
@@ -971,8 +949,6 @@ class DataTable2 extends DataTable {
               children: fixedCornerRows,
               border: border);
         }
-
-        // TODO, check how that works, might also use on leftmost colum
 
         Widget _addBottomMargin(Table t) =>
             bottomMargin != null && bottomMargin! > 0
