@@ -1,6 +1,10 @@
 [![Pub Version](https://img.shields.io/pub/v/data_table_2?label=pub.dev&labelColor=333940&logo=flutter)](https://pub.dev/packages/data_table_2) [![GitHub](https://img.shields.io/github/license/maxim-saplin/data_table_2?color=%23007A88&labelColor=333940)](https://github.com/maxim-saplin/data_table_2/blob/main/LICENSE) [![Tests](https://github.com/maxim-saplin/data_table_2/workflows/Dev%20Build/badge.svg)](https://github.com/maxim-saplin/data_table_2/actions) [![Codecov](https://img.shields.io/codecov/c/github/maxim-saplin/data_table_2/nndb?labelColor=333940&logo=codecov&logoColor=white)](https://codecov.io/gh/maxim-saplin/data_table_2)
 
-In-place substitute for Flutter's stock **DataTable** and **PaginatedDataTable** widgets with fixed header/sticky top row and other useful features missing in the originals. **DataTable2** and **PaginatedDataTable2** widgets are based on the sources of Flutter's originals, mimic the API and provide seamless integration.
+!Support for fixed columns has been added!
+
+In-place substitute for Flutter's stock **DataTable** and **PaginatedDataTable** widgets with fixed header/sticky top row and other useful features missing in the originals. 
+
+**DataTable2** and **PaginatedDataTable2** widgets are based on the sources of Flutter's originals, mimic the API and provide seamless integration.
 
 If you've been using (or considered using) standard Flutter's widgets for displaying tables or data grids and missed the sticky headers (or vertical borders, 'No rows' placeholder, straightforward async data source API etc.) - you've come to the right place. No need to learn yet another API of a new control, just stick to well described DataTable and PaginatedDataTable.
 
@@ -12,6 +16,8 @@ Please check the [example folder](https://github.com/maxim-saplin/data_table_2/t
 
 ## Extra Features
 - Sticky headers and paginator (when using `PaginatedDataTable2`)
+  - The number of sticky rows is defined by `DataTable2.fixedTopRows`
+  - Sticky left columns `DataTable2.fixedLeftColumns`
 - Vertically scrollable main area (with data rows)
   - `autoRowsToHeight` property on PaginatedDataTable2 allows to auto calculate page size depending on how much rows fit the height and makes vertical scrolling unnecessary
 - All columns are fixed width, table automatically stretches horizontally, individual column's width is determined as **(Width)/(Number of Columns)**
@@ -95,7 +101,8 @@ class DataTable2SimpleDemo extends StatelessWidget {
 If you're already using the standard widgets you can reference the package and add '2' to the names of stock widgets (making them **DataTable2** or **PaginatedDataTable2**) and that is it. 
 
 ##  Know issues/limitations
+- Paginated tables always have 1 fixed row and no fixed columns, might be added soon
 - There's no capability to size data table cells to fit contents. Column width's adapt to available width (either to parent width or `minWidth`), data rows width are predefined by constructor params. Content that doesn't fit a cell gets clipped
-- There're no data grid capabilities, such as: expanding/collapsing rows (drill-down scenarios), manually moving or resizing columns or rows, merging cells (i.e. CSS's colspan, rowspan)
+- There're no expanding/collapsing rows (drill-down scenarios), manually moving or resizing columns or rows, merging cells (i.e. HTML's colspan, rowspan)
 - When fixing left columns, hovering over rows doesn't highlight entire row (should there be any tap handlers standard behavior is hovering a row changes it background)
  - With fixed top rows and left columns hovering over actionable data rows their highlighted background can be displayed behind fixed sections
