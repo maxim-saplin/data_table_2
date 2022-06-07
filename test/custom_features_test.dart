@@ -78,7 +78,7 @@ void main() {
     testWidgets('empty widget is displayed when there\'s no data',
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
-          tester, buildTable(empty: const Text('No data'), noData: true));
+          tester, buildTable(empty: const Text('No data'), rows: []));
 
       expect(find.text('Name'), findsOneWidget);
       expect(find.text('No data'), findsOneWidget);

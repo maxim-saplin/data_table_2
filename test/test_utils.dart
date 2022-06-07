@@ -130,17 +130,22 @@ DataTable2 buildTable(
     bool sortAscending = true,
     bool overrideSizes = false,
     double? minWidth,
-    bool noData = false,
     int fixedTopRows = 1,
     int fixedLeftColumns = 0,
     Color? fixedColumnsColor,
     Color? fixedCornerColor,
+    double? dividerThickness,
+    bool showBottomBorder = false,
+    TableBorder? border,
+    double? bottomMargin,
     Widget? empty,
     bool showCheckboxColumn = true,
     ScrollController? scrollController,
-    List<DataColumn2>? columns}) {
+    List<DataColumn2>? columns,
+    List<DataRow2>? rows}) {
   return DataTable2(
     horizontalMargin: 24,
+    bottomMargin: bottomMargin,
     showCheckboxColumn: showCheckboxColumn,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
@@ -149,13 +154,16 @@ DataTable2 buildTable(
     fixedLeftColumns: fixedLeftColumns,
     fixedColumnsColor: fixedColumnsColor,
     fixedCornerColor: fixedCornerColor,
+    dividerThickness: dividerThickness,
+    showBottomBorder: showBottomBorder,
+    border: border,
     empty: empty,
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
     scrollController: scrollController,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
-    rows: noData ? [] : testRows,
+    rows: rows ?? testRows,
   );
 }
 

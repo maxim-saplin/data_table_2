@@ -20,13 +20,18 @@ void main() {
   testWidgets('DataTable2 control test', (WidgetTester tester) async {
     final List<String> log = <String>[];
 
-    Widget buildTable({int? sortColumnIndex, bool sortAscending = true}) {
+    Widget buildTable(
+        {int? sortColumnIndex,
+        bool sortAscending = true,
+        bool selectAll = true}) {
       return DataTable2(
         sortColumnIndex: sortColumnIndex,
         sortAscending: sortAscending,
-        onSelectAll: (bool? value) {
-          log.add('select-all: $value');
-        },
+        onSelectAll: selectAll
+            ? (bool? value) {
+                log.add('select-all: $value');
+              }
+            : null,
         columns: <DataColumn>[
           const DataColumn2(
             label: Text('Name'),
@@ -86,6 +91,15 @@ void main() {
     await tester.tap(find.byType(Checkbox).first);
 
     expect(log, <String>['select-all: true']);
+    log.clear();
+
+    // test when there's no global onSelectAll handler
+    await tester.pumpWidget(MaterialApp(
+      home: Material(child: buildTable(selectAll: false)),
+    ));
+    await tester.tap(find.byType(Checkbox).first);
+
+    expect(log.length, 10);
     log.clear();
 
     await tester.tap(find.text('Cupcake'));

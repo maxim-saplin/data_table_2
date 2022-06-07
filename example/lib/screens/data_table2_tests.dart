@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, prefer_interpolation_to_compose_strings
+// ignore_for_file: avoid_print, prefer_interpolation_to_compose_strings, avoid_renaming_method_parameters
 
 import 'package:data_table_2/data_table_2.dart';
 
@@ -100,23 +100,34 @@ DataTable2 buildTable(
     bool sortAscending = true,
     bool overrideSizes = false,
     double? minWidth,
-    bool noData = false,
+    int fixedTopRows = 1,
+    int fixedLeftColumns = 0,
+    Color? fixedColumnsColor,
+    Color? fixedCornerColor,
+    double? dividerThickness,
     Widget? empty,
+    bool showCheckboxColumn = true,
     ScrollController? scrollController,
-    List<DataColumn2>? columns}) {
+    List<DataColumn2>? columns,
+    List<DataRow2>? rows}) {
   return DataTable2(
     horizontalMargin: 24,
-    showCheckboxColumn: true,
+    showCheckboxColumn: showCheckboxColumn,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
     minWidth: minWidth,
+    fixedTopRows: fixedTopRows,
+    fixedLeftColumns: fixedLeftColumns,
+    fixedColumnsColor: fixedColumnsColor,
+    fixedCornerColor: fixedCornerColor,
+    dividerThickness: dividerThickness,
     empty: empty,
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
     scrollController: scrollController,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
-    rows: noData ? [] : testRows,
+    rows: rows ?? testRows,
   );
 }
 
@@ -191,9 +202,12 @@ PaginatedDataTable2 buildPaginatedTable(
     bool showPageSizeSelector = false,
     bool noData = false,
     bool hidePaginator = false,
+    TableBorder? border,
     PaginatorController? controller,
     Widget? empty,
+    FlexFit fit = FlexFit.tight,
     ScrollController? scrollController,
+    MaterialStateProperty<Color?>? headingRowColor,
     double? minWidth,
     Function(int?)? onRowsPerPageChanged,
     List<DataColumn2>? columns}) {
@@ -208,7 +222,10 @@ PaginatedDataTable2 buildPaginatedTable(
     columns: columns ?? testColumns,
     showFirstLastButtons: true,
     controller: controller,
+    border: border,
+    headingRowColor: headingRowColor,
     empty: empty,
+    fit: fit,
     scrollController: scrollController,
     hidePaginator: hidePaginator,
     minWidth: minWidth,
@@ -237,17 +254,26 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     bool wrapInCard = false,
     bool showPageSizeSelector = false,
     bool noData = false,
+    bool throwError = false,
     bool hidePaginator = false,
+    int rowsPerPage = 10,
+    initialFirstRowIndex = 0,
+    bool circularSpinner = false,
+    bool showCheckboxColumn = true,
+    bool fewerResultsAfterRefresh = false,
     PaginatorController? controller,
     Widget? empty,
+    PageSyncApproach syncApproach = PageSyncApproach.doNothing,
+    // Return less rows when calling refresh method on the data source
     ScrollController? scrollController,
     double? minWidth,
     Function(int?)? onRowsPerPageChanged,
     List<DataColumn2>? columns}) {
   return AsyncPaginatedDataTable2(
     horizontalMargin: 24,
-    showCheckboxColumn: true,
+    showCheckboxColumn: showCheckboxColumn,
     wrapInCard: wrapInCard,
+    initialFirstRowIndex: initialFirstRowIndex,
     header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
@@ -255,45 +281,53 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     columns: columns ?? testColumns,
     showFirstLastButtons: true,
     controller: controller,
+    rowsPerPage: rowsPerPage,
+    loading: circularSpinner
+        ? const Center(
+            child: SizedBox(
+                width: 32,
+                height: 32,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.black,
+                )))
+        : null,
     empty: empty,
-    loading: const Center(
-        child: SizedBox(
-            width: 32,
-            height: 32,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: Colors.black,
-            ))),
     scrollController: scrollController,
     hidePaginator: hidePaginator,
     minWidth: minWidth,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     autoRowsToHeight: autoRowsToHeight,
+    errorBuilder: (e) => Text(e.toString()),
     onRowsPerPageChanged: showPageSizeSelector || onRowsPerPageChanged != null
         ? onRowsPerPageChanged ?? (int? rowsPerPage) {}
         : null,
+    pageSyncApproach: syncApproach,
     source: DessertDataSourceAsync(
         allowSelection: true,
         showPage: showPage,
-        showGeneration: showGeneration,
-        noData: noData),
+        noData: noData,
+        fewerResultsAfterRefresh: fewerResultsAfterRefresh)
+      .._errorCounter = throwError ? 0 : null,
   );
 }
 
 class DessertDataSourceAsync extends AsyncDataTableSource {
-  DessertDataSourceAsync(
-      {this.allowSelection = false,
-      this.showPage = true,
-      this.showGeneration = true,
-      this.noData = false,
-      this.useKDeserts = false});
+  DessertDataSourceAsync({
+    this.allowSelection = false,
+    this.showPage = true,
+    this.noData = false,
+    this.useKDeserts = false,
+    this.fewerResultsAfterRefresh = false,
+  });
 
   final bool allowSelection;
   final bool showPage;
-  final bool showGeneration;
   final bool noData;
   final bool useKDeserts;
+  final bool fewerResultsAfterRefresh;
+  bool _usefewerResultsAfterRefresh = false;
 
   int get generation => _generation;
 
@@ -324,8 +358,8 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
   }
 
   @override
-  Future<AsyncRowsResponse> getRows(int start, int end) async {
-    print('getRows($start, $end)');
+  Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
+    print('getRows($startIndex, $count)');
     if (_errorCounter != null) {
       _errorCounter = _errorCounter! + 1;
 
@@ -335,18 +369,23 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
       }
     }
 
-    var index = start;
-    // final format = NumberFormat.decimalPercentPattern(
-    //   locale: 'en',
-    //   decimalDigits: 0,
-    // );
+    var index = startIndex;
     assert(index >= 0);
 
     var x = _empty
         ? await Future.delayed(const Duration(milliseconds: 2000),
             () => DesertsFakeWebServiceResponse(0, []))
-        : await _repo.getData(
-            start, end, _sortColumn, _sortAscending, noData, useKDeserts);
+        : (_usefewerResultsAfterRefresh)
+            ? await Future.delayed(
+                const Duration(milliseconds: 2000),
+                () => DesertsFakeWebServiceResponse(
+                    10, _dessertsX3.take(10).toList()))
+            : await _repo.getData(startIndex, count, _sortColumn,
+                _sortAscending, noData, useKDeserts);
+
+    if (fewerResultsAfterRefresh && !_usefewerResultsAfterRefresh) {
+      _usefewerResultsAfterRefresh = true;
+    }
 
     var r = AsyncRowsResponse(
         x.totalRecords,
@@ -369,7 +408,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
                 onTap: () {},
               ),
               DataCell(
-                Text(showGeneration ? '$generation' : '${dessert.carbs}'),
+                Text('${dessert.carbs}'),
                 showEditIcon: true,
                 onTap: () {},
               ),
@@ -447,9 +486,9 @@ class DesertsFakeWebService {
 List<Dessert> _desserts = kDesserts;
 
 List<Dessert> _dessertsX3 = _desserts.toList()
-  ..addAll(_desserts.map((i) => Dessert(i.name + ' x2', i.calories, i.fat,
+  ..addAll(_desserts.map((i) => Dessert('${i.name} x2', i.calories, i.fat,
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)))
-  ..addAll(_desserts.map((i) => Dessert(i.name + ' x3', i.calories, i.fat,
+  ..addAll(_desserts.map((i) => Dessert('${i.name} x3', i.calories, i.fat,
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)));
 
 class DataTable2Tests extends StatelessWidget {
@@ -512,6 +551,6 @@ class DataTable2Tests extends StatelessWidget {
             //     onSort: (int columnIndex, bool ascending) {},
             //   ),
             // ]));
-            buildTable());
+            buildTable(sortColumnIndex: 1));
   }
 }
