@@ -523,6 +523,8 @@ void main() {
             onTap: () {
               log.add('row-tap: ${dessert.name}');
             },
+            onTapDown: (d) => log.add(
+                'row-tapdown: ${dessert.name} at ${d.globalPosition.dx.toInt()}'),
             onSecondaryTap: () {
               log.add('row-secondaryTap: ${dessert.name}');
             },
@@ -586,7 +588,8 @@ void main() {
     log.clear();
 
     await tester.longPress(find.text('305'));
-    expect(log, <String>['row-longPress: Cupcake']);
+    expect(
+        log, <String>['row-tapdown: Cupcake at 755', 'row-longPress: Cupcake']);
     log.clear();
   });
 

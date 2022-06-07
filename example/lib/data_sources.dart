@@ -165,6 +165,16 @@ class DessertDataSource extends DataTableSource {
       onTap: hasRowTaps
           ? () => _showSnackbar(context, 'Tapped on row ${dessert.name}')
           : null,
+      onTapDown: hasRowTaps
+          ? (d) => print(
+              'Tap down on row ${dessert.name} at ${d.globalPosition.dx}-${d.globalPosition.dy}')
+          : null,
+      onTapUp: hasRowTaps
+          ? (d) => print(
+              'Tap up on row ${dessert.name} at ${d.globalPosition.dx}-${d.globalPosition.dy}')
+          : null,
+      onTapCancel:
+          hasRowTaps ? () => print('Tap cancel on row ${dessert.name}') : null,
       onDoubleTap: hasRowTaps
           ? () => _showSnackbar(context, 'Double Tapped on row ${dessert.name}')
           : null,

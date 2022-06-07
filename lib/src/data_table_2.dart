@@ -59,6 +59,9 @@ class DataRow2 extends DataRow {
       required super.cells,
       this.specificRowHeight,
       this.onTap,
+      this.onTapDown,
+      this.onTapUp,
+      this.onTapCancel,
       this.onDoubleTap,
       super.onLongPress,
       this.onSecondaryTap,
@@ -72,6 +75,9 @@ class DataRow2 extends DataRow {
       required super.cells,
       this.specificRowHeight,
       this.onTap,
+      this.onTapDown,
+      this.onTapUp,
+      this.onTapCancel,
       this.onDoubleTap,
       super.onLongPress,
       this.onSecondaryTap,
@@ -82,19 +88,28 @@ class DataRow2 extends DataRow {
   /// If not provided, dataRowHeight will be applied.
   final double? specificRowHeight;
 
-  /// Row tap handler, won't be called if tapped cell has any tap event handlers
+  /// Row tap handler
   final GestureTapCallback? onTap;
 
-  /// Row right click handler, won't be called if tapped cell has any tap event handlers
+  /// Row tap down handler
+  final GestureTapDownCallback? onTapDown;
+
+  /// Row tap up handler
+  final GestureTapUpCallback? onTapUp;
+
+  /// Row tap cancel handler
+  final Function()? onTapCancel;
+
+  /// Row right click handler
   final GestureTapCallback? onSecondaryTap;
 
-  /// Row right mouse down handler, won't be called if tapped cell has any tap event handlers
+  /// Row right mouse down handler
   final GestureTapDownCallback? onSecondaryTapDown;
 
-  /// Row double tap handler, won't be called if tapped cell has any tap event handlers
+  /// Row double tap handler
   final GestureTapCallback? onDoubleTap;
 
-  // /// Row long press handler, won't be called if tapped cell has any tap event handlers
+  // /// Row long press handler
   // final GestureLongPressCallback? onLongPress;
 }
 
@@ -436,6 +451,9 @@ class DataTable2 extends DataTable {
     required GestureTapDownCallback? onTapDown,
     required GestureTapCancelCallback? onTapCancel,
     required GestureTapCallback? onRowTap,
+    required GestureTapDownCallback? onRowTapDown,
+    required GestureTapUpCallback? onRowTapUp,
+    required Function()? onRowTapCancel,
     required GestureTapCallback? onRowDoubleTap,
     required GestureLongPressCallback? onRowLongPress,
     required GestureTapCallback? onRowSecondaryTap,
@@ -496,15 +514,29 @@ class DataTable2 extends DataTable {
           onLongPress?.call();
           onRowLongPress?.call();
         },
-        onTapDown: onTapDown,
-        onTapCancel: onTapCancel,
+        onTapDown: (details) {
+          onTapDown?.call(details);
+          onRowTapDown?.call(details);
+        },
+        // onTapUp: (details) {
+        //   onTapUp?.call(details);
+
+        // },
+        onTapCancel: () {
+          onTapCancel?.call();
+          onRowTapCancel?.call();
+        },
         overlayColor: overlayColor,
         child: label,
       );
-      label =
-          _addSecondaryTaps(onRowSecondaryTap, onRowSecondaryTapDown, label);
+      // No need to add on TapDown/Cancel since it is a;ready added above
+      label = _addSecondaryTaps(onRowSecondaryTap, onRowSecondaryTapDown, label,
+          null, onRowTapUp, null);
     } else if (onSelectChanged != null ||
         onRowTap != null ||
+        onRowTapDown != null ||
+        onRowTapUp != null ||
+        onRowTapCancel != null ||
         onRowDoubleTap != null ||
         onRowLongPress != null ||
         onRowSecondaryTap != null ||
@@ -522,18 +554,30 @@ class DataTable2 extends DataTable {
         child: label,
       );
 
-      label =
-          _addSecondaryTaps(onRowSecondaryTap, onRowSecondaryTapDown, label);
+      label = _addSecondaryTaps(onRowSecondaryTap, onRowSecondaryTapDown, label,
+          onRowTapDown, onRowTapUp, onRowTapCancel);
     }
     return label;
   }
 
-  Widget _addSecondaryTaps(GestureTapCallback? onRowSecondaryTap,
-      GestureTapDownCallback? onRowSecondaryTapDown, Widget label) {
-    if (onRowSecondaryTap != null || onRowSecondaryTapDown != null) {
+  Widget _addSecondaryTaps(
+      GestureTapCallback? onRowSecondaryTap,
+      GestureTapDownCallback? onRowSecondaryTapDown,
+      Widget label,
+      GestureTapDownCallback? onRowTapDown,
+      GestureTapUpCallback? onRowTapUp,
+      Function()? onRowTapCancel) {
+    if (onRowSecondaryTap != null ||
+        onRowSecondaryTapDown != null ||
+        onRowTapDown != null ||
+        onRowTapUp != null ||
+        onRowTapCancel != null) {
       label = GestureDetector(
           onSecondaryTap: onRowSecondaryTap,
           onSecondaryTapDown: onRowSecondaryTapDown,
+          onTapDown: onRowTapDown,
+          onTapUp: onRowTapUp,
+          onTapCancel: onRowTapCancel,
           child: label);
     }
     return label;
@@ -813,6 +857,9 @@ class DataTable2 extends DataTable {
               onTapDown: cell.onTapDown,
               onTapCancel: cell.onTapCancel,
               onRowTap: row is DataRow2 ? row.onTap : null,
+              onRowTapDown: row is DataRow2 ? row.onTapDown : null,
+              onRowTapUp: row is DataRow2 ? row.onTapUp : null,
+              onRowTapCancel: row is DataRow2 ? row.onTapCancel : null,
               onRowDoubleTap: row is DataRow2 ? row.onDoubleTap : null,
               onRowLongPress: row.onLongPress,
               onRowSecondaryTap: row is DataRow2 ? row.onSecondaryTap : null,

@@ -350,6 +350,8 @@ void main() {
             key: ValueKey<String>(dessert.name),
             onSelectChanged: (_) => log.add('row-selected: ${dessert.name}'),
             onTap: () => log.add('row-tap: ${dessert.name}'),
+            onTapDown: (d) => log.add(
+                'row-tapdown: ${dessert.name} at ${d.globalPosition.dx.toInt()}'),
             onSecondaryTap: () => log.add('row-secondaryTap: ${dessert.name}'),
             onSecondaryTapDown: (_) =>
                 log.add('row-secondaryTapDown: ${dessert.name}'),
@@ -380,12 +382,16 @@ void main() {
     expect(log, <String>['row-tap: Cupcake', 'row-selected: Cupcake']);
     log.clear();
 
-    // Since cell has tap events row won't be se;lected
+    // Since cell has tap events row won't be selected
     await tester.tap(find.text('Cupcake'));
     // Wait 500ms to get tap registered instead of double tap
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(log, <String>['cell-tap: Cupcake', 'row-tap: Cupcake']);
+    expect(log, <String>[
+      'row-tapdown: Cupcake at 115',
+      'cell-tap: Cupcake',
+      'row-tap: Cupcake'
+    ]);
     log.clear();
 
     await tester.tap(find.text('305'));
@@ -415,7 +421,8 @@ void main() {
     log.clear();
 
     await tester.longPress(find.text('305'));
-    expect(log, <String>['row-longPress: Cupcake']);
+    expect(
+        log, <String>['row-tapdown: Cupcake at 755', 'row-longPress: Cupcake']);
     log.clear();
   });
 
