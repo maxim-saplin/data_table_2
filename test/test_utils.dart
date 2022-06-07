@@ -295,9 +295,11 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     int rowsPerPage = 10,
     initialFirstRowIndex = 0,
     bool circularSpinner = false,
+    Function(bool? value)? onSelectAll,
     bool showCheckboxColumn = true,
     bool fewerResultsAfterRefresh = false,
     PaginatorController? controller,
+    AsyncDataTableSource? source,
     Widget? empty,
     PageSyncApproach syncApproach = PageSyncApproach.doNothing,
     // Return less rows when calling refresh method on the data source
@@ -313,7 +315,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
-    onSelectAll: (bool? value) {},
+    onSelectAll: onSelectAll ?? (bool? value) {},
     columns: columns ?? testColumns,
     showFirstLastButtons: true,
     controller: controller,
@@ -340,12 +342,13 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
         ? onRowsPerPageChanged ?? (int? rowsPerPage) {}
         : null,
     pageSyncApproach: syncApproach,
-    source: DessertDataSourceAsync(
-        allowSelection: true,
-        showPage: showPage,
-        noData: noData,
-        fewerResultsAfterRefresh: fewerResultsAfterRefresh)
-      .._errorCounter = throwError ? 0 : null,
+    source: source ??
+        (DessertDataSourceAsync(
+            allowSelection: true,
+            showPage: showPage,
+            noData: noData,
+            fewerResultsAfterRefresh: fewerResultsAfterRefresh)
+          .._errorCounter = throwError ? 0 : null),
   );
 }
 

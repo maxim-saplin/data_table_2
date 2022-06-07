@@ -259,9 +259,11 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     int rowsPerPage = 10,
     initialFirstRowIndex = 0,
     bool circularSpinner = false,
+    Function(bool? value)? onSelectAll,
     bool showCheckboxColumn = true,
     bool fewerResultsAfterRefresh = false,
     PaginatorController? controller,
+    AsyncDataTableSource? source,
     Widget? empty,
     PageSyncApproach syncApproach = PageSyncApproach.doNothing,
     // Return less rows when calling refresh method on the data source
@@ -277,7 +279,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
-    onSelectAll: (bool? value) {},
+    onSelectAll: onSelectAll ?? (bool? value) {},
     columns: columns ?? testColumns,
     showFirstLastButtons: true,
     controller: controller,
@@ -304,12 +306,13 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
         ? onRowsPerPageChanged ?? (int? rowsPerPage) {}
         : null,
     pageSyncApproach: syncApproach,
-    source: DessertDataSourceAsync(
-        allowSelection: true,
-        showPage: showPage,
-        noData: noData,
-        fewerResultsAfterRefresh: fewerResultsAfterRefresh)
-      .._errorCounter = throwError ? 0 : null,
+    source: source ??
+        (DessertDataSourceAsync(
+            allowSelection: true,
+            showPage: showPage,
+            noData: noData,
+            fewerResultsAfterRefresh: fewerResultsAfterRefresh)
+          .._errorCounter = throwError ? 0 : null),
   );
 }
 
@@ -499,6 +502,8 @@ class DataTable2Tests extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var source = DessertDataSourceAsync(allowSelection: true);
+
     //setColumnSizeRatios(1, 2);
     return Padding(
         padding: const EdgeInsets.all(16),
@@ -526,31 +531,17 @@ class DataTable2Tests extends StatelessWidget {
             //   ],
             // )
 
-            // buildAsyncPaginatedTable(
-            //     showPage: false,
-            //     showGeneration: false,
-            //     showPageSizeSelector: true,
-            //     controller: pc)
-
-            //     buildTable(columns: <DataColumn2>[
-            //   DataColumn2(
-            //       label: const Text('Name'),
-            //       tooltip: 'Name',
-            //       fixedWidth: 100,
-            //       onSort: (int columnIndex, bool ascending) {}),
-            //   DataColumn2(
-            //     label: const Text('Calories'),
-            //     tooltip: 'Calories',
-            //     numeric: true,
-            //     onSort: (int columnIndex, bool ascending) {},
-            //   ),
-            //   DataColumn2(
-            //     label: const Text('Carbs'),
-            //     tooltip: 'Carbs',
-            //     numeric: true,
-            //     onSort: (int columnIndex, bool ascending) {},
-            //   ),
-            // ]));
-            buildTable(sortColumnIndex: 1));
+            buildAsyncPaginatedTable(
+                showPage: false,
+                showGeneration: false,
+                showPageSizeSelector: true,
+                source: source,
+                onSelectAll: (val) {
+                  if (val ?? false) {
+                    source.selectAll();
+                  } else {
+                    source.deselectAll();
+                  }
+                }));
   }
 }
