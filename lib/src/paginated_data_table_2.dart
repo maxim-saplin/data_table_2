@@ -692,7 +692,12 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           border: widget.border,
           smRatio: widget.smRatio,
           lmRatio: widget.lmRatio,
-          onColumnResized: _onColumnResized,
+          columnResizingParameters: ColumnResizingParameters(
+            onColumnResized: _onColumnResized,
+            desktopMode: true,
+            realTime: true,
+            widgetColor: Colors.blueAccent,
+          ),
           columnDataController: columnDataController,
         ),
       ),

@@ -156,6 +156,141 @@ class ColumnDataController extends ChangeNotifier {
   }
 }
 
+/// Widget to control column resizing
+class ColumnResizeWidget extends StatefulWidget {
+  final double height;
+  final void Function(double) onDragUpdate;
+  final Color color;
+  final bool desktopMode;
+  final bool realTime;
+
+  const ColumnResizeWidget({
+    super.key,
+    required this.height,
+    required this.onDragUpdate,
+    this.color = Colors.black,
+    this.desktopMode = false,
+    this.realTime = false,
+  });
+
+  @override
+  State<StatefulWidget> createState() => ColumnResizeWidgetState();
+}
+
+class ColumnResizeWidgetState extends State<ColumnResizeWidget> {
+  var _width = 4.0;
+  var _color = Colors.transparent;
+  var _hover = false;
+  var _dragging = false;
+  var amountResized = 0.0;
+
+  void _update() {
+    if (_dragging || _hover) {
+      _color = widget.color;
+      _width = 6;
+    } else if (!_hover) {
+      _color = Colors.transparent;
+      _width = 4;
+      if (!widget.realTime) {
+        _dragUpdated(0.0);
+      }
+    }
+  }
+
+  void _dragUpdated(double delta) {
+    if (widget.realTime) {
+      widget.onDragUpdate(delta);
+    } else {
+      if (_dragging) {
+        setState(() {
+          amountResized += delta;
+        });
+      } else {
+        widget.onDragUpdate(amountResized);
+        amountResized = 0;
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Draggable(
+      onDragUpdate: (details) => _dragUpdated(details.delta.dx),
+      onDragStarted: () => setState(() {
+        _dragging = true;
+        _update();
+      }),
+      onDragEnd: (_) => setState(() {
+        _dragging = false;
+        _update();
+      }),
+      axis: Axis.horizontal,
+      feedback: widget.realTime
+          ? const SizedBox.shrink()
+          : (widget.desktopMode)
+              ? Container(
+                  width: _width,
+                  height: widget.height,
+                  color: _color,
+                )
+              : (RotatedBox(
+                  quarterTurns: 1,
+                  child: Icon(
+                    color: widget.color,
+                    Icons.vertical_align_center,
+                  ),
+                )),
+      childWhenDragging: (!widget.desktopMode)
+          ? RotatedBox(
+              quarterTurns: 1,
+              child: Icon(
+                color: widget.color,
+                Icons.vertical_align_center,
+              ),
+            )
+          : null,
+      child: (widget.desktopMode)
+          ? MouseRegion(
+              cursor: SystemMouseCursors.resizeColumn,
+              onEnter: (_) => setState(() {
+                _hover = true;
+                _update();
+              }),
+              onExit: (_) => setState(() {
+                _hover = false;
+                _update();
+              }),
+              child: AnimatedContainer(
+                height: widget.height,
+                width: _width,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeIn,
+                decoration: BoxDecoration(
+                  color: widget.realTime || !_dragging ? _color : Colors.grey,
+                ),
+              ),
+            )
+          : Icon(color: widget.color, Icons.drag_indicator),
+    );
+  }
+}
+
+/// Class to set parameters of resize widget
+class ColumnResizingParameters {
+  /// Called when the column is resized
+  final void Function(DataColumn2, double) onColumnResized;
+  final bool desktopMode;
+  final Color widgetColor;
+  final bool realTime;
+
+  ColumnResizingParameters({
+    required this.onColumnResized,
+    this.desktopMode = true,
+    this.widgetColor = Colors.black,
+    this.realTime = true,
+  });
+}
+
 /// In-place replacement of standard [DataTable] widget, mimics it API.
 /// Has the header row always fixed and core of the table (with data rows)
 /// scrollable and stretching to max width/height of it's container.
@@ -194,8 +329,8 @@ class DataTable2 extends DataTable {
     this.fixedLeftColumns = 0,
     this.lmRatio = 1.2,
     required super.rows,
-    this.onColumnResized,
     this.columnDataController,
+    this.columnResizingParameters,
   })  : _coreVerticalController = scrollController ?? ScrollController(),
         assert(fixedLeftColumns >= 0),
         assert(fixedTopRows >= 0) {
@@ -345,9 +480,6 @@ class DataTable2 extends DataTable {
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
 
-  /// Called when the column is resized
-  final void Function(DataColumn2, double)? onColumnResized;
-
   final ColumnDataController? columnDataController;
 
   /// The number of sticky rows fixed at the top of the table.
@@ -376,6 +508,8 @@ class DataTable2 extends DataTable {
   /// Note: to change background color of fixed data rows use [DataTable2.headingRowColor] and
   /// individual row colors of data rows provided via [rows]
   final Color? fixedCornerColor;
+
+  final ColumnResizingParameters? columnResizingParameters;
 
   Widget _buildCheckbox(
       {required BuildContext context,
@@ -424,6 +558,25 @@ class DataTable2 extends DataTable {
     //   verticalAlignment: TableCellVerticalAlignment.fill,
     //   child: contents,
     // );
+  }
+
+  Widget _buildResizeWidget(DataColumn2 dc2, double widgetHeight,
+      {desktopMode = true}) {
+    return ColumnResizeWidget(
+      height: widgetHeight,
+      color: columnResizingParameters != null
+          ? columnResizingParameters!.widgetColor
+          : Colors.black,
+      onDragUpdate: (delta) {
+        if (columnResizingParameters != null && dc2.resizeable) {
+          columnResizingParameters!.onColumnResized(dc2, delta);
+        }
+      },
+      desktopMode: desktopMode,
+      realTime: columnResizingParameters != null
+          ? columnResizingParameters!.realTime
+          : true,
+    );
   }
 
   Widget _buildHeadingCell({
@@ -483,19 +636,12 @@ class DataTable2 extends DataTable {
       label = Row(
         children: [
           Expanded(child: label),
-          Draggable(
-            onDragUpdate: (d) {
-              if (onColumnResized != null && dc2.resizeable) {
-                onColumnResized!(dc2, d.delta.dx);
-              }
-            },
-            axis: Axis.horizontal,
-            childWhenDragging: const RotatedBox(
-              quarterTurns: 1,
-              child: Icon(Icons.vertical_align_center),
-            ),
-            feedback: const SizedBox.shrink(),
-            child: const Icon(Icons.drag_indicator),
+          _buildResizeWidget(
+            dc2,
+            effectiveHeadingRowHeight,
+            desktopMode: columnResizingParameters != null
+                ? columnResizingParameters!.desktopMode
+                : true,
           ),
         ],
       );
