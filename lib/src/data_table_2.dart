@@ -9,6 +9,8 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+part 'stateful_data_table_2.dart';
+
 /// Relative size of a column determines the share of total table width allocated
 /// to each individual column. When determining column widths ratios between S, M and L
 /// columns are kept (i.e. Large columns are set to 1.2x width of Medium ones)
@@ -23,15 +25,13 @@ class DataColumn2 extends DataColumn {
   /// Creates the configuration for a column of a [DataTable2].
   ///
   /// The [label] argument must not be null.
-  const DataColumn2({
-    required super.label,
-    super.tooltip,
-    super.numeric = false,
-    super.onSort,
-    this.size = ColumnSize.M,
-    this.fixedWidth,
-    this.resizeable = false,
-  });
+  const DataColumn2(
+      {required super.label,
+      super.tooltip,
+      super.numeric = false,
+      super.onSort,
+      this.size = ColumnSize.M,
+      this.fixedWidth});
 
   /// Column sizes are determined based on available width by distributing it
   /// to individual columns accounting for their relative sizes (see [ColumnSize])
@@ -41,9 +41,6 @@ class DataColumn2 extends DataColumn {
   /// Warning, if the width happens to be larger than available total width other
   /// columns can be clipped
   final double? fixedWidth;
-
-  /// If set to true, a resize handler will apper on the column header
-  final bool resizeable;
 }
 
 /// Extension of standard [DataRow], adds row level tap events. Also there're
@@ -101,194 +98,6 @@ class DataRow2 extends DataRow {
 
   // /// Row long press handler, won't be called if tapped cell has any tap event handlers
   // final GestureLongPressCallback? onLongPress;
-}
-
-/// Controller to store and calculate columns resizing
-class ColumnDataController extends ChangeNotifier {
-  /// Minimum size for a column
-  /// TODO: find a way to calculate minimum column or just leave it hardcoded
-  static double minColWidth = 50;
-
-  Map<int, double> colsExtraWidth = {};
-  Map<int, double> colsWidthNoExtra = {};
-
-  double getExtraWidth(int idCol) {
-    return colsExtraWidth[idCol] ?? 0.0;
-  }
-
-  double getCurrentWidth(int idCol) {
-    return (colsWidthNoExtra[idCol] ?? 0.0) + getExtraWidth(idCol);
-  }
-
-  void updateDataColumn(int idCol, double delta) {
-    colsExtraWidth[idCol] = getExtraWidth(idCol) + delta;
-  }
-
-  bool isFixedWidth(DataColumn dc, int colIdx) {
-    return dc is! DataColumn2 ||
-        (dc.fixedWidth != null || getExtraWidth(colIdx) != 0);
-  }
-
-  /// Returns the proportion of not fixed width columns left of [colLimit]
-  /// with respect the total of not fixed width columns
-  double getPropLeftNotFixedColumns(
-      List<DataColumn> columns, DataColumn colLimit) {
-    double res = 0;
-    int t = 0;
-    int l = 0;
-    var idxLimit = columns.indexOf(colLimit);
-    for (var c in columns) {
-      var idx = columns.indexOf(c);
-      if (c != colLimit &&
-          !isFixedWidth(c, idx) &&
-          (colsWidthNoExtra[idx] == null ||
-              colsWidthNoExtra[idx]! > ColumnDataController.minColWidth)) {
-        if (idx < idxLimit) {
-          l++;
-        }
-        t++;
-      }
-    }
-    if (t > 0) {
-      res = l / t;
-    }
-    return res;
-  }
-}
-
-/// Widget to control column resizing
-class ColumnResizeWidget extends StatefulWidget {
-  final double height;
-  final void Function(double) onDragUpdate;
-  final Color color;
-  final bool desktopMode;
-  final bool realTime;
-
-  const ColumnResizeWidget({
-    super.key,
-    required this.height,
-    required this.onDragUpdate,
-    this.color = Colors.black,
-    this.desktopMode = false,
-    this.realTime = false,
-  });
-
-  @override
-  State<StatefulWidget> createState() => ColumnResizeWidgetState();
-}
-
-class ColumnResizeWidgetState extends State<ColumnResizeWidget> {
-  var _width = 4.0;
-  var _color = Colors.transparent;
-  var _hover = false;
-  var _dragging = false;
-  var amountResized = 0.0;
-
-  void _update() {
-    if (_dragging || _hover) {
-      _color = widget.color;
-      _width = 6;
-    } else if (!_hover) {
-      _color = Colors.transparent;
-      _width = 4;
-      if (!widget.realTime) {
-        _dragUpdated(0.0);
-      }
-    }
-  }
-
-  void _dragUpdated(double delta) {
-    if (widget.realTime) {
-      widget.onDragUpdate(delta);
-    } else {
-      if (_dragging) {
-        setState(() {
-          amountResized += delta;
-        });
-      } else {
-        widget.onDragUpdate(amountResized);
-        amountResized = 0;
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Draggable(
-      onDragUpdate: (details) => _dragUpdated(details.delta.dx),
-      onDragStarted: () => setState(() {
-        _dragging = true;
-        _update();
-      }),
-      onDragEnd: (_) => setState(() {
-        _dragging = false;
-        _update();
-      }),
-      axis: Axis.horizontal,
-      feedback: widget.realTime
-          ? const SizedBox.shrink()
-          : (widget.desktopMode)
-              ? Container(
-                  width: _width,
-                  height: widget.height,
-                  color: _color,
-                )
-              : (RotatedBox(
-                  quarterTurns: 1,
-                  child: Icon(
-                    color: widget.color,
-                    Icons.vertical_align_center,
-                  ),
-                )),
-      childWhenDragging: (!widget.desktopMode)
-          ? RotatedBox(
-              quarterTurns: 1,
-              child: Icon(
-                color: widget.color,
-                Icons.vertical_align_center,
-              ),
-            )
-          : null,
-      child: (widget.desktopMode)
-          ? MouseRegion(
-              cursor: SystemMouseCursors.resizeColumn,
-              onEnter: (_) => setState(() {
-                _hover = true;
-                _update();
-              }),
-              onExit: (_) => setState(() {
-                _hover = false;
-                _update();
-              }),
-              child: AnimatedContainer(
-                height: widget.height,
-                width: _width,
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeIn,
-                decoration: BoxDecoration(
-                  color: widget.realTime || !_dragging ? _color : Colors.grey,
-                ),
-              ),
-            )
-          : Icon(color: widget.color, Icons.drag_indicator),
-    );
-  }
-}
-
-/// Class to set parameters of resize widget
-class ColumnResizingParameters {
-  /// Called when the column is resized
-  final void Function(DataColumn2, double) onColumnResized;
-  final bool desktopMode;
-  final Color widgetColor;
-  final bool realTime;
-
-  ColumnResizingParameters({
-    required this.onColumnResized,
-    this.desktopMode = true,
-    this.widgetColor = Colors.black,
-    this.realTime = true,
-  });
 }
 
 /// In-place replacement of standard [DataTable] widget, mimics it API.
@@ -554,13 +363,9 @@ class DataTable2 extends DataTable {
     }
 
     return contents;
-    // return TableCell(
-    //   verticalAlignment: TableCellVerticalAlignment.fill,
-    //   child: contents,
-    // );
   }
 
-  Widget _buildResizeWidget(DataColumn2 dc2, double widgetHeight,
+  Widget _buildResizeWidget(DataColumn2 column, double widgetHeight,
       {desktopMode = true}) {
     return ColumnResizeWidget(
       height: widgetHeight,
@@ -568,8 +373,10 @@ class DataTable2 extends DataTable {
           ? columnResizingParameters!.widgetColor
           : Colors.black,
       onDragUpdate: (delta) {
-        if (columnResizingParameters != null && dc2.resizeable) {
-          columnResizingParameters!.onColumnResized(dc2, delta);
+        if (columnResizingParameters != null &&
+            column is ResizableDataColumn2 &&
+            column.isResizable) {
+          columnResizingParameters!.onColumnResized(column, delta);
         }
       },
       desktopMode: desktopMode,
@@ -591,7 +398,7 @@ class DataTable2 extends DataTable {
     required double effectiveHeadingRowHeight,
     required MaterialStateProperty<Color?>? overlayColor,
     Color? backgroundColor,
-    DataColumn2? dc2,
+    DataColumn2? column,
   }) {
     final ThemeData themeData = Theme.of(context);
     label = Row(
@@ -632,12 +439,14 @@ class DataTable2 extends DataTable {
         child: label,
       );
     }
-    if (dc2 != null && dc2.resizeable) {
+    if (column != null &&
+        column is ResizableDataColumn2 &&
+        column.isResizable) {
       label = Row(
         children: [
           Expanded(child: label),
           _buildResizeWidget(
-            dc2,
+            column,
             effectiveHeadingRowHeight,
             desktopMode: columnResizingParameters != null
                 ? columnResizingParameters!.desktopMode
@@ -996,7 +805,7 @@ class DataTable2 extends DataTable {
             sorted: dataColumnIndex == sortColumnIndex,
             ascending: sortAscending,
             overlayColor: effectiveHeadingRowColor,
-            dc2: column is DataColumn2 ? column : null,
+            column: column is DataColumn2 ? column : null,
             backgroundColor: displayColumnIndex < actualFixedColumns
                 ? (actualFixedRows < 1
                     ? fixedColumnsColor
