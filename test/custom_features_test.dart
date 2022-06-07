@@ -78,7 +78,7 @@ void main() {
     testWidgets('empty widget is displayed when there\'s no data',
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
-          tester, buildTable(empty: const Text('No data'), noData: true));
+          tester, buildTable(empty: const Text('No data'), rows: []));
 
       expect(find.text('Name'), findsOneWidget);
       expect(find.text('No data'), findsOneWidget);
@@ -1080,6 +1080,97 @@ void main() {
               3 * 11 + 1)); // 3 columns, 10 rows + 1 header row + paginator
       expect(find.text('Frozen yogurt x2'), findsOneWidget);
       expect(find.text('11–20 of 30'), findsOneWidget);
+    });
+
+    testWidgets('Select/deselect all', (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(1000, 300));
+      var source = DessertDataSourceAsync(allowSelection: true);
+      await tester.pumpWidget(MaterialApp(
+          home: Material(
+              child: buildAsyncPaginatedTable(
+                  showPage: false,
+                  showGeneration: false,
+                  showPageSizeSelector: true,
+                  source: source,
+                  onSelectAll: (val) {
+                    if (val ?? false) {
+                      source.selectAll();
+                    } else {
+                      source.deselectAll();
+                    }
+                  }))));
+
+      await tester.pumpAndSettle();
+
+      int _numebrOfCheckboxes(bool cheked) => find
+          .byType(Checkbox)
+          .evaluate()
+          .where((e) => (e.widget as Checkbox).value == cheked)
+          .length;
+
+      expect(_numebrOfCheckboxes(false), 11);
+
+      await tester.tap(find.byType(Checkbox).first);
+      await tester.pumpAndSettle();
+      expect(_numebrOfCheckboxes(true), 11);
+
+      await tester.tap(find.byIcon(Icons.chevron_right)); // page 2
+      await tester.pumpAndSettle();
+      expect(_numebrOfCheckboxes(true), 11);
+      await tester.tap(find.byIcon(Icons.chevron_right)); // page 3
+      await tester.pumpAndSettle();
+      expect(_numebrOfCheckboxes(true), 11);
+
+      await tester.tap(find.byType(Checkbox).first);
+      await tester.pumpAndSettle();
+      expect(_numebrOfCheckboxes(false), 11);
+    });
+
+    testWidgets('Select/deselect all on page', (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(1000, 300));
+      var source = DessertDataSourceAsync(allowSelection: true);
+      await tester.pumpWidget(MaterialApp(
+          home: Material(
+              child: buildAsyncPaginatedTable(
+                  showPage: false,
+                  showGeneration: false,
+                  showPageSizeSelector: true,
+                  source: source,
+                  onSelectAll: (val) {
+                    if (val!) {
+                      source.selectAllOnThePage();
+                    } else {
+                      source.deselectAllOnThePage();
+                    }
+                  }))));
+
+      await tester.pumpAndSettle();
+
+      int _numebrOfCheckboxes(bool cheked) => find
+          .byType(Checkbox)
+          .evaluate()
+          .where((e) => (e.widget as Checkbox).value == cheked)
+          .length;
+
+      expect(_numebrOfCheckboxes(false), 11);
+
+      await tester.tap(find.byType(Checkbox).first);
+      await tester.pumpAndSettle();
+      expect(_numebrOfCheckboxes(true), 11);
+
+      await tester.tap(find.byIcon(Icons.chevron_right)); // page 2
+      await tester.pumpAndSettle();
+      expect(_numebrOfCheckboxes(false), 11);
+      await tester.tap(find.byIcon(Icons.chevron_right)); // page 3
+      await tester.pumpAndSettle();
+      expect(_numebrOfCheckboxes(false), 11);
+
+      await tester.tap(find.byType(Checkbox).first);
+      await tester.pumpAndSettle();
+      expect(_numebrOfCheckboxes(true), 11);
+      await tester.tap(find.byType(Checkbox).first);
+      await tester.pumpAndSettle();
+      expect(_numebrOfCheckboxes(false), 11);
     });
   });
 

@@ -200,6 +200,88 @@ void main() {
     });
   });
 
+  group('Borders', () {
+    testWidgets('0 fixed rows, 0 fixed columns', (WidgetTester tester) async {
+      var border = TableBorder.all(color: Colors.red);
+
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(fixedTopRows: 0, fixedLeftColumns: 0, border: border),
+          const Size(500, 300));
+
+      var t = find.byType(Table).evaluate().first.widget as Table;
+      expect(t.border, border);
+    });
+
+    testWidgets('0 fixed rows, 1 fixed column', (WidgetTester tester) async {
+      var border = TableBorder.all(color: Colors.red);
+
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(fixedTopRows: 0, fixedLeftColumns: 1, border: border),
+          const Size(500, 300));
+
+      var tables = find
+          .byType(Table)
+          .evaluate()
+          .map<Table>((e) => e.widget as Table)
+          .toList();
+      expect(tables.length, 2);
+      expect(tables[0].border, border);
+      expect(tables[1].border!.left, BorderSide.none);
+      expect(tables[1].border!.right, border.right);
+    });
+
+    testWidgets('1 fixed row, 0 fixed columns', (WidgetTester tester) async {
+      var border = TableBorder.all(color: Colors.red);
+
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(fixedTopRows: 1, fixedLeftColumns: 0, border: border),
+          const Size(500, 300));
+
+      var tables = find
+          .byType(Table)
+          .evaluate()
+          .map<Table>((e) => e.widget as Table)
+          .toList();
+      expect(tables.length, 2);
+      expect(tables[0].border, border);
+      expect(tables[1].border!.top, BorderSide.none);
+      expect(tables[1].border!.bottom, border.right);
+    });
+
+    testWidgets('2 fixed rows, 2 fixed columns', (WidgetTester tester) async {
+      var border = TableBorder.all(color: Colors.red);
+
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+              fixedTopRows: 2,
+              fixedLeftColumns: 2,
+              border: border,
+              bottomMargin: 10),
+          const Size(500, 300));
+
+      _verifyDataTable2InitialState(tester);
+
+      var tables = find
+          .byType(Table)
+          .evaluate()
+          .map<Table>((e) => e.widget as Table)
+          .toList();
+      expect(tables.length, 4);
+      expect(tables[0].border, border);
+      expect(tables[1].border!.top, BorderSide.none);
+      expect(tables[1].border!.bottom, border.right);
+      expect(tables[2].border!.left, BorderSide.none);
+      expect(tables[2].border!.bottom, border.right);
+      expect(tables[3].border!.left, BorderSide.none);
+      expect(tables[3].border!.top, BorderSide.none);
+      expect(tables[3].border!.bottom, border.right);
+    });
+  });
+
   group('Fixed cols/rows out of range', () {
     testWidgets('Fixed columns equal to the number of columns',
         (WidgetTester tester) async {
@@ -799,6 +881,37 @@ void main() {
       expect(_isVisibleInTable(find.text('24'), tester), isFalse);
 
       await tester.ensureVisible(find.text('65'));
+      expect(_isVisibleInTable(find.text('Carbs'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('159'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('237'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('65'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
+
+      expect(_isVisibleInTable(find.text('Name'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('Eclair'), tester), isFalse);
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+    });
+
+    testWidgets(
+        '3 fixed rows, 2 fixed columns, with minWidth, with scrollController, scroll to bottom',
+        (WidgetTester tester) async {
+      var sc = ScrollController();
+
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+              fixedTopRows: 3,
+              fixedLeftColumns: 2,
+              minWidth: 850,
+              scrollController: sc),
+          const Size(850, 300));
+
+      _verifyDataTable2InitialState(tester);
+
+      sc.jumpTo(400);
+
+      await tester.pumpAndSettle();
+
       expect(_isVisibleInTable(find.text('Carbs'), tester), isTrue);
       expect(_isVisibleInTable(find.text('159'), tester), isTrue);
       expect(_isVisibleInTable(find.text('237'), tester), isTrue);

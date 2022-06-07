@@ -394,14 +394,14 @@ class DataTable2 extends DataTable {
     }
   }
 
-  static ScrollController? _leftColumnVerticalContollerStatic;
-  static ScrollController? _coreVerticalControllerStatic;
-
   void _leftColumnVerticalContollerListener() {
     if (_coreVerticalController.hasClients) {
       _coreVerticalController.jumpTo(_leftColumnVerticalContoller.offset);
     }
   }
+
+  static ScrollController? _leftColumnVerticalContollerStatic;
+  static ScrollController? _coreVerticalControllerStatic;
 
   static final LocalKey _headingRowKey = UniqueKey();
 
@@ -1319,9 +1319,12 @@ class DataTable2 extends DataTable {
         var x = _buildCheckbox(
             context: context,
             checked: row.selected,
-            onRowTap: () => row.onSelectChanged != null
-                ? row.onSelectChanged!(!row.selected)
-                : null,
+            onRowTap: () {
+              row.onSelectChanged?.call(!row.selected);
+              if (row is DataRow2) {
+                row.onTap?.call();
+              }
+            },
             onCheckboxChanged: row.onSelectChanged,
             overlayColor: row.color ?? effectiveDataRowColor,
             tristate: false,
@@ -1684,6 +1687,7 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
   }
 }
 
+// coverage:ignore-start
 class _NullTableColumnWidth extends TableColumnWidth {
   const _NullTableColumnWidth();
 
@@ -1702,3 +1706,4 @@ class _NullWidget extends Widget {
   @override
   Element createElement() => throw UnimplementedError();
 }
+// coverage:ignore-end

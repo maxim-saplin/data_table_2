@@ -1,6 +1,6 @@
 [![Pub Version](https://img.shields.io/pub/v/data_table_2?label=pub.dev&labelColor=333940&logo=flutter)](https://pub.dev/packages/data_table_2) [![GitHub](https://img.shields.io/github/license/maxim-saplin/data_table_2?color=%23007A88&labelColor=333940)](https://github.com/maxim-saplin/data_table_2/blob/main/LICENSE) [![Tests](https://github.com/maxim-saplin/data_table_2/workflows/Dev%20Build/badge.svg)](https://github.com/maxim-saplin/data_table_2/actions) [![Codecov](https://img.shields.io/codecov/c/github/maxim-saplin/data_table_2/nndb?labelColor=333940&logo=codecov&logoColor=white)](https://codecov.io/gh/maxim-saplin/data_table_2)
 
-!Support for fixed columns has been added!
+*! Support for fixed/sticky columns has been added !*
 
 In-place substitute for Flutter's stock **DataTable** and **PaginatedDataTable** widgets with fixed header/sticky top row and other useful features missing in the originals. 
 
