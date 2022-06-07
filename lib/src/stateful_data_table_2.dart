@@ -22,8 +22,8 @@ class ResizableDataColumn2 extends DataColumn2 {
 // 2) Stretch and fill container, should the available width be less then specified minWidth - size the columns to minwidth and show horizontal scrollbar
 // IMO, for the resizable table it makes sens to have 3rd option, let the table change total width when resizing columns
 class StatefulDataTable2 extends StatefulWidget {
-  const StatefulDataTable2({Key? key})
-      : super(key: key, this.lockTableWidth = true);
+  const StatefulDataTable2({Key? key, this.lockTableWidth = true})
+      : super(key: key);
 
   /// If this flag is set to `false` than strating/shrinking table columns lead to
   /// changing table's total width. I.e. by default the table fills viewport's width OR occupies
