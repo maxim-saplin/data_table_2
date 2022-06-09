@@ -40,6 +40,8 @@ Please check the [example folder](https://github.com/maxim-saplin/data_table_2/t
 
 ## Usage
 
+**NOTE:*** don't put the widgets into any unconstrained parents with infinit width or height (e.g. scrollables such as SingleChildScrollView, Column etc.). The widgets are designed to stretch and fill all available space within parent and have a number of own scrollables inside to address fixed rows/columns feature. Putting it inside unconsgtrained parent break widgets.
+
 1. Add reference to pubspec.yaml.
 
 2. Import:
