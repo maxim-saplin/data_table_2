@@ -196,6 +196,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.autoRowsToHeight = false,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
+    this.columnResizingParameters,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
@@ -407,6 +408,9 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? scrollController;
 
+  /// Parameters to control column resizing
+  final ColumnResizingParameters? columnResizingParameters;
+
   @override
   PaginatedDataTable2State createState() => PaginatedDataTable2State();
 }
@@ -422,7 +426,6 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   final Map<int, DataRow?> _rows = <int, DataRow?>{};
   int _effectiveRowsPerPage = -1;
   int _prevRowsPerPageForAutoRows = -1;
-  ColumnDataController columnDataController = ColumnDataController();
 
   @override
   void setState(VoidCallback fn) {
@@ -466,7 +469,6 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   @override
   void dispose() {
     widget.source.removeListener(_handleDataSourceChanged);
-    columnDataController.dispose();
     super.dispose();
   }
 
@@ -646,29 +648,12 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     );
   }
 
-  void _onColumnResized(DataColumn2 dc2, double delta) {
-    var idx = widget.columns.indexOf(dc2);
-
-    /// Compensate delta when there are columns with not fixed width to the left
-    var cl =
-        columnDataController.getPropLeftNotFixedColumns(widget.columns, dc2);
-    if (cl < 1) {
-      delta = delta / (1 - cl);
-    }
-    if ((columnDataController.getCurrentWidth(idx) + delta) >=
-        ColumnDataController.minColWidth) {
-      setState(() {
-        columnDataController.updateDataColumn(idx, delta);
-      });
-    }
-  }
-
   Widget _getTable(BoxConstraints constraints) {
     return Flexible(
       fit: widget.fit,
       child: ConstrainedBox(
         constraints: BoxConstraints(minWidth: constraints.minWidth),
-        child: DataTable2(
+        child: StatefulDataTable2(
           key: _tableKey,
           columns: widget.columns,
           sortColumnIndex: widget.sortColumnIndex,
@@ -692,13 +677,6 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           border: widget.border,
           smRatio: widget.smRatio,
           lmRatio: widget.lmRatio,
-          columnResizingParameters: ColumnResizingParameters(
-            onColumnResized: _onColumnResized,
-            desktopMode: true,
-            realTime: true,
-            widgetColor: Colors.blueAccent,
-          ),
-          columnDataController: columnDataController,
         ),
       ),
     );

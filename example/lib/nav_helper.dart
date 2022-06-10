@@ -24,6 +24,8 @@ const rowTaps = 'Row Taps';
 const rowHeightOverrides = 'Row height overrides';
 const fixedColumnWidth = 'Fixed column width';
 const resizableCols = "Resizable columns";
+const resizableColsNoRealtime = "Resizable columns no real time";
+const resizableColsMobile = "Resizable columns mobile";
 
 /// Async sample that emulates network error and allow retrying load operation
 const asyncErrors = "Errors/Retries";
@@ -40,6 +42,12 @@ const Map<String, List<String>> routeOptions = {
     fixedColumnWidth,
     rowTaps,
     rowHeightOverrides
+  ],
+  '/statefulDatatable2': [
+    dflt,
+    resizableCols,
+    resizableColsNoRealtime,
+    resizableColsMobile,
   ],
   '/paginated2': [
     dflt,

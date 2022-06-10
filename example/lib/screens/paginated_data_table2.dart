@@ -188,6 +188,11 @@ class PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
         source: getCurrentRouteOption(context) == noData
             ? DessertDataSource.empty(context)
             : _dessertsDataSource,
+        columnResizingParameters: ColumnResizingParameters(
+          desktopMode: true,
+          realTime: true,
+          widgetColor: Theme.of(context).primaryColor,
+        ),
       ),
       if (getCurrentRouteOption(context) == custPager)
         Positioned(bottom: 16, child: CustomPager(_controller!))

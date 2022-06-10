@@ -139,7 +139,7 @@ class DataTable2 extends DataTable {
     this.lmRatio = 1.2,
     required super.rows,
     this.columnDataController,
-    this.columnResizingParameters,
+    this.buildResizeColumnWidget,
   })  : _coreVerticalController = scrollController ?? ScrollController(),
         assert(fixedLeftColumns >= 0),
         assert(fixedTopRows >= 0) {
@@ -318,7 +318,8 @@ class DataTable2 extends DataTable {
   /// individual row colors of data rows provided via [rows]
   final Color? fixedCornerColor;
 
-  final ColumnResizingParameters? columnResizingParameters;
+  /// Called to build the resizing column widget
+  final Widget Function(DataColumn2, double)? buildResizeColumnWidget;
 
   Widget _buildCheckbox(
       {required BuildContext context,
@@ -363,27 +364,6 @@ class DataTable2 extends DataTable {
     }
 
     return contents;
-  }
-
-  Widget _buildResizeWidget(DataColumn2 column, double widgetHeight,
-      {desktopMode = true}) {
-    return ColumnResizeWidget(
-      height: widgetHeight,
-      color: columnResizingParameters != null
-          ? columnResizingParameters!.widgetColor
-          : Colors.black,
-      onDragUpdate: (delta) {
-        if (columnResizingParameters != null &&
-            column is ResizableDataColumn2 &&
-            column.isResizable) {
-          columnResizingParameters!.onColumnResized(column, delta);
-        }
-      },
-      desktopMode: desktopMode,
-      realTime: columnResizingParameters != null
-          ? columnResizingParameters!.realTime
-          : true,
-    );
   }
 
   Widget _buildHeadingCell({
@@ -445,13 +425,11 @@ class DataTable2 extends DataTable {
       label = Row(
         children: [
           Expanded(child: label),
-          _buildResizeWidget(
-            column,
-            effectiveHeadingRowHeight,
-            desktopMode: columnResizingParameters != null
-                ? columnResizingParameters!.desktopMode
-                : true,
-          ),
+          if (buildResizeColumnWidget != null)
+            buildResizeColumnWidget!(
+              column,
+              effectiveHeadingRowHeight,
+            ),
         ],
       );
     }
