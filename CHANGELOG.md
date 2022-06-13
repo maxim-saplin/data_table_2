@@ -1,3 +1,6 @@
+## 2.3.1
+- Changed readme, added notes regarding putting the widgets inside scrollable and Column
+
 ## 2.3.0
 - Added fixed columns (DataTable2.fixedLeftColumns)
 - Number of fixed rows can now be changed (DataTable2.fixedTopRows)
