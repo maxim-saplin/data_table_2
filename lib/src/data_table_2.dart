@@ -985,14 +985,22 @@ class DataTable2 extends DataTable {
         fixedRowsAndCoreCol = Scrollbar(
             controller: _coreHorizontalController,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              if (fixedRowsTabel != null)
-                ScrollConfiguration(
-                    behavior: ScrollConfiguration.of(context)
-                        .copyWith(scrollbars: false),
-                    child: SingleChildScrollView(
-                        controller: _fixedRowsHorizontalController,
-                        scrollDirection: Axis.horizontal,
-                        child: fixedRowsTabel)),
+              ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context)
+                      .copyWith(scrollbars: false),
+                  child: SingleChildScrollView(
+                      controller: _fixedRowsHorizontalController,
+                      scrollDirection: Axis.horizontal,
+                      child: (fixedRowsTabel != null)
+                          ? fixedRowsTabel
+                          // WOrkaround for a bug when there's no horizontal scrollbar should there be no this SingleChildScrollView. I.e. originally this part was ommited and not scrollable was added to the column if not fixed top row was visible
+                          : SizedBox(
+                              height: 0,
+                              width: widths.fold<double>(
+                                  0,
+                                  (previousValue, value) =>
+                                      previousValue + value),
+                            ))),
               Flexible(
                   fit: FlexFit.tight,
                   child: SingleChildScrollView(

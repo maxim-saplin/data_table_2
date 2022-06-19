@@ -86,29 +86,30 @@ Scaffold _getScaffold(BuildContext context, Widget body,
               ],
             )),
         options != null && options.isNotEmpty
-            ? Padding(
-                padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
-
-                // screen options
-                child: DropdownButton<String>(
-                    icon: const SizedBox(),
-                    dropdownColor: Colors.grey[300],
-                    style: Theme.of(context)
-                        .textTheme
-                        .subtitle1!
-                        .copyWith(color: Colors.black),
-                    value: defaultOption,
-                    onChanged: (v) {
-                      var r = _getCurrentRoute(context);
-                      Navigator.of(context).pushNamed(r, arguments: v);
-                    },
-                    items: options
-                        .map<DropdownMenuItem<String>>(
-                            (v) => DropdownMenuItem<String>(
-                                  value: v,
-                                  child: Text(v),
-                                ))
-                        .toList()))
+            ? Flexible(
+                child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 4, 0, 4),
+                        child: DropdownButton<String>(
+                            icon: const SizedBox(),
+                            dropdownColor: Colors.grey[300],
+                            style: Theme.of(context)
+                                .textTheme
+                                .subtitle1!
+                                .copyWith(color: Colors.black),
+                            value: defaultOption,
+                            onChanged: (v) {
+                              var r = _getCurrentRoute(context);
+                              Navigator.of(context).pushNamed(r, arguments: v);
+                            },
+                            items: options
+                                .map<DropdownMenuItem<String>>(
+                                    (v) => DropdownMenuItem<String>(
+                                          value: v,
+                                          child: Text(v),
+                                        ))
+                                .toList()))))
             : const SizedBox()
       ]),
     ),
