@@ -10,7 +10,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 /// Relative size of a column determines the share of total table width allocated
 /// to each individual column. When determining column widths ratios between S, M and L
@@ -185,6 +184,7 @@ class DataTable2 extends DataTable {
   // In response the listener of fixed row controller will reqeuest the core scrollable to
   // do the jump which will halt intertial scrolling
   // TODO, fix issue when srolling up via core and then trying scroll to down via fixed col, fixed col scrolling is not becoming available until core stops scrolling
+  // TODO, add test
   static bool _isControllerActive(ScrollController controller) {
     // Somehow inertial scrolling is not an issue on Desktop platforms, the question is how that approach will work on touch Windows devices
     return !kIsWeb && (Platform.isAndroid || Platform.isIOS)
