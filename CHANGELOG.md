@@ -1,3 +1,6 @@
+## 2.3.2
+- Fixed horizontal scrolling not working (jumping\stuttering with small shifts) on Android and iOS
+
 ## 2.3.1
 - Changed readme, added notes regarding putting the widgets inside scrollable and Column
 

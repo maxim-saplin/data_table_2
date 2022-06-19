@@ -9,8 +9,6 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'dart:io' show Platform;
-
 /// Relative size of a column determines the share of total table width allocated
 /// to each individual column. When determining column widths ratios between S, M and L
 /// columns are kept (i.e. Large columns are set to 1.2x width of Medium ones)
@@ -187,7 +185,8 @@ class DataTable2 extends DataTable {
   // TODO, add test
   static bool _isControllerActive(ScrollController controller) {
     // Somehow inertial scrolling is not an issue on Desktop platforms, the question is how that approach will work on touch Windows devices
-    return !kIsWeb && (Platform.isAndroid || Platform.isIOS)
+    return defaultTargetPlatform == TargetPlatform.android ||
+            defaultTargetPlatform == TargetPlatform.iOS
         ? controller.position.isScrollingNotifier.value
         : true;
   }
