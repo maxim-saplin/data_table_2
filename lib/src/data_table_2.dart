@@ -9,6 +9,9 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 /// Relative size of a column determines the share of total table width allocated
 /// to each individual column. When determining column widths ratios between S, M and L
 /// columns are kept (i.e. Large columns are set to 1.2x width of Medium ones)
@@ -172,14 +175,33 @@ class DataTable2 extends DataTable {
     }
   }
 
+  // Check whether the scrollable to which the given controller is attached is currently
+  // scrolling/animating it's contents, i.e. active.
+  // On touch devices scrolling has intertia. E.g. when swiping up/down
+  // on vertical scrollable the contents will shift gradually. During this thim
+  // the controller will receive a series of events and push the to listeners.
+  // Added this to address bug #106, circular jumpTo(). In a table with
+  // one fixed row core controller will ask fixed row controller to jumpTo new potion.
+  // In response the listener of fixed row controller will reqeuest the core scrollable to
+  // do the jump which will halt intertial scrolling
+  // TODO, fix issue when srolling up via core and then trying scroll to down via fixed col, fixed col scrolling is not becoming available until core stops scrolling
+  static bool _isControllerActive(ScrollController controller) {
+    // Somehow inertial scrolling is not an issue on Desktop platforms, the question is how that approach will work on touch Windows devices
+    return !kIsWeb && (Platform.isAndroid || Platform.isIOS)
+        ? controller.position.isScrollingNotifier.value
+        : true;
+  }
+
   void _fixedRowsHorizontalControllerListener() {
-    if (_fixedRowsHorizontalController.hasClients) {
+    if (_coreHorizontalController.hasClients &&
+        _isControllerActive(_fixedRowsHorizontalController)) {
       _coreHorizontalController.jumpTo(_fixedRowsHorizontalController.offset);
     }
   }
 
   void _scrollControllerCoreHorizontalListener() {
-    if (_fixedRowsHorizontalController.hasClients) {
+    if (_fixedRowsHorizontalController.hasClients &&
+        _isControllerActive(_coreHorizontalController)) {
       _fixedRowsHorizontalController.jumpTo(_coreHorizontalController.offset);
     }
   }
@@ -187,20 +209,23 @@ class DataTable2 extends DataTable {
   static void _scrollControllerCoreVerticalListenerStatic() {
     if (_leftColumnVerticalContollerStatic != null &&
         _coreVerticalControllerStatic != null &&
-        _leftColumnVerticalContollerStatic!.hasClients) {
+        _leftColumnVerticalContollerStatic!.hasClients &&
+        _isControllerActive(_coreVerticalControllerStatic!)) {
       _leftColumnVerticalContollerStatic!
           .jumpTo(_coreVerticalControllerStatic!.offset);
     }
   }
 
   void _scrollControllerCoreVerticalListener() {
-    if (_leftColumnVerticalContoller.hasClients) {
+    if (_leftColumnVerticalContoller.hasClients &&
+        _isControllerActive(_coreVerticalController)) {
       _leftColumnVerticalContoller.jumpTo(_coreVerticalController.offset);
     }
   }
 
   void _leftColumnVerticalContollerListener() {
-    if (_coreVerticalController.hasClients) {
+    if (_coreVerticalController.hasClients &&
+        _isControllerActive(_leftColumnVerticalContoller)) {
       _coreVerticalController.jumpTo(_leftColumnVerticalContoller.offset);
     }
   }
