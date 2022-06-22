@@ -16,6 +16,80 @@ class ResizableDataColumn2 extends DataColumn2 {
   final bool isResizable;
 }
 
+class _DataTable2 extends DataTable2 {
+  _DataTable2({
+    required super.columns,
+    super.sortColumnIndex,
+    super.sortAscending = true,
+    super.onSelectAll,
+    super.decoration,
+    super.dataRowHeight,
+    super.headingRowColor,
+    super.headingRowHeight,
+    super.horizontalMargin,
+    super.checkboxHorizontalMargin,
+    super.bottomMargin,
+    super.columnSpacing,
+    super.showCheckboxColumn = true,
+    super.showBottomBorder = false,
+    super.dividerThickness,
+    super.minWidth,
+    super.scrollController,
+    super.empty,
+    super.border,
+    super.smRatio = 0.67,
+    super.lmRatio = 1.2,
+    required super.rows,
+    super.columnDataController,
+    required this.buildResizeColumnWidget,
+  });
+
+  /// Called to build the resizing column widget
+  final Widget Function(DataColumn2, double) buildResizeColumnWidget;
+
+  @override
+  Widget _buildHeadingCell({
+    required BuildContext context,
+    required EdgeInsetsGeometry padding,
+    required Widget label,
+    required String? tooltip,
+    required bool numeric,
+    required VoidCallback? onSort,
+    required bool sorted,
+    required bool ascending,
+    required double effectiveHeadingRowHeight,
+    required MaterialStateProperty<Color?>? overlayColor,
+    Color? backgroundColor,
+    DataColumn2? column,
+  }) {
+    label = super._buildHeadingCell(
+        context: context,
+        padding: padding,
+        label: label,
+        tooltip: tooltip,
+        numeric: numeric,
+        onSort: onSort,
+        sorted: sorted,
+        ascending: ascending,
+        effectiveHeadingRowHeight: effectiveHeadingRowHeight,
+        overlayColor: overlayColor);
+    if (column != null &&
+        column is ResizableDataColumn2 &&
+        column.isResizable) {
+      label = Row(
+        children: [
+          Expanded(child: label),
+          buildResizeColumnWidget(
+            column,
+            effectiveHeadingRowHeight,
+          ),
+        ],
+      );
+    }
+    return label;
+  }
+}
+
 // TODO - conclude on resizing the table and it's width.
 // Current implementation assumes there're 2 options:
 // 1) Stretch to fill the container, size all columns inside to the avaialble with
@@ -222,7 +296,7 @@ class _StatefulDataTable2State extends State<StatefulDataTable2> {
 
   @override
   Widget build(BuildContext context) {
-    var table = DataTable2(
+    var table = _DataTable2(
       columns: widget.columns,
       sortColumnIndex: widget.sortColumnIndex,
       sortAscending: widget.sortAscending,
@@ -255,9 +329,11 @@ class _StatefulDataTable2State extends State<StatefulDataTable2> {
     return ColumnResizeWidget(
       height: widgetHeight,
       color: _colParams.widgetColor,
+      minWidth: _colParams.widgetMinWidth,
+      maxWidth: _colParams.widgetMaxWidth,
       onDragUpdate: (delta) {
         if (column is ResizableDataColumn2 && column.isResizable) {
-          _onColumnResized!(column, delta);
+          _onColumnResized(column, delta);
         }
       },
       desktopMode: _colParams.desktopMode,
@@ -350,6 +426,11 @@ class ColumnResizeWidget extends StatefulWidget {
   final bool desktopMode;
   final bool realTime;
 
+  /// Minimum width of widget in desktop mode
+  final double minWidth;
+
+  /// Maximum width of widget in desktop mode
+  final double maxWidth;
   const ColumnResizeWidget({
     super.key,
     required this.height,
@@ -357,6 +438,8 @@ class ColumnResizeWidget extends StatefulWidget {
     this.color = Colors.black,
     this.desktopMode = false,
     this.realTime = false,
+    this.minWidth = 2,
+    this.maxWidth = 6,
   });
 
   @override
@@ -364,19 +447,25 @@ class ColumnResizeWidget extends StatefulWidget {
 }
 
 class ColumnResizeWidgetState extends State<ColumnResizeWidget> {
-  var _width = 4.0;
+  late double _width;
   var _color = Colors.transparent;
   var _hover = false;
   var _dragging = false;
   var amountResized = 0.0;
 
+  @override
+  void initState() {
+    _width = widget.minWidth;
+    super.initState();
+  }
+
   void _update() {
     if (_dragging || _hover) {
       _color = widget.color;
-      _width = 6;
+      _width = widget.maxWidth;
     } else if (!_hover) {
       _color = Colors.transparent;
-      _width = 4;
+      _width = widget.minWidth;
       if (!widget.realTime) {
         _dragUpdated(0.0);
       }
@@ -465,11 +554,19 @@ class ColumnResizeWidgetState extends State<ColumnResizeWidget> {
 class ColumnResizingParameters {
   final bool desktopMode;
   final Color widgetColor;
+
+  /// Minimum width of widget in desktop mode
+  final double widgetMinWidth;
+
+  /// Maximum width of widget in desktop mode
+  final double widgetMaxWidth;
   final bool realTime;
 
   ColumnResizingParameters({
     this.desktopMode = true,
     this.widgetColor = Colors.black,
     this.realTime = true,
+    this.widgetMinWidth = 2,
+    this.widgetMaxWidth = 6,
   });
 }

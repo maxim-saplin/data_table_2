@@ -139,7 +139,6 @@ class DataTable2 extends DataTable {
     this.lmRatio = 1.2,
     required super.rows,
     this.columnDataController,
-    this.buildResizeColumnWidget,
   })  : _coreVerticalController = scrollController ?? ScrollController(),
         assert(fixedLeftColumns >= 0),
         assert(fixedTopRows >= 0) {
@@ -318,9 +317,6 @@ class DataTable2 extends DataTable {
   /// individual row colors of data rows provided via [rows]
   final Color? fixedCornerColor;
 
-  /// Called to build the resizing column widget
-  final Widget Function(DataColumn2, double)? buildResizeColumnWidget;
-
   Widget _buildCheckbox(
       {required BuildContext context,
       required bool? checked,
@@ -417,20 +413,6 @@ class DataTable2 extends DataTable {
       label = Tooltip(
         message: tooltip,
         child: label,
-      );
-    }
-    if (column != null &&
-        column is ResizableDataColumn2 &&
-        column.isResizable) {
-      label = Row(
-        children: [
-          Expanded(child: label),
-          if (buildResizeColumnWidget != null)
-            buildResizeColumnWidget!(
-              column,
-              effectiveHeadingRowHeight,
-            ),
-        ],
       );
     }
     label = InkWell(
