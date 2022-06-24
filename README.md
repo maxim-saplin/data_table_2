@@ -108,3 +108,4 @@ If you're already using the standard widgets you can reference the package and a
 - There're no expanding/collapsing rows (drill-down scenarios), manually moving or resizing columns or rows, merging cells (i.e. HTML's colspan, rowspan)
 - When fixing left columns, hovering over rows doesn't highlight entire row (should there be any tap handlers standard behavior is hovering a row changes it background)
  - With fixed top rows and left columns hovering over actionable data rows their highlighted background can be displayed behind fixed sections
+ - Touch scrolling not working/jumping under mobile device emulation in Chrome (https://github.com/maxim-saplin/data_table_2/issues/100)
