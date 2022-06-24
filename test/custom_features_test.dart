@@ -84,6 +84,52 @@ void main() {
       expect(find.text('No data'), findsOneWidget);
     });
 
+    testWidgets('border in heading is displayed when there\'s no data',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+            empty: const Text('No data'),
+            rows: [],
+            border: TableBorder.all(color: Colors.red),
+          ));
+
+      expect(find.text('Name'), findsOneWidget);
+      expect(find.text('No data'), findsOneWidget);
+
+      var tableBorder =
+          (find.byType(Table).evaluate().first.widget as Table).border!;
+      expect(tableBorder.top.color, Colors.red);
+      expect(tableBorder.top.width, 1);
+      expect(tableBorder.bottom.color, Colors.red);
+      expect(tableBorder.bottom.width, 1);
+      expect(tableBorder.left.color, Colors.red);
+      expect(tableBorder.left.width, 1);
+      expect(tableBorder.right.color, Colors.red);
+      expect(tableBorder.right.width, 1);
+
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+            rows: [],
+            border: TableBorder.all(color: Colors.red),
+          ));
+
+      expect(find.text('Name'), findsOneWidget);
+      expect(find.text('No data'), findsNothing);
+
+      tableBorder =
+          (find.byType(Table).evaluate().first.widget as Table).border!;
+      expect(tableBorder.top.color, Colors.red);
+      expect(tableBorder.top.width, 1);
+      expect(tableBorder.bottom.color, Colors.red);
+      expect(tableBorder.bottom.width, 1);
+      expect(tableBorder.left.color, Colors.red);
+      expect(tableBorder.left.width, 1);
+      expect(tableBorder.right.color, Colors.red);
+      expect(tableBorder.right.width, 1);
+    });
+
     testWidgets('DataTable2.border', (WidgetTester tester) async {
       const columns = <DataColumn>[
         DataColumn2(label: Text('col1')),

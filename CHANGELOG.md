@@ -1,3 +1,6 @@
+## 2.3.3
+- Fixed column width/applying border to heading rows in case there're no data rows provided
+
 ## 2.3.2
 - Fixed horizontal scrolling not working (jumping\stuttering with small shifts) on Android and iOS
 

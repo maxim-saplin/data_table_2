@@ -182,7 +182,6 @@ class DataTable2 extends DataTable {
   // In response the listener of fixed row controller will reqeuest the core scrollable to
   // do the jump which will halt intertial scrolling
   // TODO, fix issue when srolling up via core and then trying scroll to down via fixed col, fixed col scrolling is not becoming available until core stops scrolling
-  // TODO, add test
   static bool _isControllerActive(ScrollController controller) {
     // Somehow inertial scrolling is not an issue on Desktop platforms, the question is how that approach will work on touch Windows devices
     return defaultTargetPlatform == TargetPlatform.android ||
@@ -1034,7 +1033,13 @@ class DataTable2 extends DataTable {
           decoration: decoration ?? theme.dataTableTheme.decoration,
           child: rows.isEmpty
               ? Column(children: [
-                  Table(children: [headingRow]),
+                  SingleChildScrollView(
+                      controller: _coreHorizontalController,
+                      scrollDirection: Axis.horizontal,
+                      child: Table(
+                          columnWidths: widthsAsMap,
+                          border: border,
+                          children: [headingRow])),
                   Flexible(fit: FlexFit.tight, child: empty ?? const SizedBox())
                 ])
               : Row(
