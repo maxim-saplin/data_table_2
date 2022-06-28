@@ -147,6 +147,7 @@ class DataTable2 extends DataTable {
 
     // TODO, add test
     // Fix for #111, syncrhonize scroll position for left fixed column with core
+    // Works fine if there's scrollCongtroller provided externally, allows to avoid jumping
     _leftColumnVerticalContoller = ScrollController(
         initialScrollOffset: _coreVerticalController.positions.isNotEmpty
             ? _coreVerticalController.offset
@@ -1062,6 +1063,17 @@ class DataTable2 extends DataTable {
 
       return completeWidget;
     });
+
+    // TODO, add test
+    // Fix for #111, syncrhonize scroll position for left fixed column with core
+    // Works fine if there's no scrollCongtroller provided externally, can have jumping effect on iOS
+    if (fixedLeftColumns > 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) =>
+          _leftColumnVerticalContoller.hasClients
+              ? _leftColumnVerticalContoller
+                  .jumpTo(_coreVerticalController.offset)
+              : {});
+    }
 
     sw.stop();
     if (kDebugMode) print('DataTable2 built: ${sw.elapsedMilliseconds}ms');
