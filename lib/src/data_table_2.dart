@@ -144,6 +144,14 @@ class DataTable2 extends DataTable {
     //     .removeListener(_fixedRowsHorizontalControllerListener);
     _fixedRowsHorizontalController
         .addListener(_fixedRowsHorizontalControllerListener);
+
+    // TODO, add test
+    // Fix for #111, syncrhonize scroll position for left fixed column with core
+    _leftColumnVerticalContoller = ScrollController(
+        initialScrollOffset: _coreVerticalController.positions.isNotEmpty
+            ? _coreVerticalController.offset
+            : 0.0);
+
     if (fixedLeftColumns < columns.length + (showCheckboxColumn ? 1 : 0)) {
       _leftColumnVerticalContoller
           .addListener(_leftColumnVerticalContollerListener);
@@ -286,7 +294,7 @@ class DataTable2 extends DataTable {
   // https://github.com/maxim-saplin/data_table_2/issues/42
   final ScrollController _fixedRowsHorizontalController = ScrollController();
 
-  final ScrollController _leftColumnVerticalContoller = ScrollController();
+  late final ScrollController _leftColumnVerticalContoller;
 
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
