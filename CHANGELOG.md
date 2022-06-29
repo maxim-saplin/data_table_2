@@ -1,3 +1,6 @@
+## 2.3.4
+- Fix for #111, synchronized scroll position for left fixed column with core table when fixed column is added and core table is already scrolled
+
 ## 2.3.3
 - Fixed column width/applying border to heading rows in case there're no data rows provided (#108)
 

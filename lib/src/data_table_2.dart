@@ -145,7 +145,6 @@ class DataTable2 extends DataTable {
     _fixedRowsHorizontalController
         .addListener(_fixedRowsHorizontalControllerListener);
 
-    // TODO, add test
     // Fix for #111, syncrhonize scroll position for left fixed column with core
     // Works fine if there's scrollCongtroller provided externally, allows to avoid jumping
     _leftColumnVerticalContoller = ScrollController(
@@ -191,6 +190,7 @@ class DataTable2 extends DataTable {
   // In response the listener of fixed row controller will reqeuest the core scrollable to
   // do the jump which will halt intertial scrolling
   // TODO, fix issue when srolling up via core and then trying scroll to down via fixed col, fixed col scrolling is not becoming available until core stops scrolling
+  // #113
   static bool _isControllerActive(ScrollController controller) {
     // Somehow inertial scrolling is not an issue on Desktop platforms, the question is how that approach will work on touch Windows devices
     return defaultTargetPlatform == TargetPlatform.android ||
@@ -1064,7 +1064,6 @@ class DataTable2 extends DataTable {
       return completeWidget;
     });
 
-    // TODO, add test
     // Fix for #111, syncrhonize scroll position for left fixed column with core
     // Works fine if there's no scrollCongtroller provided externally, can have jumping effect on iOS
     if (fixedLeftColumns > 0) {

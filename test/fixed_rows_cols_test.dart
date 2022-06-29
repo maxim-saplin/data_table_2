@@ -2,6 +2,8 @@
 
 @TestOn('!chrome')
 
+import 'dart:async';
+
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -965,6 +967,80 @@ void main() {
       expect(_isVisibleInTable(find.text('Name'), tester), isTrue);
       expect(_isVisibleInTable(find.text('Eclair'), tester), isFalse);
       expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+    });
+
+    testWidgets(
+        '0 fixed rows, 0-1 fixed column, left coulm out of sync when added, bug#111',
+        (WidgetTester tester) async {
+      var col = 0;
+      var trigger = StreamController();
+
+      var widget = StreamBuilder(
+          stream: trigger.stream,
+          builder: (c, s) {
+            return buildTable(
+                fixedTopRows: 0,
+                fixedLeftColumns: col,
+                minWidth: 850,
+                showCheckboxColumn: false);
+          });
+
+      await wrapWidgetSetSurf(tester, widget, const Size(500, 300));
+      await tester.pumpAndSettle();
+
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('159'), tester), isTrue);
+
+      await tester.ensureVisible(find.text('KitKat'));
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
+
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isFalse);
+      expect(_isVisibleInTable(find.text('159'), tester), isFalse);
+
+      col = 1;
+      trigger.add(true);
+      await tester.pumpAndSettle();
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
+    });
+
+    testWidgets(
+        '0 fixed rows, 0-1 fixed column, left coulm out of sync when added, with ScrollController, bug#111',
+        (WidgetTester tester) async {
+      var col = 0;
+      var trigger = StreamController();
+      var sc = ScrollController();
+
+      var widget = StreamBuilder(
+          stream: trigger.stream,
+          builder: (c, s) {
+            return buildTable(
+                fixedTopRows: 0,
+                fixedLeftColumns: col,
+                scrollController: sc,
+                minWidth: 850,
+                showCheckboxColumn: false);
+          });
+
+      await wrapWidgetSetSurf(tester, widget, const Size(500, 300));
+      await tester.pumpAndSettle();
+
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('159'), tester), isTrue);
+
+      await tester.ensureVisible(find.text('KitKat'));
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
+
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isFalse);
+      expect(_isVisibleInTable(find.text('159'), tester), isFalse);
+
+      col = 1;
+      trigger.add(true);
+      await tester.pumpAndSettle();
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
     });
   });
 }
