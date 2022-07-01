@@ -635,6 +635,7 @@ class DataTable2 extends DataTable {
 
     var builder = LayoutBuilder(builder: (context, constraints) {
       return SyncedScrollControllers(
+          key: key,
           scrollController: scrollController,
           sc12toSc11Position: true,
           builder: (context, sc11, sc12, sc21, sc22) {
@@ -974,17 +975,6 @@ class DataTable2 extends DataTable {
                                 fit: FlexFit.tight, child: fixedRowsAndCoreCol)
                         ],
                       ));
-
-            // Fix for #111, syncrhonize scroll position for left fixed column with core
-            // Works fine if there's no scrollCongtroller provided externally, can have jumping effect on iOS
-            // TODO, check for jump fix altter
-            if (fixedLeftColumns > 0) {
-              WidgetsBinding.instance.addPostFrameCallback((_) =>
-                  leftColumnVerticalContoller.hasClients
-                      ? leftColumnVerticalContoller
-                          .jumpTo(coreVerticalController.offset)
-                      : {});
-            }
 
             return completeWidget;
           });
@@ -1447,7 +1437,7 @@ class SyncedScrollControllers extends StatefulWidget {
 }
 
 class SyncedScrollControllersState extends State<SyncedScrollControllers> {
-  late ScrollController _sc11;
+  ScrollController? _sc11;
   late ScrollController _sc12;
   late ScrollController _sc21;
   late ScrollController _sc22;
@@ -1475,30 +1465,29 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
 
   void _initControllers() {
     _doNotReissueJump.clear();
+    var offset = _sc11 == null ? 0.0 : _sc11!.offset;
     if (widget.scrollController != null) {
       _sc11 = widget.scrollController!;
+      offset = _sc11!.offset;
     } else {
       _sc11 = ScrollController();
     }
 
     _sc12 = ScrollController(
-        initialScrollOffset: widget.scrollController != null &&
-                widget.scrollController!.positions.isNotEmpty
-            ? widget.scrollController!.offset
-            : 0.0);
+        initialScrollOffset: widget.sc12toSc11Position ? offset : 0.0);
 
     _sc21 = ScrollController();
     _sc22 = ScrollController();
 
-    _syncScrollControllers(_sc11, _sc12);
+    _syncScrollControllers(_sc11!, _sc12);
     _syncScrollControllers(_sc21, _sc22);
   }
 
   void _disposeOrUnsubscribe() {
     if (widget.scrollController == _sc11) {
-      _sc11.removeListener(_listeners[0]);
+      _sc11?.removeListener(_listeners[0]);
     } else {
-      _sc11.dispose();
+      _sc11?.dispose();
     }
     _sc12.dispose();
     _sc21.dispose();
@@ -1532,5 +1521,5 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
 
   @override
   Widget build(BuildContext context) =>
-      widget.builder(context, _sc11, _sc12, _sc21, _sc22);
+      widget.builder(context, _sc11!, _sc12, _sc21, _sc22);
 }

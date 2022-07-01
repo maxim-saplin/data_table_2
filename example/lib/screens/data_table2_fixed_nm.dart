@@ -114,7 +114,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
                           thumbColor:
                               MaterialStateProperty.all<Color>(Colors.black))),
                   child: DataTable2(
-                      scrollController: _controller,
+                      //scrollController: _controller,
                       columnSpacing: 0,
                       horizontalMargin: 12,
                       bottomMargin: 20,
