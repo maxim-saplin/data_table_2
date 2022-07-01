@@ -51,6 +51,7 @@ class DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
   @override
   void dispose() {
     _dessertsDataSource.dispose();
+    _controller.dispose();
     super.dispose();
   }
 

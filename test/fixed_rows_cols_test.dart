@@ -2,7 +2,10 @@
 
 @TestOn('!chrome')
 
+import 'dart:async';
+
 import 'package:data_table_2/data_table_2.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_utils.dart';
@@ -285,6 +288,8 @@ void main() {
   group('Fixed cols/rows out of range', () {
     testWidgets('Fixed columns equal to the number of columns',
         (WidgetTester tester) async {
+      // Will fail if not macOS, see data_table_2.dart _isControllerActive()
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester, buildTable(fixedLeftColumns: 3), const Size(500, 300));
 
@@ -297,6 +302,7 @@ void main() {
 
       expect(_isVisibleInTable(find.text('Name'), tester), isTrue);
       expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isFalse);
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets('Fixed columns greater than number of columns',
@@ -468,6 +474,7 @@ void main() {
     testWidgets(
         '3 fixed rows, 2 fixed columns, no minWidth, scroll to bottom (via fixed col item), scroll views sync test ',
         (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
           buildTable(fixedTopRows: 3, fixedLeftColumns: 2),
@@ -488,11 +495,13 @@ void main() {
       expect(
           _isVisibleInTable(find.text('Ice cream sandwich'), tester), isTrue);
       expect(_isVisibleInTable(find.text('Eclair'), tester), isFalse);
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets(
         '0 fixed rows, 1 fixed column, no minWidth, scroll to bottom, scroll views sync test ',
         (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
           buildTable(fixedTopRows: 0, fixedLeftColumns: 2),
@@ -510,11 +519,14 @@ void main() {
 
       expect(_isVisibleInTable(find.text('Name'), tester), isFalse);
       expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isFalse);
+
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets(
         '0 fixed rows, 2 fixed columns, no minWidth, scroll to bottom (via fixed col item), scroll views sync test ',
         (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
           buildTable(fixedTopRows: 0, fixedLeftColumns: 2),
@@ -532,11 +544,13 @@ void main() {
 
       expect(_isVisibleInTable(find.text('Name'), tester), isFalse);
       expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isFalse);
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets(
         '3 fixed rows, 2 fixed columns, with minWidth, scroll to bottom (via fixed col item), scroll views sync test ',
         (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
           buildTable(fixedTopRows: 3, fixedLeftColumns: 2, minWidth: 850),
@@ -557,6 +571,7 @@ void main() {
       expect(
           _isVisibleInTable(find.text('Ice cream sandwich'), tester), isTrue);
       expect(_isVisibleInTable(find.text('Eclair'), tester), isFalse);
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets('0 fixed rows, 0 fixed columns, with minWidth, scroll to right',
@@ -622,6 +637,7 @@ void main() {
     testWidgets(
         '1 fixed row, 1 fixed column, with minWidth, scroll to right (via fixed row item), scroll views sync test',
         (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
           buildTable(fixedTopRows: 1, fixedLeftColumns: 1, minWidth: 850),
@@ -638,11 +654,13 @@ void main() {
       expect(_isVisibleInTable(find.text('Name'), tester), isFalse);
       expect(_isVisibleInTable(find.text('Eclair'), tester), isFalse);
       expect(_isVisibleInTable(find.text('KitKat'), tester), isFalse);
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets(
         '1 fixed row, 2 fixed columns, with minWidth, scroll to right (via fixed row item), scroll views sync test',
         (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
           buildTable(fixedTopRows: 1, fixedLeftColumns: 2, minWidth: 850),
@@ -659,6 +677,8 @@ void main() {
       expect(_isVisibleInTable(find.text('Name'), tester), isTrue);
       expect(_isVisibleInTable(find.text('Eclair'), tester), isTrue);
       expect(_isVisibleInTable(find.text('KitKat'), tester), isFalse);
+
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets(
@@ -707,6 +727,7 @@ void main() {
     testWidgets(
         '1 fixed row, 0 fixed columns, with minWidth, scroll to bottom right',
         (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
           buildTable(fixedTopRows: 1, fixedLeftColumns: 0, minWidth: 850),
@@ -724,11 +745,14 @@ void main() {
       expect(_isVisibleInTable(find.text('Name'), tester), isFalse);
       expect(_isVisibleInTable(find.text('Eclair'), tester), isFalse);
       expect(_isVisibleInTable(find.text('KitKat'), tester), isFalse);
+
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets(
         '2 fixed rows, 0 fixed columns, with minWidth, scroll to bottom right',
         (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
           buildTable(fixedTopRows: 2, fixedLeftColumns: 0, minWidth: 850),
@@ -747,11 +771,14 @@ void main() {
       expect(_isVisibleInTable(find.text('Name'), tester), isFalse);
       expect(_isVisibleInTable(find.text('Eclair'), tester), isFalse);
       expect(_isVisibleInTable(find.text('KitKat'), tester), isFalse);
+
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets(
         '3 fixed rows, 0 fixed columns, with minWidth, scroll to bottom right',
         (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
           buildTable(fixedTopRows: 3, fixedLeftColumns: 0, minWidth: 850),
@@ -771,11 +798,14 @@ void main() {
       expect(_isVisibleInTable(find.text('Name'), tester), isFalse);
       expect(_isVisibleInTable(find.text('Eclair'), tester), isFalse);
       expect(_isVisibleInTable(find.text('KitKat'), tester), isFalse);
+
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets(
         '1 fixed row, 1 fixed column, with minWidth, scroll to bottom right',
         (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
           buildTable(fixedTopRows: 1, fixedLeftColumns: 1, minWidth: 850),
@@ -793,11 +823,14 @@ void main() {
       expect(_isVisibleInTable(find.text('Name'), tester), isFalse);
       expect(_isVisibleInTable(find.text('Eclair'), tester), isFalse);
       expect(_isVisibleInTable(find.text('KitKat'), tester), isFalse);
+
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets(
         '1 fixed row, 2 fixed columns, with minWidth, scroll to bottom right',
         (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
           buildTable(fixedTopRows: 1, fixedLeftColumns: 2, minWidth: 850),
@@ -815,11 +848,15 @@ void main() {
       expect(_isVisibleInTable(find.text('Name'), tester), isTrue);
       expect(_isVisibleInTable(find.text('Eclair'), tester), isFalse);
       expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets(
         '2 fixed rows, 2 fixed columns, with minWidth, scroll to bottom right',
         (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
+
       await wrapWidgetSetSurf(
           tester,
           buildTable(fixedTopRows: 2, fixedLeftColumns: 2, minWidth: 850),
@@ -838,11 +875,14 @@ void main() {
       expect(_isVisibleInTable(find.text('Name'), tester), isTrue);
       expect(_isVisibleInTable(find.text('Eclair'), tester), isFalse);
       expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets(
         '3 fixed rows, 1 fixed columns, with minWidth, no checkboxes, scroll to bottom right',
         (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
           buildTable(
@@ -866,11 +906,15 @@ void main() {
       expect(_isVisibleInTable(find.text('Name'), tester), isTrue);
       expect(_isVisibleInTable(find.text('Eclair'), tester), isFalse);
       expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets(
         '3 fixed rows, 2 fixed columns, with minWidth, scroll to bottom right',
         (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
+
       await wrapWidgetSetSurf(
           tester,
           buildTable(fixedTopRows: 3, fixedLeftColumns: 2, minWidth: 850),
@@ -890,6 +934,8 @@ void main() {
       expect(_isVisibleInTable(find.text('Name'), tester), isTrue);
       expect(_isVisibleInTable(find.text('Eclair'), tester), isFalse);
       expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets(
@@ -921,6 +967,139 @@ void main() {
       expect(_isVisibleInTable(find.text('Name'), tester), isTrue);
       expect(_isVisibleInTable(find.text('Eclair'), tester), isFalse);
       expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+    });
+
+    testWidgets(
+        '0 fixed rows, 0-1 fixed column, left coulm out of sync when added, bug#111',
+        (WidgetTester tester) async {
+      var col = 0;
+      var trigger = StreamController();
+
+      var widget = StreamBuilder(
+          stream: trigger.stream,
+          builder: (c, s) {
+            return buildTable(
+                fixedTopRows: 0,
+                fixedLeftColumns: col,
+                minWidth: 850,
+                showCheckboxColumn: false);
+          });
+
+      await wrapWidgetSetSurf(tester, widget, const Size(500, 300));
+      await tester.pumpAndSettle();
+
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('159'), tester), isTrue);
+
+      await tester.ensureVisible(find.text('KitKat'));
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
+
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isFalse);
+      expect(_isVisibleInTable(find.text('159'), tester), isFalse);
+
+      col = 1;
+      trigger.add(true);
+      await tester.pumpAndSettle();
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
+    });
+
+    testWidgets(
+        '0 fixed rows, 0-1 fixed column, left coulm out of sync when added, with ScrollController, bug#111',
+        (WidgetTester tester) async {
+      var col = 0;
+      var trigger = StreamController();
+      var sc = ScrollController();
+
+      var widget = StreamBuilder(
+          stream: trigger.stream,
+          builder: (c, s) {
+            return buildTable(
+                fixedTopRows: 0,
+                fixedLeftColumns: col,
+                scrollController: sc,
+                minWidth: 850,
+                showCheckboxColumn: false);
+          });
+
+      await wrapWidgetSetSurf(tester, widget, const Size(500, 300));
+      await tester.pumpAndSettle();
+
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('159'), tester), isTrue);
+
+      await tester.ensureVisible(find.text('KitKat'));
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
+
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isFalse);
+      expect(_isVisibleInTable(find.text('159'), tester), isFalse);
+
+      col = 1;
+      trigger.add(true);
+      await tester.pumpAndSettle();
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
+    });
+    testWidgets(
+        '1 fixed rows, 1 fixed column, scroll down via core, scroll up via left column',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+              fixedTopRows: 1,
+              fixedLeftColumns: 1,
+              minWidth: 850,
+              showCheckboxColumn: false),
+          const Size(500, 300));
+
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('159'), tester), isTrue);
+
+      await tester.ensureVisible(find.text('518')); // core
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isFalse);
+      expect(_isVisibleInTable(find.text('159'), tester), isFalse);
+
+      await tester.ensureVisible(find.text('159'));
+      await tester.ensureVisible(find.text('518'));
+
+      await tester.ensureVisible(find.text('Frozen yogurt')); // left column
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('159'), tester), isTrue);
+    });
+
+    testWidgets(
+        '1 fixed rows, 1 fixed column, scroll down via core, scroll up via left column, with controller',
+        (WidgetTester tester) async {
+      var sc = ScrollController();
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+              fixedTopRows: 1,
+              fixedLeftColumns: 1,
+              minWidth: 850,
+              scrollController: sc,
+              showCheckboxColumn: false),
+          const Size(500, 300));
+
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('159'), tester), isTrue);
+
+      await tester.ensureVisible(find.text('518')); // core
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isFalse);
+      expect(_isVisibleInTable(find.text('159'), tester), isFalse);
+
+      await tester.ensureVisible(find.text('159'));
+      await tester.ensureVisible(find.text('518'));
+
+      await tester.ensureVisible(find.text('Frozen yogurt')); // left column
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('159'), tester), isTrue);
     });
   });
 }

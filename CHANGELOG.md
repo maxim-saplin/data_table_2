@@ -1,3 +1,19 @@
+## 2.3.5
+- Refactored scroll syncing approach, no static workaround and potential memleaks
+- Fixed locked scrolling when bouncing on iOS (#113)
+
+## 2.3.4
+- Fix for #111, synchronized scroll position for left fixed column with core table when fixed column is added and core table is already scrolled
+
+## 2.3.3
+- Fixed column width/applying border to heading rows in case there're no data rows provided (#108)
+
+## 2.3.2
+- Fixed horizontal scrolling not working (jumping\stuttering with small shifts) on Android and iOS
+
+## 2.3.1
+- Changed readme, added notes regarding putting the widgets inside scrollable and Column
+
 ## 2.3.0
 - Added fixed columns (DataTable2.fixedLeftColumns)
 - Number of fixed rows can now be changed (DataTable2.fixedTopRows)

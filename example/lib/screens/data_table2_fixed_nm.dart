@@ -94,6 +94,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
   @override
   void dispose() {
     _dessertsDataSource.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -200,6 +201,8 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
   }
 
   Theme _getParamsWidget(BuildContext context) {
+    const double col1 = 130;
+    const double col2 = 210;
     return Theme(
         data: blackSlider(context),
         child: Column(
@@ -211,9 +214,9 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     SizedBox(
-                        width: 130, child: Text('Fixed rows ($_fixedRows)')),
+                        width: col1, child: Text('Fixed rows ($_fixedRows)')),
                     SizedBox(
-                        width: 240,
+                        width: col2,
                         child: Slider(
                             value: _fixedRows.toDouble(),
                             min: 0,
@@ -232,9 +235,10 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     SizedBox(
-                        width: 130, child: Text('Fixed columns ($_fixedCols)')),
+                        width: col1,
+                        child: Text('Fixed columns ($_fixedCols)')),
                     SizedBox(
-                        width: 240,
+                        width: col2,
                         child: Slider(
                             value: _fixedCols.toDouble(),
                             min: 0,
@@ -253,9 +257,9 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     SizedBox(
-                        width: 130, child: Text('Data items ($_dataItems)')),
+                        width: col1, child: Text('Data items ($_dataItems)')),
                     SizedBox(
-                        width: 240,
+                        width: col2,
                         child: Slider(
                             value: _dataItems.toDouble(),
                             min: 0,

@@ -1,8 +1,8 @@
 [![Pub Version](https://img.shields.io/pub/v/data_table_2?label=pub.dev&labelColor=333940&logo=flutter)](https://pub.dev/packages/data_table_2) [![GitHub](https://img.shields.io/github/license/maxim-saplin/data_table_2?color=%23007A88&labelColor=333940)](https://github.com/maxim-saplin/data_table_2/blob/main/LICENSE) [![Tests](https://github.com/maxim-saplin/data_table_2/workflows/Dev%20Build/badge.svg)](https://github.com/maxim-saplin/data_table_2/actions) [![Codecov](https://img.shields.io/codecov/c/github/maxim-saplin/data_table_2/nndb?labelColor=333940&logo=codecov&logoColor=white)](https://codecov.io/gh/maxim-saplin/data_table_2)
 
-*! Support for fixed/sticky columns has been added !*
+*! Don't put the widgets inside unbounded parents. You don't need scrollables anymore (e.g. `SingleChildScrollView`) - widgets handle scrolling by theirselves. If you need a widget inside a `Column()`, wrap it into `Expanded()` or `Flexible()`.*
 
-In-place substitute for Flutter's stock **DataTable** and **PaginatedDataTable** widgets with fixed header/sticky top row and other useful features missing in the originals. 
+In-place substitute for Flutter's stock **DataTable** and **PaginatedDataTable** widgets with fixed/sticky header/top rows and left columns. A few useful features missing in the originals were added. 
 
 **DataTable2** and **PaginatedDataTable2** widgets are based on the sources of Flutter's originals, mimic the API and provide seamless integration.
 
@@ -39,6 +39,8 @@ Please check the [example folder](https://github.com/maxim-saplin/data_table_2/t
 
 
 ## Usage
+
+**NOTE:*** don't put the widgets into any unconstrained parents with infinit width or height (e.g. scrollables such as SingleChildScrollView, Column etc.). The widgets are designed to stretch and fill all available space within parent and have a number of own scrollables inside to address fixed rows/columns feature. Putting it inside unconsgtrained parent break widgets.
 
 1. Add reference to pubspec.yaml.
 
@@ -106,3 +108,4 @@ If you're already using the standard widgets you can reference the package and a
 - There're no expanding/collapsing rows (drill-down scenarios), manually moving or resizing columns or rows, merging cells (i.e. HTML's colspan, rowspan)
 - When fixing left columns, hovering over rows doesn't highlight entire row (should there be any tap handlers standard behavior is hovering a row changes it background)
  - With fixed top rows and left columns hovering over actionable data rows their highlighted background can be displayed behind fixed sections
+ - Touch scrolling not working/jumping under mobile device emulation in Chrome (https://github.com/maxim-saplin/data_table_2/issues/100)
