@@ -635,7 +635,6 @@ class DataTable2 extends DataTable {
 
     var builder = LayoutBuilder(builder: (context, constraints) {
       return SyncedScrollControllers(
-          key: key,
           scrollController: scrollController,
           sc12toSc11Position: true,
           builder: (context, sc11, sc12, sc21, sc22) {
@@ -1465,10 +1464,13 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
 
   void _initControllers() {
     _doNotReissueJump.clear();
-    var offset = _sc11 == null ? 0.0 : _sc11!.offset;
+    var offset =
+        _sc11 == null || _sc11!.positions.isEmpty ? 0.0 : _sc11!.offset;
     if (widget.scrollController != null) {
       _sc11 = widget.scrollController!;
-      offset = _sc11!.offset;
+      if (_sc11!.positions.isNotEmpty) {
+        offset = _sc11!.offset;
+      }
     } else {
       _sc11 = ScrollController();
     }
