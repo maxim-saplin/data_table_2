@@ -136,109 +136,15 @@ class DataTable2 extends DataTable {
     this.fixedLeftColumns = 0,
     this.lmRatio = 1.2,
     required super.rows,
-  })  : _coreVerticalController = scrollController ?? ScrollController(),
-        assert(fixedLeftColumns >= 0),
+  })  : assert(fixedLeftColumns >= 0),
         assert(fixedTopRows >= 0) {
-    // no point in removing listeners, evry widget instantiation will have a new scroll controller with no listeners
-    // _fixedRowsHorizontalController
-    //     .removeListener(_fixedRowsHorizontalControllerListener);
-    _fixedRowsHorizontalController
-        .addListener(_fixedRowsHorizontalControllerListener);
-
-    // Fix for #111, syncrhonize scroll position for left fixed column with core
-    // Works fine if there's scrollCongtroller provided externally, allows to avoid jumping
-    _leftColumnVerticalContoller = ScrollController(
-        initialScrollOffset: _coreVerticalController.positions.isNotEmpty
-            ? _coreVerticalController.offset
-            : 0.0);
-
-    if (fixedLeftColumns < columns.length + (showCheckboxColumn ? 1 : 0)) {
-      _leftColumnVerticalContoller
-          .addListener(_leftColumnVerticalContollerListener);
-    }
-
-    _coreHorizontalController
-        .addListener(_scrollControllerCoreHorizontalListener);
-
-    // Dirty hack to allow Stateless widget avoid memleaks and growing of number
-    // of listeners for _coreVerticalController when it is provided externaly
-    // via scrollController. This might brake is there're 2 data tables
-    // in the screen at the same time, they have left fixed column and both
-    // provide scrollController - look like a very unlikey case. Still that's
-    // a tradeoff to keep DataTable2 stateless and inheriting DataTable
-
-    if (scrollController != null) {
-      _leftColumnVerticalContollerStatic = _leftColumnVerticalContoller;
-      _coreVerticalControllerStatic = _coreVerticalController;
-      _coreVerticalController
-          .removeListener(_scrollControllerCoreVerticalListenerStatic);
-      _coreVerticalController
-          .addListener(_scrollControllerCoreVerticalListenerStatic);
-    } else {
-      _coreVerticalController
-          .addListener(_scrollControllerCoreVerticalListener);
-    }
+    // // Fix for #111, syncrhonize scroll position for left fixed column with core
+    // // Works fine if there's scrollCongtroller provided externally, allows to avoid jumping
+    // _leftColumnVerticalContoller = ScrollController(
+    //     initialScrollOffset: _coreVerticalController.positions.isNotEmpty
+    //         ? _coreVerticalController.offset
+    //         : 0.0);
   }
-
-  // Check whether the scrollable to which the given controller is attached is currently
-  // scrolling/animating it's contents, i.e. active.
-  // On touch devices scrolling has intertia. E.g. when swiping up/down
-  // on vertical scrollable the contents will shift gradually. During this thim
-  // the controller will receive a series of events and push the to listeners.
-  // Added this to address bug #106, circular jumpTo(). In a table with
-  // one fixed row core controller will ask fixed row controller to jumpTo new potion.
-  // In response the listener of fixed row controller will reqeuest the core scrollable to
-  // do the jump which will halt intertial scrolling
-  // TODO, fix issue when srolling up via core and then trying scroll to down via fixed col, fixed col scrolling is not becoming available until core stops scrolling
-  // #113
-  static bool _isControllerActive(ScrollController controller) {
-    // Somehow inertial scrolling is not an issue on Desktop platforms, the question is how that approach will work on touch Windows devices
-    return defaultTargetPlatform == TargetPlatform.android ||
-            defaultTargetPlatform == TargetPlatform.iOS
-        ? controller.position.isScrollingNotifier.value
-        : true;
-  }
-
-  void _fixedRowsHorizontalControllerListener() {
-    if (_coreHorizontalController.hasClients &&
-        _isControllerActive(_fixedRowsHorizontalController)) {
-      _coreHorizontalController.jumpTo(_fixedRowsHorizontalController.offset);
-    }
-  }
-
-  void _scrollControllerCoreHorizontalListener() {
-    if (_fixedRowsHorizontalController.hasClients &&
-        _isControllerActive(_coreHorizontalController)) {
-      _fixedRowsHorizontalController.jumpTo(_coreHorizontalController.offset);
-    }
-  }
-
-  static void _scrollControllerCoreVerticalListenerStatic() {
-    if (_leftColumnVerticalContollerStatic != null &&
-        _coreVerticalControllerStatic != null &&
-        _leftColumnVerticalContollerStatic!.hasClients &&
-        _isControllerActive(_coreVerticalControllerStatic!)) {
-      _leftColumnVerticalContollerStatic!
-          .jumpTo(_coreVerticalControllerStatic!.offset);
-    }
-  }
-
-  void _scrollControllerCoreVerticalListener() {
-    if (_leftColumnVerticalContoller.hasClients &&
-        _isControllerActive(_coreVerticalController)) {
-      _leftColumnVerticalContoller.jumpTo(_coreVerticalController.offset);
-    }
-  }
-
-  void _leftColumnVerticalContollerListener() {
-    if (_coreVerticalController.hasClients &&
-        _isControllerActive(_leftColumnVerticalContoller)) {
-      _coreVerticalController.jumpTo(_leftColumnVerticalContoller.offset);
-    }
-  }
-
-  static ScrollController? _leftColumnVerticalContollerStatic;
-  static ScrollController? _coreVerticalControllerStatic;
 
   static final LocalKey _headingRowKey = UniqueKey();
 
@@ -288,14 +194,6 @@ class DataTable2 extends DataTable {
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? scrollController;
-
-  final ScrollController _coreVerticalController;
-  final ScrollController _coreHorizontalController = ScrollController();
-
-  // https://github.com/maxim-saplin/data_table_2/issues/42
-  final ScrollController _fixedRowsHorizontalController = ScrollController();
-
-  late final ScrollController _leftColumnVerticalContoller;
 
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
@@ -387,10 +285,6 @@ class DataTable2 extends DataTable {
     }
 
     return contents;
-    // return TableCell(
-    //   verticalAlignment: TableCellVerticalAlignment.fill,
-    //   child: contents,
-    // );
   }
 
   Widget _buildHeadingCell(
@@ -740,339 +634,361 @@ class DataTable2 extends DataTable {
         effectiveDataRowColor);
 
     var builder = LayoutBuilder(builder: (context, constraints) {
-      var displayColumnIndex = 0;
+      return SyncedScrollControllers(
+          scrollController: scrollController,
+          sc12toSc11Position: true,
+          builder: (context, sc11, sc12, sc21, sc22) {
+            var coreVerticalController = sc11;
+            var leftColumnVerticalContoller = sc12;
+            var coreHorizontalController = sc21;
+            var fixedRowsHorizontalController = sc22;
 
-      // size & build checkboxes in heading and leftmost column
-      // to be substracted from total width available to columns
+            var displayColumnIndex = 0;
 
-      if (checkBoxWidth > 0) displayColumnIndex += 1;
+            // size & build checkboxes in heading and leftmost column
+            // to be substracted from total width available to columns
 
-      // size data columns
-      final widths = _calculateDataColumnSizes(
-          constraints, checkBoxWidth, effectiveHorizontalMargin);
+            if (checkBoxWidth > 0) displayColumnIndex += 1;
 
-      // File empty cells in created rows with actual widgets
-      for (int dataColumnIndex = 0;
-          dataColumnIndex < columns.length;
-          dataColumnIndex++) {
-        final DataColumn column = columns[dataColumnIndex];
+            // size data columns
+            final widths = _calculateDataColumnSizes(
+                constraints, checkBoxWidth, effectiveHorizontalMargin);
 
-        final double paddingStart;
-        if (dataColumnIndex == 0 && displayCheckboxColumn) {
-          paddingStart = effectiveHorizontalMargin / 2.0;
-        } else if (dataColumnIndex == 0 && !displayCheckboxColumn) {
-          paddingStart = effectiveHorizontalMargin;
-        } else {
-          paddingStart = effectiveColumnSpacing / 2.0;
-        }
+            // File empty cells in created rows with actual widgets
+            for (int dataColumnIndex = 0;
+                dataColumnIndex < columns.length;
+                dataColumnIndex++) {
+              final DataColumn column = columns[dataColumnIndex];
 
-        final double paddingEnd;
-        if (dataColumnIndex == columns.length - 1) {
-          paddingEnd = effectiveHorizontalMargin;
-        } else {
-          paddingEnd = effectiveColumnSpacing / 2.0;
-        }
+              final double paddingStart;
+              if (dataColumnIndex == 0 && displayCheckboxColumn) {
+                paddingStart = effectiveHorizontalMargin / 2.0;
+              } else if (dataColumnIndex == 0 && !displayCheckboxColumn) {
+                paddingStart = effectiveHorizontalMargin;
+              } else {
+                paddingStart = effectiveColumnSpacing / 2.0;
+              }
 
-        final EdgeInsetsDirectional padding = EdgeInsetsDirectional.only(
-          start: paddingStart,
-          end: paddingEnd,
-        );
+              final double paddingEnd;
+              if (dataColumnIndex == columns.length - 1) {
+                paddingEnd = effectiveHorizontalMargin;
+              } else {
+                paddingEnd = effectiveColumnSpacing / 2.0;
+              }
 
-        tableColumnWidths[displayColumnIndex] =
-            FixedColumnWidth(widths[dataColumnIndex]);
+              final EdgeInsetsDirectional padding = EdgeInsetsDirectional.only(
+                start: paddingStart,
+                end: paddingEnd,
+              );
 
-        var h = _buildHeadingCell(
-            context: context,
-            padding: padding,
-            effectiveHeadingRowHeight: effectiveHeadingRowHeight,
-            label: column.label,
-            tooltip: column.tooltip,
-            numeric: column.numeric,
-            onSort: column.onSort != null
-                ? () => column.onSort!(dataColumnIndex,
-                    sortColumnIndex != dataColumnIndex || !sortAscending)
-                : null,
-            sorted: dataColumnIndex == sortColumnIndex,
-            ascending: sortAscending,
-            overlayColor: effectiveHeadingRowColor,
-            backgroundColor: displayColumnIndex < actualFixedColumns
-                ? (actualFixedRows < 1
-                    ? fixedColumnsColor
-                    : (actualFixedRows > 0 ? fixedCornerColor : null))
-                : null);
+              tableColumnWidths[displayColumnIndex] =
+                  FixedColumnWidth(widths[dataColumnIndex]);
 
-        headingRow.children![displayColumnIndex] =
-            h; // heading row alone is used to display table header should there be no data rows
+              var h = _buildHeadingCell(
+                  context: context,
+                  padding: padding,
+                  effectiveHeadingRowHeight: effectiveHeadingRowHeight,
+                  label: column.label,
+                  tooltip: column.tooltip,
+                  numeric: column.numeric,
+                  onSort: column.onSort != null
+                      ? () => column.onSort!(dataColumnIndex,
+                          sortColumnIndex != dataColumnIndex || !sortAscending)
+                      : null,
+                  sorted: dataColumnIndex == sortColumnIndex,
+                  ascending: sortAscending,
+                  overlayColor: effectiveHeadingRowColor,
+                  backgroundColor: displayColumnIndex < actualFixedColumns
+                      ? (actualFixedRows < 1
+                          ? fixedColumnsColor
+                          : (actualFixedRows > 0 ? fixedCornerColor : null))
+                      : null);
 
-        if (displayColumnIndex < actualFixedColumns) {
-          if (actualFixedRows < 1) {
-            fixedColumnsRows![0].children![displayColumnIndex] = h;
-          } else if (actualFixedRows > 0) {
-            fixedCornerRows![0].children![displayColumnIndex] = h;
-          }
-        } else {
-          if (actualFixedRows < 1 && coreRows != null) {
-            coreRows[0].children![displayColumnIndex - actualFixedColumns] = h;
-          } else if (actualFixedRows > 0) {
-            fixedRows![0].children![displayColumnIndex - actualFixedColumns] =
-                h;
-          }
-        }
+              headingRow.children![displayColumnIndex] =
+                  h; // heading row alone is used to display table header should there be no data rows
 
-        var rowIndex = 0;
-        var skipRows = actualFixedRows == 1
-            ? 0
-            : actualFixedRows > 1
-                ? actualFixedRows - 1
-                : -1;
+              if (displayColumnIndex < actualFixedColumns) {
+                if (actualFixedRows < 1) {
+                  fixedColumnsRows![0].children![displayColumnIndex] = h;
+                } else if (actualFixedRows > 0) {
+                  fixedCornerRows![0].children![displayColumnIndex] = h;
+                }
+              } else {
+                if (actualFixedRows < 1 && coreRows != null) {
+                  coreRows[0]
+                      .children![displayColumnIndex - actualFixedColumns] = h;
+                } else if (actualFixedRows > 0) {
+                  fixedRows![0]
+                      .children![displayColumnIndex - actualFixedColumns] = h;
+                }
+              }
 
-        for (final DataRow row in rows) {
-          final DataCell cell = row.cells[dataColumnIndex];
-          //dataRows[rowIndex].children![displayColumnIndex]
+              var rowIndex = 0;
+              var skipRows = actualFixedRows == 1
+                  ? 0
+                  : actualFixedRows > 1
+                      ? actualFixedRows - 1
+                      : -1;
 
-          var c = _buildDataCell(
-              context: context,
-              padding: padding,
-              defaultDataRowHeight: defaultDataRowHeight,
-              specificRowHeight: row is DataRow2 ? row.specificRowHeight : null,
-              label: cell.child,
-              numeric: column.numeric,
-              placeholder: cell.placeholder,
-              showEditIcon: cell.showEditIcon,
-              onTap: cell.onTap,
-              onDoubleTap: cell.onDoubleTap,
-              onLongPress: cell.onLongPress,
-              onTapDown: cell.onTapDown,
-              onTapCancel: cell.onTapCancel,
-              onRowTap: row is DataRow2 ? row.onTap : null,
-              onRowDoubleTap: row is DataRow2 ? row.onDoubleTap : null,
-              onRowLongPress: row.onLongPress,
-              onRowSecondaryTap: row is DataRow2 ? row.onSecondaryTap : null,
-              onRowSecondaryTapDown:
-                  row is DataRow2 ? row.onSecondaryTapDown : null,
-              onSelectChanged: row.onSelectChanged != null
-                  ? () => row.onSelectChanged!(!row.selected)
-                  : null,
-              overlayColor: row.color ?? effectiveDataRowColor,
-              backgroundColor: displayColumnIndex < actualFixedColumns
-                  ? (rowIndex + 1 < actualFixedRows
-                      ? fixedCornerColor
-                      : fixedColumnsColor)
-                  : null);
+              for (final DataRow row in rows) {
+                final DataCell cell = row.cells[dataColumnIndex];
+                //dataRows[rowIndex].children![displayColumnIndex]
 
-          if (displayColumnIndex < actualFixedColumns) {
-            if (rowIndex + 1 < actualFixedRows) {
-              fixedCornerRows![rowIndex + 1].children![displayColumnIndex] = c;
-            } else {
-              fixedColumnsRows![rowIndex - skipRows]
-                  .children![displayColumnIndex] = c;
+                var c = _buildDataCell(
+                    context: context,
+                    padding: padding,
+                    defaultDataRowHeight: defaultDataRowHeight,
+                    specificRowHeight:
+                        row is DataRow2 ? row.specificRowHeight : null,
+                    label: cell.child,
+                    numeric: column.numeric,
+                    placeholder: cell.placeholder,
+                    showEditIcon: cell.showEditIcon,
+                    onTap: cell.onTap,
+                    onDoubleTap: cell.onDoubleTap,
+                    onLongPress: cell.onLongPress,
+                    onTapDown: cell.onTapDown,
+                    onTapCancel: cell.onTapCancel,
+                    onRowTap: row is DataRow2 ? row.onTap : null,
+                    onRowDoubleTap: row is DataRow2 ? row.onDoubleTap : null,
+                    onRowLongPress: row.onLongPress,
+                    onRowSecondaryTap:
+                        row is DataRow2 ? row.onSecondaryTap : null,
+                    onRowSecondaryTapDown:
+                        row is DataRow2 ? row.onSecondaryTapDown : null,
+                    onSelectChanged: row.onSelectChanged != null
+                        ? () => row.onSelectChanged!(!row.selected)
+                        : null,
+                    overlayColor: row.color ?? effectiveDataRowColor,
+                    backgroundColor: displayColumnIndex < actualFixedColumns
+                        ? (rowIndex + 1 < actualFixedRows
+                            ? fixedCornerColor
+                            : fixedColumnsColor)
+                        : null);
+
+                if (displayColumnIndex < actualFixedColumns) {
+                  if (rowIndex + 1 < actualFixedRows) {
+                    fixedCornerRows![rowIndex + 1]
+                        .children![displayColumnIndex] = c;
+                  } else {
+                    fixedColumnsRows![rowIndex - skipRows]
+                        .children![displayColumnIndex] = c;
+                  }
+                } else {
+                  if (rowIndex + 1 < actualFixedRows) {
+                    fixedRows![rowIndex + 1]
+                        .children![displayColumnIndex - actualFixedColumns] = c;
+                  } else {
+                    coreRows![rowIndex - skipRows]
+                        .children![displayColumnIndex - actualFixedColumns] = c;
+                  }
+                }
+
+                rowIndex += 1;
+              }
+              displayColumnIndex += 1;
             }
-          } else {
-            if (rowIndex + 1 < actualFixedRows) {
-              fixedRows![rowIndex + 1]
-                  .children![displayColumnIndex - actualFixedColumns] = c;
-            } else {
-              coreRows![rowIndex - skipRows]
-                  .children![displayColumnIndex - actualFixedColumns] = c;
+
+            var widthsAsMap = tableColumnWidths.asMap();
+            Map<int, TableColumnWidth>? leftWidthsAsMap = actualFixedColumns > 0
+                ? tableColumnWidths.take(actualFixedColumns).toList().asMap()
+                : null;
+            Map<int, TableColumnWidth>? rightWidthsAsMap = actualFixedColumns >
+                    0
+                ? tableColumnWidths.skip(actualFixedColumns).toList().asMap()
+                : null;
+
+            bool _isRowsEmpty(List<TableRow>? rows) {
+              return rows == null || rows.isEmpty || rows[0].children!.isEmpty;
             }
-          }
 
-          rowIndex += 1;
-        }
-        displayColumnIndex += 1;
-      }
+            var coreTable = Table(
+                columnWidths:
+                    actualFixedColumns > 0 ? rightWidthsAsMap : widthsAsMap,
+                children: coreRows ?? [],
+                border: border == null
+                    ? null
+                    : _isRowsEmpty(fixedRows) && _isRowsEmpty(fixedColumnsRows)
+                        ? border
+                        : !_isRowsEmpty(fixedRows) &&
+                                !_isRowsEmpty(fixedColumnsRows)
+                            ? TableBorder(
+                                //top: border!.top,
+                                //left: border!.left,
+                                right: border!.right,
+                                bottom: border!.bottom,
+                                verticalInside: border!.verticalInside,
+                                horizontalInside: border!.horizontalInside,
+                                borderRadius: border!.borderRadius)
+                            : _isRowsEmpty(fixedRows)
+                                ? TableBorder(
+                                    top: border!.top,
+                                    //left: border!.left,
+                                    right: border!.right,
+                                    bottom: border!.bottom,
+                                    verticalInside: border!.verticalInside,
+                                    horizontalInside: border!.horizontalInside,
+                                    borderRadius: border!.borderRadius)
+                                : TableBorder(
+                                    //top: border!.top,
+                                    left: border!.left,
+                                    right: border!.right,
+                                    bottom: border!.bottom,
+                                    verticalInside: border!.verticalInside,
+                                    horizontalInside: border!.horizontalInside,
+                                    borderRadius: border!.borderRadius));
 
-      var widthsAsMap = tableColumnWidths.asMap();
-      Map<int, TableColumnWidth>? leftWidthsAsMap = actualFixedColumns > 0
-          ? tableColumnWidths.take(actualFixedColumns).toList().asMap()
-          : null;
-      Map<int, TableColumnWidth>? rightWidthsAsMap = actualFixedColumns > 0
-          ? tableColumnWidths.skip(actualFixedColumns).toList().asMap()
-          : null;
+            Table? fixedRowsTabel;
+            Table? fixedColumnsTable;
+            Table? fixedTopLeftCornerTable;
+            Widget? fixedColumnAndCornerCol;
+            Widget? fixedRowsAndCoreCol;
 
-      bool _isRowsEmpty(List<TableRow>? rows) {
-        return rows == null || rows.isEmpty || rows[0].children!.isEmpty;
-      }
+            if (rows.isNotEmpty) {
+              if (fixedRows != null &&
+                  !_isRowsEmpty(fixedRows) &&
+                  actualFixedColumns <
+                      columns.length + (showCheckboxColumn ? 1 : 0)) {
+                fixedRowsTabel = Table(
+                    columnWidths:
+                        actualFixedColumns > 0 ? rightWidthsAsMap : widthsAsMap,
+                    children: fixedRows,
+                    border: border == null
+                        ? null
+                        : _isRowsEmpty(fixedCornerRows)
+                            ? border
+                            : TableBorder(
+                                top: border!.top,
+                                //left: border!.left,
+                                right: border!.right,
+                                bottom: border!.bottom,
+                                verticalInside: border!.verticalInside,
+                                horizontalInside: border!.horizontalInside,
+                                borderRadius: border!.borderRadius));
+              }
 
-      var coreTable = Table(
-          columnWidths: actualFixedColumns > 0 ? rightWidthsAsMap : widthsAsMap,
-          children: coreRows ?? [],
-          border: border == null
-              ? null
-              : _isRowsEmpty(fixedRows) && _isRowsEmpty(fixedColumnsRows)
-                  ? border
-                  : !_isRowsEmpty(fixedRows) && !_isRowsEmpty(fixedColumnsRows)
-                      ? TableBorder(
-                          //top: border!.top,
-                          //left: border!.left,
-                          right: border!.right,
-                          bottom: border!.bottom,
-                          verticalInside: border!.verticalInside,
-                          horizontalInside: border!.horizontalInside,
-                          borderRadius: border!.borderRadius)
-                      : _isRowsEmpty(fixedRows)
-                          ? TableBorder(
-                              top: border!.top,
-                              //left: border!.left,
-                              right: border!.right,
-                              bottom: border!.bottom,
-                              verticalInside: border!.verticalInside,
-                              horizontalInside: border!.horizontalInside,
-                              borderRadius: border!.borderRadius)
-                          : TableBorder(
-                              //top: border!.top,
-                              left: border!.left,
-                              right: border!.right,
-                              bottom: border!.bottom,
-                              verticalInside: border!.verticalInside,
-                              horizontalInside: border!.horizontalInside,
-                              borderRadius: border!.borderRadius));
+              if (fixedColumnsRows != null && !_isRowsEmpty(fixedColumnsRows)) {
+                fixedColumnsTable = Table(
+                    columnWidths: leftWidthsAsMap,
+                    children: fixedColumnsRows,
+                    border: border == null
+                        ? null
+                        : _isRowsEmpty(fixedCornerRows)
+                            ? border
+                            : TableBorder(
+                                //top: border!.top,
+                                left: border!.left,
+                                right: border!.right,
+                                bottom: border!.bottom,
+                                verticalInside: border!.verticalInside,
+                                horizontalInside: border!.horizontalInside,
+                                borderRadius: border!.borderRadius));
+              }
 
-      Table? fixedRowsTabel;
-      Table? fixedColumnsTable;
-      Table? fixedTopLeftCornerTable;
-      Widget? fixedColumnAndCornerCol;
-      Widget? fixedRowsAndCoreCol;
+              if (fixedCornerRows != null && !_isRowsEmpty(fixedCornerRows)) {
+                fixedTopLeftCornerTable = Table(
+                    columnWidths: leftWidthsAsMap,
+                    children: fixedCornerRows,
+                    border: border);
+              }
 
-      if (rows.isNotEmpty) {
-        if (fixedRows != null &&
-            !_isRowsEmpty(fixedRows) &&
-            actualFixedColumns <
-                columns.length + (showCheckboxColumn ? 1 : 0)) {
-          fixedRowsTabel = Table(
-              columnWidths:
-                  actualFixedColumns > 0 ? rightWidthsAsMap : widthsAsMap,
-              children: fixedRows,
-              border: border == null
+              Widget _addBottomMargin(Table t) =>
+                  bottomMargin != null && bottomMargin! > 0
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [t, SizedBox(height: bottomMargin!)])
+                      : t;
+
+              fixedRowsAndCoreCol = Scrollbar(
+                  controller: coreHorizontalController,
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    ScrollConfiguration(
+                        behavior: ScrollConfiguration.of(context)
+                            .copyWith(scrollbars: false),
+                        child: SingleChildScrollView(
+                            controller: fixedRowsHorizontalController,
+                            scrollDirection: Axis.horizontal,
+                            child: (fixedRowsTabel != null)
+                                ? fixedRowsTabel
+                                // WOrkaround for a bug when there's no horizontal scrollbar should there be no this SingleChildScrollView. I.e. originally this part was ommited and not scrollable was added to the column if not fixed top row was visible
+                                : SizedBox(
+                                    height: 0,
+                                    width: widths.fold<double>(
+                                        0,
+                                        (previousValue, value) =>
+                                            previousValue + value),
+                                  ))),
+                    Flexible(
+                        fit: FlexFit.tight,
+                        child: SingleChildScrollView(
+                            controller: coreVerticalController,
+                            scrollDirection: Axis.vertical,
+                            child: SingleChildScrollView(
+                                controller: coreHorizontalController,
+                                scrollDirection: Axis.horizontal,
+                                child: _addBottomMargin(coreTable))))
+                  ]));
+
+              fixedColumnAndCornerCol = fixedTopLeftCornerTable == null &&
+                      fixedColumnsTable == null
                   ? null
-                  : _isRowsEmpty(fixedCornerRows)
-                      ? border
-                      : TableBorder(
-                          top: border!.top,
-                          //left: border!.left,
-                          right: border!.right,
-                          bottom: border!.bottom,
-                          verticalInside: border!.verticalInside,
-                          horizontalInside: border!.horizontalInside,
-                          borderRadius: border!.borderRadius));
-        }
+                  : Column(mainAxisSize: MainAxisSize.min, children: [
+                      if (fixedTopLeftCornerTable != null)
+                        fixedTopLeftCornerTable,
+                      if (fixedColumnsTable != null)
+                        Flexible(
+                            fit: FlexFit.loose,
+                            child: ScrollConfiguration(
+                                behavior: ScrollConfiguration.of(context)
+                                    .copyWith(scrollbars: false),
+                                child: SingleChildScrollView(
+                                    controller: leftColumnVerticalContoller,
+                                    scrollDirection: Axis.vertical,
+                                    child:
+                                        _addBottomMargin(fixedColumnsTable))))
+                    ]);
+            }
 
-        if (fixedColumnsRows != null && !_isRowsEmpty(fixedColumnsRows)) {
-          fixedColumnsTable = Table(
-              columnWidths: leftWidthsAsMap,
-              children: fixedColumnsRows,
-              border: border == null
-                  ? null
-                  : _isRowsEmpty(fixedCornerRows)
-                      ? border
-                      : TableBorder(
-                          //top: border!.top,
-                          left: border!.left,
-                          right: border!.right,
-                          bottom: border!.bottom,
-                          verticalInside: border!.verticalInside,
-                          horizontalInside: border!.horizontalInside,
-                          borderRadius: border!.borderRadius));
-        }
+            var completeWidget = Container(
+                decoration: decoration ?? theme.dataTableTheme.decoration,
+                child: rows.isEmpty
+                    ? Column(children: [
+                        SingleChildScrollView(
+                            controller: coreHorizontalController,
+                            scrollDirection: Axis.horizontal,
+                            child: Table(
+                                columnWidths: widthsAsMap,
+                                border: border,
+                                children: [headingRow])),
+                        Flexible(
+                            fit: FlexFit.tight,
+                            child: empty ?? const SizedBox())
+                      ])
+                    : Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (fixedColumnAndCornerCol != null)
+                            fixedColumnAndCornerCol,
+                          if (fixedRowsAndCoreCol != null)
+                            Flexible(
+                                fit: FlexFit.tight, child: fixedRowsAndCoreCol)
+                        ],
+                      ));
 
-        if (fixedCornerRows != null && !_isRowsEmpty(fixedCornerRows)) {
-          fixedTopLeftCornerTable = Table(
-              columnWidths: leftWidthsAsMap,
-              children: fixedCornerRows,
-              border: border);
-        }
+            // Fix for #111, syncrhonize scroll position for left fixed column with core
+            // Works fine if there's no scrollCongtroller provided externally, can have jumping effect on iOS
+            // TODO, check for jump fix altter
+            if (fixedLeftColumns > 0) {
+              WidgetsBinding.instance.addPostFrameCallback((_) =>
+                  leftColumnVerticalContoller.hasClients
+                      ? leftColumnVerticalContoller
+                          .jumpTo(coreVerticalController.offset)
+                      : {});
+            }
 
-        Widget _addBottomMargin(Table t) =>
-            bottomMargin != null && bottomMargin! > 0
-                ? Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [t, SizedBox(height: bottomMargin!)])
-                : t;
-
-        fixedRowsAndCoreCol = Scrollbar(
-            controller: _coreHorizontalController,
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              ScrollConfiguration(
-                  behavior: ScrollConfiguration.of(context)
-                      .copyWith(scrollbars: false),
-                  child: SingleChildScrollView(
-                      controller: _fixedRowsHorizontalController,
-                      scrollDirection: Axis.horizontal,
-                      child: (fixedRowsTabel != null)
-                          ? fixedRowsTabel
-                          // WOrkaround for a bug when there's no horizontal scrollbar should there be no this SingleChildScrollView. I.e. originally this part was ommited and not scrollable was added to the column if not fixed top row was visible
-                          : SizedBox(
-                              height: 0,
-                              width: widths.fold<double>(
-                                  0,
-                                  (previousValue, value) =>
-                                      previousValue + value),
-                            ))),
-              Flexible(
-                  fit: FlexFit.tight,
-                  child: SingleChildScrollView(
-                      controller: _coreVerticalController,
-                      scrollDirection: Axis.vertical,
-                      child: SingleChildScrollView(
-                          controller: _coreHorizontalController,
-                          scrollDirection: Axis.horizontal,
-                          child: _addBottomMargin(coreTable))))
-            ]));
-
-        fixedColumnAndCornerCol =
-            fixedTopLeftCornerTable == null && fixedColumnsTable == null
-                ? null
-                : Column(mainAxisSize: MainAxisSize.min, children: [
-                    if (fixedTopLeftCornerTable != null)
-                      fixedTopLeftCornerTable,
-                    if (fixedColumnsTable != null)
-                      Flexible(
-                          fit: FlexFit.loose,
-                          child: ScrollConfiguration(
-                              behavior: ScrollConfiguration.of(context)
-                                  .copyWith(scrollbars: false),
-                              child: SingleChildScrollView(
-                                  controller: _leftColumnVerticalContoller,
-                                  scrollDirection: Axis.vertical,
-                                  child: _addBottomMargin(fixedColumnsTable))))
-                  ]);
-      }
-
-      var completeWidget = Container(
-          decoration: decoration ?? theme.dataTableTheme.decoration,
-          child: rows.isEmpty
-              ? Column(children: [
-                  SingleChildScrollView(
-                      controller: _coreHorizontalController,
-                      scrollDirection: Axis.horizontal,
-                      child: Table(
-                          columnWidths: widthsAsMap,
-                          border: border,
-                          children: [headingRow])),
-                  Flexible(fit: FlexFit.tight, child: empty ?? const SizedBox())
-                ])
-              : Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (fixedColumnAndCornerCol != null)
-                      fixedColumnAndCornerCol,
-                    if (fixedRowsAndCoreCol != null)
-                      Flexible(fit: FlexFit.tight, child: fixedRowsAndCoreCol)
-                  ],
-                ));
-
-      return completeWidget;
+            return completeWidget;
+          });
     });
-
-    // Fix for #111, syncrhonize scroll position for left fixed column with core
-    // Works fine if there's no scrollCongtroller provided externally, can have jumping effect on iOS
-    if (fixedLeftColumns > 0) {
-      WidgetsBinding.instance.addPostFrameCallback((_) =>
-          _leftColumnVerticalContoller.hasClients
-              ? _leftColumnVerticalContoller
-                  .jumpTo(_coreVerticalController.offset)
-              : {});
-    }
 
     sw.stop();
     if (kDebugMode) print('DataTable2 built: ${sw.elapsedMilliseconds}ms');
@@ -1498,3 +1414,123 @@ class _NullWidget extends Widget {
   Element createElement() => throw UnimplementedError();
 }
 // coverage:ignore-end
+
+/// Creates pairs of scroll controllers which can be provided to scrollables and ensure that
+/// offset change in one scrollable scroll the second one (and vice a versa)
+/// There's a bug (or feature) on iOS with bouncing scroll (when it goes out of range)
+/// when scrollable get out of sync while in this bouncing position
+class SyncedScrollControllers extends StatefulWidget {
+  const SyncedScrollControllers(
+      {super.key,
+      required this.builder,
+      this.scrollController,
+      this.sc12toSc11Position = false});
+
+  /// One of the controllers (sc11) won't be created by this widget
+  /// but rather use externally provided one
+  final ScrollController? scrollController;
+
+  /// Whether to set sc12 initison offset to the value from sc11
+  final bool sc12toSc11Position;
+
+  /// Positions of 2 pairs of scroll controllers (sc11|sc12 and sc21|sc22)
+  /// will be synchronized, attached scrollables will copy the positions
+  final Widget Function(
+      BuildContext context,
+      ScrollController sc11,
+      ScrollController sc12,
+      ScrollController sc21,
+      ScrollController sc22) builder;
+
+  @override
+  SyncedScrollControllersState createState() => SyncedScrollControllersState();
+}
+
+class SyncedScrollControllersState extends State<SyncedScrollControllers> {
+  late ScrollController _sc11;
+  late ScrollController _sc12;
+  late ScrollController _sc21;
+  late ScrollController _sc22;
+
+  final List<void Function()> _listeners = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _initControllers();
+  }
+
+  @override
+  void didUpdateWidget(SyncedScrollControllers oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _disposeOrUnsubscribe();
+    _initControllers();
+  }
+
+  @override
+  void dispose() {
+    _disposeOrUnsubscribe();
+    super.dispose();
+  }
+
+  void _initControllers() {
+    _doNotReissueJump.clear();
+    if (widget.scrollController != null) {
+      _sc11 = widget.scrollController!;
+    } else {
+      _sc11 = ScrollController();
+    }
+
+    _sc12 = ScrollController(
+        initialScrollOffset: widget.scrollController != null &&
+                widget.scrollController!.positions.isNotEmpty
+            ? widget.scrollController!.offset
+            : 0.0);
+
+    _sc21 = ScrollController();
+    _sc22 = ScrollController();
+
+    _syncScrollControllers(_sc11, _sc12);
+    _syncScrollControllers(_sc21, _sc22);
+  }
+
+  void _disposeOrUnsubscribe() {
+    if (widget.scrollController == _sc11) {
+      _sc11.removeListener(_listeners[0]);
+    } else {
+      _sc11.dispose();
+    }
+    _sc12.dispose();
+    _sc21.dispose();
+    _sc22.dispose();
+    _listeners.clear();
+  }
+
+  final Map<ScrollController, bool> _doNotReissueJump = {};
+
+  void _syncScrollControllers(ScrollController sc1, ScrollController sc2) {
+    var l = () => _jumpToNoCascade(sc1, sc2);
+    sc1.addListener(l);
+    _listeners.add(l);
+    l = () => _jumpToNoCascade(sc2, sc1);
+    sc2.addListener(l);
+  }
+
+  void _jumpToNoCascade(ScrollController master, ScrollController slave) {
+    //print('$master $slave');
+    if (!slave.hasClients || slave.position.outOfRange) {
+      return; //outOfRange check for bounce case, bug #113
+    }
+    if (_doNotReissueJump[master] == null ||
+        _doNotReissueJump[master]! == false) {
+      _doNotReissueJump[slave] = true;
+      slave.jumpTo(master.offset);
+    } else {
+      _doNotReissueJump[master] = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      widget.builder(context, _sc11, _sc12, _sc21, _sc22);
+}

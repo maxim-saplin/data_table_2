@@ -94,6 +94,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
   @override
   void dispose() {
     _dessertsDataSource.dispose();
+    _controller.dispose();
     super.dispose();
   }
 

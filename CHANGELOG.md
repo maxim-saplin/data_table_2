@@ -1,3 +1,7 @@
+## 2.3.5
+- Refactored scroll syncing approach, no static workaround and potential memleaks
+- Fixed locked scrolling when bouncing on iOS (#113)
+
 ## 2.3.4
 - Fix for #111, synchronized scroll position for left fixed column with core table when fixed column is added and core table is already scrolled
 

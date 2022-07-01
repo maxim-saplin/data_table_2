@@ -1042,6 +1042,65 @@ void main() {
       expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
       expect(_isVisibleInTable(find.text('518'), tester), isTrue);
     });
+    testWidgets(
+        '1 fixed rows, 1 fixed column, scroll down via core, scroll up via left column',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+              fixedTopRows: 1,
+              fixedLeftColumns: 1,
+              minWidth: 850,
+              showCheckboxColumn: false),
+          const Size(500, 300));
+
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('159'), tester), isTrue);
+
+      await tester.ensureVisible(find.text('518')); // core
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isFalse);
+      expect(_isVisibleInTable(find.text('159'), tester), isFalse);
+
+      await tester.ensureVisible(find.text('159'));
+      await tester.ensureVisible(find.text('518'));
+
+      await tester.ensureVisible(find.text('Frozen yogurt')); // left column
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('159'), tester), isTrue);
+    });
+
+    testWidgets(
+        '1 fixed rows, 1 fixed column, scroll down via core, scroll up via left column, with controller',
+        (WidgetTester tester) async {
+      var sc = ScrollController();
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+              fixedTopRows: 1,
+              fixedLeftColumns: 1,
+              minWidth: 850,
+              scrollController: sc,
+              showCheckboxColumn: false),
+          const Size(500, 300));
+
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('159'), tester), isTrue);
+
+      await tester.ensureVisible(find.text('518')); // core
+      expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('518'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isFalse);
+      expect(_isVisibleInTable(find.text('159'), tester), isFalse);
+
+      await tester.ensureVisible(find.text('159'));
+      await tester.ensureVisible(find.text('518'));
+
+      await tester.ensureVisible(find.text('Frozen yogurt')); // left column
+      expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
+      expect(_isVisibleInTable(find.text('159'), tester), isTrue);
+    });
   });
 }
 
