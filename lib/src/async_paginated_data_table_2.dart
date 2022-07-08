@@ -320,6 +320,7 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
       super.sortAscending = true,
       super.onSelectAll,
       super.dataRowHeight = kMinInteractiveDimension,
+      super.headingRowColor,
       super.headingRowHeight = 56,
       super.horizontalMargin = 24,
       super.columnSpacing = 56,
