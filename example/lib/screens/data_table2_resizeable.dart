@@ -91,18 +91,13 @@ class ResizeableDataTable2DemoState extends State<ResizeableDataTable2Demo> {
       child: DataTable2(
         columnSpacing: 12,
         horizontalMargin: 12,
-        border: getCurrentRouteOption(context) == fixedColumnWidth
-            ? TableBorder(
-                top: const BorderSide(color: Colors.black),
-                bottom: BorderSide(color: Colors.grey[300]!),
-                left: BorderSide(color: Colors.grey[300]!),
-                right: BorderSide(color: Colors.grey[300]!),
-                verticalInside: BorderSide(color: Colors.grey[300]!),
-                horizontalInside:
-                    const BorderSide(color: Colors.grey, width: 1))
-            : (getCurrentRouteOption(context) == showBordersWithZebraStripes
-                ? TableBorder.all()
-                : null),
+        border: TableBorder(
+            top: const BorderSide(color: Colors.black),
+            bottom: BorderSide(color: Colors.grey[300]!),
+            left: BorderSide(color: Colors.grey[300]!),
+            right: BorderSide(color: Colors.grey[300]!),
+            verticalInside: BorderSide(color: Colors.grey[300]!),
+            horizontalInside: const BorderSide(color: Colors.grey, width: 1)),
         dividerThickness:
             1, // this one will be ignored if [border] is set above
         bottomMargin: 10,
