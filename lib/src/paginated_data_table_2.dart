@@ -653,7 +653,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       fit: widget.fit,
       child: ConstrainedBox(
         constraints: BoxConstraints(minWidth: constraints.minWidth),
-        child: StatefulDataTable2(
+        child: DataTable2(
           key: _tableKey,
           columns: widget.columns,
           sortColumnIndex: widget.sortColumnIndex,

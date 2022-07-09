@@ -11,14 +11,15 @@ import '../nav_helper.dart';
 // The file was extracted from GitHub: https://github.com/flutter/gallery
 // Changes and modifications by Maxim Saplin, 2021
 
-class StatefulDataTable2Demo extends StatefulWidget {
-  const StatefulDataTable2Demo({super.key});
+class ResizeableDataTable2Demo extends StatefulWidget {
+  const ResizeableDataTable2Demo({super.key});
 
   @override
-  StatefulDataTable2DemoState createState() => StatefulDataTable2DemoState();
+  ResizeableDataTable2DemoState createState() =>
+      ResizeableDataTable2DemoState();
 }
 
-class StatefulDataTable2DemoState extends State<StatefulDataTable2Demo> {
+class ResizeableDataTable2DemoState extends State<ResizeableDataTable2Demo> {
   bool _sortAscending = true;
   int? _sortColumnIndex;
   late DessertDataSource _dessertsDataSource;
@@ -67,13 +68,7 @@ class StatefulDataTable2DemoState extends State<StatefulDataTable2Demo> {
   @override
   Widget build(BuildContext context) {
     ColumnResizingParameters? resizeParam;
-    if (getCurrentRouteOption(context) == resizableCols) {
-      resizeParam = ColumnResizingParameters(
-        desktopMode: true,
-        realTime: true,
-        widgetColor: Colors.blue,
-      );
-    } else if (getCurrentRouteOption(context) == resizableColsNoRealtime) {
+    if (getCurrentRouteOption(context) == resizableColsNoRealtime) {
       resizeParam = ColumnResizingParameters(
         desktopMode: true,
         realTime: false,
@@ -84,10 +79,16 @@ class StatefulDataTable2DemoState extends State<StatefulDataTable2Demo> {
         desktopMode: false,
         realTime: true,
       );
+    } else {
+      resizeParam = ColumnResizingParameters(
+        desktopMode: true,
+        realTime: true,
+        widgetColor: Colors.blue,
+      );
     }
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: StatefulDataTable2(
+      child: DataTable2(
         columnSpacing: 12,
         horizontalMargin: 12,
         border: getCurrentRouteOption(context) == fixedColumnWidth
@@ -111,7 +112,7 @@ class StatefulDataTable2DemoState extends State<StatefulDataTable2Demo> {
         onSelectAll: (val) =>
             setState(() => _dessertsDataSource.selectAll(val)),
         columns: [
-          ResizableDataColumn2(
+          DataColumn2(
             label: const Text('Desert'),
             size: ColumnSize.S,
             isResizable: resizeParam != null,
@@ -121,7 +122,7 @@ class StatefulDataTable2DemoState extends State<StatefulDataTable2Demo> {
             onSort: (columnIndex, ascending) =>
                 _sort<String>((d) => d.name, columnIndex, ascending),
           ),
-          ResizableDataColumn2(
+          DataColumn2(
             label: const Text('Calories'),
             isResizable: resizeParam != null,
             size: ColumnSize.S,
@@ -129,7 +130,7 @@ class StatefulDataTable2DemoState extends State<StatefulDataTable2Demo> {
             onSort: (columnIndex, ascending) =>
                 _sort<num>((d) => d.calories, columnIndex, ascending),
           ),
-          ResizableDataColumn2(
+          DataColumn2(
             label: const Text('Fat (gm)'),
             isResizable: resizeParam != null,
             size: ColumnSize.S,
@@ -137,7 +138,7 @@ class StatefulDataTable2DemoState extends State<StatefulDataTable2Demo> {
             onSort: (columnIndex, ascending) =>
                 _sort<num>((d) => d.fat, columnIndex, ascending),
           ),
-          ResizableDataColumn2(
+          DataColumn2(
             label: const Text('Carbs (gm)'),
             isResizable: resizeParam != null,
             size: ColumnSize.S,
@@ -145,7 +146,7 @@ class StatefulDataTable2DemoState extends State<StatefulDataTable2Demo> {
             onSort: (columnIndex, ascending) =>
                 _sort<num>((d) => d.carbs, columnIndex, ascending),
           ),
-          ResizableDataColumn2(
+          DataColumn2(
             label: const Text('Protein (gm)'),
             isResizable: resizeParam != null,
             size: ColumnSize.S,
@@ -153,7 +154,7 @@ class StatefulDataTable2DemoState extends State<StatefulDataTable2Demo> {
             onSort: (columnIndex, ascending) =>
                 _sort<num>((d) => d.protein, columnIndex, ascending),
           ),
-          ResizableDataColumn2(
+          DataColumn2(
             label: const Text('Sodium (mg)'),
             isResizable: resizeParam != null,
             size: ColumnSize.S,
@@ -161,7 +162,7 @@ class StatefulDataTable2DemoState extends State<StatefulDataTable2Demo> {
             onSort: (columnIndex, ascending) =>
                 _sort<num>((d) => d.sodium, columnIndex, ascending),
           ),
-          ResizableDataColumn2(
+          DataColumn2(
             label: const Text('Calcium (%)'),
             isResizable: resizeParam != null,
             size: ColumnSize.S,
@@ -169,7 +170,7 @@ class StatefulDataTable2DemoState extends State<StatefulDataTable2Demo> {
             onSort: (columnIndex, ascending) =>
                 _sort<num>((d) => d.calcium, columnIndex, ascending),
           ),
-          ResizableDataColumn2(
+          DataColumn2(
             label: const Text('Iron (%)'),
             isResizable: resizeParam != null,
             size: ColumnSize.S,

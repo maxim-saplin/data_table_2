@@ -23,9 +23,9 @@ const selectAllPage = 'Select all at page';
 const rowTaps = 'Row Taps';
 const rowHeightOverrides = 'Row height overrides';
 const fixedColumnWidth = 'Fixed column width';
-const resizableCols = "Resizable columns";
-const resizableColsNoRealtime = "Resizable columns no real time";
-const resizableColsMobile = "Resizable columns mobile";
+const resizableCols = "Real time";
+const resizableColsNoRealtime = "No real time";
+const resizableColsMobile = "Mobile";
 
 /// Async sample that emulates network error and allow retrying load operation
 const asyncErrors = "Errors/Retries";
@@ -43,8 +43,7 @@ const Map<String, List<String>> routeOptions = {
     rowTaps,
     rowHeightOverrides
   ],
-  '/statefulDatatable2': [
-    dflt,
+  '/datatable2resize': [
     resizableCols,
     resizableColsNoRealtime,
     resizableColsMobile,

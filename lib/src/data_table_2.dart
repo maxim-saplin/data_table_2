@@ -9,8 +9,6 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-part 'stateful_data_table_2.dart';
-
 /// Relative size of a column determines the share of total table width allocated
 /// to each individual column. When determining column widths ratios between S, M and L
 /// columns are kept (i.e. Large columns are set to 1.2x width of Medium ones)
@@ -31,7 +29,8 @@ class DataColumn2 extends DataColumn {
       super.numeric = false,
       super.onSort,
       this.size = ColumnSize.M,
-      this.fixedWidth});
+      this.fixedWidth,
+      this.isResizable = false});
 
   /// Column sizes are determined based on available width by distributing it
   /// to individual columns accounting for their relative sizes (see [ColumnSize])
@@ -41,6 +40,9 @@ class DataColumn2 extends DataColumn {
   /// Warning, if the width happens to be larger than available total width other
   /// columns can be clipped
   final double? fixedWidth;
+
+  /// If you want to disable resizing for a given column, set this field to `false`
+  final bool isResizable;
 }
 
 /// Extension of standard [DataRow], adds row level tap events. Also there're
@@ -137,7 +139,7 @@ class DataTable2 extends DataTable {
     this.fixedTopRows = 1,
     this.fixedLeftColumns = 0,
     this.lmRatio = 1.2,
-    this.columnDataController,
+    this.columnResizingParameters,
     required super.rows,
   })  : assert(fixedLeftColumns >= 0),
         assert(fixedTopRows >= 0) {
@@ -218,7 +220,7 @@ class DataTable2 extends DataTable {
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
 
-  final ColumnDataController? columnDataController;
+  final ColumnResizingParameters? columnResizingParameters;
 
   /// The number of sticky rows fixed at the top of the table.
   /// The heading row is counted/included.
@@ -305,6 +307,7 @@ class DataTable2 extends DataTable {
     required MaterialStateProperty<Color?>? overlayColor,
     Color? backgroundColor,
     DataColumn2? column,
+    required Function(DataColumn2, double) onColumnResized,
   }) {
     final ThemeData themeData = Theme.of(context);
     label = Row(
@@ -350,7 +353,39 @@ class DataTable2 extends DataTable {
       overlayColor: overlayColor,
       child: label,
     );
+    if (column != null && column.isResizable) {
+      label = Row(
+        children: [
+          Expanded(child: label),
+          _buildResizeWidget(
+            column,
+            effectiveHeadingRowHeight,
+            onColumnResized,
+          ),
+        ],
+      );
+    }
     return label;
+  }
+
+  Widget _buildResizeWidget(DataColumn2 column, double widgetHeight,
+      Function(DataColumn2, double) onColumnResized) {
+    ColumnResizingParameters crp = columnResizingParameters != null
+        ? columnResizingParameters!
+        : ColumnResizingParameters();
+    return ColumnResizeWidget(
+      height: widgetHeight,
+      color: crp.widgetColor,
+      minWidth: crp.widgetMinWidth,
+      maxWidth: crp.widgetMaxWidth,
+      onDragUpdate: (delta) {
+        if (column.isResizable) {
+          onColumnResized(column, delta);
+        }
+      },
+      desktopMode: crp.desktopMode,
+      realTime: crp.realTime,
+    );
   }
 
   Widget _buildDataCell({
@@ -644,344 +679,380 @@ class DataTable2 extends DataTable {
           scrollController: scrollController,
           sc12toSc11Position: true,
           builder: (context, sc11, sc12, sc21, sc22) {
-            var coreVerticalController = sc11;
-            var leftColumnVerticalContoller = sc12;
-            var coreHorizontalController = sc21;
-            var fixedRowsHorizontalController = sc22;
+            return ResizeColumnControllers(
+                columns: columns,
+                builder: (context, cdc, onColumnResized) {
+                  var coreVerticalController = sc11;
+                  var leftColumnVerticalContoller = sc12;
+                  var coreHorizontalController = sc21;
+                  var fixedRowsHorizontalController = sc22;
 
-            var displayColumnIndex = 0;
+                  var displayColumnIndex = 0;
 
-            // size & build checkboxes in heading and leftmost column
-            // to be substracted from total width available to columns
+                  // size & build checkboxes in heading and leftmost column
+                  // to be substracted from total width available to columns
 
-            if (checkBoxWidth > 0) displayColumnIndex += 1;
+                  if (checkBoxWidth > 0) displayColumnIndex += 1;
 
-            // size data columns
-            final widths = _calculateDataColumnSizes(
-                constraints, checkBoxWidth, effectiveHorizontalMargin);
+                  // size data columns
+                  final widths = _calculateDataColumnSizes(constraints,
+                      checkBoxWidth, effectiveHorizontalMargin, cdc);
 
-            // File empty cells in created rows with actual widgets
-            for (int dataColumnIndex = 0;
-                dataColumnIndex < columns.length;
-                dataColumnIndex++) {
-              final DataColumn column = columns[dataColumnIndex];
+                  // File empty cells in created rows with actual widgets
+                  for (int dataColumnIndex = 0;
+                      dataColumnIndex < columns.length;
+                      dataColumnIndex++) {
+                    final DataColumn column = columns[dataColumnIndex];
 
-              final double paddingStart;
-              if (dataColumnIndex == 0 && displayCheckboxColumn) {
-                paddingStart = effectiveHorizontalMargin / 2.0;
-              } else if (dataColumnIndex == 0 && !displayCheckboxColumn) {
-                paddingStart = effectiveHorizontalMargin;
-              } else {
-                paddingStart = effectiveColumnSpacing / 2.0;
-              }
+                    final double paddingStart;
+                    if (dataColumnIndex == 0 && displayCheckboxColumn) {
+                      paddingStart = effectiveHorizontalMargin / 2.0;
+                    } else if (dataColumnIndex == 0 && !displayCheckboxColumn) {
+                      paddingStart = effectiveHorizontalMargin;
+                    } else {
+                      paddingStart = effectiveColumnSpacing / 2.0;
+                    }
 
-              final double paddingEnd;
-              if (dataColumnIndex == columns.length - 1) {
-                paddingEnd = effectiveHorizontalMargin;
-              } else {
-                paddingEnd = effectiveColumnSpacing / 2.0;
-              }
+                    final double paddingEnd;
+                    if (dataColumnIndex == columns.length - 1) {
+                      paddingEnd = effectiveHorizontalMargin;
+                    } else {
+                      paddingEnd = effectiveColumnSpacing / 2.0;
+                    }
 
-              final EdgeInsetsDirectional padding = EdgeInsetsDirectional.only(
-                start: paddingStart,
-                end: paddingEnd,
-              );
+                    final EdgeInsetsDirectional padding =
+                        EdgeInsetsDirectional.only(
+                      start: paddingStart,
+                      end: paddingEnd,
+                    );
 
-              tableColumnWidths[displayColumnIndex] =
-                  FixedColumnWidth(widths[dataColumnIndex]);
-              var h = _buildHeadingCell(
-                  context: context,
-                  padding: padding,
-                  effectiveHeadingRowHeight: effectiveHeadingRowHeight,
-                  label: column.label,
-                  tooltip: column.tooltip,
-                  numeric: column.numeric,
-                  onSort: column.onSort != null
-                      ? () => column.onSort!(dataColumnIndex,
-                          sortColumnIndex != dataColumnIndex || !sortAscending)
-                      : null,
-                  sorted: dataColumnIndex == sortColumnIndex,
-                  ascending: sortAscending,
-                  overlayColor: effectiveHeadingRowColor,
-                  column: column is DataColumn2 ? column : null,
-                  backgroundColor: displayColumnIndex < actualFixedColumns
-                      ? (actualFixedRows < 1
-                          ? fixedColumnsColor
-                          : (actualFixedRows > 0 ? fixedCornerColor : null))
-                      : null);
+                    tableColumnWidths[displayColumnIndex] =
+                        FixedColumnWidth(widths[dataColumnIndex]);
+                    var h = _buildHeadingCell(
+                        context: context,
+                        padding: padding,
+                        effectiveHeadingRowHeight: effectiveHeadingRowHeight,
+                        label: column.label,
+                        tooltip: column.tooltip,
+                        numeric: column.numeric,
+                        onSort: column.onSort != null
+                            ? () => column.onSort!(
+                                dataColumnIndex,
+                                sortColumnIndex != dataColumnIndex ||
+                                    !sortAscending)
+                            : null,
+                        sorted: dataColumnIndex == sortColumnIndex,
+                        ascending: sortAscending,
+                        overlayColor: effectiveHeadingRowColor,
+                        column: column is DataColumn2 ? column : null,
+                        backgroundColor: displayColumnIndex < actualFixedColumns
+                            ? (actualFixedRows < 1
+                                ? fixedColumnsColor
+                                : (actualFixedRows > 0
+                                    ? fixedCornerColor
+                                    : null))
+                            : null,
+                        onColumnResized: onColumnResized);
 
-              headingRow.children![displayColumnIndex] =
-                  h; // heading row alone is used to display table header should there be no data rows
+                    headingRow.children![displayColumnIndex] =
+                        h; // heading row alone is used to display table header should there be no data rows
 
-              if (displayColumnIndex < actualFixedColumns) {
-                if (actualFixedRows < 1) {
-                  fixedColumnsRows![0].children![displayColumnIndex] = h;
-                } else if (actualFixedRows > 0) {
-                  fixedCornerRows![0].children![displayColumnIndex] = h;
-                }
-              } else {
-                if (actualFixedRows < 1 && coreRows != null) {
-                  coreRows[0]
-                      .children![displayColumnIndex - actualFixedColumns] = h;
-                } else if (actualFixedRows > 0) {
-                  fixedRows![0]
-                      .children![displayColumnIndex - actualFixedColumns] = h;
-                }
-              }
+                    if (displayColumnIndex < actualFixedColumns) {
+                      if (actualFixedRows < 1) {
+                        fixedColumnsRows![0].children![displayColumnIndex] = h;
+                      } else if (actualFixedRows > 0) {
+                        fixedCornerRows![0].children![displayColumnIndex] = h;
+                      }
+                    } else {
+                      if (actualFixedRows < 1 && coreRows != null) {
+                        coreRows[0].children![
+                            displayColumnIndex - actualFixedColumns] = h;
+                      } else if (actualFixedRows > 0) {
+                        fixedRows![0].children![
+                            displayColumnIndex - actualFixedColumns] = h;
+                      }
+                    }
 
-              var rowIndex = 0;
-              var skipRows = actualFixedRows == 1
-                  ? 0
-                  : actualFixedRows > 1
-                      ? actualFixedRows - 1
-                      : -1;
+                    var rowIndex = 0;
+                    var skipRows = actualFixedRows == 1
+                        ? 0
+                        : actualFixedRows > 1
+                            ? actualFixedRows - 1
+                            : -1;
 
-              for (final DataRow row in rows) {
-                final DataCell cell = row.cells[dataColumnIndex];
-                //dataRows[rowIndex].children![displayColumnIndex]
+                    for (final DataRow row in rows) {
+                      final DataCell cell = row.cells[dataColumnIndex];
+                      //dataRows[rowIndex].children![displayColumnIndex]
 
-                var c = _buildDataCell(
-                    context: context,
-                    padding: padding,
-                    defaultDataRowHeight: defaultDataRowHeight,
-                    specificRowHeight:
-                        row is DataRow2 ? row.specificRowHeight : null,
-                    label: cell.child,
-                    numeric: column.numeric,
-                    placeholder: cell.placeholder,
-                    showEditIcon: cell.showEditIcon,
-                    onTap: cell.onTap,
-                    onDoubleTap: cell.onDoubleTap,
-                    onLongPress: cell.onLongPress,
-                    onTapDown: cell.onTapDown,
-                    onTapCancel: cell.onTapCancel,
-                    onRowTap: row is DataRow2 ? row.onTap : null,
-                    onRowDoubleTap: row is DataRow2 ? row.onDoubleTap : null,
-                    onRowLongPress: row.onLongPress,
-                    onRowSecondaryTap:
-                        row is DataRow2 ? row.onSecondaryTap : null,
-                    onRowSecondaryTapDown:
-                        row is DataRow2 ? row.onSecondaryTapDown : null,
-                    onSelectChanged: row.onSelectChanged != null
-                        ? () => row.onSelectChanged!(!row.selected)
-                        : null,
-                    overlayColor: row.color ?? effectiveDataRowColor,
-                    backgroundColor: displayColumnIndex < actualFixedColumns
-                        ? (rowIndex + 1 < actualFixedRows
-                            ? fixedCornerColor
-                            : fixedColumnsColor)
-                        : null);
+                      var c = _buildDataCell(
+                          context: context,
+                          padding: padding,
+                          defaultDataRowHeight: defaultDataRowHeight,
+                          specificRowHeight:
+                              row is DataRow2 ? row.specificRowHeight : null,
+                          label: cell.child,
+                          numeric: column.numeric,
+                          placeholder: cell.placeholder,
+                          showEditIcon: cell.showEditIcon,
+                          onTap: cell.onTap,
+                          onDoubleTap: cell.onDoubleTap,
+                          onLongPress: cell.onLongPress,
+                          onTapDown: cell.onTapDown,
+                          onTapCancel: cell.onTapCancel,
+                          onRowTap: row is DataRow2 ? row.onTap : null,
+                          onRowDoubleTap:
+                              row is DataRow2 ? row.onDoubleTap : null,
+                          onRowLongPress: row.onLongPress,
+                          onRowSecondaryTap:
+                              row is DataRow2 ? row.onSecondaryTap : null,
+                          onRowSecondaryTapDown:
+                              row is DataRow2 ? row.onSecondaryTapDown : null,
+                          onSelectChanged: row.onSelectChanged != null
+                              ? () => row.onSelectChanged!(!row.selected)
+                              : null,
+                          overlayColor: row.color ?? effectiveDataRowColor,
+                          backgroundColor:
+                              displayColumnIndex < actualFixedColumns
+                                  ? (rowIndex + 1 < actualFixedRows
+                                      ? fixedCornerColor
+                                      : fixedColumnsColor)
+                                  : null);
 
-                if (displayColumnIndex < actualFixedColumns) {
-                  if (rowIndex + 1 < actualFixedRows) {
-                    fixedCornerRows![rowIndex + 1]
-                        .children![displayColumnIndex] = c;
-                  } else {
-                    fixedColumnsRows![rowIndex - skipRows]
-                        .children![displayColumnIndex] = c;
+                      if (displayColumnIndex < actualFixedColumns) {
+                        if (rowIndex + 1 < actualFixedRows) {
+                          fixedCornerRows![rowIndex + 1]
+                              .children![displayColumnIndex] = c;
+                        } else {
+                          fixedColumnsRows![rowIndex - skipRows]
+                              .children![displayColumnIndex] = c;
+                        }
+                      } else {
+                        if (rowIndex + 1 < actualFixedRows) {
+                          fixedRows![rowIndex + 1].children![
+                              displayColumnIndex - actualFixedColumns] = c;
+                        } else {
+                          coreRows![rowIndex - skipRows].children![
+                              displayColumnIndex - actualFixedColumns] = c;
+                        }
+                      }
+
+                      rowIndex += 1;
+                    }
+                    displayColumnIndex += 1;
                   }
-                } else {
-                  if (rowIndex + 1 < actualFixedRows) {
-                    fixedRows![rowIndex + 1]
-                        .children![displayColumnIndex - actualFixedColumns] = c;
-                  } else {
-                    coreRows![rowIndex - skipRows]
-                        .children![displayColumnIndex - actualFixedColumns] = c;
+
+                  var widthsAsMap = tableColumnWidths.asMap();
+                  Map<int, TableColumnWidth>? leftWidthsAsMap =
+                      actualFixedColumns > 0
+                          ? tableColumnWidths
+                              .take(actualFixedColumns)
+                              .toList()
+                              .asMap()
+                          : null;
+                  Map<int, TableColumnWidth>? rightWidthsAsMap =
+                      actualFixedColumns > 0
+                          ? tableColumnWidths
+                              .skip(actualFixedColumns)
+                              .toList()
+                              .asMap()
+                          : null;
+
+                  bool _isRowsEmpty(List<TableRow>? rows) {
+                    return rows == null ||
+                        rows.isEmpty ||
+                        rows[0].children!.isEmpty;
                   }
-                }
 
-                rowIndex += 1;
-              }
-              displayColumnIndex += 1;
-            }
+                  var coreTable = Table(
+                      columnWidths: actualFixedColumns > 0
+                          ? rightWidthsAsMap
+                          : widthsAsMap,
+                      children: coreRows ?? [],
+                      border: border == null
+                          ? null
+                          : _isRowsEmpty(fixedRows) &&
+                                  _isRowsEmpty(fixedColumnsRows)
+                              ? border
+                              : !_isRowsEmpty(fixedRows) &&
+                                      !_isRowsEmpty(fixedColumnsRows)
+                                  ? TableBorder(
+                                      //top: border!.top,
+                                      //left: border!.left,
+                                      right: border!.right,
+                                      bottom: border!.bottom,
+                                      verticalInside: border!.verticalInside,
+                                      horizontalInside:
+                                          border!.horizontalInside,
+                                      borderRadius: border!.borderRadius)
+                                  : _isRowsEmpty(fixedRows)
+                                      ? TableBorder(
+                                          top: border!.top,
+                                          //left: border!.left,
+                                          right: border!.right,
+                                          bottom: border!.bottom,
+                                          verticalInside:
+                                              border!.verticalInside,
+                                          horizontalInside:
+                                              border!.horizontalInside,
+                                          borderRadius: border!.borderRadius)
+                                      : TableBorder(
+                                          //top: border!.top,
+                                          left: border!.left,
+                                          right: border!.right,
+                                          bottom: border!.bottom,
+                                          verticalInside:
+                                              border!.verticalInside,
+                                          horizontalInside:
+                                              border!.horizontalInside,
+                                          borderRadius: border!.borderRadius));
 
-            var widthsAsMap = tableColumnWidths.asMap();
-            Map<int, TableColumnWidth>? leftWidthsAsMap = actualFixedColumns > 0
-                ? tableColumnWidths.take(actualFixedColumns).toList().asMap()
-                : null;
-            Map<int, TableColumnWidth>? rightWidthsAsMap = actualFixedColumns >
-                    0
-                ? tableColumnWidths.skip(actualFixedColumns).toList().asMap()
-                : null;
+                  Table? fixedRowsTabel;
+                  Table? fixedColumnsTable;
+                  Table? fixedTopLeftCornerTable;
+                  Widget? fixedColumnAndCornerCol;
+                  Widget? fixedRowsAndCoreCol;
 
-            bool _isRowsEmpty(List<TableRow>? rows) {
-              return rows == null || rows.isEmpty || rows[0].children!.isEmpty;
-            }
+                  if (rows.isNotEmpty) {
+                    if (fixedRows != null &&
+                        !_isRowsEmpty(fixedRows) &&
+                        actualFixedColumns <
+                            columns.length + (showCheckboxColumn ? 1 : 0)) {
+                      fixedRowsTabel = Table(
+                          columnWidths: actualFixedColumns > 0
+                              ? rightWidthsAsMap
+                              : widthsAsMap,
+                          children: fixedRows,
+                          border: border == null
+                              ? null
+                              : _isRowsEmpty(fixedCornerRows)
+                                  ? border
+                                  : TableBorder(
+                                      top: border!.top,
+                                      //left: border!.left,
+                                      right: border!.right,
+                                      bottom: border!.bottom,
+                                      verticalInside: border!.verticalInside,
+                                      horizontalInside:
+                                          border!.horizontalInside,
+                                      borderRadius: border!.borderRadius));
+                    }
 
-            var coreTable = Table(
-                columnWidths:
-                    actualFixedColumns > 0 ? rightWidthsAsMap : widthsAsMap,
-                children: coreRows ?? [],
-                border: border == null
-                    ? null
-                    : _isRowsEmpty(fixedRows) && _isRowsEmpty(fixedColumnsRows)
-                        ? border
-                        : !_isRowsEmpty(fixedRows) &&
-                                !_isRowsEmpty(fixedColumnsRows)
-                            ? TableBorder(
-                                //top: border!.top,
-                                //left: border!.left,
-                                right: border!.right,
-                                bottom: border!.bottom,
-                                verticalInside: border!.verticalInside,
-                                horizontalInside: border!.horizontalInside,
-                                borderRadius: border!.borderRadius)
-                            : _isRowsEmpty(fixedRows)
-                                ? TableBorder(
-                                    top: border!.top,
-                                    //left: border!.left,
-                                    right: border!.right,
-                                    bottom: border!.bottom,
-                                    verticalInside: border!.verticalInside,
-                                    horizontalInside: border!.horizontalInside,
-                                    borderRadius: border!.borderRadius)
-                                : TableBorder(
-                                    //top: border!.top,
-                                    left: border!.left,
-                                    right: border!.right,
-                                    bottom: border!.bottom,
-                                    verticalInside: border!.verticalInside,
-                                    horizontalInside: border!.horizontalInside,
-                                    borderRadius: border!.borderRadius));
+                    if (fixedColumnsRows != null &&
+                        !_isRowsEmpty(fixedColumnsRows)) {
+                      fixedColumnsTable = Table(
+                          columnWidths: leftWidthsAsMap,
+                          children: fixedColumnsRows,
+                          border: border == null
+                              ? null
+                              : _isRowsEmpty(fixedCornerRows)
+                                  ? border
+                                  : TableBorder(
+                                      //top: border!.top,
+                                      left: border!.left,
+                                      right: border!.right,
+                                      bottom: border!.bottom,
+                                      verticalInside: border!.verticalInside,
+                                      horizontalInside:
+                                          border!.horizontalInside,
+                                      borderRadius: border!.borderRadius));
+                    }
 
-            Table? fixedRowsTabel;
-            Table? fixedColumnsTable;
-            Table? fixedTopLeftCornerTable;
-            Widget? fixedColumnAndCornerCol;
-            Widget? fixedRowsAndCoreCol;
+                    if (fixedCornerRows != null &&
+                        !_isRowsEmpty(fixedCornerRows)) {
+                      fixedTopLeftCornerTable = Table(
+                          columnWidths: leftWidthsAsMap,
+                          children: fixedCornerRows,
+                          border: border);
+                    }
 
-            if (rows.isNotEmpty) {
-              if (fixedRows != null &&
-                  !_isRowsEmpty(fixedRows) &&
-                  actualFixedColumns <
-                      columns.length + (showCheckboxColumn ? 1 : 0)) {
-                fixedRowsTabel = Table(
-                    columnWidths:
-                        actualFixedColumns > 0 ? rightWidthsAsMap : widthsAsMap,
-                    children: fixedRows,
-                    border: border == null
+                    Widget _addBottomMargin(Table t) =>
+                        bottomMargin != null && bottomMargin! > 0
+                            ? Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [t, SizedBox(height: bottomMargin!)])
+                            : t;
+
+                    fixedRowsAndCoreCol = Scrollbar(
+                        controller: coreHorizontalController,
+                        child:
+                            Column(mainAxisSize: MainAxisSize.min, children: [
+                          ScrollConfiguration(
+                              behavior: ScrollConfiguration.of(context)
+                                  .copyWith(scrollbars: false),
+                              child: SingleChildScrollView(
+                                  controller: fixedRowsHorizontalController,
+                                  scrollDirection: Axis.horizontal,
+                                  child: (fixedRowsTabel != null)
+                                      ? fixedRowsTabel
+                                      // WOrkaround for a bug when there's no horizontal scrollbar should there be no this SingleChildScrollView. I.e. originally this part was ommited and not scrollable was added to the column if not fixed top row was visible
+                                      : SizedBox(
+                                          height: 0,
+                                          width: widths.fold<double>(
+                                              0,
+                                              (previousValue, value) =>
+                                                  previousValue + value),
+                                        ))),
+                          Flexible(
+                              fit: FlexFit.tight,
+                              child: SingleChildScrollView(
+                                  controller: coreVerticalController,
+                                  scrollDirection: Axis.vertical,
+                                  child: SingleChildScrollView(
+                                      controller: coreHorizontalController,
+                                      scrollDirection: Axis.horizontal,
+                                      child: _addBottomMargin(coreTable))))
+                        ]));
+
+                    fixedColumnAndCornerCol = fixedTopLeftCornerTable == null &&
+                            fixedColumnsTable == null
                         ? null
-                        : _isRowsEmpty(fixedCornerRows)
-                            ? border
-                            : TableBorder(
-                                top: border!.top,
-                                //left: border!.left,
-                                right: border!.right,
-                                bottom: border!.bottom,
-                                verticalInside: border!.verticalInside,
-                                horizontalInside: border!.horizontalInside,
-                                borderRadius: border!.borderRadius));
-              }
+                        : Column(mainAxisSize: MainAxisSize.min, children: [
+                            if (fixedTopLeftCornerTable != null)
+                              fixedTopLeftCornerTable,
+                            if (fixedColumnsTable != null)
+                              Flexible(
+                                  fit: FlexFit.loose,
+                                  child: ScrollConfiguration(
+                                      behavior: ScrollConfiguration.of(context)
+                                          .copyWith(scrollbars: false),
+                                      child: SingleChildScrollView(
+                                          controller:
+                                              leftColumnVerticalContoller,
+                                          scrollDirection: Axis.vertical,
+                                          child: _addBottomMargin(
+                                              fixedColumnsTable))))
+                          ]);
+                  }
 
-              if (fixedColumnsRows != null && !_isRowsEmpty(fixedColumnsRows)) {
-                fixedColumnsTable = Table(
-                    columnWidths: leftWidthsAsMap,
-                    children: fixedColumnsRows,
-                    border: border == null
-                        ? null
-                        : _isRowsEmpty(fixedCornerRows)
-                            ? border
-                            : TableBorder(
-                                //top: border!.top,
-                                left: border!.left,
-                                right: border!.right,
-                                bottom: border!.bottom,
-                                verticalInside: border!.verticalInside,
-                                horizontalInside: border!.horizontalInside,
-                                borderRadius: border!.borderRadius));
-              }
+                  var completeWidget = Container(
+                      decoration: decoration ?? theme.dataTableTheme.decoration,
+                      child: rows.isEmpty
+                          ? Column(children: [
+                              SingleChildScrollView(
+                                  controller: coreHorizontalController,
+                                  scrollDirection: Axis.horizontal,
+                                  child: Table(
+                                      columnWidths: widthsAsMap,
+                                      border: border,
+                                      children: [headingRow])),
+                              Flexible(
+                                  fit: FlexFit.tight,
+                                  child: empty ?? const SizedBox())
+                            ])
+                          : Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (fixedColumnAndCornerCol != null)
+                                  fixedColumnAndCornerCol,
+                                if (fixedRowsAndCoreCol != null)
+                                  Flexible(
+                                      fit: FlexFit.tight,
+                                      child: fixedRowsAndCoreCol)
+                              ],
+                            ));
 
-              if (fixedCornerRows != null && !_isRowsEmpty(fixedCornerRows)) {
-                fixedTopLeftCornerTable = Table(
-                    columnWidths: leftWidthsAsMap,
-                    children: fixedCornerRows,
-                    border: border);
-              }
-
-              Widget _addBottomMargin(Table t) =>
-                  bottomMargin != null && bottomMargin! > 0
-                      ? Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [t, SizedBox(height: bottomMargin!)])
-                      : t;
-
-              fixedRowsAndCoreCol = Scrollbar(
-                  controller: coreHorizontalController,
-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(context)
-                            .copyWith(scrollbars: false),
-                        child: SingleChildScrollView(
-                            controller: fixedRowsHorizontalController,
-                            scrollDirection: Axis.horizontal,
-                            child: (fixedRowsTabel != null)
-                                ? fixedRowsTabel
-                                // WOrkaround for a bug when there's no horizontal scrollbar should there be no this SingleChildScrollView. I.e. originally this part was ommited and not scrollable was added to the column if not fixed top row was visible
-                                : SizedBox(
-                                    height: 0,
-                                    width: widths.fold<double>(
-                                        0,
-                                        (previousValue, value) =>
-                                            previousValue + value),
-                                  ))),
-                    Flexible(
-                        fit: FlexFit.tight,
-                        child: SingleChildScrollView(
-                            controller: coreVerticalController,
-                            scrollDirection: Axis.vertical,
-                            child: SingleChildScrollView(
-                                controller: coreHorizontalController,
-                                scrollDirection: Axis.horizontal,
-                                child: _addBottomMargin(coreTable))))
-                  ]));
-
-              fixedColumnAndCornerCol = fixedTopLeftCornerTable == null &&
-                      fixedColumnsTable == null
-                  ? null
-                  : Column(mainAxisSize: MainAxisSize.min, children: [
-                      if (fixedTopLeftCornerTable != null)
-                        fixedTopLeftCornerTable,
-                      if (fixedColumnsTable != null)
-                        Flexible(
-                            fit: FlexFit.loose,
-                            child: ScrollConfiguration(
-                                behavior: ScrollConfiguration.of(context)
-                                    .copyWith(scrollbars: false),
-                                child: SingleChildScrollView(
-                                    controller: leftColumnVerticalContoller,
-                                    scrollDirection: Axis.vertical,
-                                    child:
-                                        _addBottomMargin(fixedColumnsTable))))
-                    ]);
-            }
-
-            var completeWidget = Container(
-                decoration: decoration ?? theme.dataTableTheme.decoration,
-                child: rows.isEmpty
-                    ? Column(children: [
-                        SingleChildScrollView(
-                            controller: coreHorizontalController,
-                            scrollDirection: Axis.horizontal,
-                            child: Table(
-                                columnWidths: widthsAsMap,
-                                border: border,
-                                children: [headingRow])),
-                        Flexible(
-                            fit: FlexFit.tight,
-                            child: empty ?? const SizedBox())
-                      ])
-                    : Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (fixedColumnAndCornerCol != null)
-                            fixedColumnAndCornerCol,
-                          if (fixedRowsAndCoreCol != null)
-                            Flexible(
-                                fit: FlexFit.tight, child: fixedRowsAndCoreCol)
-                        ],
-                      ));
-
-            return completeWidget;
+                  return completeWidget;
+                });
           });
     });
 
@@ -1088,8 +1159,11 @@ class DataTable2 extends DataTable {
     return checkBoxWidth;
   }
 
-  List<double> _calculateDataColumnSizes(BoxConstraints constraints,
-      double checkBoxWidth, double effectiveHorizontalMargin) {
+  List<double> _calculateDataColumnSizes(
+      BoxConstraints constraints,
+      double checkBoxWidth,
+      double effectiveHorizontalMargin,
+      ColumnDataController columnDataController) {
     var totalColAvailableWidth = constraints.maxWidth;
     double totalExtraWidth = 0;
     double totalFixedWidth = 0;
@@ -1561,4 +1635,281 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
   @override
   Widget build(BuildContext context) =>
       widget.builder(context, _sc11!, _sc12, _sc21, _sc22);
+}
+
+/// Cretates the controller to manage column resizing and implements events logic
+class ResizeColumnControllers extends StatefulWidget {
+  const ResizeColumnControllers({
+    super.key,
+    required this.columns,
+    required this.builder,
+  });
+
+  /// Positions of 2 pairs of scroll controllers (sc11|sc12 and sc21|sc22)
+  /// will be synchronized, attached scrollables will copy the positions
+  final Widget Function(BuildContext context, ColumnDataController cdc,
+      Function(DataColumn2 dc2, double delta) onColumnResized) builder;
+
+  final List<DataColumn> columns;
+
+  @override
+  ResizeColumnControllersState createState() => ResizeColumnControllersState();
+}
+
+class ResizeColumnControllersState extends State<ResizeColumnControllers> {
+  late ColumnDataController _cdc;
+  @override
+  void initState() {
+    super.initState();
+    _initControllers();
+  }
+
+  @override
+  void didUpdateWidget(ResizeColumnControllers oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _disposeOrUnsubscribe();
+    _initControllers();
+  }
+
+  @override
+  void dispose() {
+    _disposeOrUnsubscribe();
+    super.dispose();
+  }
+
+  void _initControllers() {
+    _cdc = ColumnDataController();
+    _cdc.columns = widget.columns;
+  }
+
+  void _disposeOrUnsubscribe() {
+    _cdc.dispose();
+  }
+
+  void _onColumnResized(DataColumn2 dc2, double delta) {
+    var idx = _cdc.columns.indexOf(dc2);
+
+    /// Compensate delta when there are columns with not fixed width to the left
+    var cl = _cdc.getPropLeftNotFixedColumns(_cdc.columns, dc2);
+    if (cl < 1) {
+      delta = delta / (1 - cl);
+    }
+    if ((_cdc.getCurrentWidth(idx) + delta) >=
+        ColumnDataController.minColWidth) {
+      setState(() {
+        _cdc.updateDataColumn(idx, delta);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      widget.builder(context, _cdc, _onColumnResized);
+}
+
+/// Controller to store and calculate columns resizing
+class ColumnDataController extends ChangeNotifier {
+  /// Minimum size for a column
+  /// TODO: find a way to calculate minimum column or just leave it hardcoded
+  static double minColWidth = 50;
+
+  Map<int, double> colsExtraWidth = {};
+  Map<int, double> colsWidthNoExtra = {};
+  List<DataColumn> columns = [];
+
+  double getExtraWidth(int idCol) {
+    return colsExtraWidth[idCol] ?? 0.0;
+  }
+
+  double getCurrentWidth(int idCol) {
+    return (colsWidthNoExtra[idCol] ?? 0.0) + getExtraWidth(idCol);
+  }
+
+  void updateDataColumn(int idCol, double delta) {
+    colsExtraWidth[idCol] = getExtraWidth(idCol) + delta;
+  }
+
+  bool isFixedWidth(DataColumn dc, int colIdx) {
+    return dc is! DataColumn2 ||
+        (dc.fixedWidth != null || getExtraWidth(colIdx) != 0);
+  }
+
+  /// Returns the proportion of not fixed width columns left of [colLimit]
+  /// with respect the total of not fixed width columns
+  double getPropLeftNotFixedColumns(
+      List<DataColumn> columns, DataColumn colLimit) {
+    double res = 0;
+    int t = 0;
+    int l = 0;
+    var idxLimit = columns.indexOf(colLimit);
+    for (var c in columns) {
+      var idx = columns.indexOf(c);
+      if (c != colLimit &&
+          !isFixedWidth(c, idx) &&
+          (colsWidthNoExtra[idx] == null ||
+              colsWidthNoExtra[idx]! > ColumnDataController.minColWidth)) {
+        if (idx < idxLimit) {
+          l++;
+        }
+        t++;
+      }
+    }
+    if (t > 0) {
+      res = l / t;
+    }
+    return res;
+  }
+}
+
+/// Widget to control column resizing
+class ColumnResizeWidget extends StatefulWidget {
+  final double height;
+  final void Function(double) onDragUpdate;
+  final Color color;
+  final bool desktopMode;
+  final bool realTime;
+
+  /// Minimum width of widget in desktop mode
+  final double minWidth;
+
+  /// Maximum width of widget in desktop mode
+  final double maxWidth;
+  const ColumnResizeWidget({
+    super.key,
+    required this.height,
+    required this.onDragUpdate,
+    this.color = Colors.black,
+    this.desktopMode = false,
+    this.realTime = false,
+    this.minWidth = 2,
+    this.maxWidth = 6,
+  });
+
+  @override
+  State<StatefulWidget> createState() => ColumnResizeWidgetState();
+}
+
+class ColumnResizeWidgetState extends State<ColumnResizeWidget> {
+  late double _width;
+  var _color = Colors.transparent;
+  var _hover = false;
+  var _dragging = false;
+  var amountResized = 0.0;
+
+  @override
+  void initState() {
+    _width = widget.minWidth;
+    super.initState();
+  }
+
+  void _update() {
+    if (_dragging || _hover) {
+      _color = widget.color;
+      _width = widget.maxWidth;
+    } else if (!_hover) {
+      _color = Colors.transparent;
+      _width = widget.minWidth;
+      if (!widget.realTime) {
+        _dragUpdated(0.0);
+      }
+    }
+  }
+
+  void _dragUpdated(double delta) {
+    if (widget.realTime) {
+      widget.onDragUpdate(delta);
+    } else {
+      if (_dragging) {
+        setState(() {
+          amountResized += delta;
+        });
+      } else {
+        widget.onDragUpdate(amountResized);
+        amountResized = 0;
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Draggable(
+      onDragUpdate: (details) => _dragUpdated(details.delta.dx),
+      onDragStarted: () => setState(() {
+        _dragging = true;
+        _update();
+      }),
+      onDragEnd: (_) => setState(() {
+        _dragging = false;
+        _update();
+      }),
+      axis: Axis.horizontal,
+      feedback: widget.realTime
+          ? const SizedBox.shrink()
+          : (widget.desktopMode)
+              ? Container(
+                  width: _width,
+                  height: widget.height,
+                  color: _color,
+                )
+              : (RotatedBox(
+                  quarterTurns: 1,
+                  child: Icon(
+                    color: widget.color,
+                    Icons.vertical_align_center,
+                  ),
+                )),
+      childWhenDragging: (!widget.desktopMode)
+          ? RotatedBox(
+              quarterTurns: 1,
+              child: Icon(
+                color: widget.color,
+                Icons.vertical_align_center,
+              ),
+            )
+          : null,
+      child: (widget.desktopMode)
+          ? MouseRegion(
+              cursor: SystemMouseCursors.resizeColumn,
+              onEnter: (_) => setState(() {
+                _hover = true;
+                _update();
+              }),
+              onExit: (_) => setState(() {
+                _hover = false;
+                _update();
+              }),
+              child: AnimatedContainer(
+                height: widget.height,
+                width: _width,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeIn,
+                decoration: BoxDecoration(
+                  color: widget.realTime || !_dragging ? _color : Colors.grey,
+                ),
+              ),
+            )
+          : Icon(color: widget.color, Icons.drag_indicator),
+    );
+  }
+}
+
+/// Class to set parameters of resize widget
+class ColumnResizingParameters {
+  final bool desktopMode;
+  final Color widgetColor;
+
+  /// Minimum width of widget in desktop mode
+  final double widgetMinWidth;
+
+  /// Maximum width of widget in desktop mode
+  final double widgetMaxWidth;
+  final bool realTime;
+
+  ColumnResizingParameters({
+    this.desktopMode = true,
+    this.widgetColor = Colors.black,
+    this.realTime = true,
+    this.widgetMinWidth = 2,
+    this.widgetMaxWidth = 6,
+  });
 }

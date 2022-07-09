@@ -66,55 +66,55 @@ class PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
 
   List<DataColumn> get _columns {
     return [
-      ResizableDataColumn2(
+      DataColumn2(
         label: const Text('Desert'),
         isResizable: getCurrentRouteOption(context) == resizableCols,
         onSort: (columnIndex, ascending) =>
             sort<String>((d) => d.name, columnIndex, ascending),
       ),
-      ResizableDataColumn2(
+      DataColumn2(
         label: const Text('Calories'),
         isResizable: getCurrentRouteOption(context) == resizableCols,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.calories, columnIndex, ascending),
       ),
-      ResizableDataColumn2(
+      DataColumn2(
         label: const Text('Fat (gm)'),
         isResizable: getCurrentRouteOption(context) == resizableCols,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.fat, columnIndex, ascending),
       ),
-      ResizableDataColumn2(
+      DataColumn2(
         label: const Text('Carbs (gm)'),
         isResizable: getCurrentRouteOption(context) == resizableCols,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.carbs, columnIndex, ascending),
       ),
-      ResizableDataColumn2(
+      DataColumn2(
         label: const Text('Protein (gm)'),
         isResizable: getCurrentRouteOption(context) == resizableCols,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.protein, columnIndex, ascending),
       ),
-      ResizableDataColumn2(
+      DataColumn2(
         label: const Text('Sodium (mg)'),
         isResizable: getCurrentRouteOption(context) == resizableCols,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.sodium, columnIndex, ascending),
       ),
-      ResizableDataColumn2(
+      DataColumn2(
         label: const Text('Calcium (%)'),
         isResizable: getCurrentRouteOption(context) == resizableCols,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.calcium, columnIndex, ascending),
       ),
-      ResizableDataColumn2(
+      DataColumn2(
         label: const Text('Iron (%)'),
         isResizable: getCurrentRouteOption(context) == resizableCols,
         numeric: true,
