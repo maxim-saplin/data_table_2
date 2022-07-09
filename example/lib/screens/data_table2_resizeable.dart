@@ -115,7 +115,7 @@ class ResizeableDataTable2DemoState extends State<ResizeableDataTable2Demo> {
           DataColumn2(
             label: const Text('Desert'),
             size: ColumnSize.S,
-            isResizable: resizeParam != null,
+            isResizable: true,
             // example of fixed 1st row
             fixedWidth:
                 getCurrentRouteOption(context) == fixedColumnWidth ? 200 : null,
@@ -124,7 +124,7 @@ class ResizeableDataTable2DemoState extends State<ResizeableDataTable2Demo> {
           ),
           DataColumn2(
             label: const Text('Calories'),
-            isResizable: resizeParam != null,
+            isResizable: true,
             size: ColumnSize.S,
             numeric: true,
             onSort: (columnIndex, ascending) =>
@@ -132,7 +132,7 @@ class ResizeableDataTable2DemoState extends State<ResizeableDataTable2Demo> {
           ),
           DataColumn2(
             label: const Text('Fat (gm)'),
-            isResizable: resizeParam != null,
+            isResizable: true,
             size: ColumnSize.S,
             numeric: true,
             onSort: (columnIndex, ascending) =>
@@ -140,7 +140,7 @@ class ResizeableDataTable2DemoState extends State<ResizeableDataTable2Demo> {
           ),
           DataColumn2(
             label: const Text('Carbs (gm)'),
-            isResizable: resizeParam != null,
+            isResizable: true,
             size: ColumnSize.S,
             numeric: true,
             onSort: (columnIndex, ascending) =>
@@ -148,7 +148,7 @@ class ResizeableDataTable2DemoState extends State<ResizeableDataTable2Demo> {
           ),
           DataColumn2(
             label: const Text('Protein (gm)'),
-            isResizable: resizeParam != null,
+            isResizable: true,
             size: ColumnSize.S,
             numeric: true,
             onSort: (columnIndex, ascending) =>
@@ -156,7 +156,7 @@ class ResizeableDataTable2DemoState extends State<ResizeableDataTable2Demo> {
           ),
           DataColumn2(
             label: const Text('Sodium (mg)'),
-            isResizable: resizeParam != null,
+            isResizable: true,
             size: ColumnSize.S,
             numeric: true,
             onSort: (columnIndex, ascending) =>
@@ -164,7 +164,7 @@ class ResizeableDataTable2DemoState extends State<ResizeableDataTable2Demo> {
           ),
           DataColumn2(
             label: const Text('Calcium (%)'),
-            isResizable: resizeParam != null,
+            isResizable: true,
             size: ColumnSize.S,
             numeric: true,
             onSort: (columnIndex, ascending) =>
@@ -172,7 +172,7 @@ class ResizeableDataTable2DemoState extends State<ResizeableDataTable2Demo> {
           ),
           DataColumn2(
             label: const Text('Iron (%)'),
-            isResizable: resizeParam != null,
+            isResizable: true,
             size: ColumnSize.S,
             numeric: true,
             onSort: (columnIndex, ascending) =>
