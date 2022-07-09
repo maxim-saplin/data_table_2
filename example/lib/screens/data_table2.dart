@@ -47,10 +47,10 @@ class DataTable2DemoState extends State<DataTable2Demo> {
   }
 
   void _sort<T>(
-    Comparable<T> Function(Dessert d) getField,
-    int columnIndex,
-    bool ascending,
-  ) {
+      Comparable<T> Function(Dessert d) getField,
+      int columnIndex,
+      bool ascending,
+      ) {
     _dessertsDataSource.sort<T>(getField, ascending);
     setState(() {
       _sortColumnIndex = columnIndex;
@@ -69,22 +69,24 @@ class DataTable2DemoState extends State<DataTable2Demo> {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: DataTable2(
+        sortArrowIcon: Icons.keyboard_arrow_up,
+        sortArrowAnimationDuration: const Duration(milliseconds: 0),
         columnSpacing: 12,
         horizontalMargin: 12,
         border: getCurrentRouteOption(context) == fixedColumnWidth
             ? TableBorder(
-                top: const BorderSide(color: Colors.black),
-                bottom: BorderSide(color: Colors.grey[300]!),
-                left: BorderSide(color: Colors.grey[300]!),
-                right: BorderSide(color: Colors.grey[300]!),
-                verticalInside: BorderSide(color: Colors.grey[300]!),
-                horizontalInside:
-                    const BorderSide(color: Colors.grey, width: 1))
+            top: const BorderSide(color: Colors.black),
+            bottom: BorderSide(color: Colors.grey[300]!),
+            left: BorderSide(color: Colors.grey[300]!),
+            right: BorderSide(color: Colors.grey[300]!),
+            verticalInside: BorderSide(color: Colors.grey[300]!),
+            horizontalInside:
+            const BorderSide(color: Colors.grey, width: 1))
             : (getCurrentRouteOption(context) == showBordersWithZebraStripes
-                ? TableBorder.all()
-                : null),
+            ? TableBorder.all()
+            : null),
         dividerThickness:
-            1, // this one will be ignored if [border] is set above
+        1, // this one will be ignored if [border] is set above
         bottomMargin: 10,
         minWidth: 900,
         sortColumnIndex: _sortColumnIndex,
@@ -97,7 +99,7 @@ class DataTable2DemoState extends State<DataTable2Demo> {
             size: ColumnSize.S,
             // example of fixed 1st row
             fixedWidth:
-                getCurrentRouteOption(context) == fixedColumnWidth ? 200 : null,
+            getCurrentRouteOption(context) == fixedColumnWidth ? 200 : null,
             onSort: (columnIndex, ascending) =>
                 _sort<String>((d) => d.name, columnIndex, ascending),
           ),
