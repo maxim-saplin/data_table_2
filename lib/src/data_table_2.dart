@@ -1169,15 +1169,13 @@ class DataTable2 extends DataTable {
     double totalFixedWidth = 0;
     for (var c in columns) {
       if (c is DataColumn2) {
-        var extraWidth = columnDataController != null
-            ? columnDataController!.getExtraWidth(columns.indexOf(c))
-            : 0.0;
+        var extraWidth = columnDataController.getExtraWidth(columns.indexOf(c));
         totalExtraWidth += extraWidth;
         if (c.fixedWidth != null) {
           totalFixedWidth += c.fixedWidth!;
-        } else if (columnDataController != null && extraWidth != 0) {
+        } else if (extraWidth != 0) {
           totalFixedWidth +=
-              columnDataController!.colsWidthNoExtra[columns.indexOf(c)]!;
+              columnDataController.colsWidthNoExtra[columns.indexOf(c)]!;
         }
       }
     }
@@ -1210,11 +1208,9 @@ class DataTable2 extends DataTable {
       var column = columns[i];
       var extraWidth = 0.0;
       if (column is DataColumn2) {
-        extraWidth = columnDataController != null
-            ? columnDataController!.getExtraWidth(i)
-            : 0.0;
+        extraWidth = columnDataController.getExtraWidth(i);
         if (extraWidth != 0) {
-          w = columnDataController!.colsWidthNoExtra[i]!;
+          w = columnDataController.colsWidthNoExtra[i]!;
         } else if (column.fixedWidth != null) {
           w = column.fixedWidth!;
         } else if (column.size == ColumnSize.S) {
@@ -1238,24 +1234,18 @@ class DataTable2 extends DataTable {
         ? totalColAvailableWidth / totalColCalculatedWidth
         : 0;
     for (var i = 0; i < widths.length; i++) {
-      double extraWidth = columnDataController != null
-          ? columnDataController!.getExtraWidth(i)
-          : 0.0;
+      double extraWidth = columnDataController.getExtraWidth(i);
       // skip fixed width column
       if (!(columns[i] is DataColumn2 &&
               (columns[i] as DataColumn2).fixedWidth != null) &&
           extraWidth == 0) {
         widths[i] *= ratio;
       }
-      if (columnDataController != null) {
-        columnDataController!.colsWidthNoExtra[i] = widths[i];
-      }
+      columnDataController.colsWidthNoExtra[i] = widths[i];
       widths[i] += extraWidth;
-      if (columnDataController != null) {
-        if (widths[i] < ColumnDataController.minColWidth) {
-          widths[i] = ColumnDataController.minColWidth;
-          columnDataController!.colsWidthNoExtra[i] = widths[i];
-        }
+      if (widths[i] < ColumnDataController.minColWidth) {
+        widths[i] = ColumnDataController.minColWidth;
+        columnDataController.colsWidthNoExtra[i] = widths[i];
       }
     }
 
