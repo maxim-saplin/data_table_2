@@ -36,6 +36,7 @@ Please check the [example folder](https://github.com/maxim-saplin/data_table_2/t
 - `border` allows drawing inner and outer vertical and horizontal borders (e.g. outlining individual cells) - stock widgets only allow drawing horizontal row splitters
 - `PaginatorController` allows to externally control `PaginatedDataTable2` state (e.g. switch pages, change page size etc.)
 - **Experimental `AsynPaginatedDataTable2` widget built for asynchronous scenarios (such a requesting data from a web service) and relies on `AsyncDataTableSource` returning rows in a `Future`**
+- Use any icon for the sorted column with `sortArrowIcon` and also define how long it's animation takes to flip from ascending to descending (or vice versa) with `sortArrowAnimationDuration`.
 
 
 ## Usage
