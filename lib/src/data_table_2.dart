@@ -251,7 +251,6 @@ class DataTable2 extends DataTable {
       required bool tristate,
       required double rowHeight,
       Color? backgroundColor}) {
-    final ThemeData themeData = Theme.of(context);
     final double effectiveHorizontalMargin = horizontalMargin ??
         themeData.dataTableTheme.horizontalMargin ??
         _horizontalMargin;
@@ -267,8 +266,6 @@ class DataTable2 extends DataTable {
         ),
         child: Center(
           child: Checkbox(
-            activeColor: themeData.colorScheme.primary,
-            checkColor: themeData.colorScheme.onPrimary,
             value: checked,
             onChanged: onCheckboxChanged,
             tristate: tristate,
