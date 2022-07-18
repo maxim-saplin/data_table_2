@@ -251,6 +251,7 @@ class DataTable2 extends DataTable {
       required bool tristate,
       required double rowHeight,
       Color? backgroundColor}) {
+    final ThemeData themeData = Theme.of(context);
     final double effectiveHorizontalMargin = horizontalMargin ??
         themeData.dataTableTheme.horizontalMargin ??
         _horizontalMargin;
