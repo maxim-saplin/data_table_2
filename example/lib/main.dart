@@ -65,7 +65,7 @@ Scaffold _getScaffold(BuildContext context, Widget body,
                 ),
                 DropdownMenuItem(
                   value: '/datatable2resize',
-                  child: Text('DataTable2 Resizeable Columns'),
+                  child: Text('Resizeable Columns'),
                 ),
                 DropdownMenuItem(
                   value: '/paginated2',
