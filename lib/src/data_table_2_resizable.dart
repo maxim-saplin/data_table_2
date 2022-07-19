@@ -13,7 +13,8 @@ class ResizeColumns extends StatefulWidget {
   final Widget Function(
       BuildContext context,
       ColumnDataController dataController,
-      Function(DataColumn2 column, double delta) onColumnResized) builder;
+      Function(List<DataColumn> columns, DataColumn2 dc2, double delta)
+          onColumnResized) builder;
 
   final List<DataColumn> columns;
 
@@ -30,13 +31,6 @@ class ResizeColumnsState extends State<ResizeColumns> {
   }
 
   @override
-  void didUpdateWidget(ResizeColumns oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _disposeOrUnsubscribe();
-    _initControllers();
-  }
-
-  @override
   void dispose() {
     _disposeOrUnsubscribe();
     super.dispose();
@@ -44,18 +38,18 @@ class ResizeColumnsState extends State<ResizeColumns> {
 
   void _initControllers() {
     _cdc = ColumnDataController();
-    _cdc.columns = widget.columns;
   }
 
   void _disposeOrUnsubscribe() {
     _cdc.dispose();
   }
 
-  void _onColumnResized(DataColumn2 dc2, double delta) {
-    var idx = _cdc.columns.indexOf(dc2);
+  void _onColumnResized(
+      List<DataColumn> columns, DataColumn2 dc2, double delta) {
+    var idx = columns.indexOf(dc2);
 
     /// Compensate delta when there are columns with not fixed width to the left
-    var cl = _cdc.getPropLeftNotFixedColumns(_cdc.columns, dc2);
+    var cl = _cdc.getPropLeftNotFixedColumns(columns, dc2);
     if (cl < 1) {
       delta = delta / (1 - cl);
     }
@@ -80,7 +74,6 @@ class ColumnDataController extends ChangeNotifier {
 
   Map<int, double> colsExtraWidth = {};
   Map<int, double> colsWidthNoExtra = {};
-  List<DataColumn> columns = [];
 
   double getExtraWidth(int idCol) {
     return colsExtraWidth[idCol] ?? 0.0;

@@ -309,7 +309,7 @@ class DataTable2 extends DataTable {
     required MaterialStateProperty<Color?>? overlayColor,
     Color? backgroundColor,
     DataColumn2? column,
-    required Function(DataColumn2, double) onColumnResized,
+    required Function(List<DataColumn>, DataColumn2, double) onColumnResized,
   }) {
     final ThemeData themeData = Theme.of(context);
     label = Row(
@@ -371,7 +371,7 @@ class DataTable2 extends DataTable {
   }
 
   Widget _buildResizeWidget(DataColumn2 column, double widgetHeight,
-      Function(DataColumn2, double) onColumnResized) {
+      Function(List<DataColumn>, DataColumn2, double) onColumnResized) {
     ColumnResizingParameters crp = columnResizingParameters != null
         ? columnResizingParameters!
         : ColumnResizingParameters();
@@ -382,7 +382,7 @@ class DataTable2 extends DataTable {
       maxWidth: crp.widgetMaxWidth,
       onDragUpdate: (delta) {
         if (column.isResizable) {
-          onColumnResized(column, delta);
+          onColumnResized(columns, column, delta);
         }
       },
       desktopMode: crp.desktopMode,
