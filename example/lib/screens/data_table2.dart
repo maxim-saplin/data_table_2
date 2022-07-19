@@ -89,6 +89,9 @@ class DataTable2DemoState extends State<DataTable2Demo> {
         minWidth: 900,
         sortColumnIndex: _sortColumnIndex,
         sortAscending: _sortAscending,
+        sortArrowIcon: Icons.keyboard_arrow_up, // custom arrow
+        sortArrowAnimationDuration:
+            const Duration(milliseconds: 0), // custom animation duration
         onSelectAll: (val) =>
             setState(() => _dessertsDataSource.selectAll(val)),
         columns: [
