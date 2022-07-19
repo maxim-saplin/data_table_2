@@ -267,8 +267,6 @@ class DataTable2 extends DataTable {
         ),
         child: Center(
           child: Checkbox(
-            activeColor: themeData.colorScheme.primary,
-            checkColor: themeData.colorScheme.onPrimary,
             value: checked,
             onChanged: onCheckboxChanged,
             tristate: tristate,
