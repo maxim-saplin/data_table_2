@@ -1175,7 +1175,7 @@ class DataTable2 extends DataTable {
         totalExtraWidth += extraWidth;
         if (c.fixedWidth != null) {
           totalFixedWidth += c.fixedWidth!;
-        } else if (extraWidth != 0) {
+        } else if (columnDataController.hasExtraWidth(columns.indexOf(c))) {
           totalFixedWidth +=
               columnDataController.colsWidthNoExtra[columns.indexOf(c)]!;
         }
@@ -1208,10 +1208,8 @@ class DataTable2 extends DataTable {
     final widths = List<double>.generate(columns.length, (i) {
       var w = columnWidth;
       var column = columns[i];
-      var extraWidth = 0.0;
       if (column is DataColumn2) {
-        extraWidth = columnDataController.getExtraWidth(i);
-        if (extraWidth != 0) {
+        if (columnDataController.hasExtraWidth(i)) {
           w = columnDataController.colsWidthNoExtra[i]!;
         } else if (column.fixedWidth != null) {
           w = column.fixedWidth!;
@@ -1224,7 +1222,7 @@ class DataTable2 extends DataTable {
 
       //skip fixed width columns
       if (!(column is DataColumn2 && column.fixedWidth != null) &&
-          extraWidth == 0) {
+          !columnDataController.hasExtraWidth(i)) {
         totalColCalculatedWidth += w;
       }
       return w;
@@ -1240,7 +1238,7 @@ class DataTable2 extends DataTable {
       // skip fixed width column
       if (!(columns[i] is DataColumn2 &&
               (columns[i] as DataColumn2).fixedWidth != null) &&
-          extraWidth == 0) {
+          !columnDataController.hasExtraWidth(i)) {
         widths[i] *= ratio;
       }
       columnDataController.colsWidthNoExtra[i] = widths[i];

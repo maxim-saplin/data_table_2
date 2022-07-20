@@ -8,8 +8,6 @@ class ResizeColumns extends StatefulWidget {
     required this.builder,
   });
 
-  /// Positions of 2 pairs of scroll controllers (sc11|sc12 and sc21|sc22)
-  /// will be synchronized, attached scrollables will copy the positions
   final Widget Function(
       BuildContext context,
       ColumnDataController dataController,
@@ -48,14 +46,15 @@ class ResizeColumnsState extends State<ResizeColumns> {
       List<DataColumn> columns, DataColumn2 dc2, double delta) {
     var idx = columns.indexOf(dc2);
 
-    /// Compensate delta when there are columns with not fixed width to the left
-    var cl = _cdc.getPropLeftNotFixedColumns(columns, dc2);
-    if (cl < 1) {
-      delta = delta / (1 - cl);
-    }
+    /// Force non fixed width columns to the left of the column beeing resized to fixed
     if ((_cdc.getCurrentWidth(idx) + delta) >=
         ColumnDataController.minColWidth) {
       setState(() {
+        for (int i = 0; i < idx; i++) {
+          if (!_cdc.hasExtraWidth(i)) {
+            _cdc.updateDataColumn(i, 0);
+          }
+        }
         _cdc.updateDataColumn(idx, delta);
       });
     }
@@ -75,47 +74,25 @@ class ColumnDataController extends ChangeNotifier {
   Map<int, double> colsExtraWidth = {};
   Map<int, double> colsWidthNoExtra = {};
 
-  double getExtraWidth(int idCol) {
-    return colsExtraWidth[idCol] ?? 0.0;
+  double getExtraWidth(int colIdx) {
+    return colsExtraWidth[colIdx] ?? 0.0;
   }
 
-  double getCurrentWidth(int idCol) {
-    return (colsWidthNoExtra[idCol] ?? 0.0) + getExtraWidth(idCol);
+  bool hasExtraWidth(int colIdx) {
+    return colsExtraWidth[colIdx] != null;
   }
 
-  void updateDataColumn(int idCol, double delta) {
-    colsExtraWidth[idCol] = getExtraWidth(idCol) + delta;
+  double getCurrentWidth(int colIdx) {
+    return (colsWidthNoExtra[colIdx] ?? 0.0) + getExtraWidth(colIdx);
+  }
+
+  void updateDataColumn(int colIdx, double delta) {
+    colsExtraWidth[colIdx] = getExtraWidth(colIdx) + delta;
   }
 
   bool isFixedWidth(DataColumn dc, int colIdx) {
     return dc is! DataColumn2 ||
         (dc.fixedWidth != null || getExtraWidth(colIdx) != 0);
-  }
-
-  /// Returns the proportion of not fixed width columns left of [colLimit]
-  /// with respect the total of not fixed width columns
-  double getPropLeftNotFixedColumns(
-      List<DataColumn> columns, DataColumn colLimit) {
-    double res = 0;
-    int t = 0;
-    int l = 0;
-    var idxLimit = columns.indexOf(colLimit);
-    for (var c in columns) {
-      var idx = columns.indexOf(c);
-      if (c != colLimit &&
-          !isFixedWidth(c, idx) &&
-          (colsWidthNoExtra[idx] == null ||
-              colsWidthNoExtra[idx]! > ColumnDataController.minColWidth)) {
-        if (idx < idxLimit) {
-          l++;
-        }
-        t++;
-      }
-    }
-    if (t > 0) {
-      res = l / t;
-    }
-    return res;
   }
 }
 
