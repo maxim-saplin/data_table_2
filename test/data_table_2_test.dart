@@ -1792,6 +1792,7 @@ void main() {
     );
   });
 
+// Skiping test after removing color overrides in checkboxes (CheckboxThemeData can be used for that)
   testWidgets('DataRow2 renders checkbox with colors from Theme',
       (WidgetTester tester) async {
     final ThemeData themeData = ThemeData.light();
@@ -1825,7 +1826,7 @@ void main() {
     await tester.pumpWidget(buildTable());
     expect(lastCheckbox().activeColor, themeData.colorScheme.primary);
     expect(lastCheckbox().checkColor, themeData.colorScheme.onPrimary);
-  });
+  }, skip: true);
 
   testWidgets('DataRow2 renders custom colors when selected',
       (WidgetTester tester) async {
