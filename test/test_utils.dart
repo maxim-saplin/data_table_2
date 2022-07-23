@@ -128,6 +128,8 @@ final testRows = kDesserts.map<DataRow2>((Dessert dessert) {
 DataTable2 buildTable(
     {int? sortColumnIndex,
     bool sortAscending = true,
+    IconData? sortArrowIcon,
+    Duration? sortArrowAnimationDuration,
     bool overrideSizes = false,
     double? minWidth,
     int fixedTopRows = 1,
@@ -149,6 +151,9 @@ DataTable2 buildTable(
     showCheckboxColumn: showCheckboxColumn,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
+    sortArrowIcon: sortArrowIcon ?? Icons.arrow_upward,
+    sortArrowAnimationDuration:
+        sortArrowAnimationDuration ?? const Duration(milliseconds: 150),
     minWidth: minWidth,
     fixedTopRows: fixedTopRows,
     fixedLeftColumns: fixedLeftColumns,

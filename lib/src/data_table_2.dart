@@ -135,6 +135,8 @@ class DataTable2 extends DataTable {
     this.fixedTopRows = 1,
     this.fixedLeftColumns = 0,
     this.lmRatio = 1.2,
+    this.sortArrowAnimationDuration = const Duration(milliseconds: 150),
+    this.sortArrowIcon = Icons.arrow_upward,
     required super.rows,
   })  : assert(fixedLeftColumns >= 0),
         assert(fixedTopRows >= 0) {
@@ -179,8 +181,11 @@ class DataTable2 extends DataTable {
   /// The default divider thickness.
   static const double _dividerThickness = 1.0;
 
-  static const Duration _sortArrowAnimationDuration =
-      Duration(milliseconds: 150);
+  /// If not set, the default animation duration is 150 ms.
+  final Duration sortArrowAnimationDuration;
+
+  /// If not set, the default icon is Icons.arrow_upward
+  final IconData sortArrowIcon;
 
   /// If set, the table will stop shrinking below the threshold and provide
   /// horizontal scrolling. Useful for the cases with narrow screens (e.g. portrait phone orientation)
@@ -306,7 +311,8 @@ class DataTable2 extends DataTable {
           _SortArrow(
             visible: sorted,
             up: sorted ? ascending : null,
-            duration: _sortArrowAnimationDuration,
+            duration: sortArrowAnimationDuration,
+            sortArrowIcon: sortArrowIcon,
           ),
           const SizedBox(width: _sortArrowPadding),
         ],
@@ -326,7 +332,7 @@ class DataTable2 extends DataTable {
       child: AnimatedDefaultTextStyle(
         style: effectiveHeadingTextStyle,
         softWrap: false,
-        duration: _sortArrowAnimationDuration,
+        duration: sortArrowAnimationDuration,
         child: label,
       ),
     );
@@ -1262,6 +1268,7 @@ class _SortArrow extends StatefulWidget {
     required this.visible,
     required this.up,
     required this.duration,
+    required this.sortArrowIcon,
   });
 
   final bool visible;
@@ -1269,6 +1276,8 @@ class _SortArrow extends StatefulWidget {
   final bool? up;
 
   final Duration duration;
+
+  final IconData sortArrowIcon;
 
   @override
   _SortArrowState createState() => _SortArrowState();
@@ -1372,8 +1381,8 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
             Matrix4.rotationZ(_orientationOffset + _orientationAnimation.value)
               ..setTranslationRaw(0.0, _arrowIconBaselineOffset, 0.0),
         alignment: Alignment.center,
-        child: const Icon(
-          Icons.arrow_upward,
+        child: Icon(
+          widget.sortArrowIcon,
           size: _arrowIconSize,
         ),
       ),
