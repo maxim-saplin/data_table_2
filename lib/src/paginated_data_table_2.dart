@@ -404,7 +404,7 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// [PaginatorController]
   final PaginatorController? controller;
 
-  /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
+  /// Exposes scroll controller of the SingleChildScrollView that makes data rows vertically scrollable
   final ScrollController? scrollController;
 
   @override

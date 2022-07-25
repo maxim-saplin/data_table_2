@@ -192,7 +192,7 @@ class DataTable2 extends DataTable {
   /// have the ability to slightly scroll up the bototm row to avoid the obstruction)
   final double? bottomMargin;
 
-  /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
+  /// Exposes scroll controller of the SingleChildScrollView that makes data rows vertically scrollable
   final ScrollController? scrollController;
 
   /// Placeholder widget which is displayed whenever the data rows are empty.
