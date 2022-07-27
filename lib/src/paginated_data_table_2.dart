@@ -196,6 +196,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.autoRowsToHeight = false,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
+    this.columnResizingParameters,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
@@ -406,6 +407,9 @@ class PaginatedDataTable2 extends StatefulWidget {
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows vertically scrollable
   final ScrollController? scrollController;
+
+  /// Parameters to control column resizing
+  final ColumnResizingParameters? columnResizingParameters;
 
   @override
   PaginatedDataTable2State createState() => PaginatedDataTable2State();

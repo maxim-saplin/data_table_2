@@ -23,6 +23,9 @@ const selectAllPage = 'Select all at page';
 const rowTaps = 'Row Taps';
 const rowHeightOverrides = 'Row height overrides';
 const fixedColumnWidth = 'Fixed column width';
+const resizableCols = "Real time";
+const resizableColsNoRealtime = "No real time";
+const resizableColsMobile = "Mobile";
 
 /// Async sample that emulates network error and allow retrying load operation
 const asyncErrors = "Errors/Retries";
@@ -40,7 +43,19 @@ const Map<String, List<String>> routeOptions = {
     rowTaps,
     rowHeightOverrides
   ],
-  '/paginated2': [dflt, noData, autoRows, custPager, defaultSorting],
+  '/datatable2resize': [
+    resizableCols,
+    resizableColsNoRealtime,
+    resizableColsMobile,
+  ],
+  '/paginated2': [
+    dflt,
+    noData,
+    autoRows,
+    custPager,
+    defaultSorting,
+    resizableCols
+  ],
   '/asyncpaginated2': [
     dflt,
     noData,
