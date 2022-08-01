@@ -11,6 +11,7 @@ import 'screens/data_table2_simple.dart';
 import 'screens/data_table2_tests.dart';
 import 'screens/paginated_data_table.dart';
 import 'screens/paginated_data_table2.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(MyApp());
@@ -135,6 +136,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.grey[300],
       ),
       initialRoute: initialRoute,
+
       routes: {
         '/datatable2': (context) => _getScaffold(
             context, const DataTable2Demo(), getOptionsForRoute('/datatable2')),
@@ -156,10 +158,12 @@ class MyApp extends StatelessWidget {
         '/datatable2tests': (context) =>
             _getScaffold(context, const DataTable2Tests()),
       },
+      localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
       supportedLocales: const [
         Locale('en', ''),
         Locale('be', ''),
         Locale('ru', ''),
+        Locale('fr', ''),
       ],
       // change to see how PaginatedDataTable2 controls (e.g. Rows per page) get translated
       locale: const Locale('en', ''),
