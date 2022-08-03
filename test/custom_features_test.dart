@@ -737,6 +737,98 @@ void main() {
         i++;
       }
     });
+
+    // $ add sortArrowIcon test here
+    testWidgets('Custom sortArrowIcon test for PaginatedDataTable2',
+        (WidgetTester tester) async {
+      IconData iconForTest = Icons.keyboard_arrow_up;
+      var sortAscendingGlobal = true;
+      var currentColumnIndex = 0;
+      var trigger = StreamController();
+
+      // using 'columns' here for the fake async trigger
+      final triggerColumns = <DataColumn2>[
+        DataColumn2(
+            label: const Text('Name'),
+            tooltip: 'Name',
+            onSort: (int columnIndex, bool ascending) {
+              sortAscendingGlobal = !sortAscendingGlobal;
+              currentColumnIndex = columnIndex;
+
+              trigger.add(null);
+              // print(
+              //     'onSort() --> [column: $columnIndex, ascending: $ascending], sortAscendingGlobal: $sortAscendingGlobal');
+            }),
+        const DataColumn2(
+          label: Text('Calories'),
+          tooltip: 'Calories',
+          numeric: true,
+          //onSort: (int columnIndex, bool ascending) {},
+        ),
+        const DataColumn2(
+          label: Text('Carbs'),
+          tooltip: 'Carbs',
+          numeric: true,
+          //onSort: (int columnIndex, bool ascending) {},
+        ),
+      ];
+
+      Widget getStatefulWidget(
+          {IconData? sortArrowIcon, Duration? sortArrowAnimationDuration}) {
+        return StreamBuilder(
+            stream: trigger.stream,
+            builder: (c, s) {
+              return MaterialApp(
+                home: Material(
+                  child: buildPaginatedTable(
+                      sortAscending: sortAscendingGlobal,
+                      sortArrowIcon: sortArrowIcon,
+                      sortArrowAnimationDuration: sortArrowAnimationDuration,
+                      sortColumnIndex: currentColumnIndex,
+                      columns: triggerColumns),
+                ),
+              );
+            });
+      }
+
+      await tester.pumpWidget(getStatefulWidget(
+        sortArrowIcon: iconForTest,
+        sortArrowAnimationDuration: const Duration(milliseconds: 100),
+      ));
+
+      expect(find.byIcon(iconForTest), findsOneWidget);
+
+      // initial rotation before toggle
+      Transform transformOfArrow = tester.widget<Transform>(
+        find.widgetWithIcon(Transform, iconForTest).first,
+      );
+      expect(
+          transformOfArrow.transform.getRotation(), equals(Matrix3.identity()));
+
+      // tap column header to toggle sort to descending...
+      await tester.tap(find.text('Name'));
+      await tester.pump(const Duration(milliseconds: 95));
+
+      // rotation before sortArrowAnimationDuration
+      transformOfArrow = tester.widget<Transform>(
+        find.widgetWithIcon(Transform, iconForTest).first,
+      );
+      print(
+          'before sortArrowAnimationDuration: \n${transformOfArrow.transform.getRotation()}');
+      expect(transformOfArrow.transform.getRotation(),
+          isNot(Matrix3.rotationZ(math.pi)));
+
+      await tester.pump(const Duration(milliseconds: 105));
+
+      // rotation after sortArrowAnimationDuration
+      transformOfArrow = tester.widget<Transform>(
+        find.widgetWithIcon(Transform, iconForTest).first,
+      );
+      expect(transformOfArrow.transform.getRotation(),
+          equals(Matrix3.rotationZ(math.pi)));
+      print(
+          'after sortArrowAnimationDuration: \n${transformOfArrow.transform.getRotation()}');
+    });
   });
 
   group('AsyncPaginatedDataTable2', () {

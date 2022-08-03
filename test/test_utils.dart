@@ -234,6 +234,8 @@ class TestDataSource extends DataTableSource {
 PaginatedDataTable2 buildPaginatedTable(
     {int? sortColumnIndex,
     bool sortAscending = true,
+    IconData? sortArrowIcon,
+    Duration? sortArrowAnimationDuration,
     bool showPage = true,
     bool showGeneration = true,
     bool overrideSizes = false,
@@ -259,6 +261,9 @@ PaginatedDataTable2 buildPaginatedTable(
     header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
+    sortArrowIcon: sortArrowIcon ?? Icons.arrow_upward,
+    sortArrowAnimationDuration:
+        sortArrowAnimationDuration ?? const Duration(milliseconds: 150),
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
     showFirstLastButtons: true,
