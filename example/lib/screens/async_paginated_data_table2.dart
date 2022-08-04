@@ -207,6 +207,8 @@ class AsyncPaginatedDataTable2DemoState
           },
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
+          sortArrowIcon: Icons.keyboard_arrow_up,
+          sortArrowAnimationDuration: const Duration(milliseconds: 0),
           onSelectAll: (select) => select != null && select
               ? (getCurrentRouteOption(context) != selectAllPage
                   ? _dessertsDataSource!.selectAll()

@@ -318,6 +318,8 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
       required super.columns,
       super.sortColumnIndex,
       super.sortAscending = true,
+      super.sortArrowAnimationDuration = const Duration(milliseconds: 150),
+      super.sortArrowIcon = Icons.arrow_upward,
       super.onSelectAll,
       super.dataRowHeight = kMinInteractiveDimension,
       super.headingRowColor,
