@@ -1,3 +1,6 @@
+## 2.3.6
+-  Added sortArrowIcon and sortArrowAnimationDuration properties
+
 ## 2.3.5
 - Refactored scroll syncing approach, no static workaround and potential memleaks
 - Fixed locked scrolling when bouncing on iOS (#113)

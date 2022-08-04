@@ -175,6 +175,9 @@ class PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
         },
         sortColumnIndex: _sortColumnIndex,
         sortAscending: _sortAscending,
+        sortArrowIcon: Icons.keyboard_arrow_up, // custom arrow
+        sortArrowAnimationDuration:
+            const Duration(milliseconds: 0), // custom animation duration
         onSelectAll: _dessertsDataSource.selectAll,
         controller:
             getCurrentRouteOption(context) == custPager ? _controller : null,

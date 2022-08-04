@@ -12,6 +12,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter 
   intl: ^0.17.0
   data_table_2:
     path: ../

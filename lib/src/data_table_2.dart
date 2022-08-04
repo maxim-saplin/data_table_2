@@ -142,6 +142,8 @@ class DataTable2 extends DataTable {
     this.fixedLeftColumns = 0,
     this.lmRatio = 1.2,
     this.columnResizingParameters,
+    this.sortArrowAnimationDuration = const Duration(milliseconds: 150),
+    this.sortArrowIcon = Icons.arrow_upward,
     required super.rows,
   })  : assert(fixedLeftColumns >= 0),
         assert(fixedTopRows >= 0) {
@@ -186,8 +188,14 @@ class DataTable2 extends DataTable {
   /// The default divider thickness.
   static const double _dividerThickness = 1.0;
 
-  static const Duration _sortArrowAnimationDuration =
-      Duration(milliseconds: 150);
+  /// When changing sort direction an arrow icon in the header is rotated clockwise.
+  /// The value defines the duration of the rotation animation.
+  /// If not set, the default animation duration is 150 ms.
+  final Duration sortArrowAnimationDuration;
+
+  /// Icon to be displayed when sorting is applied to a column.
+  /// If not set, the default icon is [Icons.arrow_upward]
+  final IconData sortArrowIcon;
 
   /// If set, the table will stop shrinking below the threshold and provide
   /// horizontal scrolling. Useful for the cases with narrow screens (e.g. portrait phone orientation)
@@ -199,7 +207,7 @@ class DataTable2 extends DataTable {
   /// have the ability to slightly scroll up the bototm row to avoid the obstruction)
   final double? bottomMargin;
 
-  /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
+  /// Exposes scroll controller of the SingleChildScrollView that makes data rows vertically scrollable
   final ScrollController? scrollController;
 
   /// Placeholder widget which is displayed whenever the data rows are empty.
@@ -276,8 +284,6 @@ class DataTable2 extends DataTable {
         ),
         child: Center(
           child: Checkbox(
-            activeColor: themeData.colorScheme.primary,
-            checkColor: themeData.colorScheme.onPrimary,
             value: checked,
             onChanged: onCheckboxChanged,
             tristate: tristate,
@@ -320,7 +326,8 @@ class DataTable2 extends DataTable {
           _SortArrow(
             visible: sorted,
             up: sorted ? ascending : null,
-            duration: _sortArrowAnimationDuration,
+            duration: sortArrowAnimationDuration,
+            sortArrowIcon: sortArrowIcon,
           ),
           const SizedBox(width: _sortArrowPadding),
         ],
@@ -340,7 +347,7 @@ class DataTable2 extends DataTable {
       child: AnimatedDefaultTextStyle(
         style: effectiveHeadingTextStyle,
         softWrap: false,
-        duration: _sortArrowAnimationDuration,
+        duration: sortArrowAnimationDuration,
         child: label,
       ),
     );
@@ -1365,6 +1372,7 @@ class _SortArrow extends StatefulWidget {
     required this.visible,
     required this.up,
     required this.duration,
+    required this.sortArrowIcon,
   });
 
   final bool visible;
@@ -1372,6 +1380,8 @@ class _SortArrow extends StatefulWidget {
   final bool? up;
 
   final Duration duration;
+
+  final IconData sortArrowIcon;
 
   @override
   _SortArrowState createState() => _SortArrowState();
@@ -1475,8 +1485,8 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
             Matrix4.rotationZ(_orientationOffset + _orientationAnimation.value)
               ..setTranslationRaw(0.0, _arrowIconBaselineOffset, 0.0),
         alignment: Alignment.center,
-        child: const Icon(
-          Icons.arrow_upward,
+        child: Icon(
+          widget.sortArrowIcon,
           size: _arrowIconSize,
         ),
       ),

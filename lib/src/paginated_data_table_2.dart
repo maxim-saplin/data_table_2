@@ -164,6 +164,8 @@ class PaginatedDataTable2 extends StatefulWidget {
     required this.columns,
     this.sortColumnIndex,
     this.sortAscending = true,
+    this.sortArrowAnimationDuration = const Duration(milliseconds: 150),
+    this.sortArrowIcon = Icons.arrow_upward,
     this.onSelectAll,
     this.dataRowHeight = kMinInteractiveDimension,
     this.headingRowHeight = 56.0,
@@ -244,6 +246,15 @@ class PaginatedDataTable2 extends StatefulWidget {
   ///
   /// See [DataTable.sortAscending].
   final bool sortAscending;
+
+  /// When changing sort direction an arrow icon in the header is rotated clockwise.
+  /// The value defines the duration of the rotation animation.
+  /// If not set, the default animation duration is 150 ms.
+  final Duration sortArrowAnimationDuration;
+
+  /// Icon to be displayed when sorting is applied to a column.
+  /// If not set, the default icon is [Icons.arrow_upward]
+  final IconData sortArrowIcon;
 
   /// Invoked when the user selects or unselects every row, using the
   /// checkbox in the heading row.
@@ -405,7 +416,7 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// [PaginatorController]
   final PaginatorController? controller;
 
-  /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
+  /// Exposes scroll controller of the SingleChildScrollView that makes data rows vertically scrollable
   final ScrollController? scrollController;
 
   /// Parameters to control column resizing
@@ -658,6 +669,8 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           columns: widget.columns,
           sortColumnIndex: widget.sortColumnIndex,
           sortAscending: widget.sortAscending,
+          sortArrowIcon: widget.sortArrowIcon,
+          sortArrowAnimationDuration: widget.sortArrowAnimationDuration,
           onSelectAll: widget.onSelectAll,
           // Make sure no decoration is set on the DataTable
           // from the theme, as its already wrapped in a Card.

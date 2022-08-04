@@ -32,15 +32,16 @@ Please check the [example folder](https://github.com/maxim-saplin/data_table_2/t
   - `PaginatedDataTable2.fit` property controls whether the paginator sticks to the bottom and leaves a gap to data rows above
 - There's `DataRow2` alternative to stock `DataRow` which provides row level tap events (including right clicks)
   - `DataRow2.specificRowHeight` allows overriding default height for any row
+- Overriding sort arrows via `sortArrowIcon` and `sortArrowAnimationDuration` properties
 - `empty` property which allows defining a placeholder widget to be displayed when data source is empty
 - `border` allows drawing inner and outer vertical and horizontal borders (e.g. outlining individual cells) - stock widgets only allow drawing horizontal row splitters
 - `PaginatorController` allows to externally control `PaginatedDataTable2` state (e.g. switch pages, change page size etc.)
-- **Experimental `AsynPaginatedDataTable2` widget built for asynchronous scenarios (such a requesting data from a web service) and relies on `AsyncDataTableSource` returning rows in a `Future`**
+- **Experimental `AsynPaginatedDataTable2` widget built for asynchronous scenarios (such a requesting data from a web service) relying on `AsyncDataTableSource` returning rows in a `Future`**
 
 
 ## Usage
 
-**NOTE:*** don't put the widgets into any unconstrained parents with infinit width or height (e.g. scrollables such as SingleChildScrollView, Column etc.). The widgets are designed to stretch and fill all available space within parent and have a number of own scrollables inside to address fixed rows/columns feature. Putting it inside unconsgtrained parent break widgets.
+**NOTE:*** don't put the widgets into any unconstrained parents with infinite width or height (e.g. scrollables such as SingleChildScrollView, Column etc.). The widgets are designed to stretch and fill all available space within parent and have a number of own scrollables inside to address fixed rows/columns feature. Putting it inside unconstrained parent break widgets.
 
 1. Add reference to pubspec.yaml.
 

@@ -128,6 +128,8 @@ final testRows = kDesserts.map<DataRow2>((Dessert dessert) {
 DataTable2 buildTable(
     {int? sortColumnIndex,
     bool sortAscending = true,
+    IconData? sortArrowIcon,
+    Duration? sortArrowAnimationDuration,
     bool overrideSizes = false,
     double? minWidth,
     int fixedTopRows = 1,
@@ -149,6 +151,9 @@ DataTable2 buildTable(
     showCheckboxColumn: showCheckboxColumn,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
+    sortArrowIcon: sortArrowIcon ?? Icons.arrow_upward,
+    sortArrowAnimationDuration:
+        sortArrowAnimationDuration ?? const Duration(milliseconds: 150),
     minWidth: minWidth,
     fixedTopRows: fixedTopRows,
     fixedLeftColumns: fixedLeftColumns,
@@ -229,6 +234,8 @@ class TestDataSource extends DataTableSource {
 PaginatedDataTable2 buildPaginatedTable(
     {int? sortColumnIndex,
     bool sortAscending = true,
+    IconData? sortArrowIcon,
+    Duration? sortArrowAnimationDuration,
     bool showPage = true,
     bool showGeneration = true,
     bool overrideSizes = false,
@@ -254,6 +261,9 @@ PaginatedDataTable2 buildPaginatedTable(
     header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
+    sortArrowIcon: sortArrowIcon ?? Icons.arrow_upward,
+    sortArrowAnimationDuration:
+        sortArrowAnimationDuration ?? const Duration(milliseconds: 150),
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
     showFirstLastButtons: true,
@@ -282,6 +292,8 @@ PaginatedDataTable2 buildPaginatedTable(
 PaginatedDataTable2 buildAsyncPaginatedTable(
     {int? sortColumnIndex,
     bool sortAscending = true,
+    IconData? sortArrowIcon,
+    Duration? sortArrowAnimationDuration,
     bool showPage = true,
     bool showGeneration = true,
     bool overrideSizes = false,
@@ -315,6 +327,9 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
+    sortArrowIcon: sortArrowIcon ?? Icons.arrow_upward,
+    sortArrowAnimationDuration:
+        sortArrowAnimationDuration ?? const Duration(milliseconds: 150),
     onSelectAll: onSelectAll ?? (bool? value) {},
     columns: columns ?? testColumns,
     showFirstLastButtons: true,
