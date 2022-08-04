@@ -1264,6 +1264,7 @@ void main() {
       Transform transformOfArrow = tester.widget<Transform>(
         find.widgetWithIcon(Transform, iconForTest).first,
       );
+      //print('before tap: \n${transformOfArrow.transform.getRotation()}');
       expect(
           transformOfArrow.transform.getRotation(), equals(Matrix3.identity()));
 
@@ -1290,6 +1291,8 @@ void main() {
           equals(Matrix3.rotationZ(math.pi)));
       print(
           'after sortArrowAnimationDuration: \n${transformOfArrow.transform.getRotation()}');
+
+      tester.pumpAndSettle();
     });
 
     testWidgets('Default loading spinner is shown',
