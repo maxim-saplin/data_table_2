@@ -246,12 +246,12 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// See [DataTable.sortAscending].
   final bool sortAscending;
 
-  /// When changin sorting direction arrow icon is the header is rotated clockwise.
+  /// When changing sort direction an arrow icon in the header is rotated clockwise.
   /// The value defines the duration of the rotation animation.
   /// If not set, the default animation duration is 150 ms.
   final Duration sortArrowAnimationDuration;
 
-  /// Icon to be displayed when sorting to a column is applied.
+  /// Icon to be displayed when sorting is applied to a column.
   /// If not set, the default icon is [Icons.arrow_upward]
   final IconData sortArrowIcon;
 
