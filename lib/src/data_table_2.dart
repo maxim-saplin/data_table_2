@@ -927,13 +927,24 @@ class DataTable2 extends DataTable {
                                   ))),
                     Flexible(
                         fit: FlexFit.tight,
-                        child: SingleChildScrollView(
+                        child: Scrollbar(
                             controller: coreVerticalController,
-                            scrollDirection: Axis.vertical,
-                            child: SingleChildScrollView(
-                                controller: coreHorizontalController,
-                                scrollDirection: Axis.horizontal,
-                                child: _addBottomMargin(coreTable))))
+                            child: ScrollConfiguration(
+                                behavior: ScrollConfiguration.of(context)
+                                    .copyWith(scrollbars: false),
+                                child: SingleChildScrollView(
+                                    controller: coreVerticalController,
+                                    scrollDirection: Axis.vertical,
+                                    child: ScrollConfiguration(
+                                        behavior:
+                                            ScrollConfiguration.of(context)
+                                                .copyWith(scrollbars: false),
+                                        child: SingleChildScrollView(
+                                            controller:
+                                                coreHorizontalController,
+                                            scrollDirection: Axis.horizontal,
+                                            child: _addBottomMargin(
+                                                coreTable)))))))
                   ]));
 
               fixedColumnAndCornerCol = fixedTopLeftCornerTable == null &&
