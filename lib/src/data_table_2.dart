@@ -146,14 +146,7 @@ class DataTable2 extends DataTable {
     this.sortArrowIcon = Icons.arrow_upward,
     required super.rows,
   })  : assert(fixedLeftColumns >= 0),
-        assert(fixedTopRows >= 0) {
-    // // Fix for #111, syncrhonize scroll position for left fixed column with core
-    // // Works fine if there's scrollCongtroller provided externally, allows to avoid jumping
-    // _leftColumnVerticalContoller = ScrollController(
-    //     initialScrollOffset: _coreVerticalController.positions.isNotEmpty
-    //         ? _coreVerticalController.offset
-    //         : 0.0);
-  }
+        assert(fixedTopRows >= 0);
 
   static final LocalKey _headingRowKey = UniqueKey();
 
