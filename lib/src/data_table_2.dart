@@ -125,6 +125,7 @@ class DataTable2 extends DataTable {
     this.bottomMargin,
     super.columnSpacing,
     super.showCheckboxColumn = true,
+    this.changeSelectedOnRowTap = true,
     super.showBottomBorder = false,
     super.dividerThickness,
     this.minWidth,
@@ -249,6 +250,10 @@ class DataTable2 extends DataTable {
   /// Note: to change background color of fixed data rows use [DataTable2.headingRowColor] and
   /// individual row colors of data rows provided via [rows]
   final Color? fixedCornerColor;
+
+  /// Determines if [DataRow2.onSelectChanged] is invoked when the row is tapped
+  /// If true, [DataRow2.onSelectChanged] will be invoked when the row is tapped
+  final bool changeSelectedOnRowTap;
 
   Widget _buildCheckbox(
       {required BuildContext context,
@@ -447,7 +452,7 @@ class DataTable2 extends DataTable {
             ? null
             : () {
                 onRowTap?.call();
-                onSelectChanged?.call();
+                if (changeSelectedOnRowTap) onSelectChanged?.call();
               },
         onDoubleTap: onRowDoubleTap,
         onLongPress: onRowLongPress,

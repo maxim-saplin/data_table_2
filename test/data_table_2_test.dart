@@ -493,9 +493,14 @@ void main() {
       (WidgetTester tester) async {
     final List<String> log = <String>[];
 
-    Widget buildTable({int? sortColumnIndex, bool sortAscending = true}) {
+    Widget buildTable({
+      int? sortColumnIndex,
+      bool sortAscending = true,
+      changeSelectedOnRowTap = true,
+    }) {
       return DataTable2(
         sortColumnIndex: sortColumnIndex,
+        changeSelectedOnRowTap: changeSelectedOnRowTap,
         sortAscending: sortAscending,
         onSelectAll: (bool? value) {
           log.add('select-all: $value');
@@ -587,6 +592,21 @@ void main() {
 
     await tester.longPress(find.text('305'));
     expect(log, <String>['row-longPress: Cupcake']);
+    log.clear();
+
+    await tester.pumpWidget(MaterialApp(
+      home: Material(
+        child: buildTable(
+          changeSelectedOnRowTap: false,
+        ),
+      ),
+    ));
+
+    await tester.tap(find.text('Cupcake'));
+    // Wait 500ms to get tap registered instead of double tap
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(log, <String>['row-tap: Cupcake']);
     log.clear();
   });
 
