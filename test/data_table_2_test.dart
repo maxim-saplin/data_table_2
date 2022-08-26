@@ -255,8 +255,7 @@ void main() {
     await tester.tapAt(Offset(xy.dx - 10, xy.dy - 20));
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(
-        log, <String>['row-selected: Frozen yogurt', 'row-tap: Frozen yogurt']);
+    expect(log, <String>['row-tap: Frozen yogurt']);
     log.clear();
 
     await tester.tap(find.text('Cupcake'));
@@ -264,7 +263,7 @@ void main() {
         milliseconds:
             300)); // if there's a double tap event you need to give some time to let input system decide there's no second tap following and onTap event is good to be fired
 
-    expect(log, <String>['row-tap: Cupcake', 'row-selected: Cupcake']);
+    expect(log, <String>['row-tap: Cupcake']);
     log.clear();
 
     await tester.longPress(find.text('Cupcake'));
@@ -496,11 +495,10 @@ void main() {
     Widget buildTable({
       int? sortColumnIndex,
       bool sortAscending = true,
-      changeSelectedOnRowTap = true,
+      bool setOnTap = true,
     }) {
       return DataTable2(
         sortColumnIndex: sortColumnIndex,
-        changeSelectedOnRowTap: changeSelectedOnRowTap,
         sortAscending: sortAscending,
         onSelectAll: (bool? value) {
           log.add('select-all: $value');
@@ -525,9 +523,11 @@ void main() {
             onSelectChanged: (bool? selected) {
               log.add('row-selected: ${dessert.name}');
             },
-            onTap: () {
-              log.add('row-tap: ${dessert.name}');
-            },
+            onTap: setOnTap
+                ? () {
+                    log.add('row-tap: ${dessert.name}');
+                  }
+                : null,
             onSecondaryTap: () {
               log.add('row-secondaryTap: ${dessert.name}');
             },
@@ -561,14 +561,14 @@ void main() {
     // Wait 500ms to get tap registered instead of double tap
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(log, <String>['row-tap: Cupcake', 'row-selected: Cupcake']);
+    expect(log, <String>['row-tap: Cupcake']);
     log.clear();
 
     await tester.tap(find.text('305'));
     // Wait 500ms to get tap registered instead of double tap
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(log, <String>['row-tap: Cupcake', 'row-selected: Cupcake']);
+    expect(log, <String>['row-tap: Cupcake']);
     log.clear();
 
     await tester.tap(find.text('Cupcake'), buttons: kSecondaryMouseButton);
@@ -597,7 +597,7 @@ void main() {
     await tester.pumpWidget(MaterialApp(
       home: Material(
         child: buildTable(
-          changeSelectedOnRowTap: false,
+          setOnTap: false,
         ),
       ),
     ));
@@ -606,7 +606,7 @@ void main() {
     // Wait 500ms to get tap registered instead of double tap
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(log, <String>['row-tap: Cupcake']);
+    expect(log, <String>['row-selected: Cupcake']);
     log.clear();
   });
 

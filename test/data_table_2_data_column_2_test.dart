@@ -377,7 +377,7 @@ void main() {
     // Wait 500ms to get tap registered instead of double tap
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(log, <String>['row-tap: Cupcake', 'row-selected: Cupcake']);
+    expect(log, <String>['row-tap: Cupcake']);
     log.clear();
 
     // Since cell has tap events row won't be se;lected
@@ -392,7 +392,7 @@ void main() {
     // Wait 500ms to get tap registered instead of double tap
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(log, <String>['row-tap: Cupcake', 'row-selected: Cupcake']);
+    expect(log, <String>['row-tap: Cupcake']);
     log.clear();
 
     await tester.tap(find.text('Cupcake'), buttons: kSecondaryMouseButton);
