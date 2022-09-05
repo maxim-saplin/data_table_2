@@ -1426,28 +1426,28 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      int _numebrOfCheckboxes(bool cheked) => find
+      int numebrOfCheckboxes(bool cheked) => find
           .byType(Checkbox)
           .evaluate()
           .where((e) => (e.widget as Checkbox).value == cheked)
           .length;
 
-      expect(_numebrOfCheckboxes(false), 11);
+      expect(numebrOfCheckboxes(false), 11);
 
       await tester.tap(find.byType(Checkbox).first);
       await tester.pumpAndSettle();
-      expect(_numebrOfCheckboxes(true), 11);
+      expect(numebrOfCheckboxes(true), 11);
 
       await tester.tap(find.byIcon(Icons.chevron_right)); // page 2
       await tester.pumpAndSettle();
-      expect(_numebrOfCheckboxes(true), 11);
+      expect(numebrOfCheckboxes(true), 11);
       await tester.tap(find.byIcon(Icons.chevron_right)); // page 3
       await tester.pumpAndSettle();
-      expect(_numebrOfCheckboxes(true), 11);
+      expect(numebrOfCheckboxes(true), 11);
 
       await tester.tap(find.byType(Checkbox).first);
       await tester.pumpAndSettle();
-      expect(_numebrOfCheckboxes(false), 11);
+      expect(numebrOfCheckboxes(false), 11);
     });
 
     testWidgets('Select/deselect all on page', (WidgetTester tester) async {
@@ -1470,31 +1470,31 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      int _numebrOfCheckboxes(bool cheked) => find
+      int numebrOfCheckboxes(bool cheked) => find
           .byType(Checkbox)
           .evaluate()
           .where((e) => (e.widget as Checkbox).value == cheked)
           .length;
 
-      expect(_numebrOfCheckboxes(false), 11);
+      expect(numebrOfCheckboxes(false), 11);
 
       await tester.tap(find.byType(Checkbox).first);
       await tester.pumpAndSettle();
-      expect(_numebrOfCheckboxes(true), 11);
+      expect(numebrOfCheckboxes(true), 11);
 
       await tester.tap(find.byIcon(Icons.chevron_right)); // page 2
       await tester.pumpAndSettle();
-      expect(_numebrOfCheckboxes(false), 11);
+      expect(numebrOfCheckboxes(false), 11);
       await tester.tap(find.byIcon(Icons.chevron_right)); // page 3
       await tester.pumpAndSettle();
-      expect(_numebrOfCheckboxes(false), 11);
+      expect(numebrOfCheckboxes(false), 11);
 
       await tester.tap(find.byType(Checkbox).first);
       await tester.pumpAndSettle();
-      expect(_numebrOfCheckboxes(true), 11);
+      expect(numebrOfCheckboxes(true), 11);
       await tester.tap(find.byType(Checkbox).first);
       await tester.pumpAndSettle();
-      expect(_numebrOfCheckboxes(false), 11);
+      expect(numebrOfCheckboxes(false), 11);
     });
   });
 

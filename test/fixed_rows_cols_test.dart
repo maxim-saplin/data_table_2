@@ -65,7 +65,7 @@ void main() {
           Colors.red);
     });
 
-    Color? _colorFromTextInContainer(String text) {
+    Color? colorFromTextInContainer(String text) {
       return (find
               .ancestor(of: find.text(text), matching: find.byType(Container))
               .evaluate()
@@ -94,9 +94,9 @@ void main() {
       expect(containers.where((c) => c.color == Colors.blue).length, 0);
       expect(containers.where((c) => c.color == Colors.red).length, 22);
 
-      expect(_colorFromTextInContainer('Name'), Colors.red);
-      expect(_colorFromTextInContainer('Carbs'), null);
-      expect(_colorFromTextInContainer('KitKat'), Colors.red);
+      expect(colorFromTextInContainer('Name'), Colors.red);
+      expect(colorFromTextInContainer('Carbs'), null);
+      expect(colorFromTextInContainer('KitKat'), Colors.red);
     });
 
     testWidgets('3 cols, 0 rows', (WidgetTester tester) async {
@@ -119,11 +119,11 @@ void main() {
       expect(containers.where((c) => c.color == Colors.blue).length, 0);
       expect(containers.where((c) => c.color == Colors.red).length, 33);
 
-      expect(_colorFromTextInContainer('Name'), Colors.red);
-      expect(_colorFromTextInContainer('Calories'), Colors.red);
-      expect(_colorFromTextInContainer('Carbs'), null);
-      expect(_colorFromTextInContainer('KitKat'), Colors.red);
-      expect(_colorFromTextInContainer('518'), Colors.red);
+      expect(colorFromTextInContainer('Name'), Colors.red);
+      expect(colorFromTextInContainer('Calories'), Colors.red);
+      expect(colorFromTextInContainer('Carbs'), null);
+      expect(colorFromTextInContainer('KitKat'), Colors.red);
+      expect(colorFromTextInContainer('518'), Colors.red);
     });
 
     testWidgets('1 col, 1 row', (WidgetTester tester) async {
@@ -157,11 +157,11 @@ void main() {
               .color!,
           Colors.blue);
 
-      expect(_colorFromTextInContainer('Name'), null);
-      expect(_colorFromTextInContainer('Calories'), null);
-      expect(_colorFromTextInContainer('Carbs'), null);
-      expect(_colorFromTextInContainer('KitKat'), null);
-      expect(_colorFromTextInContainer('518'), null);
+      expect(colorFromTextInContainer('Name'), null);
+      expect(colorFromTextInContainer('Calories'), null);
+      expect(colorFromTextInContainer('Carbs'), null);
+      expect(colorFromTextInContainer('KitKat'), null);
+      expect(colorFromTextInContainer('518'), null);
     });
 
     testWidgets('3 cols, 3 rows', (WidgetTester tester) async {
@@ -195,11 +195,11 @@ void main() {
               .color!,
           Colors.blue);
 
-      expect(_colorFromTextInContainer('Name'), Colors.blue);
-      expect(_colorFromTextInContainer('Calories'), Colors.blue);
-      expect(_colorFromTextInContainer('Carbs'), null);
-      expect(_colorFromTextInContainer('KitKat'), Colors.red);
-      expect(_colorFromTextInContainer('518'), Colors.red);
+      expect(colorFromTextInContainer('Name'), Colors.blue);
+      expect(colorFromTextInContainer('Calories'), Colors.blue);
+      expect(colorFromTextInContainer('Carbs'), null);
+      expect(colorFromTextInContainer('KitKat'), Colors.red);
+      expect(colorFromTextInContainer('518'), Colors.red);
     });
   });
 
