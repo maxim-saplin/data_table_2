@@ -800,7 +800,7 @@ class DataTable2 extends DataTable {
                 ? tableColumnWidths.skip(actualFixedColumns).toList().asMap()
                 : null;
 
-            bool _isRowsEmpty(List<TableRow>? rows) {
+            bool isRowsEmpty(List<TableRow>? rows) {
               return rows == null || rows.isEmpty || rows[0].children!.isEmpty;
             }
 
@@ -810,10 +810,10 @@ class DataTable2 extends DataTable {
                 children: coreRows ?? [],
                 border: border == null
                     ? null
-                    : _isRowsEmpty(fixedRows) && _isRowsEmpty(fixedColumnsRows)
+                    : isRowsEmpty(fixedRows) && isRowsEmpty(fixedColumnsRows)
                         ? border
-                        : !_isRowsEmpty(fixedRows) &&
-                                !_isRowsEmpty(fixedColumnsRows)
+                        : !isRowsEmpty(fixedRows) &&
+                                !isRowsEmpty(fixedColumnsRows)
                             ? TableBorder(
                                 //top: border!.top,
                                 //left: border!.left,
@@ -822,7 +822,7 @@ class DataTable2 extends DataTable {
                                 verticalInside: border!.verticalInside,
                                 horizontalInside: border!.horizontalInside,
                                 borderRadius: border!.borderRadius)
-                            : _isRowsEmpty(fixedRows)
+                            : isRowsEmpty(fixedRows)
                                 ? TableBorder(
                                     top: border!.top,
                                     //left: border!.left,
@@ -848,7 +848,7 @@ class DataTable2 extends DataTable {
 
             if (rows.isNotEmpty) {
               if (fixedRows != null &&
-                  !_isRowsEmpty(fixedRows) &&
+                  !isRowsEmpty(fixedRows) &&
                   actualFixedColumns <
                       columns.length + (showCheckboxColumn ? 1 : 0)) {
                 fixedRowsTabel = Table(
@@ -857,7 +857,7 @@ class DataTable2 extends DataTable {
                     children: fixedRows,
                     border: border == null
                         ? null
-                        : _isRowsEmpty(fixedCornerRows)
+                        : isRowsEmpty(fixedCornerRows)
                             ? border
                             : TableBorder(
                                 top: border!.top,
@@ -869,13 +869,13 @@ class DataTable2 extends DataTable {
                                 borderRadius: border!.borderRadius));
               }
 
-              if (fixedColumnsRows != null && !_isRowsEmpty(fixedColumnsRows)) {
+              if (fixedColumnsRows != null && !isRowsEmpty(fixedColumnsRows)) {
                 fixedColumnsTable = Table(
                     columnWidths: leftWidthsAsMap,
                     children: fixedColumnsRows,
                     border: border == null
                         ? null
-                        : _isRowsEmpty(fixedCornerRows)
+                        : isRowsEmpty(fixedCornerRows)
                             ? border
                             : TableBorder(
                                 //top: border!.top,
@@ -887,14 +887,14 @@ class DataTable2 extends DataTable {
                                 borderRadius: border!.borderRadius));
               }
 
-              if (fixedCornerRows != null && !_isRowsEmpty(fixedCornerRows)) {
+              if (fixedCornerRows != null && !isRowsEmpty(fixedCornerRows)) {
                 fixedTopLeftCornerTable = Table(
                     columnWidths: leftWidthsAsMap,
                     children: fixedCornerRows,
                     border: border);
               }
 
-              Widget _addBottomMargin(Table t) =>
+              Widget addBottomMargin(Table t) =>
                   bottomMargin != null && bottomMargin! > 0
                       ? Column(
                           mainAxisSize: MainAxisSize.min,
@@ -928,7 +928,7 @@ class DataTable2 extends DataTable {
                             child: SingleChildScrollView(
                                 controller: coreHorizontalController,
                                 scrollDirection: Axis.horizontal,
-                                child: _addBottomMargin(coreTable))))
+                                child: addBottomMargin(coreTable))))
                   ]));
 
               fixedColumnAndCornerCol = fixedTopLeftCornerTable == null &&
@@ -946,8 +946,7 @@ class DataTable2 extends DataTable {
                                 child: SingleChildScrollView(
                                     controller: leftColumnVerticalContoller,
                                     scrollDirection: Axis.vertical,
-                                    child:
-                                        _addBottomMargin(fixedColumnsTable))))
+                                    child: addBottomMargin(fixedColumnsTable))))
                     ]);
             }
 
