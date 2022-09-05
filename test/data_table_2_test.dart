@@ -88,6 +88,12 @@ void main() {
     expect(log, <String>['select-all: true']);
     log.clear();
 
+    // clicking on a cell empty space outside chekbox should still select the row
+    var c = tester.getCenter(find.byType(Checkbox).at(1));
+    await tester.tapAt(Offset(c.dx - 16, c.dy - 16));
+    expect(log, <String>['row-selected: Frozen yogurt']);
+    log.clear();
+
     await tester.tap(find.text('Cupcake'));
 
     expect(log, <String>['row-selected: Cupcake']);
