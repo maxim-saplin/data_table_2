@@ -1,3 +1,6 @@
+# 2.3.7
+- Row tap events now do not bubble onSelectChanged() event handler, yet it still fires if there's a checkbox column and a checkbox is clicked (PR #133)
+
 ## 2.3.6
 -  Added sortArrowIcon and sortArrowAnimationDuration properties
 

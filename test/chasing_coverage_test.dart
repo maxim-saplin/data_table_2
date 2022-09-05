@@ -152,7 +152,7 @@ void main() {
     var asc = false;
     var trigger = StreamController();
 
-    Widget _sortedColTable(int col, bool direction) => buildTable(
+    Widget sortedColTable(int col, bool direction) => buildTable(
           sortColumnIndex: col,
           sortAscending: direction,
           dividerThickness: 0.0,
@@ -192,7 +192,7 @@ void main() {
     var widget = StreamBuilder(
         stream: trigger.stream,
         builder: (c, s) {
-          return _sortedColTable(sortCol, asc);
+          return sortedColTable(sortCol, asc);
         });
 
     await tester.pumpWidget(MaterialApp(home: Material(child: widget)));
