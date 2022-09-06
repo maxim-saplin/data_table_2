@@ -981,7 +981,7 @@ class DataTable2 extends DataTable {
     });
 
     sw.stop();
-    if (kDebugMode) print('DataTable2 built: ${sw.elapsedMilliseconds}ms');
+   
     return builder;
   }
 
