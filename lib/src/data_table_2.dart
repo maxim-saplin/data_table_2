@@ -479,12 +479,7 @@ class DataTable2 extends DataTable {
         onRowSecondaryTap != null ||
         onRowSecondaryTapDown != null) {
       label = TableRowInkWell(
-        onTap: onRowTap == null && onSelectChanged == null
-            ? null
-            : () {
-                onRowTap?.call();
-                onSelectChanged?.call();
-              },
+        onTap: onRowTap ?? onSelectChanged,
         onDoubleTap: onRowDoubleTap,
         onLongPress: onRowLongPress,
         overlayColor: overlayColor,
@@ -1126,9 +1121,10 @@ class DataTable2 extends DataTable {
             context: context,
             checked: row.selected,
             onRowTap: () {
-              row.onSelectChanged?.call(!row.selected);
-              if (row is DataRow2) {
+              if (row is DataRow2 && row.onTap != null) {
                 row.onTap?.call();
+              } else {
+                row.onSelectChanged?.call(!row.selected);
               }
             },
             onCheckboxChanged: row.onSelectChanged,
