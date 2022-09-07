@@ -15,6 +15,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(MyApp());
+  // Add import
+  // import 'package:data_table_2/data_table_2.dart';
+  // and uncomment below line to remove widgets' logs
+  //dataTableShowLogs = false;
 }
 
 const String initialRoute = '/datatable2';

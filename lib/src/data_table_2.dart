@@ -9,6 +9,8 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+bool dataTableShowLogs = true;
+
 /// Relative size of a column determines the share of total table width allocated
 /// to each individual column. When determining column widths ratios between S, M and L
 /// columns are kept (i.e. Large columns are set to 1.2x width of Medium ones)
@@ -981,7 +983,11 @@ class DataTable2 extends DataTable {
     });
 
     sw.stop();
-    if (kDebugMode) print('DataTable2 built: ${sw.elapsedMilliseconds}ms');
+
+    if (dataTableShowLogs && kDebugMode) {
+      debugPrint('DataTable2 built: ${sw.elapsedMilliseconds}ms');
+    }
+
     return builder;
   }
 
