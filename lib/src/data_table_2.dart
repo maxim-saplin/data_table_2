@@ -6,7 +6,10 @@
 
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+bool dataTableShowLogs = true;
 
 /// Relative size of a column determines the share of total table width allocated
 /// to each individual column. When determining column widths ratios between S, M and L
@@ -136,7 +139,6 @@ class DataTable2 extends DataTable {
     this.lmRatio = 1.2,
     this.sortArrowAnimationDuration = const Duration(milliseconds: 150),
     this.sortArrowIcon = Icons.arrow_upward,
-    this.showLogs = false,
     required super.rows,
   })  : assert(fixedLeftColumns >= 0),
         assert(fixedTopRows >= 0) {
@@ -249,9 +251,6 @@ class DataTable2 extends DataTable {
   /// Note: to change background color of fixed data rows use [DataTable2.headingRowColor] and
   /// individual row colors of data rows provided via [rows]
   final Color? fixedCornerColor;
-
-  /// View debug logs
-  final bool showLogs;
 
   Widget _buildCheckbox(
       {required BuildContext context,
@@ -984,7 +983,8 @@ class DataTable2 extends DataTable {
     });
 
     sw.stop();
-    if (showLogs) {
+
+    if (dataTableShowLogs && kDebugMode) {
       debugPrint('DataTable2 built: ${sw.elapsedMilliseconds}ms');
     }
 
