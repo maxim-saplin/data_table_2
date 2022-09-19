@@ -129,6 +129,7 @@ class DataTable2 extends DataTable {
     super.showCheckboxColumn = true,
     super.showBottomBorder = false,
     super.dividerThickness,
+    this.dividerColor,
     this.minWidth,
     this.scrollController,
     this.empty,
@@ -196,6 +197,10 @@ class DataTable2 extends DataTable {
   /// horizontal scrolling. Useful for the cases with narrow screens (e.g. portrait phone orientation)
   /// and lots of columns (that get messed with little space)
   final double? minWidth;
+
+  ///[dividerColor] represents the color between two DataRows
+  ///If you leave it null, it will get the default border color
+  final Color? dividerColor;
 
   /// If set the table will have empty space added after the the last row and allow scroll the
   /// core of the table higher (e.g. if you would like to have iOS navigation UI at the bottom overlapping the table and
@@ -1210,6 +1215,7 @@ class DataTable2 extends DataTable {
           final Color? rowColor = resolvedDataRowColor;
           final BorderSide borderSide = Divider.createBorderSide(
             context,
+            color: dividerColor,
             width: dividerThickness ??
                 theme.dataTableTheme.dividerThickness ??
                 _dividerThickness,
