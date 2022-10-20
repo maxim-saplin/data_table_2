@@ -107,18 +107,13 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
           Flexible(
               fit: FlexFit.tight,
               child: Theme(
-                  data: ThemeData(
-                      scrollbarTheme: ScrollbarThemeData(
-                          thumbVisibility: MaterialStateProperty.all(_dataItems >
-                              0), // hide scrollbars and avoid exception when no data rows
-                          thumbColor:
-                              MaterialStateProperty.all<Color>(Colors.black))),
+                  data: ThemeData(dividerColor: Colors.amber),
                   child: DataTable2(
+                      dividerThickness: 4,
                       scrollController: _controller,
                       columnSpacing: 0,
                       horizontalMargin: 12,
                       bottomMargin: 20,
-                      dividerThickness: 0,
                       border: TableBorder.all(width: 1.5),
                       headingRowColor: MaterialStateProperty.resolveWith(
                           (states) => _fixedRows > 0
@@ -191,12 +186,12 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
                       ],
                       rows: List<DataRow>.generate(
                           _dataItems,
-                          (index) => _getRow(
-                              index,
-                              index + 1 <
-                                      _fixedRows // header row is also treated as fixed row
-                                  ? Colors.grey[200]
-                                  : null)))))
+                          (index) => _getRow(index, Colors.blue
+                              // index + 1 <
+                              //         _fixedRows // header row is also treated as fixed row
+                              //     ? Colors.grey[200]
+                              //     : null
+                              )))))
         ]));
   }
 
