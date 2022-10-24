@@ -185,13 +185,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
                         ),
                       ],
                       rows: List<DataRow>.generate(
-                          _dataItems,
-                          (index) => _getRow(index, Colors.blue
-                              // index + 1 <
-                              //         _fixedRows // header row is also treated as fixed row
-                              //     ? Colors.grey[200]
-                              //     : null
-                              )))))
+                          _dataItems, (index) => _getRow(index, Colors.blue)))))
         ]));
   }
 

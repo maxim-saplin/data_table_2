@@ -540,7 +540,12 @@ class DataTable2 extends DataTable {
         : actualFixedColumns > 0
             ? (actualFixedRows < 1
                 ? [
-                    _buildHeadingRow(context, theme, effectiveHeadingRowColor,
+                    _buildHeadingRow(
+                        context,
+                        theme,
+                        fixedColumnsColor != null
+                            ? MaterialStatePropertyAll(fixedColumnsColor)
+                            : effectiveHeadingRowColor,
                         actualFixedColumns),
                     ..._buildTableRows(
                         anyRowSelectable,
