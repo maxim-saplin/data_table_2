@@ -8,7 +8,6 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'mock_canvas.dart';
 import 'test_utils.dart';
 
 // Table with 10 rows, aproximately 450 pixel tall
@@ -301,19 +300,6 @@ void main() {
               bottomMargin: 10),
           const Size(500, 300));
 
-      // var te = find.byType(Table).evaluate().toList();
-
-      // No point using paints, divider strokes are present as rect painting, took me half a day reverse engineering and finding out how table row borders (aka vertical divider) are painted. Wasted time, I'd rather do golden test right aways
-
-      // expect(
-      //   te[2].renderObject,
-      //   paints
-      //     ..everything((methodName, arguments) {
-      //       print(methodName);
-      //       return true;
-      //     }),
-      // );
-
       _verifyDataTable2InitialState(tester);
 
       // 0 - fixed corner, 1 - fixed left columns, 2 - fixed rows, 3 - core
@@ -367,6 +353,42 @@ void main() {
               ?.top
               .width,
           4);
+    });
+
+    // To update the rendered fill run flutter test --update-goldens
+    testWidgets(
+        '2 fixed rows, 2 fixed columns - divider is visible in fixed columns, golden test',
+        (WidgetTester tester) async {
+      var border = TableBorder.all(color: Colors.red);
+
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+              fixedTopRows: 2,
+              dividerThickness: 4,
+              fixedLeftColumns: 2,
+              fixedColumnsColor: Colors.red,
+              border: border,
+              bottomMargin: 10),
+          const Size(500, 300));
+
+      // var te = find.byType(Table).evaluate().toList();
+
+      // No point using paints, divider strokes are present as rect painting, took me half a day reverse engineering and finding out how table row borders (aka vertical divider) are painted. Wasted time, I'd rather do golden test right aways
+
+      // expect(
+      //   te[2].renderObject,
+      //   paints
+      //     ..everything((methodName, arguments) {
+      //       print(methodName);
+      //       return true;
+      //     }),
+      // );
+
+      _verifyDataTable2InitialState(tester);
+
+      await expectLater(
+          find.byType(DataTable2), matchesGoldenFile('fixed_2_2_divider.png'));
     });
   });
 
