@@ -1,3 +1,10 @@
+# 2.3.8
+- Fixed horizontal divider not being displayed in fixed column cells when fixedColumnColor was defined
+- Aligned/refactored fixed sections colors (headingColor, fixedRowColor, fixedColumnColor)
+ - Now headingColor is applied to all fixed rows, before it was only applied to all rows
+ - Fixed colors now take precedence despite any color overrides (e.g. DataRow.color)
+- Added few golden tests
+
 # 2.3.7
 - Row tap events now do not bubble onSelectChanged() event handler, yet it still fires if there's a checkbox column and a checkbox is clicked (PR #133)
 
