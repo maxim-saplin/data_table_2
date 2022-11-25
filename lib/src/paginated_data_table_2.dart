@@ -172,6 +172,10 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.headingRowColor,
     this.horizontalMargin = 24.0,
     this.columnSpacing = 56.0,
+    this.dividerThickness,
+    this.fixedLeftColumns = 0,
+    this.fixedColumnsColor,
+    this.fixedCornerColor,
     this.showCheckboxColumn = true,
     this.showFirstLastButtons = false,
     this.initialFirstRowIndex = 0,
@@ -406,6 +410,28 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// Determines ratio of Large column's width to Medium column's width.
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
+
+  /// The divider thickness between rows.
+  final double? dividerThickness;
+
+  /// Number of sticky columns fixed at the left side of the table.
+  /// Check box column (if enabled) is also counted
+  final int fixedLeftColumns;
+
+  /// Backgound color of the sticky columns fixed via [fixedLeftColumns].
+  /// Note: unlike data rows which can change their colors depending on material state (e.g. selected, hovered)
+  /// this color is static and doesn't repond to state change
+  /// Note: to change background color of fixed data rows use [PaginatedDataTable2.headingRowColor] and
+  /// individual row colors of data rows provided via [rows]
+  final Color? fixedColumnsColor;
+
+  /// Backgound color of the top left corner which is fixed whenere both [fixedTopRows]
+  /// and [fixedLeftColumns] are greater than 0
+  /// Note: unlike data rows which can change their colors depending on material state (e.g. selected, hovered)
+  /// this color is static and doesn't repond to state change
+  /// Note: to change background color of fixed data rows use [PaginatedDataTable2.headingRowColor] and
+  /// individual row colors of data rows provided via [rows]
+  final Color? fixedCornerColor;
 
   /// Hides the paginator at the bottom. Can be useful in case you decide create
   /// your own paginator and control the widget via [PaginatedDataTable2.controller]
@@ -671,6 +697,10 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           // Make sure no decoration is set on the DataTable
           // from the theme, as its already wrapped in a Card.
           decoration: const BoxDecoration(),
+          dividerThickness: widget.dividerThickness,
+          fixedLeftColumns: widget.fixedLeftColumns,
+          fixedColumnsColor: widget.fixedColumnsColor,
+          fixedCornerColor: widget.fixedCornerColor,
           dataRowHeight: widget.dataRowHeight,
           headingRowColor: widget.headingRowColor,
           headingRowHeight: widget.headingRowHeight,
