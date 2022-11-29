@@ -174,6 +174,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.columnSpacing = 56.0,
     this.dividerThickness,
     this.fixedLeftColumns = 0,
+    this.fixedTopRows = 1,
     this.fixedColumnsColor,
     this.fixedCornerColor,
     this.showCheckboxColumn = true,
@@ -413,6 +414,14 @@ class PaginatedDataTable2 extends StatefulWidget {
 
   /// The divider thickness between rows.
   final double? dividerThickness;
+
+  /// The number of sticky rows fixed at the top of the table.
+  /// The heading row is counted/included.
+  /// By defult the value is 1 which means header row is fixed.
+  /// Set to 0 in order to unstick the header,
+  /// set to >1 in order to fix data rows
+  /// (i.e. in order to fix both header and the first data row use value of 2)
+  final int fixedTopRows;
 
   /// Number of sticky columns fixed at the left side of the table.
   /// Check box column (if enabled) is also counted
@@ -699,6 +708,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           decoration: const BoxDecoration(),
           dividerThickness: widget.dividerThickness,
           fixedLeftColumns: widget.fixedLeftColumns,
+          fixedTopRows: widget.fixedTopRows,
           fixedColumnsColor: widget.fixedColumnsColor,
           fixedCornerColor: widget.fixedCornerColor,
           dataRowHeight: widget.dataRowHeight,
