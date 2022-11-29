@@ -9,6 +9,8 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+bool dataTableShowLogs = true;
+
 /// Relative size of a column determines the share of total table width allocated
 /// to each individual column. When determining column widths ratios between S, M and L
 /// columns are kept (i.e. Large columns are set to 1.2x width of Medium ones)
@@ -208,8 +210,6 @@ class DataTable2 extends DataTable {
   final Widget? empty;
 
   /// Set vertical and horizontal borders between cells, as well as outside borders around table.
-  /// NOTE: setting this field will disable standard horizontal dividers which are controlled by
-  /// themes and [dividerThickness] property
   @override
   // keep field in order to keep doc
   // ignore: overridden_fields
@@ -238,16 +238,14 @@ class DataTable2 extends DataTable {
   /// Backgound color of the sticky columns fixed via [fixedLeftColumns].
   /// Note: unlike data rows which can change their colors depending on material state (e.g. selected, hovered)
   /// this color is static and doesn't repond to state change
-  /// Note: to change background color of fixed data rows use [DataTable2.headingRowColor] and
-  /// individual row colors of data rows provided via [rows]
+  /// Note: to change background color of fixed data rows use [DataTable2.headingRowColor]
   final Color? fixedColumnsColor;
 
   /// Backgound color of the top left corner which is fixed whenere both [fixedTopRows]
   /// and [fixedLeftColumns] are greater than 0
   /// Note: unlike data rows which can change their colors depending on material state (e.g. selected, hovered)
   /// this color is static and doesn't repond to state change
-  /// Note: to change background color of fixed data rows use [DataTable2.headingRowColor] and
-  /// individual row colors of data rows provided via [rows]
+  /// Note: to change background color of fixed data rows use [DataTable2.headingRowColor]
   final Color? fixedCornerColor;
 
   Widget _buildCheckbox(
@@ -257,8 +255,7 @@ class DataTable2 extends DataTable {
       required ValueChanged<bool?>? onCheckboxChanged,
       required MaterialStateProperty<Color?>? overlayColor,
       required bool tristate,
-      required double rowHeight,
-      Color? backgroundColor}) {
+      required double rowHeight}) {
     final ThemeData themeData = Theme.of(context);
     final double effectiveHorizontalMargin = horizontalMargin ??
         themeData.dataTableTheme.horizontalMargin ??
@@ -268,7 +265,6 @@ class DataTable2 extends DataTable {
       container: true,
       child: Container(
         height: rowHeight,
-        color: backgroundColor,
         padding: EdgeInsetsDirectional.only(
           start: checkboxHorizontalMargin ?? effectiveHorizontalMargin,
           end: (checkboxHorizontalMargin ?? effectiveHorizontalMargin) / 2.0,
@@ -303,8 +299,7 @@ class DataTable2 extends DataTable {
       required bool sorted,
       required bool ascending,
       required double effectiveHeadingRowHeight,
-      required MaterialStateProperty<Color?>? overlayColor,
-      Color? backgroundColor}) {
+      required MaterialStateProperty<Color?>? overlayColor}) {
     final ThemeData themeData = Theme.of(context);
     label = Row(
       textDirection: numeric ? TextDirection.rtl : null,
@@ -329,7 +324,6 @@ class DataTable2 extends DataTable {
     label = Container(
       padding: padding,
       height: effectiveHeadingRowHeight,
-      color: backgroundColor,
       alignment:
           numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
       child: AnimatedDefaultTextStyle(
@@ -354,29 +348,27 @@ class DataTable2 extends DataTable {
     return label;
   }
 
-  Widget _buildDataCell({
-    required BuildContext context,
-    required EdgeInsetsGeometry padding,
-    required double? specificRowHeight,
-    required Widget label,
-    required bool numeric,
-    required bool placeholder,
-    required bool showEditIcon,
-    required double defaultDataRowHeight,
-    required GestureTapCallback? onTap,
-    required GestureTapCallback? onDoubleTap,
-    required GestureLongPressCallback? onLongPress,
-    required GestureTapDownCallback? onTapDown,
-    required GestureTapCancelCallback? onTapCancel,
-    required GestureTapCallback? onRowTap,
-    required GestureTapCallback? onRowDoubleTap,
-    required GestureLongPressCallback? onRowLongPress,
-    required GestureTapCallback? onRowSecondaryTap,
-    required GestureTapDownCallback? onRowSecondaryTapDown,
-    required VoidCallback? onSelectChanged,
-    required MaterialStateProperty<Color?>? overlayColor,
-    Color? backgroundColor,
-  }) {
+  Widget _buildDataCell(
+      {required BuildContext context,
+      required EdgeInsetsGeometry padding,
+      required double? specificRowHeight,
+      required Widget label,
+      required bool numeric,
+      required bool placeholder,
+      required bool showEditIcon,
+      required double defaultDataRowHeight,
+      required GestureTapCallback? onTap,
+      required GestureTapCallback? onDoubleTap,
+      required GestureLongPressCallback? onLongPress,
+      required GestureTapDownCallback? onTapDown,
+      required GestureTapCancelCallback? onTapCancel,
+      required GestureTapCallback? onRowTap,
+      required GestureTapCallback? onRowDoubleTap,
+      required GestureLongPressCallback? onRowLongPress,
+      required GestureTapCallback? onRowSecondaryTap,
+      required GestureTapDownCallback? onRowSecondaryTapDown,
+      required VoidCallback? onSelectChanged,
+      required MaterialStateProperty<Color?>? overlayColor}) {
     final ThemeData themeData = Theme.of(context);
     if (showEditIcon) {
       const Widget icon = Icon(Icons.edit, size: 18.0);
@@ -396,7 +388,6 @@ class DataTable2 extends DataTable {
     label = Container(
       padding: padding,
       height: effectiveDataRowHeight,
-      color: backgroundColor,
       alignment:
           numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
       child: DefaultTextStyle(
@@ -443,12 +434,7 @@ class DataTable2 extends DataTable {
         onRowSecondaryTap != null ||
         onRowSecondaryTapDown != null) {
       label = TableRowInkWell(
-        onTap: onRowTap == null && onSelectChanged == null
-            ? null
-            : () {
-                onRowTap?.call();
-                onSelectChanged?.call();
-              },
+        onTap: onRowTap ?? onSelectChanged,
         onDoubleTap: onRowDoubleTap,
         onLongPress: onRowLongPress,
         overlayColor: overlayColor,
@@ -554,48 +540,68 @@ class DataTable2 extends DataTable {
         : actualFixedColumns > 0
             ? (actualFixedRows < 1
                 ? [
-                    _buildHeadingRow(context, theme, effectiveHeadingRowColor,
+                    _buildHeadingRow(
+                        context,
+                        theme,
+                        fixedColumnsColor != null
+                            ? MaterialStatePropertyAll(fixedColumnsColor)
+                            : effectiveHeadingRowColor,
                         actualFixedColumns),
                     ..._buildTableRows(
                         anyRowSelectable,
-                        effectiveDataRowColor,
+                        fixedColumnsColor != null
+                            ? MaterialStatePropertyAll(fixedColumnsColor)
+                            : effectiveDataRowColor,
                         context,
                         theme,
                         actualFixedColumns,
                         defaultRowColor,
-                        null)
+                        null,
+                        0,
+                        0,
+                        true)
                   ]
                 : _buildTableRows(
                     anyRowSelectable,
-                    effectiveDataRowColor,
+                    fixedColumnsColor != null
+                        ? MaterialStatePropertyAll(fixedColumnsColor)
+                        : effectiveDataRowColor,
                     context,
                     theme,
                     actualFixedColumns,
                     defaultRowColor,
                     null,
                     actualFixedRows - 1,
-                  ))
+                    0,
+                    true))
             : null;
 
     List<TableRow>? fixedRows = actualFixedRows > 0
         ? (actualFixedRows == 1
             ? [
-                _buildHeadingRow(context, theme, effectiveHeadingRowColor,
+                _buildHeadingRow(
+                    context,
+                    theme,
+                    headingRowColor ?? effectiveHeadingRowColor,
                     tableColumnWidths.length - actualFixedColumns)
               ]
             : [
-                _buildHeadingRow(context, theme, effectiveHeadingRowColor,
+                _buildHeadingRow(
+                    context,
+                    theme,
+                    headingRowColor ?? effectiveHeadingRowColor,
                     tableColumnWidths.length - actualFixedColumns),
                 ..._buildTableRows(
                     anyRowSelectable,
-                    effectiveDataRowColor,
+                    headingRowColor ?? effectiveDataRowColor,
                     context,
                     theme,
                     tableColumnWidths.length - actualFixedColumns,
                     defaultRowColor,
                     null,
                     0,
-                    actualFixedRows - 1)
+                    actualFixedRows - 1,
+                    true)
               ])
         : null;
 
@@ -603,22 +609,35 @@ class DataTable2 extends DataTable {
         actualFixedColumns > 0 && actualFixedRows > 0
             ? (actualFixedRows == 1
                 ? [
-                    _buildHeadingRow(context, theme, effectiveHeadingRowColor,
+                    _buildHeadingRow(
+                        context,
+                        theme,
+                        fixedCornerColor != null
+                            ? MaterialStatePropertyAll(fixedCornerColor)
+                            : effectiveHeadingRowColor,
                         actualFixedColumns)
                   ]
                 : [
-                    _buildHeadingRow(context, theme, effectiveHeadingRowColor,
+                    _buildHeadingRow(
+                        context,
+                        theme,
+                        fixedCornerColor != null
+                            ? MaterialStatePropertyAll(fixedCornerColor)
+                            : effectiveHeadingRowColor,
                         actualFixedColumns),
                     ..._buildTableRows(
                         anyRowSelectable,
-                        effectiveDataRowColor,
+                        fixedCornerColor != null
+                            ? MaterialStatePropertyAll(fixedCornerColor)
+                            : effectiveDataRowColor,
                         context,
                         theme,
                         actualFixedColumns,
                         defaultRowColor,
                         null,
                         0,
-                        actualFixedRows - 1)
+                        actualFixedRows - 1,
+                        true)
                   ])
             : null;
 
@@ -704,12 +723,7 @@ class DataTable2 extends DataTable {
                       : null,
                   sorted: dataColumnIndex == sortColumnIndex,
                   ascending: sortAscending,
-                  overlayColor: effectiveHeadingRowColor,
-                  backgroundColor: displayColumnIndex < actualFixedColumns
-                      ? (actualFixedRows < 1
-                          ? fixedColumnsColor
-                          : (actualFixedRows > 0 ? fixedCornerColor : null))
-                      : null);
+                  overlayColor: effectiveHeadingRowColor);
 
               headingRow.children![displayColumnIndex] =
                   h; // heading row alone is used to display table header should there be no data rows
@@ -766,12 +780,7 @@ class DataTable2 extends DataTable {
                     onSelectChanged: row.onSelectChanged != null
                         ? () => row.onSelectChanged!(!row.selected)
                         : null,
-                    overlayColor: row.color ?? effectiveDataRowColor,
-                    backgroundColor: displayColumnIndex < actualFixedColumns
-                        ? (rowIndex + 1 < actualFixedRows
-                            ? fixedCornerColor
-                            : fixedColumnsColor)
-                        : null);
+                    overlayColor: row.color ?? effectiveDataRowColor);
 
                 if (displayColumnIndex < actualFixedColumns) {
                   if (rowIndex + 1 < actualFixedRows) {
@@ -805,7 +814,7 @@ class DataTable2 extends DataTable {
                 ? tableColumnWidths.skip(actualFixedColumns).toList().asMap()
                 : null;
 
-            bool _isRowsEmpty(List<TableRow>? rows) {
+            bool isRowsEmpty(List<TableRow>? rows) {
               return rows == null || rows.isEmpty || rows[0].children!.isEmpty;
             }
 
@@ -815,10 +824,10 @@ class DataTable2 extends DataTable {
                 children: coreRows ?? [],
                 border: border == null
                     ? null
-                    : _isRowsEmpty(fixedRows) && _isRowsEmpty(fixedColumnsRows)
+                    : isRowsEmpty(fixedRows) && isRowsEmpty(fixedColumnsRows)
                         ? border
-                        : !_isRowsEmpty(fixedRows) &&
-                                !_isRowsEmpty(fixedColumnsRows)
+                        : !isRowsEmpty(fixedRows) &&
+                                !isRowsEmpty(fixedColumnsRows)
                             ? TableBorder(
                                 //top: border!.top,
                                 //left: border!.left,
@@ -827,7 +836,7 @@ class DataTable2 extends DataTable {
                                 verticalInside: border!.verticalInside,
                                 horizontalInside: border!.horizontalInside,
                                 borderRadius: border!.borderRadius)
-                            : _isRowsEmpty(fixedRows)
+                            : isRowsEmpty(fixedRows)
                                 ? TableBorder(
                                     top: border!.top,
                                     //left: border!.left,
@@ -853,7 +862,7 @@ class DataTable2 extends DataTable {
 
             if (rows.isNotEmpty) {
               if (fixedRows != null &&
-                  !_isRowsEmpty(fixedRows) &&
+                  !isRowsEmpty(fixedRows) &&
                   actualFixedColumns <
                       columns.length + (showCheckboxColumn ? 1 : 0)) {
                 fixedRowsTabel = Table(
@@ -862,7 +871,7 @@ class DataTable2 extends DataTable {
                     children: fixedRows,
                     border: border == null
                         ? null
-                        : _isRowsEmpty(fixedCornerRows)
+                        : isRowsEmpty(fixedCornerRows)
                             ? border
                             : TableBorder(
                                 top: border!.top,
@@ -874,13 +883,13 @@ class DataTable2 extends DataTable {
                                 borderRadius: border!.borderRadius));
               }
 
-              if (fixedColumnsRows != null && !_isRowsEmpty(fixedColumnsRows)) {
+              if (fixedColumnsRows != null && !isRowsEmpty(fixedColumnsRows)) {
                 fixedColumnsTable = Table(
                     columnWidths: leftWidthsAsMap,
                     children: fixedColumnsRows,
                     border: border == null
                         ? null
-                        : _isRowsEmpty(fixedCornerRows)
+                        : isRowsEmpty(fixedCornerRows)
                             ? border
                             : TableBorder(
                                 //top: border!.top,
@@ -892,14 +901,14 @@ class DataTable2 extends DataTable {
                                 borderRadius: border!.borderRadius));
               }
 
-              if (fixedCornerRows != null && !_isRowsEmpty(fixedCornerRows)) {
+              if (fixedCornerRows != null && !isRowsEmpty(fixedCornerRows)) {
                 fixedTopLeftCornerTable = Table(
                     columnWidths: leftWidthsAsMap,
                     children: fixedCornerRows,
                     border: border);
               }
 
-              Widget _addBottomMargin(Table t) =>
+              Widget addBottomMargin(Table t) =>
                   bottomMargin != null && bottomMargin! > 0
                       ? Column(
                           mainAxisSize: MainAxisSize.min,
@@ -933,7 +942,7 @@ class DataTable2 extends DataTable {
                             child: SingleChildScrollView(
                                 controller: coreHorizontalController,
                                 scrollDirection: Axis.horizontal,
-                                child: _addBottomMargin(coreTable))))
+                                child: addBottomMargin(coreTable))))
                   ]));
 
               fixedColumnAndCornerCol = fixedTopLeftCornerTable == null &&
@@ -951,8 +960,7 @@ class DataTable2 extends DataTable {
                                 child: SingleChildScrollView(
                                     controller: leftColumnVerticalContoller,
                                     scrollDirection: Axis.vertical,
-                                    child:
-                                        _addBottomMargin(fixedColumnsTable))))
+                                    child: addBottomMargin(fixedColumnsTable))))
                     ]);
             }
 
@@ -987,7 +995,11 @@ class DataTable2 extends DataTable {
     });
 
     sw.stop();
-    if (kDebugMode) print('DataTable2 built: ${sw.elapsedMilliseconds}ms');
+
+    if (dataTableShowLogs && kDebugMode) {
+      debugPrint('DataTable2 built: ${sw.elapsedMilliseconds}ms');
+    }
+
     return builder;
   }
 
@@ -1025,12 +1037,7 @@ class DataTable2 extends DataTable {
               _handleSelectAll(checked, someChecked),
           overlayColor: null,
           tristate: true,
-          rowHeight: headingHeight,
-          backgroundColor: fixedCornerRows != null
-              ? fixedCornerColor
-              : fixedColumnRows != null
-                  ? fixedColumnsColor
-                  : null);
+          rowHeight: headingHeight);
 
       if (fixedCornerRows != null) {
         fixedCornerRows[0].children![0] = headingRow.children![0];
@@ -1054,9 +1061,10 @@ class DataTable2 extends DataTable {
             context: context,
             checked: row.selected,
             onRowTap: () {
-              row.onSelectChanged?.call(!row.selected);
-              if (row is DataRow2) {
+              if (row is DataRow2 && row.onTap != null) {
                 row.onTap?.call();
+              } else {
+                row.onSelectChanged?.call(!row.selected);
               }
             },
             onCheckboxChanged: row.onSelectChanged,
@@ -1065,13 +1073,7 @@ class DataTable2 extends DataTable {
             rowHeight: ((rows[rowIndex] is DataRow2) &&
                     (rows[rowIndex] as DataRow2).specificRowHeight != null)
                 ? (rows[rowIndex] as DataRow2).specificRowHeight!
-                : defaultDataRowHeight,
-            backgroundColor:
-                fixedCornerRows != null && rowIndex < fixedCornerRows.length - 1
-                    ? fixedCornerColor
-                    : fixedColumnRows != null
-                        ? fixedColumnsColor
-                        : null);
+                : defaultDataRowHeight);
 
         if (fixedCornerRows != null && rowIndex < fixedCornerRows.length - 1) {
           fixedCornerRows[rowIndex + 1].children![0] = x;
@@ -1186,7 +1188,8 @@ class DataTable2 extends DataTable {
       MaterialStateProperty<Color?> defaultRowColor,
       TableRow? headingRow,
       [int skipRows = 0,
-      int takeRows = 0]) {
+      int takeRows = 0,
+      bool forceEffectiveDataRowColor = false]) {
     final rowStartIndex = skipRows;
     final List<TableRow> tableRows = List<TableRow>.generate(
       (takeRows <= 0 ? rows.length - skipRows : takeRows) +
@@ -1203,9 +1206,11 @@ class DataTable2 extends DataTable {
             if (isSelected) MaterialState.selected,
             if (isDisabled) MaterialState.disabled,
           };
-          final Color? resolvedDataRowColor =
-              (rows[rowStartIndex + actualIndex].color ?? effectiveDataRowColor)
-                  ?.resolve(states);
+          final Color? resolvedDataRowColor = (forceEffectiveDataRowColor
+                  ? effectiveDataRowColor
+                  : (rows[rowStartIndex + actualIndex].color ??
+                      effectiveDataRowColor))
+              ?.resolve(states);
           final Color? rowColor = resolvedDataRowColor;
           final BorderSide borderSide = Divider.createBorderSide(
             context,

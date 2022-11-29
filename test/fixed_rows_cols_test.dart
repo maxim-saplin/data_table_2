@@ -19,18 +19,28 @@ void main() {
           buildTable(
               fixedLeftColumns: 0,
               fixedTopRows: 0,
+              headingRowColor: Colors.yellow,
               fixedColumnsColor: Colors.red,
               fixedCornerColor: Colors.blue),
           const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
 
-      var containers = find
-          .byType(Container)
+      var decorations = find
+          .byType(Table)
           .evaluate()
-          .map<Container>((e) => e.widget as Container);
+          .map<Table>((e) => e.widget as Table)
+          .fold<List<Table>>([], (l, i) {
+        l.add(i);
+        return l;
+      }).fold<List<TableRow>>([], (l, i) {
+        l.addAll(i.children);
+        return l;
+      }).map<BoxDecoration>((e) => e.decoration as BoxDecoration);
 
-      expect(containers.where((c) => c.color != null).length, 0);
+      expect(decorations.where((c) => c.color == Colors.yellow).length, 1);
+      expect(decorations.where((c) => c.color == Colors.blue).length, 0);
+      expect(decorations.where((c) => c.color == Colors.red).length, 0);
     });
 
     testWidgets('1 col, 0 rows', (WidgetTester tester) async {
@@ -39,40 +49,29 @@ void main() {
           buildTable(
               fixedLeftColumns: 1,
               fixedTopRows: 0,
-              fixedColumnsColor: Colors.red,
-              fixedCornerColor: Colors.blue),
+              headingRowColor: Colors.yellow,
+              fixedCornerColor: Colors.blue,
+              fixedColumnsColor: Colors.red),
           const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
 
-      var containers = find
-          .byType(Container)
+      var decorations = find
+          .byType(Table)
           .evaluate()
-          .map<Container>((e) => e.widget as Container);
+          .map<Table>((e) => e.widget as Table)
+          .fold<List<Table>>([], (l, i) {
+        l.add(i);
+        return l;
+      }).fold<List<TableRow>>([], (l, i) {
+        l.addAll(i.children);
+        return l;
+      }).map<BoxDecoration>((e) => e.decoration as BoxDecoration);
 
-      expect(containers.where((c) => c.color == Colors.blue).length, 0);
-      expect(containers.where((c) => c.color == Colors.red).length, 11);
-
-      expect(
-          (find
-                  .ancestor(
-                      of: find.byType(Checkbox),
-                      matching: find.byType(Container))
-                  .evaluate()
-                  .first
-                  .widget as Container)
-              .color!,
-          Colors.red);
+      expect(decorations.where((c) => c.color == Colors.yellow).length, 1);
+      expect(decorations.where((c) => c.color == Colors.blue).length, 0);
+      expect(decorations.where((c) => c.color == Colors.red).length, 11);
     });
-
-    Color? _colorFromTextInContainer(String text) {
-      return (find
-              .ancestor(of: find.text(text), matching: find.byType(Container))
-              .evaluate()
-              .first
-              .widget as Container)
-          .color;
-    }
 
     testWidgets('2 cols, 0 rows', (WidgetTester tester) async {
       await wrapWidgetSetSurf(
@@ -80,23 +79,28 @@ void main() {
           buildTable(
               fixedLeftColumns: 2,
               fixedTopRows: 0,
-              fixedColumnsColor: Colors.red,
-              fixedCornerColor: Colors.blue),
+              headingRowColor: Colors.yellow,
+              fixedCornerColor: Colors.blue,
+              fixedColumnsColor: Colors.red),
           const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
 
-      var containers = find
-          .byType(Container)
+      var decorations = find
+          .byType(Table)
           .evaluate()
-          .map<Container>((e) => e.widget as Container);
+          .map<Table>((e) => e.widget as Table)
+          .fold<List<Table>>([], (l, i) {
+        l.add(i);
+        return l;
+      }).fold<List<TableRow>>([], (l, i) {
+        l.addAll(i.children);
+        return l;
+      }).map<BoxDecoration>((e) => e.decoration as BoxDecoration);
 
-      expect(containers.where((c) => c.color == Colors.blue).length, 0);
-      expect(containers.where((c) => c.color == Colors.red).length, 22);
-
-      expect(_colorFromTextInContainer('Name'), Colors.red);
-      expect(_colorFromTextInContainer('Carbs'), null);
-      expect(_colorFromTextInContainer('KitKat'), Colors.red);
+      expect(decorations.where((c) => c.color == Colors.yellow).length, 1);
+      expect(decorations.where((c) => c.color == Colors.blue).length, 0);
+      expect(decorations.where((c) => c.color == Colors.red).length, 11);
     });
 
     testWidgets('3 cols, 0 rows', (WidgetTester tester) async {
@@ -105,25 +109,28 @@ void main() {
           buildTable(
               fixedLeftColumns: 3,
               fixedTopRows: 0,
-              fixedColumnsColor: Colors.red,
-              fixedCornerColor: Colors.blue),
+              headingRowColor: Colors.yellow,
+              fixedCornerColor: Colors.blue,
+              fixedColumnsColor: Colors.red),
           const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
 
-      var containers = find
-          .byType(Container)
+      var decorations = find
+          .byType(Table)
           .evaluate()
-          .map<Container>((e) => e.widget as Container);
+          .map<Table>((e) => e.widget as Table)
+          .fold<List<Table>>([], (l, i) {
+        l.add(i);
+        return l;
+      }).fold<List<TableRow>>([], (l, i) {
+        l.addAll(i.children);
+        return l;
+      }).map<BoxDecoration>((e) => e.decoration as BoxDecoration);
 
-      expect(containers.where((c) => c.color == Colors.blue).length, 0);
-      expect(containers.where((c) => c.color == Colors.red).length, 33);
-
-      expect(_colorFromTextInContainer('Name'), Colors.red);
-      expect(_colorFromTextInContainer('Calories'), Colors.red);
-      expect(_colorFromTextInContainer('Carbs'), null);
-      expect(_colorFromTextInContainer('KitKat'), Colors.red);
-      expect(_colorFromTextInContainer('518'), Colors.red);
+      expect(decorations.where((c) => c.color == Colors.yellow).length, 1);
+      expect(decorations.where((c) => c.color == Colors.blue).length, 0);
+      expect(decorations.where((c) => c.color == Colors.red).length, 11);
     });
 
     testWidgets('1 col, 1 row', (WidgetTester tester) async {
@@ -132,36 +139,28 @@ void main() {
           buildTable(
               fixedLeftColumns: 1,
               fixedTopRows: 1,
-              fixedColumnsColor: Colors.red,
-              fixedCornerColor: Colors.blue),
+              headingRowColor: Colors.yellow,
+              fixedCornerColor: Colors.blue,
+              fixedColumnsColor: Colors.red),
           const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
 
-      var containers = find
-          .byType(Container)
+      var decorations = find
+          .byType(Table)
           .evaluate()
-          .map<Container>((e) => e.widget as Container);
+          .map<Table>((e) => e.widget as Table)
+          .fold<List<Table>>([], (l, i) {
+        l.add(i);
+        return l;
+      }).fold<List<TableRow>>([], (l, i) {
+        l.addAll(i.children);
+        return l;
+      }).map<BoxDecoration>((e) => e.decoration as BoxDecoration);
 
-      expect(containers.where((c) => c.color == Colors.blue).length, 1);
-      expect(containers.where((c) => c.color == Colors.red).length, 10);
-
-      expect(
-          (find
-                  .ancestor(
-                      of: find.byType(Checkbox),
-                      matching: find.byType(Container))
-                  .evaluate()
-                  .first
-                  .widget as Container)
-              .color!,
-          Colors.blue);
-
-      expect(_colorFromTextInContainer('Name'), null);
-      expect(_colorFromTextInContainer('Calories'), null);
-      expect(_colorFromTextInContainer('Carbs'), null);
-      expect(_colorFromTextInContainer('KitKat'), null);
-      expect(_colorFromTextInContainer('518'), null);
+      expect(decorations.where((c) => c.color == Colors.yellow).length, 1);
+      expect(decorations.where((c) => c.color == Colors.blue).length, 1);
+      expect(decorations.where((c) => c.color == Colors.red).length, 10);
     });
 
     testWidgets('3 cols, 3 rows', (WidgetTester tester) async {
@@ -170,36 +169,45 @@ void main() {
           buildTable(
               fixedLeftColumns: 3,
               fixedTopRows: 3,
-              fixedColumnsColor: Colors.red,
-              fixedCornerColor: Colors.blue),
+              headingRowColor: Colors.yellow,
+              fixedCornerColor: Colors.blue,
+              fixedColumnsColor: Colors.red),
           const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
 
-      var containers = find
-          .byType(Container)
+      var decorations = find
+          .byType(Table)
           .evaluate()
-          .map<Container>((e) => e.widget as Container);
+          .map<Table>((e) => e.widget as Table)
+          .fold<List<Table>>([], (l, i) {
+        l.add(i);
+        return l;
+      }).fold<List<TableRow>>([], (l, i) {
+        l.addAll(i.children);
+        return l;
+      }).map<BoxDecoration>((e) => e.decoration as BoxDecoration);
 
-      expect(containers.where((c) => c.color == Colors.blue).length, 9);
-      expect(containers.where((c) => c.color == Colors.red).length, 24);
+      expect(decorations.where((c) => c.color == Colors.yellow).length, 3);
+      expect(decorations.where((c) => c.color == Colors.blue).length, 3);
+      expect(decorations.where((c) => c.color == Colors.red).length, 8);
+    });
 
-      expect(
-          (find
-                  .ancestor(
-                      of: find.byType(Checkbox),
-                      matching: find.byType(Container))
-                  .evaluate()
-                  .first
-                  .widget as Container)
-              .color!,
-          Colors.blue);
+    testWidgets('3 cols, 3 rows, golden', (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+              fixedLeftColumns: 3,
+              fixedTopRows: 3,
+              headingRowColor: Colors.yellow,
+              fixedCornerColor: Colors.blue,
+              fixedColumnsColor: Colors.red),
+          const Size(500, 300));
 
-      expect(_colorFromTextInContainer('Name'), Colors.blue);
-      expect(_colorFromTextInContainer('Calories'), Colors.blue);
-      expect(_colorFromTextInContainer('Carbs'), null);
-      expect(_colorFromTextInContainer('KitKat'), Colors.red);
-      expect(_colorFromTextInContainer('518'), Colors.red);
+      _verifyDataTable2InitialState(tester);
+
+      await expectLater(
+          find.byType(DataTable2), matchesGoldenFile('fixed_3_3_colors.png'));
     });
   });
 
@@ -282,6 +290,113 @@ void main() {
       expect(tables[3].border!.left, BorderSide.none);
       expect(tables[3].border!.top, BorderSide.none);
       expect(tables[3].border!.bottom, border.right);
+    });
+
+    testWidgets(
+        '2 fixed rows, 2 fixed columns - divider is visible in fixed columns',
+        (WidgetTester tester) async {
+      var border = TableBorder.all(color: Colors.red);
+
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+              fixedTopRows: 2,
+              dividerThickness: 4,
+              fixedLeftColumns: 2,
+              fixedColumnsColor: Colors.red,
+              border: border,
+              bottomMargin: 10),
+          const Size(500, 300));
+
+      _verifyDataTable2InitialState(tester);
+
+      // 0 - fixed corner, 1 - fixed left columns, 2 - fixed rows, 3 - core
+      var tables = find
+          .byType(Table)
+          .evaluate()
+          .map<Table>((e) => e.widget as Table)
+          .toList();
+      expect(tables.length, 4);
+
+      expect(
+          (tables[0].children.first.decoration as BoxDecoration).border, null);
+      expect(
+          (tables[0].children.skip(1).first.decoration as BoxDecoration)
+              .border
+              ?.top
+              .width,
+          4);
+
+      expect(
+          (tables[1].children.first.decoration as BoxDecoration)
+              .border
+              ?.top
+              .width,
+          4);
+      expect(
+          (tables[1].children.skip(1).first.decoration as BoxDecoration)
+              .border
+              ?.top
+              .width,
+          4);
+
+      expect(
+          (tables[2].children.first.decoration as BoxDecoration).border, null);
+      expect(
+          (tables[2].children.skip(1).first.decoration as BoxDecoration)
+              .border
+              ?.top
+              .width,
+          4);
+
+      expect(
+          (tables[3].children.first.decoration as BoxDecoration)
+              .border
+              ?.top
+              .width,
+          4);
+      expect(
+          (tables[3].children.skip(1).first.decoration as BoxDecoration)
+              .border
+              ?.top
+              .width,
+          4);
+    });
+
+    // To update the rendered fill run flutter test --update-goldens
+    testWidgets(
+        '2 fixed rows, 2 fixed columns - divider is visible in fixed columns, golden test',
+        (WidgetTester tester) async {
+      var border = TableBorder.all(color: Colors.red);
+
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+              fixedTopRows: 2,
+              dividerThickness: 4,
+              fixedLeftColumns: 2,
+              fixedColumnsColor: Colors.red,
+              border: border,
+              bottomMargin: 10),
+          const Size(500, 300));
+
+      // var te = find.byType(Table).evaluate().toList();
+
+      // No point using paints, divider strokes are present as rect painting, took me half a day reverse engineering and finding out how table row borders (aka vertical divider) are painted. Wasted time, I'd rather do golden test right aways
+
+      // expect(
+      //   te[2].renderObject,
+      //   paints
+      //     ..everything((methodName, arguments) {
+      //       print(methodName);
+      //       return true;
+      //     }),
+      // );
+
+      _verifyDataTable2InitialState(tester);
+
+      await expectLater(
+          find.byType(DataTable2), matchesGoldenFile('fixed_2_2_divider.png'));
     });
   });
 

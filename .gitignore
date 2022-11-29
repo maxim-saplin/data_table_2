@@ -22,3 +22,4 @@ doc/api/
 .DS_Store
 .idea
 coverage/lcov.info
+test/failures/

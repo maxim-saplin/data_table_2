@@ -152,16 +152,14 @@ class DessertDataSource extends DataTableSource {
           : (hasZebraStripes && index.isEven
               ? MaterialStateProperty.all(Theme.of(context).highlightColor)
               : null),
-      onSelectChanged: hasRowTaps
-          ? null
-          : (value) {
-              if (dessert.selected != value) {
-                _selectedCount += value! ? 1 : -1;
-                assert(_selectedCount >= 0);
-                dessert.selected = value;
-                notifyListeners();
-              }
-            },
+      onSelectChanged: (value) {
+        if (dessert.selected != value) {
+          _selectedCount += value! ? 1 : -1;
+          assert(_selectedCount >= 0);
+          dessert.selected = value;
+          notifyListeners();
+        }
+      },
       onTap: hasRowTaps
           ? () => _showSnackbar(context, 'Tapped on row ${dessert.name}')
           : null,

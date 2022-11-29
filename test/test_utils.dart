@@ -136,6 +136,7 @@ DataTable2 buildTable(
     int fixedLeftColumns = 0,
     Color? fixedColumnsColor,
     Color? fixedCornerColor,
+    Color? headingRowColor,
     double? dividerThickness,
     bool showBottomBorder = false,
     TableBorder? border,
@@ -152,6 +153,7 @@ DataTable2 buildTable(
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
     sortArrowIcon: sortArrowIcon ?? Icons.arrow_upward,
+    headingRowColor: MaterialStatePropertyAll(headingRowColor),
     sortArrowAnimationDuration:
         sortArrowAnimationDuration ?? const Duration(milliseconds: 150),
     minWidth: minWidth,

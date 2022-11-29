@@ -15,6 +15,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(MyApp());
+  // Add import
+  // import 'package:data_table_2/data_table_2.dart';
+  // and uncomment below line to remove widgets' logs
+  //dataTableShowLogs = false;
 }
 
 const String initialRoute = '/datatable2';
@@ -53,15 +57,15 @@ Scaffold _getScaffold(BuildContext context, Widget body,
                 ),
                 DropdownMenuItem(
                   value: '/datatable2simple',
-                  child: Text('DataTable2 Simple'),
+                  child: Text('Simple'),
                 ),
                 DropdownMenuItem(
                   value: '/datatable2scrollup',
-                  child: Text('DataTable2 Scroll-up'),
+                  child: Text('Scroll-up'),
                 ),
                 DropdownMenuItem(
                   value: '/datatable2fixedmn',
-                  child: Text('DataTable2 Fixed Rows/Cols'),
+                  child: Text('Fixed Rows/Cols'),
                 ),
                 DropdownMenuItem(
                   value: '/paginated2',
