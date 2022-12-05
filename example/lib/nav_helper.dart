@@ -23,6 +23,8 @@ const selectAllPage = 'Select all at page';
 const rowTaps = 'Row Taps';
 const rowHeightOverrides = 'Row height overrides';
 const fixedColumnWidth = 'Fixed column width';
+const paginatedFixedRowsCols = 'Paginated Data Table';
+const asyncPaginatedFixedRowsCols = 'Async Paginated Data Table';
 
 /// Async sample that emulates network error and allow retrying load operation
 const asyncErrors = "Errors/Retries";
@@ -41,6 +43,11 @@ const Map<String, List<String>> routeOptions = {
     rowHeightOverrides
   ],
   '/paginated2': [dflt, noData, autoRows, custPager, defaultSorting],
+  '/datatable2fixedmn': [
+    dflt,
+    paginatedFixedRowsCols,
+    asyncPaginatedFixedRowsCols
+  ],
   '/asyncpaginated2': [
     dflt,
     noData,
