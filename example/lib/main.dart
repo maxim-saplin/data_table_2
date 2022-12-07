@@ -148,8 +148,10 @@ class MyApp extends StatelessWidget {
             _getScaffold(context, const DataTable2SimpleDemo()),
         '/datatable2scrollup': (context) =>
             _getScaffold(context, const DataTable2ScrollupDemo()),
-        '/datatable2fixedmn': (context) =>
-            _getScaffold(context, const DataTable2FixedNMDemo()),
+        '/datatable2fixedmn': (context) => _getScaffold(
+            context,
+            const DataTable2FixedNMDemo(),
+            getOptionsForRoute('/datatable2fixedmn')),
         '/paginated2': (context) => _getScaffold(context,
             const PaginatedDataTable2Demo(), getOptionsForRoute('/paginated2')),
         '/asyncpaginated2': (context) => _getScaffold(

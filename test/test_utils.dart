@@ -24,6 +24,20 @@ Future wrapWidgetSetSurf(WidgetTester tester, Widget widget,
   return tester.pumpWidget(MaterialApp(home: Material(child: widget)));
 }
 
+Future wrapWidgetSetSurfAndWait(WidgetTester tester, Widget widget,
+    [Size? size]) async {
+  await tester.binding.setSurfaceSize(size ?? const Size(1000, 200));
+
+  // tester.binding.window.physicalSizeTestValue = size != null
+  //     ? Size(size.width * tester.binding.window.devicePixelRatio,
+  //         size.height * tester.binding.window.devicePixelRatio)
+  //     : Size(1000 * tester.binding.window.devicePixelRatio,
+  //         200 * tester.binding.window.devicePixelRatio);
+
+  await tester.pumpWidget(MaterialApp(home: Material(child: widget)));
+  return tester.pumpAndSettle(const Duration(minutes: 1));
+}
+
 Finder findFirstContainerFor(String text) =>
     find.widgetWithText(Container, text).first;
 
@@ -241,11 +255,16 @@ PaginatedDataTable2 buildPaginatedTable(
     bool showPage = true,
     bool showGeneration = true,
     bool overrideSizes = false,
+    int fixedLeftColumns = 0,
+    int fixedTopRows = 1,
+    Color? fixedColumnsColor,
+    Color? fixedCornerColor,
     bool autoRowsToHeight = false,
     bool showHeader = false,
     bool wrapInCard = false,
     bool showPageSizeSelector = false,
     bool noData = false,
+    bool showCheckboxColumn = true,
     bool hidePaginator = false,
     TableBorder? border,
     PaginatorController? controller,
@@ -258,7 +277,7 @@ PaginatedDataTable2 buildPaginatedTable(
     List<DataColumn2>? columns}) {
   return PaginatedDataTable2(
     horizontalMargin: 24,
-    showCheckboxColumn: true,
+    showCheckboxColumn: showCheckboxColumn,
     wrapInCard: wrapInCard,
     header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
@@ -272,6 +291,10 @@ PaginatedDataTable2 buildPaginatedTable(
     controller: controller,
     border: border,
     headingRowColor: headingRowColor,
+    fixedColumnsColor: fixedColumnsColor,
+    fixedCornerColor: fixedCornerColor,
+    fixedLeftColumns: fixedLeftColumns,
+    fixedTopRows: fixedTopRows,
     empty: empty,
     fit: fit,
     scrollController: scrollController,
@@ -298,8 +321,14 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     Duration? sortArrowAnimationDuration,
     bool showPage = true,
     bool showGeneration = true,
+    bool useKDeserts = false,
     bool overrideSizes = false,
     bool autoRowsToHeight = false,
+    int fixedTopRows = 1,
+    int fixedLeftColumns = 0,
+    Color? headingRowColor,
+    Color? fixedColumnsColor,
+    Color? fixedCornerColor,
     bool showHeader = false,
     bool wrapInCard = false,
     bool showPageSizeSelector = false,
@@ -325,6 +354,11 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     horizontalMargin: 24,
     showCheckboxColumn: showCheckboxColumn,
     wrapInCard: wrapInCard,
+    fixedTopRows: fixedTopRows,
+    headingRowColor: MaterialStatePropertyAll(headingRowColor),
+    fixedColumnsColor: fixedColumnsColor,
+    fixedLeftColumns: fixedLeftColumns,
+    fixedCornerColor: fixedCornerColor,
     initialFirstRowIndex: initialFirstRowIndex,
     header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
@@ -363,6 +397,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
         (DessertDataSourceAsync(
             allowSelection: true,
             showPage: showPage,
+            useKDeserts: useKDeserts,
             noData: noData,
             fewerResultsAfterRefresh: fewerResultsAfterRefresh)
           .._errorCounter = throwError ? 0 : null),

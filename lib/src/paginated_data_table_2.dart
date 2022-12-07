@@ -172,6 +172,10 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.headingRowColor,
     this.horizontalMargin = 24.0,
     this.columnSpacing = 56.0,
+    this.fixedLeftColumns = 0,
+    this.fixedTopRows = 1,
+    this.fixedColumnsColor,
+    this.fixedCornerColor,
     this.showCheckboxColumn = true,
     this.showFirstLastButtons = false,
     this.initialFirstRowIndex = 0,
@@ -406,6 +410,33 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// Determines ratio of Large column's width to Medium column's width.
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
+
+  /// The number of sticky rows fixed at the top of the table.
+  /// The heading row is counted/included.
+  /// By defult the value is 1 which means header row is fixed.
+  /// Set to 0 in order to unstick the header,
+  /// set to >1 in order to fix data rows
+  /// (i.e. in order to fix both header and the first data row use value of 2)
+  final int fixedTopRows;
+
+  /// Number of sticky columns fixed at the left side of the table.
+  /// Check box column (if enabled) is also counted
+  final int fixedLeftColumns;
+
+  /// Backgound color of the sticky columns fixed via [fixedLeftColumns].
+  /// Note: unlike data rows which can change their colors depending on material state (e.g. selected, hovered)
+  /// this color is static and doesn't repond to state change
+  /// Note: to change background color of fixed data rows use [PaginatedDataTable2.headingRowColor] and
+  /// individual row colors of data rows provided via [rows]
+  final Color? fixedColumnsColor;
+
+  /// Backgound color of the top left corner which is fixed whenere both [fixedTopRows]
+  /// and [fixedLeftColumns] are greater than 0
+  /// Note: unlike data rows which can change their colors depending on material state (e.g. selected, hovered)
+  /// this color is static and doesn't repond to state change
+  /// Note: to change background color of fixed data rows use [PaginatedDataTable2.headingRowColor] and
+  /// individual row colors of data rows provided via [rows]
+  final Color? fixedCornerColor;
 
   /// Hides the paginator at the bottom. Can be useful in case you decide create
   /// your own paginator and control the widget via [PaginatedDataTable2.controller]
@@ -671,6 +702,10 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           // Make sure no decoration is set on the DataTable
           // from the theme, as its already wrapped in a Card.
           decoration: const BoxDecoration(),
+          fixedLeftColumns: widget.fixedLeftColumns,
+          fixedTopRows: widget.fixedTopRows,
+          fixedColumnsColor: widget.fixedColumnsColor,
+          fixedCornerColor: widget.fixedCornerColor,
           dataRowHeight: widget.dataRowHeight,
           headingRowColor: widget.headingRowColor,
           headingRowHeight: widget.headingRowHeight,
