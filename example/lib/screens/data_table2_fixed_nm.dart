@@ -77,9 +77,6 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
       _dessertsDataSource = DessertDataSource(context);
       _asyncDessertsDataSource = DessertDataSourceAsync();
       _initialized = true;
-      setState(() {
-        selectedTableType = getCurrentRouteOption(context);
-      });
       _dessertsDataSource.addListener(() {
         setState(() {});
       });
@@ -99,7 +96,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
   }
 
   Widget getTableFromSelectedType() {
-    switch (selectedTableType) {
+    switch (getCurrentRouteOption(context)) {
       case paginatedFixedRowsCols:
         {
           return getPaginatedDataTable();

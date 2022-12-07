@@ -104,11 +104,11 @@ class DataTable2SimpleDemo extends StatelessWidget {
 If you're already using the standard widgets you can reference the package and add '2' to the names of stock widgets (making them **DataTable2** or **PaginatedDataTable2**) and that is it. 
 
 ##  Know issues/limitations/caveats
-- Paginated tables always have 1 fixed row and no fixed columns, might be added soon
 - There's no capability to size data table cells to fit contents. Column width's adapt to available width (either to parent width or `minWidth`), data rows width are predefined by constructor params. Content that doesn't fit a cell gets clipped
 - There're no expanding/collapsing rows (drill-down scenarios), manually moving or resizing columns or rows, merging cells (i.e. HTML's colspan, rowspan)
-- When fixing left columns, hovering over rows doesn't highlight entire row (should there be any tap handlers standard behavior is hovering a row changes it background)
+- When fixing left columns, hovering over a row won't highlight entire row (should there be any tap handlers standard behavior is hovering a row changes it background)
  - With fixed top rows and left columns hovering over actionable data rows their highlighted background can be displayed behind fixed sections
  - Touch scrolling not working/jumping under mobile device emulation in Chrome (https://github.com/maxim-saplin/data_table_2/issues/100)
  - Cell and row tap events block `DataRow.onSelectChanged` event handler
  - In order to get checkbox column visible it is necessary to have `DataTable2.showCheckboxColumn` set to true AND there must be some rows with `onSelectChanged` event handler being not null
+ - Paginated table's by default add empty rows should the page be larger than the number of available rows

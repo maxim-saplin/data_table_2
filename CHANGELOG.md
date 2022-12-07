@@ -1,3 +1,6 @@
+# 2.3.9
+- Added fixed sections params to PaginatedDataTable2 and AsyncPaginatedDataTable2 (fixedLeftColumns, fixedTopRows, fixedColumnsColor, fixedCornerColor)
+
 # 2.3.8
 - Fixed horizontal divider not being displayed in fixed column cells when fixedColumnColor was defined
 - Aligned/refactored fixed sections colors (headingColor, fixedRowColor, fixedColumnColor)

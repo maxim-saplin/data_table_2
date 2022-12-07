@@ -176,7 +176,6 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.fixedTopRows = 1,
     this.fixedColumnsColor,
     this.fixedCornerColor,
-    this.renderEmptyRowsInTheEnd = true,
     this.showCheckboxColumn = true,
     this.showFirstLastButtons = false,
     this.initialFirstRowIndex = 0,
@@ -334,11 +333,6 @@ class PaginatedDataTable2 extends StatefulWidget {
 
   /// The index of the first row to display when the widget is first created.
   final int? initialFirstRowIndex;
-
-  /// Flag to render empty(invisible) rows in the end of the table when there is
-  /// a fixed number of [rowsPerPage] and the number of visible rows is smaller
-  /// This value defaults to true
-  final bool renderEmptyRowsInTheEnd;
 
   /// Invoked when the user switches to another page.
   ///
