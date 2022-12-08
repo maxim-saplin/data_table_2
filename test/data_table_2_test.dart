@@ -2302,4 +2302,32 @@ void main() {
     expect(tableBorder?.bottom.width, null);
     expect(tableBorder?.top.color, null);
   });
+
+  testWidgets('DataTable2 set hide columns header',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: DataTable2(
+            hideColumnsHeader: true,
+            columns: const <DataColumn>[
+              DataColumn(
+                label: Text('Dessert'),
+              ),
+            ],
+            rows: const <DataRow2>[
+              DataRow2(
+                cells: <DataCell>[
+                  DataCell(
+                    Text('Lollipop'), // wraps
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    expect(find.text('Dessert'), findsNothing);
+  });
 }

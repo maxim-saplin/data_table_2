@@ -26,6 +26,7 @@ const fixedColumnWidth = 'Fixed column width';
 const dataTable2 = 'DataTable2';
 const paginatedFixedRowsCols = 'PaginatedDataTable2';
 const asyncPaginatedFixedRowsCols = 'AsyncPaginatedDataTable2';
+const hideColumnHeaders = 'Hide column headers';
 
 /// Async sample that emulates network error and allow retrying load operation
 const asyncErrors = "Errors/Retries";
@@ -41,7 +42,8 @@ const Map<String, List<String>> routeOptions = {
     showBordersWithZebraStripes,
     fixedColumnWidth,
     rowTaps,
-    rowHeightOverrides
+    rowHeightOverrides,
+    hideColumnHeaders,
   ],
   '/paginated2': [dflt, noData, autoRows, custPager, defaultSorting],
   '/datatable2fixedmn': [

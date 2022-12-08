@@ -139,6 +139,7 @@ class DataTable2 extends DataTable {
     this.lmRatio = 1.2,
     this.sortArrowAnimationDuration = const Duration(milliseconds: 150),
     this.sortArrowIcon = Icons.arrow_upward,
+    this.hideColumnsHeader = false,
     required super.rows,
   })  : assert(fixedLeftColumns >= 0),
         assert(fixedTopRows >= 0) {
@@ -247,6 +248,10 @@ class DataTable2 extends DataTable {
   /// this color is static and doesn't repond to state change
   /// Note: to change background color of fixed data rows use [DataTable2.headingRowColor]
   final Color? fixedCornerColor;
+
+  /// By default the table shows the columns header row.
+  /// Set to true in order to hide the columns header row.
+  final bool hideColumnsHeader;
 
   Widget _buildCheckbox(
       {required BuildContext context,
@@ -918,22 +923,23 @@ class DataTable2 extends DataTable {
               fixedRowsAndCoreCol = Scrollbar(
                   controller: coreHorizontalController,
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(context)
-                            .copyWith(scrollbars: false),
-                        child: SingleChildScrollView(
-                            controller: fixedRowsHorizontalController,
-                            scrollDirection: Axis.horizontal,
-                            child: (fixedRowsTabel != null)
-                                ? fixedRowsTabel
-                                // WOrkaround for a bug when there's no horizontal scrollbar should there be no this SingleChildScrollView. I.e. originally this part was ommited and not scrollable was added to the column if not fixed top row was visible
-                                : SizedBox(
-                                    height: 0,
-                                    width: widths.fold<double>(
-                                        0,
-                                        (previousValue, value) =>
-                                            previousValue + value),
-                                  ))),
+                    if (!hideColumnsHeader)
+                      ScrollConfiguration(
+                          behavior: ScrollConfiguration.of(context)
+                              .copyWith(scrollbars: false),
+                          child: SingleChildScrollView(
+                              controller: fixedRowsHorizontalController,
+                              scrollDirection: Axis.horizontal,
+                              child: (fixedRowsTabel != null)
+                                  ? fixedRowsTabel
+                                  // WOrkaround for a bug when there's no horizontal scrollbar should there be no this SingleChildScrollView. I.e. originally this part was ommited and not scrollable was added to the column if not fixed top row was visible
+                                  : SizedBox(
+                                      height: 0,
+                                      width: widths.fold<double>(
+                                          0,
+                                          (previousValue, value) =>
+                                              previousValue + value),
+                                    ))),
                     Flexible(
                         fit: FlexFit.tight,
                         child: SingleChildScrollView(
