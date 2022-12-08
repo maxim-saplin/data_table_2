@@ -45,7 +45,14 @@ const Map<String, List<String>> routeOptions = {
     rowHeightOverrides,
     hideColumnHeaders,
   ],
-  '/paginated2': [dflt, noData, autoRows, custPager, defaultSorting],
+  '/paginated2': [
+    dflt,
+    noData,
+    autoRows,
+    custPager,
+    defaultSorting,
+    hideColumnHeaders
+  ],
   '/datatable2fixedmn': [
     dataTable2,
     paginatedFixedRowsCols,

@@ -1013,4 +1013,29 @@ void main() {
 
     await binding.setSurfaceSize(null);
   });
+
+  testWidgets('PaginatedDataTable2 set hide columns header',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: PaginatedDataTable2(
+        header: const Text('HEADER'),
+        source: TestDataSource(),
+        rowsPerPage: 8,
+        hideColumnsHeader: true,
+        availableRowsPerPage: const <int>[
+          8,
+          9,
+        ],
+        onRowsPerPageChanged: (int? rowsPerPage) {},
+        columns: const <DataColumn>[
+          DataColumn(label: Text('COL1')),
+          DataColumn(label: Text('COL2')),
+          DataColumn(label: Text('COL3')),
+        ],
+      ),
+    ));
+    expect(find.text('COL1'), findsNothing);
+    expect(find.text('COL2'), findsNothing);
+    expect(find.text('COL3'), findsNothing);
+  });
 }

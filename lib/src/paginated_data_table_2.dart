@@ -202,6 +202,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.autoRowsToHeight = false,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
+    this.hideColumnsHeader = false,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
@@ -448,6 +449,10 @@ class PaginatedDataTable2 extends StatefulWidget {
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows vertically scrollable
   final ScrollController? scrollController;
+
+  /// By default the table shows the columns header row.
+  /// Set to true in order to hide the columns header row.
+  final bool hideColumnsHeader;
 
   @override
   PaginatedDataTable2State createState() => PaginatedDataTable2State();
@@ -721,6 +726,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           border: widget.border,
           smRatio: widget.smRatio,
           lmRatio: widget.lmRatio,
+          hideColumnsHeader: widget.hideColumnsHeader,
         ),
       ),
     );
