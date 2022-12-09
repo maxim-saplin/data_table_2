@@ -6,12 +6,9 @@
 
 // ignore_for_file: avoid_print
 
-import 'dart:io';
-
 import 'package:data_table_2/data_table_2.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Future wrapWidgetSetSurf(WidgetTester tester, Widget widget,
@@ -584,11 +581,3 @@ List<Dessert> _dessertsX3 = _desserts.toList()
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)))
   ..addAll(_desserts.map((i) => Dessert('${i.name} x3', i.calories, i.fat,
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)));
-
-Future<void> loadFonts() async {
-  final fontData = File('assets/fonts/Roboto-Regular.ttf')
-      .readAsBytes()
-      .then((bytes) => ByteData.view(Uint8List.fromList(bytes).buffer));
-  final fontLoader = FontLoader('Roboto')..addFont(fontData);
-  await fontLoader.load();
-}

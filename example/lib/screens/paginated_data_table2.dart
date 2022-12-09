@@ -124,6 +124,7 @@ class PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
         checkboxHorizontalMargin: 12,
         columnSpacing: 0,
         wrapInCard: false,
+        renderEmptyRowsInTheEnd: false,
         headingRowColor:
             MaterialStateColor.resolveWith((states) => Colors.grey[200]!),
         header:

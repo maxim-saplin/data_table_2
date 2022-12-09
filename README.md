@@ -111,5 +111,5 @@ If you're already using the standard widgets you can reference the package and a
  - Touch scrolling not working/jumping under mobile device emulation in Chrome (https://github.com/maxim-saplin/data_table_2/issues/100)
  - Cell and row tap events block `DataRow.onSelectChanged` event handler
  - In order to get checkbox column visible it is necessary to have `DataTable2.showCheckboxColumn` set to true AND there must be some rows with `onSelectChanged` event handler being not null
- - Paginated table's by default add empty rows should the page be larger than the number of available rows
+ - Paginated table's by default add empty rows should the page be larger than the number of available rows, can be changed via `renderEmptyRowsInTheEnd`
  - Golden tests can fail on Linux due do rendered images being different from the one created on macOS and stored in the repo, PR @157
