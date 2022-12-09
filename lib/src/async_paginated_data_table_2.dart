@@ -326,6 +326,8 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
       super.headingRowHeight = 56,
       super.horizontalMargin = 24,
       super.columnSpacing = 56,
+      super.dividerThickness,
+      super.renderEmptyRowsInTheEnd = true,
       super.fixedLeftColumns = 0,
       super.fixedTopRows = 1,
       super.fixedColumnsColor,

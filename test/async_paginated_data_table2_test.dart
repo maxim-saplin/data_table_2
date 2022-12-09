@@ -780,6 +780,56 @@ void main() {
     );
   });
 
+  testWidgets('AsyncPaginatedDataTable2 set border width test',
+      (WidgetTester tester) async {
+    final DessertDataSourceAsync source =
+        DessertDataSourceAsync(allowSelection: true, useKDeserts: true);
+    const List<DataColumn> columns = <DataColumn>[
+      DataColumn(label: Text('Name')),
+      DataColumn(label: Text('Calories'), numeric: true),
+      DataColumn(label: Text('Generation')),
+    ];
+
+    // no thickness provided - border should be default: i.e "1.0" as it
+    // set in DataTable2 constructor
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: AsyncPaginatedDataTable2(
+            columns: columns,
+            source: source,
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    Table table = tester.widgetList(find.byType(Table)).last as Table;
+    TableRow tableRow = table.children.last;
+    BoxDecoration boxDecoration = tableRow.decoration! as BoxDecoration;
+    expect(boxDecoration.border!.bottom.width, 1.0);
+
+    const double thickness = 4.2;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: PaginatedDataTable2(
+            dividerThickness: thickness,
+            columns: columns,
+            source: source,
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+    table = tester.widgetList(find.byType(Table)).last as Table;
+    tableRow = table.children.last;
+    boxDecoration = tableRow.decoration! as BoxDecoration;
+    expect(boxDecoration.border!.bottom.width, thickness);
+  });
+
   testWidgets('AsyncPaginatedDataTable2 table fills Card width',
       (WidgetTester tester) async {
     final DessertDataSourceAsync source =

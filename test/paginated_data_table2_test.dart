@@ -645,6 +645,51 @@ void main() {
     await binding.setSurfaceSize(originalSize);
   });
 
+  testWidgets('PaginatedDataTable set border width test',
+      (WidgetTester tester) async {
+    final TestDataSource source = TestDataSource();
+    const List<DataColumn> columns = <DataColumn>[
+      DataColumn(label: Text('Name')),
+      DataColumn(label: Text('Calories'), numeric: true),
+      DataColumn(label: Text('Generation')),
+    ];
+
+    // no thickness provided - border should be default: i.e "1.0" as it
+    // set in DataTable2 constructor
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: PaginatedDataTable2(
+            columns: columns,
+            source: source,
+          ),
+        ),
+      ),
+    );
+
+    Table table = tester.widgetList(find.byType(Table)).last as Table;
+    TableRow tableRow = table.children.last;
+    BoxDecoration boxDecoration = tableRow.decoration! as BoxDecoration;
+    expect(boxDecoration.border!.bottom.width, 1.0);
+
+    const double thickness = 4.2;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: PaginatedDataTable2(
+            dividerThickness: thickness,
+            columns: columns,
+            source: source,
+          ),
+        ),
+      ),
+    );
+    table = tester.widgetList(find.byType(Table)).last as Table;
+    tableRow = table.children.last;
+    boxDecoration = tableRow.decoration! as BoxDecoration;
+    expect(boxDecoration.border!.bottom.width, thickness);
+  });
+
   testWidgets('PaginatedDataTable2 custom horizontal padding - no checkbox',
       (WidgetTester tester) async {
     const double defaultHorizontalMargin = 24.0;
