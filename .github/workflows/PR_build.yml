@@ -53,9 +53,9 @@ jobs:
       run: sed -i'.js' -e 's+"/"+""+g' flutter_service_worker.js #https://github.com/flutter/flutter/issues/68449
       working-directory: ./example/build/web
       
-    - name: Deploy 🚀
-      uses: JamesIves/github-pages-deploy-action@v4.3.3
-      with:
-        branch: gh-pages # The branch the action should deploy to.
-        target-folder: /pr # root folder is stable example build, /dev is the current main build
-        folder: ./example/build/web
+#     - name: Deploy 🚀
+#       uses: JamesIves/github-pages-deploy-action@v4.3.3
+#       with:
+#         branch: gh-pages # The branch the action should deploy to.
+#         target-folder: /pr # root folder is stable example build, /dev is the current main build
+#         folder: ./example/build/web
