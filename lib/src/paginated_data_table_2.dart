@@ -789,12 +789,20 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       }
     }
 
+    int lastRow = _firstRowIndex + _effectiveRowsPerPage;
+
+    if (!widget.renderEmptyRowsInTheEnd) {
+      if (_firstRowIndex + _effectiveRowsPerPage > _rowCount) {
+        lastRow = _rowCount;
+      }
+    }
+
     footerWidgets.addAll(<Widget>[
       Container(width: 32.0),
       Text(
         localizations.pageRowsInfoTitle(
           _firstRowIndex + 1,
-          _firstRowIndex + _effectiveRowsPerPage,
+          lastRow,
           _rowCount,
           _rowCountApproximate,
         ),
