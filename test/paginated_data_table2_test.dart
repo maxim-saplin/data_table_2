@@ -323,6 +323,54 @@ void main() {
             tester.getTopRight(find.text('Rows per page:')).dx + 40.0));
   }, skip: isBrowser); // https://github.com/flutter/flutter/issues/43433
 
+  testWidgets('PaginatedDataTable2 footer info title lastRow number wraps',
+      (WidgetTester tester) async {
+    final TestDataSource source = TestDataSource();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PaginatedDataTable2(
+          source: source,
+          renderEmptyRowsInTheEnd: false,
+          hidePaginator: false,
+          rowsPerPage: 501,
+          availableRowsPerPage: const <int>[501],
+          onRowsPerPageChanged: (int? rowsPerPage) {},
+          columns: const <DataColumn>[
+            DataColumn(label: Text('COL1')),
+            DataColumn(label: Text('COL2')),
+            DataColumn(label: Text('COL3')),
+          ],
+        ),
+      ),
+    );
+
+    expect(find.text('1–500 of 500'), findsOneWidget);
+  });
+  testWidgets(
+      'PaginatedDataTable2 footer info title lastRow number will not wrap',
+      (WidgetTester tester) async {
+    final TestDataSource source = TestDataSource();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PaginatedDataTable2(
+          source: source,
+          renderEmptyRowsInTheEnd: true,
+          hidePaginator: false,
+          rowsPerPage: 501,
+          availableRowsPerPage: const <int>[501],
+          onRowsPerPageChanged: (int? rowsPerPage) {},
+          columns: const <DataColumn>[
+            DataColumn(label: Text('COL1')),
+            DataColumn(label: Text('COL2')),
+            DataColumn(label: Text('COL3')),
+          ],
+        ),
+      ),
+    );
+
+    expect(find.text('1–501 of 500'), findsOneWidget);
+  });
+
   testWidgets('PaginatedDataTable2 footer scrolls',
       (WidgetTester tester) async {
     final TestDataSource source = TestDataSource();
