@@ -31,6 +31,7 @@ Please check the [example folder](https://github.com/maxim-saplin/data_table_2/t
   - Vertical scroller is exposed via table's `scrollController` property. See example 'DataTable2 - Scroll-up' which shows 'up' button when scrolling down and allows to jump to the top of the table
   - `PaginatedDataTable2.fit` property controls whether the paginator sticks to the bottom and leaves a gap to data rows above
 - There's `DataRow2` alternative to stock `DataRow` which provides row level tap events (including right clicks)
+  - `PaginatedDataTable2.renderEmptyRowsInTheEnd` property changes the default Flutter way of rendering pages with empty rows
   - `DataRow2.specificRowHeight` allows overriding default height for any row
 - Overriding sort arrows via `sortArrowIcon` and `sortArrowAnimationDuration` properties
 - `empty` property which allows defining a placeholder widget to be displayed when data source is empty
