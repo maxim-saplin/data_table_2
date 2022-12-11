@@ -11,7 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'test_utils.dart';
 
 // Table with 10 rows, aproximately 450 pixel tall
-void main() {
+main() async {
   group('PaginatedDataTable2 Fixed colums/corner colors', () {
     testWidgets('0 cols, 0 rows', (WidgetTester tester) async {
       await wrapWidgetSetSurf(
@@ -685,7 +685,7 @@ void main() {
               fixedTopRows: 0,
               fixedLeftColumns: 0,
               minWidth: 850),
-          const Size(505, 300));
+          const Size(525, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -710,7 +710,7 @@ void main() {
               fixedTopRows: 0,
               fixedLeftColumns: 1,
               minWidth: 850),
-          const Size(505, 300));
+          const Size(525, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -735,7 +735,7 @@ void main() {
               fixedTopRows: 0,
               fixedLeftColumns: 2,
               minWidth: 850),
-          const Size(505, 300));
+          const Size(525, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -821,7 +821,7 @@ void main() {
               fixedTopRows: 3,
               fixedLeftColumns: 2,
               minWidth: 850),
-          const Size(505, 300));
+          const Size(525, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -847,7 +847,7 @@ void main() {
               fixedTopRows: 0,
               fixedLeftColumns: 0,
               minWidth: 850),
-          const Size(505, 300));
+          const Size(525, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -1165,7 +1165,7 @@ void main() {
             );
           });
 
-      await wrapWidgetSetSurf(tester, widget, const Size(505, 300));
+      await wrapWidgetSetSurf(tester, widget, const Size(525, 300));
       await tester.pumpAndSettle();
 
       expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
@@ -1205,7 +1205,7 @@ void main() {
             );
           });
 
-      await wrapWidgetSetSurf(tester, widget, const Size(505, 300));
+      await wrapWidgetSetSurf(tester, widget, const Size(525, 300));
       await tester.pumpAndSettle();
 
       expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
@@ -1237,7 +1237,7 @@ void main() {
             fixedLeftColumns: 1,
             minWidth: 850,
           ),
-          const Size(505, 300));
+          const Size(525, 300));
 
       expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
       expect(_isVisibleInTable(find.text('159'), tester), isTrue);
@@ -1271,7 +1271,7 @@ void main() {
             minWidth: 850,
             scrollController: sc,
           ),
-          const Size(505, 300));
+          const Size(525, 300));
 
       expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
       expect(_isVisibleInTable(find.text('159'), tester), isTrue);

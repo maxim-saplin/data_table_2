@@ -323,6 +323,54 @@ void main() {
             tester.getTopRight(find.text('Rows per page:')).dx + 40.0));
   }, skip: isBrowser); // https://github.com/flutter/flutter/issues/43433
 
+  testWidgets('PaginatedDataTable2 footer info title lastRow number wraps',
+      (WidgetTester tester) async {
+    final TestDataSource source = TestDataSource();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PaginatedDataTable2(
+          source: source,
+          renderEmptyRowsInTheEnd: false,
+          hidePaginator: false,
+          rowsPerPage: 501,
+          availableRowsPerPage: const <int>[501],
+          onRowsPerPageChanged: (int? rowsPerPage) {},
+          columns: const <DataColumn>[
+            DataColumn(label: Text('COL1')),
+            DataColumn(label: Text('COL2')),
+            DataColumn(label: Text('COL3')),
+          ],
+        ),
+      ),
+    );
+
+    expect(find.text('1–500 of 500'), findsOneWidget);
+  });
+  testWidgets(
+      'PaginatedDataTable2 footer info title lastRow number will not wrap',
+      (WidgetTester tester) async {
+    final TestDataSource source = TestDataSource();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PaginatedDataTable2(
+          source: source,
+          renderEmptyRowsInTheEnd: true,
+          hidePaginator: false,
+          rowsPerPage: 501,
+          availableRowsPerPage: const <int>[501],
+          onRowsPerPageChanged: (int? rowsPerPage) {},
+          columns: const <DataColumn>[
+            DataColumn(label: Text('COL1')),
+            DataColumn(label: Text('COL2')),
+            DataColumn(label: Text('COL3')),
+          ],
+        ),
+      ),
+    );
+
+    expect(find.text('1–501 of 500'), findsOneWidget);
+  });
+
   testWidgets('PaginatedDataTable2 footer scrolls',
       (WidgetTester tester) async {
     final TestDataSource source = TestDataSource();
@@ -643,6 +691,51 @@ void main() {
 
     // Reset the surface size.
     await binding.setSurfaceSize(originalSize);
+  });
+
+  testWidgets('PaginatedDataTable set border width test',
+      (WidgetTester tester) async {
+    final TestDataSource source = TestDataSource();
+    const List<DataColumn> columns = <DataColumn>[
+      DataColumn(label: Text('Name')),
+      DataColumn(label: Text('Calories'), numeric: true),
+      DataColumn(label: Text('Generation')),
+    ];
+
+    // no thickness provided - border should be default: i.e "1.0" as it
+    // set in DataTable2 constructor
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: PaginatedDataTable2(
+            columns: columns,
+            source: source,
+          ),
+        ),
+      ),
+    );
+
+    Table table = tester.widgetList(find.byType(Table)).last as Table;
+    TableRow tableRow = table.children.last;
+    BoxDecoration boxDecoration = tableRow.decoration! as BoxDecoration;
+    expect(boxDecoration.border!.bottom.width, 1.0);
+
+    const double thickness = 4.2;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: PaginatedDataTable2(
+            dividerThickness: thickness,
+            columns: columns,
+            source: source,
+          ),
+        ),
+      ),
+    );
+    table = tester.widgetList(find.byType(Table)).last as Table;
+    tableRow = table.children.last;
+    boxDecoration = tableRow.decoration! as BoxDecoration;
+    expect(boxDecoration.border!.bottom.width, thickness);
   });
 
   testWidgets('PaginatedDataTable2 custom horizontal padding - no checkbox',

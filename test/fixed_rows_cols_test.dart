@@ -11,7 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'test_utils.dart';
 
 // Table with 10 rows, aproximately 450 pixel tall
-void main() {
+main() {
   group('Fixed colums/corner colors', () {
     testWidgets('0 cols, 0 rows', (WidgetTester tester) async {
       await wrapWidgetSetSurf(

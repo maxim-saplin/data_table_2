@@ -172,6 +172,8 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.headingRowColor,
     this.horizontalMargin = 24.0,
     this.columnSpacing = 56.0,
+    this.dividerThickness,
+    this.renderEmptyRowsInTheEnd = true,
     this.fixedLeftColumns = 0,
     this.fixedTopRows = 1,
     this.fixedColumnsColor,
@@ -333,6 +335,14 @@ class PaginatedDataTable2 extends StatefulWidget {
 
   /// The index of the first row to display when the widget is first created.
   final int? initialFirstRowIndex;
+
+  /// Flag to render empty(invisible) rows in the end of the table when there is
+  /// a fixed number of [rowsPerPage] and the number of visible rows is smaller
+  /// This value defaults to true
+  final bool renderEmptyRowsInTheEnd;
+
+  /// The divider thickness between rows.
+  final double? dividerThickness;
 
   /// Invoked when the user switches to another page.
   ///
@@ -594,8 +604,15 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           haveProgressIndicator = true;
         }
       }
-      row ??= _getBlankRowFor(index);
-      result.add(row);
+      // It won't render empty rows if renderEmptyRowsInTheEnd is set to false
+      if (row == null) {
+        if (widget.renderEmptyRowsInTheEnd) {
+          row ??= _getBlankRowFor(index);
+          result.add(row);
+        }
+      } else {
+        result.add(row);
+      }
     }
     return result;
   }
@@ -702,6 +719,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           // Make sure no decoration is set on the DataTable
           // from the theme, as its already wrapped in a Card.
           decoration: const BoxDecoration(),
+          dividerThickness: widget.dividerThickness,
           fixedLeftColumns: widget.fixedLeftColumns,
           fixedTopRows: widget.fixedTopRows,
           fixedColumnsColor: widget.fixedColumnsColor,
@@ -771,12 +789,20 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       }
     }
 
+    int lastRow = _firstRowIndex + _effectiveRowsPerPage;
+
+    if (!widget.renderEmptyRowsInTheEnd) {
+      if (_firstRowIndex + _effectiveRowsPerPage > _rowCount) {
+        lastRow = _rowCount;
+      }
+    }
+
     footerWidgets.addAll(<Widget>[
       Container(width: 32.0),
       Text(
         localizations.pageRowsInfoTitle(
           _firstRowIndex + 1,
-          _firstRowIndex + _effectiveRowsPerPage,
+          lastRow,
           _rowCount,
           _rowCountApproximate,
         ),
