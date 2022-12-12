@@ -1226,7 +1226,10 @@ class DataTable2 extends DataTable {
           );
           final Border border = showBottomBorder
               ? Border(bottom: borderSide)
-              : Border(top: borderSide);
+              : Border(
+                  top: hideColumnsHeader && index == 0
+                      ? BorderSide.none
+                      : borderSide);
           return TableRow(
             key: rows[rowStartIndex + actualIndex].key,
             decoration: BoxDecoration(
