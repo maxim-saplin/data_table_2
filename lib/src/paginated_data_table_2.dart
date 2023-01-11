@@ -784,6 +784,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           fixedTopRows: widget.fixedTopRows,
           fixedColumnsColor: widget.fixedColumnsColor,
           fixedCornerColor: widget.fixedCornerColor,
+          physics: widget.physics,
           dataTextStyle: widget.dataTextStyle,
           dataRowHeight: widget.dataRowHeight,
           headingTextStyle: widget.headingTextStyle,
