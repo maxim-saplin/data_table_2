@@ -184,6 +184,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.fixedTopRows = 1,
     this.fixedColumnsColor,
     this.fixedCornerColor,
+    this.physics,
     this.showCheckboxColumn = true,
     this.showFirstLastButtons = false,
     this.initialFirstRowIndex = 0,
@@ -385,6 +386,14 @@ class PaginatedDataTable2 extends StatefulWidget {
 
   /// The divider thickness between rows.
   final double? dividerThickness;
+
+  /// How the scroll view should respond to user input.
+  ///
+  /// For example, determines how the scroll view continues to animate after the
+  /// user stops dragging the scroll view.
+  ///
+  /// Defaults to matching platform conventions.
+  final ScrollPhysics? physics;
 
   /// Invoked when the user switches to another page.
   ///

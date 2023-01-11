@@ -339,6 +339,7 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
       super.fixedLeftColumns = 0,
       super.fixedTopRows = 1,
       super.fixedColumnsColor,
+      super.physics,
       super.fixedCornerColor,
       super.datarowCheckboxTheme,
       super.dataTextStyle,

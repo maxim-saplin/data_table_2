@@ -128,6 +128,7 @@ class DataTable2 extends DataTable {
     super.checkboxHorizontalMargin,
     this.checkboxAlignment = Alignment.center,
     this.bottomMargin,
+    this.physics,
     super.columnSpacing,
     super.showCheckboxColumn = true,
     super.showBottomBorder = false,
@@ -184,6 +185,14 @@ class DataTable2 extends DataTable {
 
   /// The default divider thickness.
   static const double _dividerThickness = 1.0;
+
+  /// How the scroll view should respond to user input.
+  ///
+  /// For example, determines how the scroll view continues to animate after the
+  /// user stops dragging the scroll view.
+  ///
+  /// Defaults to matching platform conventions.
+  final ScrollPhysics? physics;
 
   /// When changing sort direction an arrow icon in the header is rotated clockwise.
   /// The value defines the duration of the rotation animation.
@@ -1030,6 +1039,7 @@ class DataTable2 extends DataTable {
                                 : null),
                             controller: coreVerticalController,
                             child: SingleChildScrollView(
+                                physics: physics,
                                 controller: coreVerticalController,
                                 scrollDirection: Axis.vertical,
                                 child: SingleChildScrollView(
@@ -1051,6 +1061,7 @@ class DataTable2 extends DataTable {
                                 behavior: ScrollConfiguration.of(context)
                                     .copyWith(scrollbars: false),
                                 child: SingleChildScrollView(
+                                    physics: physics,
                                     controller: leftColumnVerticalContoller,
                                     scrollDirection: Axis.vertical,
                                     child: addBottomMargin(fixedColumnsTable))))
