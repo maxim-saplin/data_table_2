@@ -1,6 +1,9 @@
+## 2.3.11
+- Fixing Flutter 3.7 warnings
+
 ## 2.3.10
 - Added dividerThickness to paginated widgets
-- renderEmptyRowsInTheEnd now allows to override the default behaviour of paginated tables when empty rows are added in otder to fill pages to page size
+- renderEmptyRowsInTheEnd now allows to override the default behaviour of paginated tables when empty rows are added in order to fill pages to page size
 
 ## 2.3.9
 - Added fixed sections params to PaginatedDataTable2 and AsyncPaginatedDataTable2 (fixedLeftColumns, fixedTopRows, fixedColumnsColor, fixedCornerColor)
