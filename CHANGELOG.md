@@ -1,5 +1,9 @@
+## 2.3.12
+- Added Flutter version constraint to be 3.7.0 or higher
+
 ## 2.3.11
-- Fixing Flutter 3.7 warnings
+- Breaking change, Flutter SDK versions below 3.7.0 are not supported
+- Fixing Flutter 3.7.0 warnings
 
 ## 2.3.10
 - Added dividerThickness to paginated widgets
