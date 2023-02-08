@@ -966,29 +966,34 @@ class DataTable2 extends DataTable {
 
             var completeWidget = Container(
                 decoration: decoration ?? theme.dataTableTheme.decoration,
-                child: rows.isEmpty
-                    ? Column(children: [
-                        SingleChildScrollView(
-                            controller: coreHorizontalController,
-                            scrollDirection: Axis.horizontal,
-                            child: Table(
-                                columnWidths: widthsAsMap,
-                                border: border,
-                                children: [headingRow])),
-                        Flexible(
-                            fit: FlexFit.tight,
-                            child: empty ?? const SizedBox())
-                      ])
-                    : Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (fixedColumnAndCornerCol != null)
-                            fixedColumnAndCornerCol,
-                          if (fixedRowsAndCoreCol != null)
+                child: Material(
+                    type: MaterialType.transparency,
+                    borderRadius: border?.borderRadius,
+                    clipBehavior: clipBehavior,
+                    child: rows.isEmpty
+                        ? Column(children: [
+                            SingleChildScrollView(
+                                controller: coreHorizontalController,
+                                scrollDirection: Axis.horizontal,
+                                child: Table(
+                                    columnWidths: widthsAsMap,
+                                    border: border,
+                                    children: [headingRow])),
                             Flexible(
-                                fit: FlexFit.tight, child: fixedRowsAndCoreCol)
-                        ],
-                      ));
+                                fit: FlexFit.tight,
+                                child: empty ?? const SizedBox())
+                          ])
+                        : Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (fixedColumnAndCornerCol != null)
+                                fixedColumnAndCornerCol,
+                              if (fixedRowsAndCoreCol != null)
+                                Flexible(
+                                    fit: FlexFit.tight,
+                                    child: fixedRowsAndCoreCol)
+                            ],
+                          )));
 
             return completeWidget;
           });
