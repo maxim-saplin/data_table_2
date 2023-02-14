@@ -8,14 +8,20 @@
             "name": "example",
             "cwd": "example",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "args": [
+                "--web-renderer", "canvaskit" //or "html"
+            ],
         },
         {
             "name": "example-release",
             "cwd": "example",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "flutterMode": "release",
+            "args": [
+                "--web-renderer", "canvaskit" //TODO, check that fonts are same on canvaskit and native with new Flutter version
+            ],
         },
     ]
 }
