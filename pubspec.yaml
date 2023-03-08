@@ -22,5 +22,5 @@ dev_dependencies:
   flutter_lints: ^2.0.1
 
 screenshots:
-  - desctiption: 'DataTable2 wirh fixed top row and left column and customized styling'
-  - path: screenshots/fixed_row_col.png
+  - description: 'DataTable2 with fixed top row and left column and customized styling'
+    path: screenshots/fixed_row_col.png
