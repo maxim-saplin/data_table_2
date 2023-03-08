@@ -1,3 +1,8 @@
+## 2.4.1
+- Removed deprecated exports, you can now import only data_table_2.dart to get access to all widgets
+- Fixed bug #165 (row hover color being displayed outside the widget in some cases)
+- Added gallery image
+
 ## 2.3.12
 - Added Flutter version constraint to be 3.7.0 or higher
 

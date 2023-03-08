@@ -128,7 +128,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
           Flexible(
               fit: FlexFit.tight,
               child: Theme(
-                  data: ThemeData(dividerColor: Colors.amber),
+                  data: ThemeData(dividerColor: Colors.grey[400]),
                   child: getTableFromSelectedType()))
         ]));
   }
@@ -140,7 +140,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
         columnSpacing: 0,
         horizontalMargin: 12,
         bottomMargin: 20,
-        border: TableBorder.all(width: 1.5),
+        border: TableBorder.all(width: 1.0, color: Colors.grey),
         headingRowColor: MaterialStateProperty.resolveWith(
             (states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
         fixedColumnsColor: Colors.grey[300],
@@ -209,7 +209,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
           ),
         ],
         rows: List<DataRow>.generate(
-            _dataItems, (index) => _getRow(index, Colors.blue)));
+            _dataItems, (index) => _getRow(index, Colors.transparent)));
   }
 
   Widget getPaginatedDataTable() {
@@ -217,7 +217,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
         scrollController: _controller,
         columnSpacing: 0,
         horizontalMargin: 12,
-        border: TableBorder.all(width: 1.5),
+        border: TableBorder.all(width: 1.0, color: Colors.grey),
         headingRowColor: MaterialStateProperty.resolveWith(
             (states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
         fixedColumnsColor: Colors.grey[300],
@@ -293,7 +293,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
         scrollController: _controller,
         columnSpacing: 0,
         horizontalMargin: 12,
-        border: TableBorder.all(width: 1.5),
+        border: TableBorder.all(width: 1.0, color: Colors.grey),
         headingRowColor: MaterialStateProperty.resolveWith(
             (states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
         fixedColumnsColor: Colors.grey[300],
