@@ -405,7 +405,9 @@ class DataTable2 extends DataTable {
         onDoubleTap != null ||
         onLongPress != null ||
         onTapDown != null ||
-        onTapCancel != null) {
+        onTapCancel != null ||
+        onRowSecondaryTap != null ||
+        onRowSecondaryTapDown != null) {
       // cell only
       label = InkWell(
         onTap: () {
@@ -422,11 +424,11 @@ class DataTable2 extends DataTable {
         },
         onTapDown: onTapDown,
         onTapCancel: onTapCancel,
+        onSecondaryTap: onRowSecondaryTap,
+        onSecondaryTapDown: onRowSecondaryTapDown,
         overlayColor: overlayColor,
         child: label,
       );
-      label =
-          _addSecondaryTaps(onRowSecondaryTap, onRowSecondaryTapDown, label);
     } else if (onSelectChanged != null ||
         onRowTap != null ||
         onRowDoubleTap != null ||
@@ -437,23 +439,11 @@ class DataTable2 extends DataTable {
         onTap: onRowTap ?? onSelectChanged,
         onDoubleTap: onRowDoubleTap,
         onLongPress: onRowLongPress,
+        onSecondaryTap: onRowSecondaryTap,
+        onSecondaryTapDown: onRowSecondaryTapDown,
         overlayColor: overlayColor,
         child: label,
       );
-
-      label =
-          _addSecondaryTaps(onRowSecondaryTap, onRowSecondaryTapDown, label);
-    }
-    return label;
-  }
-
-  Widget _addSecondaryTaps(GestureTapCallback? onRowSecondaryTap,
-      GestureTapDownCallback? onRowSecondaryTapDown, Widget label) {
-    if (onRowSecondaryTap != null || onRowSecondaryTapDown != null) {
-      label = GestureDetector(
-          onSecondaryTap: onRowSecondaryTap,
-          onSecondaryTapDown: onRowSecondaryTapDown,
-          child: label);
     }
     return label;
   }
