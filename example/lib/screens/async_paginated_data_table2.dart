@@ -254,7 +254,7 @@ class _ErrorAndRetry extends StatelessWidget {
                   TextButton(
                       onPressed: retry,
                       child:
-                          Row(mainAxisSize: MainAxisSize.min, children: const [
+                          const Row(mainAxisSize: MainAxisSize.min, children: [
                         Icon(
                           Icons.refresh,
                           color: Colors.white,
@@ -288,9 +288,9 @@ class __LoadingState extends State<_Loading> {
                       padding: const EdgeInsets.all(7),
                       width: 150,
                       height: 50,
-                      child: Row(
+                      child: const Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: const [
+                          children: [
                             CircularProgressIndicator(
                               strokeWidth: 2,
                               color: Colors.black,

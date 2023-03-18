@@ -8,6 +8,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 bool dataTableShowLogs = true;
 
@@ -400,15 +401,13 @@ class DataTable2 extends DataTable {
       ),
     );
 
-    // Wrap label intro InkResponse if there're cell or row level tap events
+    // Wrap label with InkResponse if there're cell or row level tap events
     if (onTap != null ||
         onDoubleTap != null ||
         onLongPress != null ||
         onTapDown != null ||
-        onTapCancel != null ||
-        onRowSecondaryTap != null ||
-        onRowSecondaryTapDown != null) {
-      // cell only
+        onTapCancel != null) {
+      // cell level
       label = InkWell(
         onTap: () {
           onTap?.call();
@@ -424,6 +423,7 @@ class DataTable2 extends DataTable {
         },
         onTapDown: onTapDown,
         onTapCancel: onTapCancel,
+        // Also add row level events to cells
         onSecondaryTap: onRowSecondaryTap,
         onSecondaryTapDown: onRowSecondaryTapDown,
         overlayColor: overlayColor,
@@ -435,7 +435,8 @@ class DataTable2 extends DataTable {
         onRowLongPress != null ||
         onRowSecondaryTap != null ||
         onRowSecondaryTapDown != null) {
-      label = TableRowInkWell(
+      // row level
+      label = _TableRowInkWell(
         onTap: onRowTap ?? onSelectChanged,
         onDoubleTap: onRowDoubleTap,
         onLongPress: onRowLongPress,
@@ -715,22 +716,22 @@ class DataTable2 extends DataTable {
                   ascending: sortAscending,
                   overlayColor: effectiveHeadingRowColor);
 
-              headingRow.children![displayColumnIndex] =
+              headingRow.children[displayColumnIndex] =
                   h; // heading row alone is used to display table header should there be no data rows
 
               if (displayColumnIndex < actualFixedColumns) {
                 if (actualFixedRows < 1) {
-                  fixedColumnsRows![0].children![displayColumnIndex] = h;
+                  fixedColumnsRows![0].children[displayColumnIndex] = h;
                 } else if (actualFixedRows > 0) {
-                  fixedCornerRows![0].children![displayColumnIndex] = h;
+                  fixedCornerRows![0].children[displayColumnIndex] = h;
                 }
               } else {
                 if (actualFixedRows < 1 && coreRows != null) {
                   coreRows[0]
-                      .children![displayColumnIndex - actualFixedColumns] = h;
+                      .children[displayColumnIndex - actualFixedColumns] = h;
                 } else if (actualFixedRows > 0) {
                   fixedRows![0]
-                      .children![displayColumnIndex - actualFixedColumns] = h;
+                      .children[displayColumnIndex - actualFixedColumns] = h;
                 }
               }
 
@@ -743,7 +744,6 @@ class DataTable2 extends DataTable {
 
               for (final DataRow row in rows) {
                 final DataCell cell = row.cells[dataColumnIndex];
-                //dataRows[rowIndex].children![displayColumnIndex]
 
                 var c = _buildDataCell(
                     context: context,
@@ -775,18 +775,18 @@ class DataTable2 extends DataTable {
                 if (displayColumnIndex < actualFixedColumns) {
                   if (rowIndex + 1 < actualFixedRows) {
                     fixedCornerRows![rowIndex + 1]
-                        .children![displayColumnIndex] = c;
+                        .children[displayColumnIndex] = c;
                   } else {
                     fixedColumnsRows![rowIndex - skipRows]
-                        .children![displayColumnIndex] = c;
+                        .children[displayColumnIndex] = c;
                   }
                 } else {
                   if (rowIndex + 1 < actualFixedRows) {
                     fixedRows![rowIndex + 1]
-                        .children![displayColumnIndex - actualFixedColumns] = c;
+                        .children[displayColumnIndex - actualFixedColumns] = c;
                   } else {
                     coreRows![rowIndex - skipRows]
-                        .children![displayColumnIndex - actualFixedColumns] = c;
+                        .children[displayColumnIndex - actualFixedColumns] = c;
                   }
                 }
 
@@ -805,7 +805,7 @@ class DataTable2 extends DataTable {
                 : null;
 
             bool isRowsEmpty(List<TableRow>? rows) {
-              return rows == null || rows.isEmpty || rows[0].children!.isEmpty;
+              return rows == null || rows.isEmpty || rows[0].children.isEmpty;
             }
 
             var coreTable = Table(
@@ -1024,7 +1024,7 @@ class DataTable2 extends DataTable {
       tableColumns[0] = FixedColumnWidth(checkBoxWidth);
 
       // Create heading twice, in the heading row used as back-up for the case of no data and any of the xxx_rows table
-      headingRow.children![0] = _buildCheckbox(
+      headingRow.children[0] = _buildCheckbox(
           context: context,
           checked: someChecked ? null : allChecked,
           onRowTap: null,
@@ -1035,13 +1035,13 @@ class DataTable2 extends DataTable {
           rowHeight: headingHeight);
 
       if (fixedCornerRows != null) {
-        fixedCornerRows[0].children![0] = headingRow.children![0];
+        fixedCornerRows[0].children[0] = headingRow.children[0];
       } else if (fixedColumnRows != null) {
-        fixedColumnRows[0].children![0] = headingRow.children![0];
+        fixedColumnRows[0].children[0] = headingRow.children[0];
       } else if (fixedRows != null) {
-        fixedRows[0].children![0] = headingRow.children![0];
+        fixedRows[0].children[0] = headingRow.children[0];
       } else {
-        coreRows![0].children![0] = headingRow.children![0];
+        coreRows![0].children[0] = headingRow.children[0];
       }
 
       var skipRows = actualFixedRows == 1
@@ -1071,13 +1071,13 @@ class DataTable2 extends DataTable {
                 : defaultDataRowHeight);
 
         if (fixedCornerRows != null && rowIndex < fixedCornerRows.length - 1) {
-          fixedCornerRows[rowIndex + 1].children![0] = x;
+          fixedCornerRows[rowIndex + 1].children[0] = x;
         } else if (fixedColumnRows != null) {
-          fixedColumnRows[rowIndex - skipRows].children![0] = x;
+          fixedColumnRows[rowIndex - skipRows].children[0] = x;
         } else if (fixedRows != null && rowIndex < fixedRows.length - 1) {
-          fixedRows[rowIndex + 1].children![0] = x;
+          fixedRows[rowIndex + 1].children[0] = x;
         } else {
-          coreRows![rowIndex - skipRows].children![0] = x;
+          coreRows![rowIndex - skipRows].children[0] = x;
         }
 
         rowIndex += 1;
@@ -1534,4 +1534,56 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
   @override
   Widget build(BuildContext context) =>
       widget.builder(context, _sc11!, _sc12, _sc21, _sc22);
+}
+
+// TODO: revert back to SDK's TableRowInkWell as soon as it has secondary taps added
+class _TableRowInkWell extends InkResponse {
+  /// Creates an ink well for a table row.
+  const _TableRowInkWell({
+    super.child,
+    super.onTap,
+    super.onDoubleTap,
+    super.onLongPress,
+    super.onSecondaryTap,
+    super.onSecondaryTapDown,
+    super.overlayColor,
+  }) : super(
+          containedInkWell: true,
+          highlightShape: BoxShape.rectangle,
+        );
+
+  @override
+  RectCallback getRectCallback(RenderBox referenceBox) {
+    return () {
+      RenderObject cell = referenceBox;
+      AbstractNode? table = cell.parent;
+      final Matrix4 transform = Matrix4.identity();
+      while (table is RenderObject && table is! RenderTable) {
+        table.applyPaintTransform(cell, transform);
+        assert(table == cell.parent);
+        cell = table;
+        table = table.parent;
+      }
+      if (table is RenderTable) {
+        final TableCellParentData cellParentData =
+            cell.parentData! as TableCellParentData;
+        assert(cellParentData.y != null);
+        final Rect rect = table.getRowBox(cellParentData.y!);
+        // The rect is in the table's coordinate space. We need to change it to the
+        // TableRowInkWell's coordinate space.
+        table.applyPaintTransform(cell, transform);
+        final Offset? offset = MatrixUtils.getAsTranslation(transform);
+        if (offset != null) {
+          return rect.shift(-offset);
+        }
+      }
+      return Rect.zero;
+    };
+  }
+
+  @override
+  bool debugCheckContext(BuildContext context) {
+    assert(debugCheckHasTable(context));
+    return super.debugCheckContext(context);
+  }
 }
