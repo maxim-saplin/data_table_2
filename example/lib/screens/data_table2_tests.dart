@@ -107,7 +107,7 @@ DataTable2 buildTable(
     double? dividerThickness,
     Widget? empty,
     bool showCheckboxColumn = true,
-    ScrollController? scrollController,
+    ScrollController? verticalScrollController,
     List<DataColumn2>? columns,
     List<DataRow2>? rows}) {
   return DataTable2(
@@ -124,7 +124,7 @@ DataTable2 buildTable(
     empty: empty,
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
-    scrollController: scrollController,
+    verticalScrollController: verticalScrollController,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     rows: rows ?? testRows,
@@ -206,7 +206,7 @@ PaginatedDataTable2 buildPaginatedTable(
     PaginatorController? controller,
     Widget? empty,
     FlexFit fit = FlexFit.tight,
-    ScrollController? scrollController,
+    ScrollController? verticalScrollController,
     MaterialStateProperty<Color?>? headingRowColor,
     double? minWidth,
     Function(int?)? onRowsPerPageChanged,
@@ -226,7 +226,7 @@ PaginatedDataTable2 buildPaginatedTable(
     headingRowColor: headingRowColor,
     empty: empty,
     fit: fit,
-    scrollController: scrollController,
+    verticalScrollController: verticalScrollController,
     hidePaginator: hidePaginator,
     minWidth: minWidth,
     smRatio: overrideSizes ? 0.5 : 0.67,
@@ -267,7 +267,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     Widget? empty,
     PageSyncApproach syncApproach = PageSyncApproach.doNothing,
     // Return less rows when calling refresh method on the data source
-    ScrollController? scrollController,
+    ScrollController? verticalScrollController,
     double? minWidth,
     Function(int?)? onRowsPerPageChanged,
     List<DataColumn2>? columns}) {
@@ -295,7 +295,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
                 )))
         : null,
     empty: empty,
-    scrollController: scrollController,
+    verticalScrollController: verticalScrollController,
     hidePaginator: hidePaginator,
     minWidth: minWidth,
     smRatio: overrideSizes ? 0.5 : 0.67,

@@ -22,7 +22,7 @@ class DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
   int? _sortColumnIndex;
   late DessertDataSource _dessertsDataSource;
   bool _initialized = false;
-  final ScrollController _controller = ScrollController();
+  final ScrollController _verticalController = ScrollController();
 
   @override
   void didChangeDependencies() {
@@ -51,7 +51,7 @@ class DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
   @override
   void dispose() {
     _dessertsDataSource.dispose();
-    _controller.dispose();
+    _verticalController.dispose();
     super.dispose();
   }
 
@@ -69,7 +69,7 @@ class DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
                       thumbColor:
                           MaterialStateProperty.all<Color>(Colors.black))),
               child: DataTable2(
-                  scrollController: _controller,
+                  verticalScrollController: _verticalController,
                   columnSpacing: 0,
                   horizontalMargin: 12,
                   bottomMargin: 10,
@@ -137,7 +137,7 @@ class DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
                   ],
                   rows: List<DataRow>.generate(_dessertsDataSource.rowCount,
                       (index) => _dessertsDataSource.getRow(index)))),
-          _ScrollUpButton(_controller)
+          _ScrollUpButton(_verticalController)
         ]));
   }
 }

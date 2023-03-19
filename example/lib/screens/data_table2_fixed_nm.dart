@@ -26,7 +26,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
   late DessertDataSource _dessertsDataSource;
   late DessertDataSourceAsync _asyncDessertsDataSource;
   bool _initialized = false;
-  final ScrollController _controller = ScrollController();
+  final ScrollController _verticalController = ScrollController();
   String selectedTableType = dflt;
 
   int _fixedRows = 1;
@@ -115,7 +115,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
   @override
   void dispose() {
     _dessertsDataSource.dispose();
-    _controller.dispose();
+    _verticalController.dispose();
     super.dispose();
   }
 
@@ -136,7 +136,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
   DataTable2 getDataTable() {
     return DataTable2(
         dividerThickness: 4,
-        scrollController: _controller,
+        verticalScrollController: _verticalController,
         columnSpacing: 0,
         horizontalMargin: 12,
         bottomMargin: 20,
@@ -214,7 +214,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
 
   Widget getPaginatedDataTable() {
     return PaginatedDataTable2(
-        scrollController: _controller,
+        verticalScrollController: _verticalController,
         columnSpacing: 0,
         horizontalMargin: 12,
         border: TableBorder.all(width: 1.0, color: Colors.grey),
@@ -290,7 +290,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
 
   Widget getAsyncPaginatedDataTable() {
     return AsyncPaginatedDataTable2(
-        scrollController: _controller,
+        verticalScrollController: _verticalController,
         columnSpacing: 0,
         horizontalMargin: 12,
         border: TableBorder.all(width: 1.0, color: Colors.grey),
