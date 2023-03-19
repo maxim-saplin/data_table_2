@@ -130,7 +130,8 @@ class DataTable2 extends DataTable {
     super.showBottomBorder = false,
     super.dividerThickness,
     this.minWidth,
-    this.scrollController,
+    this.verticalScrollController,
+    this.horizontalScrollController,
     this.empty,
     this.border,
     this.smRatio = 0.67,
@@ -203,7 +204,10 @@ class DataTable2 extends DataTable {
   final double? bottomMargin;
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows vertically scrollable
-  final ScrollController? scrollController;
+  final ScrollController? verticalScrollController;
+
+  /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
+  final ScrollController? horizontalScrollController;
 
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
@@ -661,8 +665,10 @@ class DataTable2 extends DataTable {
 
     var builder = LayoutBuilder(builder: (context, constraints) {
       return SyncedScrollControllers(
-          scrollController: scrollController,
+          verticalScrollController: verticalScrollController,
+          horizontalScrollController: horizontalScrollController,
           sc12toSc11Position: true,
+          sc22toSc21Position: true,
           builder: (context, sc11, sc12, sc21, sc22) {
             var coreVerticalController = sc11;
             var leftColumnVerticalContoller = sc12;
@@ -1432,15 +1438,24 @@ class SyncedScrollControllers extends StatefulWidget {
   const SyncedScrollControllers(
       {super.key,
       required this.builder,
-      this.scrollController,
-      this.sc12toSc11Position = false});
+      this.verticalScrollController,
+      this.horizontalScrollController,
+      this.sc12toSc11Position = false,
+      this.sc22toSc21Position = false});
 
   /// One of the controllers (sc11) won't be created by this widget
   /// but rather use externally provided one
-  final ScrollController? scrollController;
+  final ScrollController? verticalScrollController;
+
+  /// One of the controllers (sc21) won't be created by this widget
+  /// but rather use externally provided one
+  final ScrollController? horizontalScrollController;
 
   /// Whether to set sc12 initison offset to the value from sc11
   final bool sc12toSc11Position;
+
+  /// Whether to set sc22 initison offset to the value from sc21
+  final bool sc22toSc21Position;
 
   /// Positions of 2 pairs of scroll controllers (sc11|sc12 and sc21|sc22)
   /// will be synchronized, attached scrollables will copy the positions
@@ -1458,7 +1473,7 @@ class SyncedScrollControllers extends StatefulWidget {
 class SyncedScrollControllersState extends State<SyncedScrollControllers> {
   ScrollController? _sc11;
   late ScrollController _sc12;
-  late ScrollController _sc21;
+  ScrollController? _sc21;
   late ScrollController _sc22;
 
   final List<void Function()> _listeners = [];
@@ -1484,35 +1499,52 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
 
   void _initControllers() {
     _doNotReissueJump.clear();
-    var offset =
+    var verticalOffset =
         _sc11 == null || _sc11!.positions.isEmpty ? 0.0 : _sc11!.offset;
-    if (widget.scrollController != null) {
-      _sc11 = widget.scrollController!;
+    if (widget.verticalScrollController != null) {
+      _sc11 = widget.verticalScrollController!;
       if (_sc11!.positions.isNotEmpty) {
-        offset = _sc11!.offset;
+        verticalOffset = _sc11!.offset;
       }
     } else {
       _sc11 = ScrollController();
     }
 
     _sc12 = ScrollController(
-        initialScrollOffset: widget.sc12toSc11Position ? offset : 0.0);
+        initialScrollOffset: widget.sc12toSc11Position ? verticalOffset : 0.0);
 
-    _sc21 = ScrollController();
-    _sc22 = ScrollController();
+    var horizontalOffset =
+        _sc21 == null || _sc21!.positions.isEmpty ? 0.0 : _sc21!.offset;
+    if (widget.horizontalScrollController != null) {
+      _sc21 = widget.horizontalScrollController!;
+      if (_sc21!.positions.isNotEmpty) {
+        horizontalOffset = _sc21!.offset;
+      }
+    } else {
+      _sc21 = ScrollController();
+    }
+
+    _sc22 = ScrollController(
+        initialScrollOffset:
+            widget.sc22toSc21Position ? horizontalOffset : 0.0);
 
     _syncScrollControllers(_sc11!, _sc12);
-    _syncScrollControllers(_sc21, _sc22);
+    _syncScrollControllers(_sc21!, _sc22);
   }
 
   void _disposeOrUnsubscribe() {
-    if (widget.scrollController == _sc11) {
+    if (widget.verticalScrollController == _sc11) {
       _sc11?.removeListener(_listeners[0]);
     } else {
       _sc11?.dispose();
     }
     _sc12.dispose();
-    _sc21.dispose();
+
+    if (widget.horizontalScrollController == _sc21) {
+      _sc21?.removeListener(_listeners[0]);
+    } else {
+      _sc21?.dispose();
+    }
     _sc22.dispose();
     _listeners.clear();
   }
@@ -1543,5 +1575,5 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
 
   @override
   Widget build(BuildContext context) =>
-      widget.builder(context, _sc11!, _sc12, _sc21, _sc22);
+      widget.builder(context, _sc11!, _sc12, _sc21!, _sc22);
 }
