@@ -198,7 +198,8 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.fit = FlexFit.tight,
     this.hidePaginator = false,
     this.controller,
-    this.scrollController,
+    this.verticalScrollController,
+    this.horizontalScrollController,
     this.empty,
     this.border,
     this.autoRowsToHeight = false,
@@ -457,7 +458,10 @@ class PaginatedDataTable2 extends StatefulWidget {
   final PaginatorController? controller;
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows vertically scrollable
-  final ScrollController? scrollController;
+  final ScrollController? verticalScrollController;
+
+  /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
+  final ScrollController? horizontalScrollController;
 
   @override
   PaginatedDataTable2State createState() => PaginatedDataTable2State();
@@ -734,7 +738,8 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           showBottomBorder: true,
           rows: _getRows(_firstRowIndex, _effectiveRowsPerPage),
           minWidth: widget.minWidth,
-          scrollController: widget.scrollController,
+          verticalScrollController: widget.verticalScrollController,
+          horizontalScrollController: widget.horizontalScrollController,
           empty: _showNothing ? null : widget.empty,
           border: widget.border,
           smRatio: widget.smRatio,
