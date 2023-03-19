@@ -67,13 +67,14 @@ void main() {
       expect(s1.width > 349 && s1.width < 351, true);
     });
 
-    testWidgets('scrollController scrolls to bottom',
+    testWidgets('verticalScrollController scrolls to bottom',
         (WidgetTester tester) async {
-      var sc = ScrollController();
-      await wrapWidgetSetSurf(tester, buildTable(scrollController: sc));
+      var verticalSc = ScrollController();
+      await wrapWidgetSetSurf(
+          tester, buildTable(verticalScrollController: verticalSc));
 
       expect(find.text('KitKat').hitTestable(), findsNothing);
-      sc.jumpTo(10000);
+      verticalSc.jumpTo(10000);
       await tester.pumpAndSettle();
       expect(find.text('KitKat').hitTestable(), findsOneWidget);
     });
@@ -494,7 +495,7 @@ void main() {
       expect(s1.width > 349 && s1.width < 351, true);
     });
 
-    testWidgets('scrollController scrolls to bottom',
+    testWidgets('verticalScrollController scrolls to bottom',
         (WidgetTester tester) async {
       var verticalSc = ScrollController();
       await wrapWidgetSetSurf(
@@ -1030,7 +1031,7 @@ void main() {
       expect(s1.width > 349 && s1.width < 351, true);
     });
 
-    testWidgets('scrollController scrolls to bottom',
+    testWidgets('verticalScrollController scrolls to bottom',
         (WidgetTester tester) async {
       var verticalSc = ScrollController();
       await wrapWidgetSetSurf(

@@ -1054,9 +1054,9 @@ main() {
     });
 
     testWidgets(
-        '3 fixed rows, 2 fixed columns, with minWidth, with scrollController, scroll to bottom',
+        '3 fixed rows, 2 fixed columns, with minWidth, with verticalScrollController, scroll to bottom',
         (WidgetTester tester) async {
-      var sc = ScrollController();
+      var verticalSc = ScrollController();
 
       await wrapWidgetSetSurf(
           tester,
@@ -1064,12 +1064,12 @@ main() {
               fixedTopRows: 3,
               fixedLeftColumns: 2,
               minWidth: 850,
-              scrollController: sc),
+              verticalScrollController: verticalSc),
           const Size(850, 300));
 
       _verifyDataTable2InitialState(tester);
 
-      sc.jumpTo(400);
+      verticalSc.jumpTo(400);
 
       await tester.pumpAndSettle();
 
@@ -1121,11 +1121,11 @@ main() {
     });
 
     testWidgets(
-        '0 fixed rows, 0-1 fixed column, left coulm out of sync when added, with ScrollController, bug#111',
+        '0 fixed rows, 0-1 fixed column, left coulm out of sync when added, with verticalScrollController, bug#111',
         (WidgetTester tester) async {
       var col = 0;
       var trigger = StreamController();
-      var sc = ScrollController();
+      var verticalSc = ScrollController();
 
       var widget = StreamBuilder(
           stream: trigger.stream,
@@ -1133,7 +1133,7 @@ main() {
             return buildTable(
                 fixedTopRows: 0,
                 fixedLeftColumns: col,
-                scrollController: sc,
+                verticalScrollController: verticalSc,
                 minWidth: 850,
                 showCheckboxColumn: false);
           });
@@ -1187,16 +1187,16 @@ main() {
     });
 
     testWidgets(
-        '1 fixed rows, 1 fixed column, scroll down via core, scroll up via left column, with controller',
+        '1 fixed rows, 1 fixed column, scroll down via core, scroll up via left column, with vertical controller',
         (WidgetTester tester) async {
-      var sc = ScrollController();
+      var verticalSc = ScrollController();
       await wrapWidgetSetSurf(
           tester,
           buildTable(
               fixedTopRows: 1,
               fixedLeftColumns: 1,
               minWidth: 850,
-              scrollController: sc,
+              verticalScrollController: verticalSc,
               showCheckboxColumn: false),
           const Size(500, 300));
 

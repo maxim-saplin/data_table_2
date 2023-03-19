@@ -157,7 +157,7 @@ DataTable2 buildTable(
     double? bottomMargin,
     Widget? empty,
     bool showCheckboxColumn = true,
-    ScrollController? scrollController,
+    ScrollController? verticalScrollController,
     List<DataColumn2>? columns,
     List<DataRow2>? rows}) {
   return DataTable2(
@@ -181,7 +181,7 @@ DataTable2 buildTable(
     empty: empty,
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
-    verticalScrollController: scrollController,
+    verticalScrollController: verticalScrollController,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     rows: rows ?? testRows,
