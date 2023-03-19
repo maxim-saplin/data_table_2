@@ -496,14 +496,16 @@ void main() {
 
     testWidgets('scrollController scrolls to bottom',
         (WidgetTester tester) async {
-      var sc = ScrollController();
+      var verticalSc = ScrollController();
       await wrapWidgetSetSurf(
           tester,
           buildPaginatedTable(
-              scrollController: sc, showGeneration: false, showPage: false));
+              verticalScrollController: verticalSc,
+              showGeneration: false,
+              showPage: false));
 
       expect(find.text('KitKat').hitTestable(), findsNothing);
-      sc.jumpTo(10000);
+      verticalSc.jumpTo(10000);
       await tester.pumpAndSettle();
       expect(find.text('KitKat').hitTestable(), findsOneWidget);
     });
@@ -1030,16 +1032,18 @@ void main() {
 
     testWidgets('scrollController scrolls to bottom',
         (WidgetTester tester) async {
-      var sc = ScrollController();
+      var verticalSc = ScrollController();
       await wrapWidgetSetSurf(
           tester,
           buildAsyncPaginatedTable(
-              scrollController: sc, showGeneration: false, showPage: false));
+              verticalScrollController: verticalSc,
+              showGeneration: false,
+              showPage: false));
 
       await tester.pumpAndSettle();
 
       expect(find.text('Frozen yogurt').hitTestable(), findsNothing);
-      sc.jumpTo(10000);
+      verticalSc.jumpTo(10000);
       await tester.pumpAndSettle();
       expect(find.text('Frozen yogurt').hitTestable(), findsOneWidget);
     });

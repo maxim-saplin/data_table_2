@@ -1117,7 +1117,7 @@ main() async {
     testWidgets(
         '3 fixed rows, 2 fixed columns, with minWidth, with scrollController, scroll to bottom',
         (WidgetTester tester) async {
-      var sc = ScrollController();
+      var verticalSc = ScrollController();
 
       await wrapWidgetSetSurf(
           tester,
@@ -1127,12 +1127,12 @@ main() async {
               fixedTopRows: 3,
               fixedLeftColumns: 2,
               minWidth: 850,
-              scrollController: sc),
+              verticalScrollController: verticalSc),
           const Size(850, 300));
 
       _verifyDataTable2InitialState(tester);
 
-      sc.jumpTo(400);
+      verticalSc.jumpTo(400);
 
       await tester.pumpAndSettle();
 
@@ -1190,7 +1190,7 @@ main() async {
         (WidgetTester tester) async {
       var col = 0;
       var trigger = StreamController();
-      var sc = ScrollController();
+      var verticalSc = ScrollController();
 
       var widget = StreamBuilder(
           stream: trigger.stream,
@@ -1200,7 +1200,7 @@ main() async {
               showPage: false,
               fixedTopRows: 0,
               fixedLeftColumns: col,
-              scrollController: sc,
+              verticalScrollController: verticalSc,
               minWidth: 850,
             );
           });
@@ -1259,7 +1259,7 @@ main() async {
     testWidgets(
         '1 fixed rows, 1 fixed column, scroll down via core, scroll up via left column, with controller',
         (WidgetTester tester) async {
-      var sc = ScrollController();
+      var verticalSc = ScrollController();
       await wrapWidgetSetSurf(
           tester,
           buildPaginatedTable(
@@ -1269,7 +1269,7 @@ main() async {
             fixedTopRows: 1,
             fixedLeftColumns: 1,
             minWidth: 850,
-            scrollController: sc,
+            verticalScrollController: verticalSc,
           ),
           const Size(525, 300));
 

@@ -963,21 +963,22 @@ main() {
     testWidgets(
         '3 fixed rows, 2 fixed columns, with minWidth, with scrollController, scroll to bottom',
         (WidgetTester tester) async {
-      var sc = ScrollController();
+      var verticalSc = ScrollController();
 
       await wrapWidgetSetSurfAndWait(
           tester,
           buildAsyncPaginatedTable(
-              useKDeserts: true,
-              fixedTopRows: 3,
-              fixedLeftColumns: 2,
-              minWidth: 850,
-              scrollController: sc),
+            useKDeserts: true,
+            fixedTopRows: 3,
+            fixedLeftColumns: 2,
+            minWidth: 850,
+            verticalScrollController: verticalSc,
+          ),
           const Size(850, 300));
 
       _verifyAsyncPaginatedDataTable2InitialState(tester);
 
-      sc.jumpTo(400);
+      verticalSc.jumpTo(400);
 
       await tester.pumpAndSettle();
 
@@ -1034,7 +1035,7 @@ main() {
         (WidgetTester tester) async {
       var col = 0;
       var trigger = StreamController();
-      var sc = ScrollController();
+      var verticalSc = ScrollController();
 
       var widget = StreamBuilder(
           stream: trigger.stream,
@@ -1043,7 +1044,7 @@ main() {
                 useKDeserts: true,
                 fixedTopRows: 0,
                 fixedLeftColumns: col,
-                scrollController: sc,
+                verticalScrollController: verticalSc,
                 minWidth: 850,
                 showCheckboxColumn: false);
           });
@@ -1100,7 +1101,7 @@ main() {
     testWidgets(
         '1 fixed rows, 1 fixed column, scroll down via core, scroll up via left column, with controller',
         (WidgetTester tester) async {
-      var sc = ScrollController();
+      var verticalSc = ScrollController();
       await wrapWidgetSetSurfAndWait(
           tester,
           buildAsyncPaginatedTable(
@@ -1108,7 +1109,7 @@ main() {
               fixedTopRows: 1,
               fixedLeftColumns: 1,
               minWidth: 850,
-              scrollController: sc,
+              verticalScrollController: verticalSc,
               showCheckboxColumn: false),
           const Size(500, 300));
 
