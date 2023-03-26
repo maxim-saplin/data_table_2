@@ -8,6 +8,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
 import 'test_utils.dart';
 
 // Table with 10 rows, aproximately 450 pixel tall
@@ -206,6 +207,7 @@ main() async {
     });
 
     testWidgets('3 cols, 3 rows, golden', (WidgetTester tester) async {
+      await loadAppFonts();
       await wrapWidgetSetSurf(
           tester,
           buildPaginatedTable(
