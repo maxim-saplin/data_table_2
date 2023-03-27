@@ -79,6 +79,27 @@ void main() {
       expect(find.text('KitKat').hitTestable(), findsOneWidget);
     });
 
+    testWidgets('horizontalScrollController scrolls to right',
+        (WidgetTester tester) async {
+      var horizontalSc = ScrollController();
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+              horizontalScrollController: horizontalSc,
+              minWidth: 199,
+              showCheckboxColumn: false,
+              columns: List.generate(
+                  3,
+                  (index) =>
+                      DataColumn2(label: Text('$index'), fixedWidth: 50))),
+          const Size(100, 500));
+
+      expect(find.text('Frozen yogurt').hitTestable(), findsOneWidget);
+      horizontalSc.jumpTo(10000);
+      await tester.pumpAndSettle();
+      expect(find.text('Frozen yogurt').hitTestable(), findsNothing);
+    });
+
     testWidgets('empty widget is displayed when there\'s no data',
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
@@ -509,6 +530,29 @@ void main() {
       verticalSc.jumpTo(10000);
       await tester.pumpAndSettle();
       expect(find.text('KitKat').hitTestable(), findsOneWidget);
+    });
+
+    testWidgets('horizontalScrollController scrolls to right',
+        (WidgetTester tester) async {
+      var horizontalSc = ScrollController();
+      await wrapWidgetSetSurf(
+          tester,
+          buildPaginatedTable(
+              horizontalScrollController: horizontalSc,
+              minWidth: 199,
+              showCheckboxColumn: false,
+              showGeneration: false,
+              showPage: false,
+              columns: List.generate(
+                  3,
+                  (index) =>
+                      DataColumn2(label: Text('$index'), fixedWidth: 50))),
+          const Size(100, 500));
+
+      expect(find.text('Frozen yogurt').hitTestable(), findsOneWidget);
+      horizontalSc.jumpTo(10000);
+      await tester.pumpAndSettle();
+      expect(find.text('Frozen yogurt').hitTestable(), findsNothing);
     });
 
     testWidgets('empty widget is displayed when there\'s no data',
@@ -1047,6 +1091,29 @@ void main() {
       verticalSc.jumpTo(10000);
       await tester.pumpAndSettle();
       expect(find.text('Frozen yogurt').hitTestable(), findsOneWidget);
+    });
+
+    testWidgets('horizontalScrollController scrolls to right',
+        (WidgetTester tester) async {
+      var horizontalSc = ScrollController();
+      await wrapWidgetSetSurf(
+          tester,
+          buildAsyncPaginatedTable(
+              horizontalScrollController: horizontalSc,
+              minWidth: 199,
+              showCheckboxColumn: false,
+              showGeneration: false,
+              showPage: false,
+              columns: List.generate(
+                  3,
+                  (index) =>
+                      DataColumn2(label: Text('$index'), fixedWidth: 50))),
+          const Size(100, 500));
+
+      expect(find.text('Frozen yogurt').hitTestable(), findsOneWidget);
+      horizontalSc.jumpTo(10000);
+      await tester.pumpAndSettle();
+      expect(find.text('Frozen yogurt').hitTestable(), findsNothing);
     });
 
     testWidgets('empty widget is displayed when there\'s no data',
