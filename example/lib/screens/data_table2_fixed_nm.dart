@@ -125,24 +125,19 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
         padding: const EdgeInsets.all(16),
         child: Column(children: [
           _getParamsWidget(context),
-          Flexible(
-              fit: FlexFit.tight,
-              child: Theme(
-                  data: ThemeData(dividerColor: Colors.grey[400]),
-                  child: getTableFromSelectedType()))
+          Flexible(fit: FlexFit.tight, child: Theme(data: ThemeData(dividerColor: Colors.grey[400]), child: getTableFromSelectedType()))
         ]));
   }
 
   DataTable2 getDataTable() {
     return DataTable2(
         dividerThickness: 4,
-        verticalScrollController: _verticalController,
+        scrollController: _verticalController,
         columnSpacing: 0,
         horizontalMargin: 12,
         bottomMargin: 20,
         border: TableBorder.all(width: 1.0, color: Colors.grey),
-        headingRowColor: MaterialStateProperty.resolveWith(
-            (states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
+        headingRowColor: MaterialStateProperty.resolveWith((states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
         fixedColumnsColor: Colors.grey[300],
         fixedCornerColor: Colors.grey[400],
         minWidth: 1000,
@@ -155,71 +150,61 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
           DataColumn2(
             label: const Text('Desert'),
             size: ColumnSize.S,
-            onSort: (columnIndex, ascending) =>
-                _sort<String>((d) => d.name, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<String>((d) => d.name, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Calories'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.calories, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.calories, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Fat (gm)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.fat, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.fat, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Carbs (gm)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.carbs, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.carbs, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Protein (gm)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.protein, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.protein, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Sodium (mg)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.sodium, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.sodium, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Calcium (%)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.calcium, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.calcium, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Iron (%)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.iron, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.iron, columnIndex, ascending),
           ),
         ],
-        rows: List<DataRow>.generate(
-            _dataItems, (index) => _getRow(index, Colors.transparent)));
+        rows: List<DataRow>.generate(_dataItems, (index) => _getRow(index, Colors.transparent)));
   }
 
   Widget getPaginatedDataTable() {
     return PaginatedDataTable2(
-        verticalScrollController: _verticalController,
+        scrollController: _verticalController,
         columnSpacing: 0,
         horizontalMargin: 12,
         border: TableBorder.all(width: 1.0, color: Colors.grey),
-        headingRowColor: MaterialStateProperty.resolveWith(
-            (states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
+        headingRowColor: MaterialStateProperty.resolveWith((states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
         fixedColumnsColor: Colors.grey[300],
         fixedCornerColor: Colors.grey[400],
         minWidth: 1000,
@@ -232,57 +217,49 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
           DataColumn2(
             label: const Text('Desert'),
             size: ColumnSize.S,
-            onSort: (columnIndex, ascending) =>
-                _sort<String>((d) => d.name, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<String>((d) => d.name, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Calories'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.calories, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.calories, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Fat (gm)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.fat, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.fat, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Carbs (gm)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.carbs, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.carbs, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Protein (gm)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.protein, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.protein, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Sodium (mg)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.sodium, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.sodium, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Calcium (%)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.calcium, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.calcium, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Iron (%)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.iron, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.iron, columnIndex, ascending),
           ),
         ],
         source: _dessertsDataSource);
@@ -290,12 +267,11 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
 
   Widget getAsyncPaginatedDataTable() {
     return AsyncPaginatedDataTable2(
-        verticalScrollController: _verticalController,
+        scrollController: _verticalController,
         columnSpacing: 0,
         horizontalMargin: 12,
         border: TableBorder.all(width: 1.0, color: Colors.grey),
-        headingRowColor: MaterialStateProperty.resolveWith(
-            (states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
+        headingRowColor: MaterialStateProperty.resolveWith((states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
         fixedColumnsColor: Colors.grey[300],
         fixedCornerColor: Colors.grey[400],
         minWidth: 1000,
@@ -308,57 +284,49 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
           DataColumn2(
             label: const Text('Desert'),
             size: ColumnSize.S,
-            onSort: (columnIndex, ascending) =>
-                _sort<String>((d) => d.name, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<String>((d) => d.name, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Calories'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.calories, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.calories, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Fat (gm)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.fat, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.fat, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Carbs (gm)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.carbs, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.carbs, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Protein (gm)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.protein, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.protein, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Sodium (mg)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.sodium, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.sodium, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Calcium (%)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.calcium, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.calcium, columnIndex, ascending),
           ),
           DataColumn2(
             label: const Text('Iron (%)'),
             size: ColumnSize.S,
             numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.iron, columnIndex, ascending),
+            onSort: (columnIndex, ascending) => _sort<num>((d) => d.iron, columnIndex, ascending),
           ),
         ],
         source: _asyncDessertsDataSource);
@@ -377,8 +345,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
                 child: Row(
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    SizedBox(
-                        width: col1, child: Text('Fixed rows ($_fixedRows)')),
+                    SizedBox(width: col1, child: Text('Fixed rows ($_fixedRows)')),
                     SizedBox(
                         width: col2,
                         child: Slider(
@@ -398,9 +365,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
                 child: Row(
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    SizedBox(
-                        width: col1,
-                        child: Text('Fixed columns ($_fixedCols)')),
+                    SizedBox(width: col1, child: Text('Fixed columns ($_fixedCols)')),
                     SizedBox(
                         width: col2,
                         child: Slider(
@@ -420,8 +385,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
                 child: Row(
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    SizedBox(
-                        width: col1, child: Text('Data items ($_dataItems)')),
+                    SizedBox(width: col1, child: Text('Data items ($_dataItems)')),
                     SizedBox(
                         width: col2,
                         child: Slider(

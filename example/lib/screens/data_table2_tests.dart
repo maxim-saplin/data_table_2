@@ -1,14 +1,12 @@
 // ignore_for_file: avoid_print, prefer_interpolation_to_compose_strings, avoid_renaming_method_parameters
 
 import 'package:data_table_2/data_table_2.dart';
-
 import 'package:flutter/material.dart';
 
 int _idCounter = 0;
 
 class Dessert {
-  Dessert(this.name, this.calories, this.fat, this.carbs, this.protein,
-      this.sodium, this.calcium, this.iron);
+  Dessert(this.name, this.calories, this.fat, this.carbs, this.protein, this.sodium, this.calcium, this.iron);
 
   final String name;
   final int calories;
@@ -37,10 +35,7 @@ final List<Dessert> kDesserts = <Dessert>[
 ];
 
 final testColumns = <DataColumn2>[
-  DataColumn2(
-      label: const Text('Name'),
-      tooltip: 'Name',
-      onSort: (int columnIndex, bool ascending) {}),
+  DataColumn2(label: const Text('Name'), tooltip: 'Name', onSort: (int columnIndex, bool ascending) {}),
   DataColumn2(
     label: const Text('Calories'),
     tooltip: 'Calories',
@@ -107,7 +102,7 @@ DataTable2 buildTable(
     double? dividerThickness,
     Widget? empty,
     bool showCheckboxColumn = true,
-    ScrollController? verticalScrollController,
+    ScrollController? scrollController,
     List<DataColumn2>? columns,
     List<DataRow2>? rows}) {
   return DataTable2(
@@ -124,7 +119,7 @@ DataTable2 buildTable(
     empty: empty,
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
-    verticalScrollController: verticalScrollController,
+    scrollController: scrollController,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     rows: rows ?? testRows,
@@ -132,11 +127,7 @@ DataTable2 buildTable(
 }
 
 class TestDataSource extends DataTableSource {
-  TestDataSource(
-      {this.allowSelection = false,
-      this.showPage = true,
-      this.showGeneration = true,
-      this.noData = false});
+  TestDataSource({this.allowSelection = false, this.showPage = true, this.showGeneration = true, this.noData = false});
 
   final bool allowSelection;
   final bool showPage;
@@ -174,9 +165,7 @@ class TestDataSource extends DataTableSource {
         DataCell(Text('${dessert.calories}')),
         DataCell(Text(showGeneration ? '$generation' : '${dessert.carbs}')),
       ],
-      onSelectChanged: allowSelection
-          ? (bool? selected) => _handleSelected(index, selected)
-          : null,
+      onSelectChanged: allowSelection ? (bool? selected) => _handleSelected(index, selected) : null,
     );
   }
 
@@ -206,7 +195,7 @@ PaginatedDataTable2 buildPaginatedTable(
     PaginatorController? controller,
     Widget? empty,
     FlexFit fit = FlexFit.tight,
-    ScrollController? verticalScrollController,
+    ScrollController? scrollController,
     MaterialStateProperty<Color?>? headingRowColor,
     double? minWidth,
     Function(int?)? onRowsPerPageChanged,
@@ -226,20 +215,14 @@ PaginatedDataTable2 buildPaginatedTable(
     headingRowColor: headingRowColor,
     empty: empty,
     fit: fit,
-    verticalScrollController: verticalScrollController,
+    scrollController: scrollController,
     hidePaginator: hidePaginator,
     minWidth: minWidth,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     autoRowsToHeight: autoRowsToHeight,
-    onRowsPerPageChanged: showPageSizeSelector || onRowsPerPageChanged != null
-        ? onRowsPerPageChanged ?? (int? rowsPerPage) {}
-        : null,
-    source: TestDataSource(
-        allowSelection: true,
-        showPage: showPage,
-        showGeneration: showGeneration,
-        noData: noData),
+    onRowsPerPageChanged: showPageSizeSelector || onRowsPerPageChanged != null ? onRowsPerPageChanged ?? (int? rowsPerPage) {} : null,
+    source: TestDataSource(allowSelection: true, showPage: showPage, showGeneration: showGeneration, noData: noData),
   );
 }
 
@@ -267,7 +250,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     Widget? empty,
     PageSyncApproach syncApproach = PageSyncApproach.doNothing,
     // Return less rows when calling refresh method on the data source
-    ScrollController? verticalScrollController,
+    ScrollController? scrollController,
     double? minWidth,
     Function(int?)? onRowsPerPageChanged,
     List<DataColumn2>? columns}) {
@@ -295,23 +278,17 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
                 )))
         : null,
     empty: empty,
-    verticalScrollController: verticalScrollController,
+    scrollController: scrollController,
     hidePaginator: hidePaginator,
     minWidth: minWidth,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     autoRowsToHeight: autoRowsToHeight,
     errorBuilder: (e) => Text(e.toString()),
-    onRowsPerPageChanged: showPageSizeSelector || onRowsPerPageChanged != null
-        ? onRowsPerPageChanged ?? (int? rowsPerPage) {}
-        : null,
+    onRowsPerPageChanged: showPageSizeSelector || onRowsPerPageChanged != null ? onRowsPerPageChanged ?? (int? rowsPerPage) {} : null,
     pageSyncApproach: syncApproach,
     source: source ??
-        (DessertDataSourceAsync(
-            allowSelection: true,
-            showPage: showPage,
-            noData: noData,
-            fewerResultsAfterRefresh: fewerResultsAfterRefresh)
+        (DessertDataSourceAsync(allowSelection: true, showPage: showPage, noData: noData, fewerResultsAfterRefresh: fewerResultsAfterRefresh)
           .._errorCounter = throwError ? 0 : null),
   );
 }
@@ -356,8 +333,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
   }
 
   Future<int> getTotalRecors() {
-    return Future<int>.delayed(
-        const Duration(milliseconds: 0), () => _empty ? 0 : _dessertsX3.length);
+    return Future<int>.delayed(const Duration(milliseconds: 0), () => _empty ? 0 : _dessertsX3.length);
   }
 
   @override
@@ -376,15 +352,10 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     assert(index >= 0);
 
     var x = _empty
-        ? await Future.delayed(const Duration(milliseconds: 2000),
-            () => DesertsFakeWebServiceResponse(0, []))
+        ? await Future.delayed(const Duration(milliseconds: 2000), () => DesertsFakeWebServiceResponse(0, []))
         : (_usefewerResultsAfterRefresh)
-            ? await Future.delayed(
-                const Duration(milliseconds: 2000),
-                () => DesertsFakeWebServiceResponse(
-                    10, _dessertsX3.take(10).toList()))
-            : await _repo.getData(startIndex, count, _sortColumn,
-                _sortAscending, noData, useKDeserts);
+            ? await Future.delayed(const Duration(milliseconds: 2000), () => DesertsFakeWebServiceResponse(10, _dessertsX3.take(10).toList()))
+            : await _repo.getData(startIndex, count, _sortColumn, _sortAscending, noData, useKDeserts);
 
     if (fewerResultsAfterRefresh && !_usefewerResultsAfterRefresh) {
       _usefewerResultsAfterRefresh = true;
@@ -434,8 +405,7 @@ class DesertsFakeWebServiceResponse {
 }
 
 class DesertsFakeWebService {
-  int Function(Dessert, Dessert)? _getComparisonFunction(
-      String column, bool ascending) {
+  int Function(Dessert, Dessert)? _getComparisonFunction(String column, bool ascending) {
     var coef = ascending ? 1 : -1;
     switch (column) {
       case 'name':
@@ -447,8 +417,7 @@ class DesertsFakeWebService {
       case 'carbs':
         return (Dessert d1, Dessert d2) => coef * (d1.carbs - d2.carbs);
       case 'protein':
-        return (Dessert d1, Dessert d2) =>
-            coef * (d1.protein - d2.protein).round();
+        return (Dessert d1, Dessert d2) => coef * (d1.protein - d2.protein).round();
       case 'sodium':
         return (Dessert d1, Dessert d2) => coef * (d1.sodium - d2.sodium);
       case 'calcium':
@@ -460,8 +429,7 @@ class DesertsFakeWebService {
     return null;
   }
 
-  Future<DesertsFakeWebServiceResponse> getData(
-      int startingAt, int count, String sortedBy, bool sortedAsc, bool noData,
+  Future<DesertsFakeWebServiceResponse> getData(int startingAt, int count, String sortedBy, bool sortedAsc, bool noData,
       [bool useKDesserts = false]) async {
     return Future.delayed(
         Duration(
@@ -475,13 +443,8 @@ class DesertsFakeWebService {
           ? DesertsFakeWebServiceResponse(0, [])
           : (useKDesserts
               ? DesertsFakeWebServiceResponse(
-                  50 * kDesserts.length,
-                  List.generate(
-                      count,
-                      (index) =>
-                          kDesserts[(startingAt + index) % kDesserts.length]))
-              : DesertsFakeWebServiceResponse(_dessertsX3.length,
-                  _dessertsX3.skip(startingAt).take(count).toList()));
+                  50 * kDesserts.length, List.generate(count, (index) => kDesserts[(startingAt + index) % kDesserts.length]))
+              : DesertsFakeWebServiceResponse(_dessertsX3.length, _dessertsX3.skip(startingAt).take(count).toList()));
     });
   }
 }
@@ -489,10 +452,8 @@ class DesertsFakeWebService {
 List<Dessert> _desserts = kDesserts;
 
 List<Dessert> _dessertsX3 = _desserts.toList()
-  ..addAll(_desserts.map((i) => Dessert('${i.name} x2', i.calories, i.fat,
-      i.carbs, i.protein, i.sodium, i.calcium, i.iron)))
-  ..addAll(_desserts.map((i) => Dessert('${i.name} x3', i.calories, i.fat,
-      i.carbs, i.protein, i.sodium, i.calcium, i.iron)));
+  ..addAll(_desserts.map((i) => Dessert('${i.name} x2', i.calories, i.fat, i.carbs, i.protein, i.sodium, i.calcium, i.iron)))
+  ..addAll(_desserts.map((i) => Dessert('${i.name} x3', i.calories, i.fat, i.carbs, i.protein, i.sodium, i.calcium, i.iron)));
 
 class DataTable2Tests extends StatelessWidget {
   const DataTable2Tests({super.key});
