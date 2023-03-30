@@ -2180,7 +2180,6 @@ void main() {
 
   testWidgets('DataTable2 renders with border and background decoration',
       (WidgetTester tester) async {
-    // const double height = 600;
     const double borderHorizontal = 5.0;
     const double borderVertical = 10.0;
     const Color borderColor = Color(0xff2196f3);
