@@ -2180,7 +2180,6 @@ void main() {
 
   testWidgets('DataTable2 renders with border and background decoration',
       (WidgetTester tester) async {
-    // const double width = 800;
     // const double height = 600;
     const double borderHorizontal = 5.0;
     const double borderVertical = 10.0;
@@ -2201,19 +2200,16 @@ void main() {
           columns: const <DataColumn>[
             DataColumn(label: Text('Col1')),
           ],
-          rows: const <DataRow2>[
-            DataRow2(cells: <DataCell>[DataCell(Text('1'))]),
+          rows: const <DataRow>[
+            DataRow(cells: <DataCell>[DataCell(Text('1'))]),
           ],
         ),
       ),
     ));
 
-    var t = find
-        .ancestor(of: find.byType(Table), matching: find.byType(Container))
-        .first;
-
     expect(
-      t,
+      find.ancestor(
+          of: find.byType(Table).first, matching: find.byType(Container)),
       paints
         ..rect(
           //rect: const Rect.fromLTRB(0.0, 0.0, width, height),
@@ -2221,22 +2217,16 @@ void main() {
         ),
     );
     expect(
-      t,
-      paints
-        ..path(color: borderColor)
-        ..path(color: borderColor)
-        ..path(color: borderColor)
-        ..path(color: borderColor),
+      find.ancestor(
+          of: find.byType(Table).first, matching: find.byType(Container)),
+      paints..drrect(color: borderColor),
     );
     expect(
       tester.getTopLeft(find.byType(Table).first),
       const Offset(borderVertical, borderHorizontal),
     );
-    // expect(
-    //   tester.getBottomRight(find.byType(Table).first),
-    //   const Offset(width - borderVertical, height - borderHorizontal),
-    // );
   });
+
   testWidgets('DataTable set interior border test',
       (WidgetTester tester) async {
     const List<DataColumn> columns = <DataColumn>[
