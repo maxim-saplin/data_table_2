@@ -365,6 +365,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
         : null,
     empty: empty,
     scrollController: scrollController,
+    horizontalScrollController: horizontalScrollController,
     hidePaginator: hidePaginator,
     minWidth: minWidth,
     smRatio: overrideSizes ? 0.5 : 0.67,

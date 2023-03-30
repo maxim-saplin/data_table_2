@@ -911,6 +911,8 @@ void main() {
               columns: List.generate(3, (index) => DataColumn2(label: Text('$index'), fixedWidth: 50))),
           const Size(100, 500));
 
+      await tester.pumpAndSettle();
+
       expect(find.text('Frozen yogurt').hitTestable(), findsOneWidget);
       horizontalSc.jumpTo(10000);
       await tester.pumpAndSettle();
