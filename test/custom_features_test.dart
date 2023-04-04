@@ -522,6 +522,24 @@ void main() {
       expect(find.text('KitKat').hitTestable(), findsOneWidget);
     });
 
+    testWidgets('horizontalScrollController scrolls to right',
+        (WidgetTester tester) async {
+      var horizontalSc = ScrollController();
+      await wrapWidgetSetSurf(
+          tester,
+          buildPaginatedTable(
+              horizontalScrollController: horizontalSc,
+              minWidth: 500,
+              showGeneration: false,
+              showPage: false),
+          const Size(300, 500));
+
+      expect(find.text('Frozen yogurt').hitTestable(), findsOneWidget);
+      horizontalSc.jumpTo(10000);
+      await tester.pumpAndSettle();
+      expect(find.text('Frozen yogurt').hitTestable(), findsNothing);
+    });
+
     testWidgets('empty widget is displayed when there\'s no data',
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(tester,
