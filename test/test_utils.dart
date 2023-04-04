@@ -351,6 +351,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     PageSyncApproach syncApproach = PageSyncApproach.doNothing,
     // Return less rows when calling refresh method on the data source
     ScrollController? scrollController,
+    ScrollController? horizontalScrollController,
     double? minWidth,
     Function(int?)? onRowsPerPageChanged,
     List<DataColumn2>? columns}) {
@@ -387,6 +388,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
         : null,
     empty: empty,
     scrollController: scrollController,
+    horizontalScrollController: horizontalScrollController,
     hidePaginator: hidePaginator,
     minWidth: minWidth,
     smRatio: overrideSizes ? 0.5 : 0.67,
