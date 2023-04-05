@@ -78,6 +78,20 @@ void main() {
       expect(find.text('KitKat').hitTestable(), findsOneWidget);
     });
 
+    testWidgets('horizontalScrollController scrolls to right',
+        (WidgetTester tester) async {
+      var horizontalSc = ScrollController();
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(horizontalScrollController: horizontalSc, minWidth: 500),
+          const Size(300, 500));
+
+      expect(find.text('Frozen yogurt').hitTestable(), findsOneWidget);
+      horizontalSc.jumpTo(10000);
+      await tester.pumpAndSettle();
+      expect(find.text('Frozen yogurt').hitTestable(), findsNothing);
+    });
+
     testWidgets('empty widget is displayed when there\'s no data',
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
@@ -506,6 +520,24 @@ void main() {
       sc.jumpTo(10000);
       await tester.pumpAndSettle();
       expect(find.text('KitKat').hitTestable(), findsOneWidget);
+    });
+
+    testWidgets('horizontalScrollController scrolls to right',
+        (WidgetTester tester) async {
+      var horizontalSc = ScrollController();
+      await wrapWidgetSetSurf(
+          tester,
+          buildPaginatedTable(
+              horizontalScrollController: horizontalSc,
+              minWidth: 500,
+              showGeneration: false,
+              showPage: false),
+          const Size(300, 500));
+
+      expect(find.text('Frozen yogurt').hitTestable(), findsOneWidget);
+      horizontalSc.jumpTo(10000);
+      await tester.pumpAndSettle();
+      expect(find.text('Frozen yogurt').hitTestable(), findsNothing);
     });
 
     testWidgets('empty widget is displayed when there\'s no data',
@@ -1042,6 +1074,26 @@ void main() {
       sc.jumpTo(10000);
       await tester.pumpAndSettle();
       expect(find.text('Frozen yogurt').hitTestable(), findsOneWidget);
+    });
+
+    testWidgets('horizontalScrollController scrolls to right',
+        (WidgetTester tester) async {
+      var horizontalSc = ScrollController();
+      await wrapWidgetSetSurf(
+          tester,
+          buildAsyncPaginatedTable(
+              horizontalScrollController: horizontalSc,
+              minWidth: 500,
+              showGeneration: false,
+              showPage: false),
+          const Size(300, 500));
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Eclair').hitTestable(), findsOneWidget);
+      horizontalSc.jumpTo(10000);
+      await tester.pumpAndSettle();
+      expect(find.text('Eclair').hitTestable(), findsNothing);
     });
 
     testWidgets('empty widget is displayed when there\'s no data',

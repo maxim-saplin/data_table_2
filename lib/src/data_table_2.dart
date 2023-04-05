@@ -132,6 +132,7 @@ class DataTable2 extends DataTable {
     super.dividerThickness,
     this.minWidth,
     this.scrollController,
+    this.horizontalScrollController,
     this.empty,
     this.border,
     this.smRatio = 0.67,
@@ -205,6 +206,9 @@ class DataTable2 extends DataTable {
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows vertically scrollable
   final ScrollController? scrollController;
+
+  /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
+  final ScrollController? horizontalScrollController;
 
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
@@ -654,6 +658,8 @@ class DataTable2 extends DataTable {
       return SyncedScrollControllers(
           scrollController: scrollController,
           sc12toSc11Position: true,
+          horizontalScrollController: horizontalScrollController,
+          sc22toSc21Position: true,
           builder: (context, sc11, sc12, sc21, sc22) {
             var coreVerticalController = sc11;
             var leftColumnVerticalContoller = sc12;
@@ -1423,14 +1429,23 @@ class SyncedScrollControllers extends StatefulWidget {
       {super.key,
       required this.builder,
       this.scrollController,
-      this.sc12toSc11Position = false});
+      this.sc12toSc11Position = false,
+      this.horizontalScrollController,
+      this.sc22toSc21Position = false});
 
   /// One of the controllers (sc11) won't be created by this widget
   /// but rather use externally provided one
   final ScrollController? scrollController;
 
-  /// Whether to set sc12 initison offset to the value from sc11
+  /// One of the controllers (sc21) won't be created by this widget
+  /// but rather use externally provided one
+  final ScrollController? horizontalScrollController;
+
+  /// Whether to set sc12 initial offset to the value from sc11
   final bool sc12toSc11Position;
+
+  /// Whether to set sc22 initial offset to the value from sc21
+  final bool sc22toSc21Position;
 
   /// Positions of 2 pairs of scroll controllers (sc11|sc12 and sc21|sc22)
   /// will be synchronized, attached scrollables will copy the positions
@@ -1448,7 +1463,7 @@ class SyncedScrollControllers extends StatefulWidget {
 class SyncedScrollControllersState extends State<SyncedScrollControllers> {
   ScrollController? _sc11;
   late ScrollController _sc12;
-  late ScrollController _sc21;
+  ScrollController? _sc21;
   late ScrollController _sc22;
 
   final List<void Function()> _listeners = [];
@@ -1485,14 +1500,25 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
       _sc11 = ScrollController();
     }
 
+    var horizontalOffset =
+        _sc21 == null || _sc21!.positions.isEmpty ? 0.0 : _sc21!.offset;
+    if (widget.horizontalScrollController != null) {
+      _sc21 = widget.horizontalScrollController!;
+      if (_sc21!.positions.isNotEmpty) {
+        offset = _sc21!.offset;
+      }
+    } else {
+      _sc21 = ScrollController();
+    }
+
     _sc12 = ScrollController(
         initialScrollOffset: widget.sc12toSc11Position ? offset : 0.0);
-
-    _sc21 = ScrollController();
-    _sc22 = ScrollController();
+    _sc22 = ScrollController(
+        initialScrollOffset:
+            widget.sc22toSc21Position ? horizontalOffset : 0.0);
 
     _syncScrollControllers(_sc11!, _sc12);
-    _syncScrollControllers(_sc21, _sc22);
+    _syncScrollControllers(_sc21!, _sc22);
   }
 
   void _disposeOrUnsubscribe() {
@@ -1502,8 +1528,14 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
       _sc11?.dispose();
     }
     _sc12.dispose();
-    _sc21.dispose();
+
+    if (widget.horizontalScrollController == _sc21) {
+      _sc21?.removeListener(_listeners[0]);
+    } else {
+      _sc21?.dispose();
+    }
     _sc22.dispose();
+
     _listeners.clear();
   }
 
@@ -1533,7 +1565,7 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
 
   @override
   Widget build(BuildContext context) =>
-      widget.builder(context, _sc11!, _sc12, _sc21, _sc22);
+      widget.builder(context, _sc11!, _sc12, _sc21!, _sc22);
 }
 
 // TODO: revert back to SDK's TableRowInkWell as soon as it has secondary taps added

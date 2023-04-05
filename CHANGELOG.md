@@ -1,3 +1,6 @@
+## 2.4.2
+- Exposed horizontalScrollController from all widgets (PR#182)
+
 ## 2.4.1
 - Removed deprecated exports, you can now import only data_table_2.dart to get access to all widgets
 - Fixed bug #165 (row hover color being displayed outside the widget in some cases)

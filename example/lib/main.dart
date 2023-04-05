@@ -61,7 +61,7 @@ Scaffold _getScaffold(BuildContext context, Widget body,
                 ),
                 DropdownMenuItem(
                   value: '/datatable2scrollup',
-                  child: Text('Scroll-up'),
+                  child: Text('Scroll-up/Scroll-left'),
                 ),
                 DropdownMenuItem(
                   value: '/datatable2fixedmn',

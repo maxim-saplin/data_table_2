@@ -158,6 +158,7 @@ DataTable2 buildTable(
     Widget? empty,
     bool showCheckboxColumn = true,
     ScrollController? scrollController,
+    ScrollController? horizontalScrollController,
     List<DataColumn2>? columns,
     List<DataRow2>? rows}) {
   return DataTable2(
@@ -182,6 +183,7 @@ DataTable2 buildTable(
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
     scrollController: scrollController,
+    horizontalScrollController: horizontalScrollController,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     rows: rows ?? testRows,
@@ -271,6 +273,7 @@ PaginatedDataTable2 buildPaginatedTable(
     Widget? empty,
     FlexFit fit = FlexFit.tight,
     ScrollController? scrollController,
+    ScrollController? horizontalScrollController,
     MaterialStateProperty<Color?>? headingRowColor,
     double? minWidth,
     Function(int?)? onRowsPerPageChanged,
@@ -298,6 +301,7 @@ PaginatedDataTable2 buildPaginatedTable(
     empty: empty,
     fit: fit,
     scrollController: scrollController,
+    horizontalScrollController: horizontalScrollController,
     hidePaginator: hidePaginator,
     minWidth: minWidth,
     smRatio: overrideSizes ? 0.5 : 0.67,
@@ -347,6 +351,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     PageSyncApproach syncApproach = PageSyncApproach.doNothing,
     // Return less rows when calling refresh method on the data source
     ScrollController? scrollController,
+    ScrollController? horizontalScrollController,
     double? minWidth,
     Function(int?)? onRowsPerPageChanged,
     List<DataColumn2>? columns}) {
@@ -383,6 +388,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
         : null,
     empty: empty,
     scrollController: scrollController,
+    horizontalScrollController: horizontalScrollController,
     hidePaginator: hidePaginator,
     minWidth: minWidth,
     smRatio: overrideSizes ? 0.5 : 0.67,
