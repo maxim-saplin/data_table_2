@@ -1451,10 +1451,10 @@ class SyncedScrollControllers extends StatefulWidget {
   /// but rather use externally provided one
   final ScrollController? horizontalScrollController;
 
-  /// Whether to set sc12 initison offset to the value from sc11
+  /// Whether to set sc12 initial offset to the value from sc11
   final bool sc12toSc11Position;
 
-  /// Whether to set sc22 initison offset to the value from sc21
+  /// Whether to set sc22 initial offset to the value from sc21
   final bool sc22toSc21Position;
 
   /// Positions of 2 pairs of scroll controllers (sc11|sc12 and sc21|sc22)

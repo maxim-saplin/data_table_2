@@ -23,6 +23,7 @@ class DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
   late DessertDataSource _dessertsDataSource;
   bool _initialized = false;
   final ScrollController _controller = ScrollController();
+  final ScrollController _horizontalController = ScrollController();
 
   @override
   void didChangeDependencies() {
@@ -52,6 +53,7 @@ class DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
   void dispose() {
     _dessertsDataSource.dispose();
     _controller.dispose();
+    _horizontalController.dispose();
     super.dispose();
   }
 
@@ -70,6 +72,7 @@ class DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
                           MaterialStateProperty.all<Color>(Colors.black))),
               child: DataTable2(
                   scrollController: _controller,
+                  horizontalScrollController: _horizontalController,
                   columnSpacing: 0,
                   horizontalMargin: 12,
                   bottomMargin: 10,
@@ -137,34 +140,42 @@ class DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
                   ],
                   rows: List<DataRow>.generate(_dessertsDataSource.rowCount,
                       (index) => _dessertsDataSource.getRow(index)))),
-          _ScrollUpButton(_controller)
+          Positioned(
+              bottom: 20,
+              right: 0,
+              child: _ScrollXYButton(_controller, '↑↑ go up ↑↑')),
+          Positioned(
+              bottom: 60,
+              right: 0,
+              child: _ScrollXYButton(_horizontalController, '←← go left ←←'))
         ]));
   }
 }
 
-class _ScrollUpButton extends StatefulWidget {
-  const _ScrollUpButton(this.controller);
+class _ScrollXYButton extends StatefulWidget {
+  const _ScrollXYButton(this.controller, this.title);
 
   final ScrollController controller;
+  final String title;
 
   @override
-  _ScrollUpButtonState createState() => _ScrollUpButtonState();
+  _ScrollXYButtonState createState() => _ScrollXYButtonState();
 }
 
-class _ScrollUpButtonState extends State<_ScrollUpButton> {
-  bool _showScrollUp = false;
+class _ScrollXYButtonState extends State<_ScrollXYButton> {
+  bool _showScrollXY = false;
 
   @override
   void initState() {
     super.initState();
     widget.controller.addListener(() {
-      if (widget.controller.position.pixels > 20 && !_showScrollUp) {
+      if (widget.controller.position.pixels > 20 && !_showScrollXY) {
         setState(() {
-          _showScrollUp = true;
+          _showScrollXY = true;
         });
-      } else if (widget.controller.position.pixels < 20 && _showScrollUp) {
+      } else if (widget.controller.position.pixels < 20 && _showScrollXY) {
         setState(() {
-          _showScrollUp = false;
+          _showScrollXY = false;
         });
       }
       // On GitHub there was a question on how to determine the event
@@ -179,19 +190,16 @@ class _ScrollUpButtonState extends State<_ScrollUpButton> {
 
   @override
   Widget build(BuildContext context) {
-    return _showScrollUp
-        ? Positioned(
-            right: 10,
-            bottom: 10,
-            child: OutlinedButton(
-              onPressed: () => widget.controller.animateTo(0,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeIn),
-              style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.grey[800]),
-                  foregroundColor: MaterialStateProperty.all(Colors.white)),
-              child: const Text('↑↑ go up ↑↑'),
-            ))
+    return _showScrollXY
+        ? OutlinedButton(
+            onPressed: () => widget.controller.animateTo(0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeIn),
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.grey[800]),
+                foregroundColor: MaterialStateProperty.all(Colors.white)),
+            child: Text(widget.title),
+          )
         : const SizedBox();
   }
 }
