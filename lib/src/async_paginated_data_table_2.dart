@@ -353,6 +353,7 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
       super.hidePaginator = false,
       super.controller,
       super.scrollController,
+      super.horizontalScrollController,
       super.empty,
       this.loading,
       this.errorBuilder,
