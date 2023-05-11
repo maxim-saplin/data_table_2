@@ -1,3 +1,8 @@
+## 2.4.3
+- Updated to support new version of Flutter (3.10.0)
+- Fix secondary taps blocked by InkWell (PR #176)
+- Test DataTable2 renders with border and background decoration fails on flutter master (issue #178)
+
 ## 2.4.2
 - Exposed horizontalScrollController from all widgets (PR#182)
 
