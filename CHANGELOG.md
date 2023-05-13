@@ -1,3 +1,8 @@
+## 2.5.0
+- SDK constraint is set to minimum Dart 3
+- Switch to dataRowMinHeight and dataRowMaxHeight (deprecating dataRowHeight and aligning with DataTable from Flutter 3.10.0)
+- Fixing analyzer warnings 
+
 ## 2.4.3
 - Updated to support new version of Flutter (3.10.0)
 - Fix secondary taps blocked by InkWell (PR #176)

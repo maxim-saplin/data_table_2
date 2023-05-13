@@ -253,6 +253,19 @@ class DataTable2 extends DataTable {
   /// Note: to change background color of fixed data rows use [DataTable2.headingRowColor]
   final Color? fixedCornerColor;
 
+  (double, double) getMinMaxRowHeight(DataTableThemeData dataTableTheme) {
+    final double effectiveDataRowMinHeight = dataRowMinHeight ??
+        dataTableTheme.dataRowMinHeight ??
+        dataTableTheme.dataRowMinHeight ??
+        kMinInteractiveDimension;
+    final double effectiveDataRowMaxHeight = dataRowMaxHeight ??
+        dataTableTheme.dataRowMaxHeight ??
+        dataTableTheme.dataRowMaxHeight ??
+        kMinInteractiveDimension;
+
+    return (effectiveDataRowMinHeight, effectiveDataRowMaxHeight);
+  }
+
   Widget _buildCheckbox(
       {required BuildContext context,
       required bool? checked,
@@ -260,28 +273,35 @@ class DataTable2 extends DataTable {
       required ValueChanged<bool?>? onCheckboxChanged,
       required MaterialStateProperty<Color?>? overlayColor,
       required bool tristate,
-      required double rowHeight}) {
-    final ThemeData themeData = Theme.of(context);
+      required double? rowHeight}) {
+    final DataTableThemeData dataTableTheme = DataTableTheme.of(context);
+
     final double effectiveHorizontalMargin = horizontalMargin ??
-        themeData.dataTableTheme.horizontalMargin ??
+        dataTableTheme.horizontalMargin ??
         _horizontalMargin;
 
-    Widget contents = Semantics(
-      container: true,
-      child: Container(
-        height: rowHeight,
+    final (effectiveDataRowMinHeight, effectiveDataRowMaxHeight) =
+        getMinMaxRowHeight(dataTableTheme);
+
+    Widget wrapInContainer(Widget child) => Container(
+        constraints: BoxConstraints(
+            minHeight: rowHeight ?? effectiveDataRowMinHeight,
+            maxHeight: rowHeight ?? effectiveDataRowMaxHeight),
         padding: EdgeInsetsDirectional.only(
           start: checkboxHorizontalMargin ?? effectiveHorizontalMargin,
           end: (checkboxHorizontalMargin ?? effectiveHorizontalMargin) / 2.0,
         ),
-        child: Center(
-          child: Checkbox(
-            value: checked,
-            onChanged: onCheckboxChanged,
-            tristate: tristate,
-          ),
+        child: child);
+
+    Widget contents = Semantics(
+      container: true,
+      child: wrapInContainer(Center(
+        child: Checkbox(
+          value: checked,
+          onChanged: onCheckboxChanged,
+          tristate: tristate,
         ),
-      ),
+      )),
     );
     if (onRowTap != null) {
       contents = TableRowInkWell(
@@ -361,7 +381,6 @@ class DataTable2 extends DataTable {
       required bool numeric,
       required bool placeholder,
       required bool showEditIcon,
-      required double defaultDataRowHeight,
       required GestureTapCallback? onTap,
       required GestureTapCallback? onDoubleTap,
       required GestureLongPressCallback? onLongPress,
@@ -375,6 +394,8 @@ class DataTable2 extends DataTable {
       required VoidCallback? onSelectChanged,
       required MaterialStateProperty<Color?>? overlayColor}) {
     final ThemeData themeData = Theme.of(context);
+    final DataTableThemeData dataTableTheme = DataTableTheme.of(context);
+
     if (showEditIcon) {
       const Widget icon = Icon(Icons.edit, size: 18.0);
       label = Expanded(child: label);
@@ -385,14 +406,18 @@ class DataTable2 extends DataTable {
     }
 
     final TextStyle effectiveDataTextStyle = dataTextStyle ??
+        dataTableTheme.dataTextStyle ??
         themeData.dataTableTheme.dataTextStyle ??
         themeData.textTheme.bodyMedium!;
-    final double effectiveDataRowHeight =
-        specificRowHeight ?? defaultDataRowHeight;
+
+    final (effectiveDataRowMinHeight, effectiveDataRowMaxHeight) =
+        getMinMaxRowHeight(dataTableTheme);
 
     label = Container(
       padding: padding,
-      height: effectiveDataRowHeight,
+      constraints: BoxConstraints(
+          minHeight: specificRowHeight ?? effectiveDataRowMinHeight,
+          maxHeight: specificRowHeight ?? effectiveDataRowMaxHeight),
       alignment:
           numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
       child: DefaultTextStyle(
@@ -493,10 +518,6 @@ class DataTable2 extends DataTable {
     final double effectiveHeadingRowHeight = headingRowHeight ??
         theme.dataTableTheme.headingRowHeight ??
         _headingRowHeight;
-
-    final double defaultDataRowHeight = dataRowHeight ??
-        theme.dataTableTheme.dataRowHeight ??
-        kMinInteractiveDimension;
 
     final tableColumnWidths = List<TableColumnWidth>.filled(
         columns.length + (displayCheckboxColumn ? 1 : 0),
@@ -651,7 +672,6 @@ class DataTable2 extends DataTable {
         fixedColumnsRows,
         rows,
         actualFixedRows,
-        defaultDataRowHeight,
         effectiveDataRowColor);
 
     var builder = LayoutBuilder(builder: (context, constraints) {
@@ -754,7 +774,6 @@ class DataTable2 extends DataTable {
                 var c = _buildDataCell(
                     context: context,
                     padding: padding,
-                    defaultDataRowHeight: defaultDataRowHeight,
                     specificRowHeight:
                         row is DataRow2 ? row.specificRowHeight : null,
                     label: cell.child,
@@ -1019,7 +1038,6 @@ class DataTable2 extends DataTable {
       List<TableRow>? fixedColumnRows,
       List<DataRow> rows,
       int actualFixedRows,
-      double defaultDataRowHeight,
       MaterialStateProperty<Color?>? effectiveDataRowColor) {
     double checkBoxWidth = 0;
 
@@ -1071,10 +1089,9 @@ class DataTable2 extends DataTable {
             onCheckboxChanged: row.onSelectChanged,
             overlayColor: row.color ?? effectiveDataRowColor,
             tristate: false,
-            rowHeight: ((rows[rowIndex] is DataRow2) &&
-                    (rows[rowIndex] as DataRow2).specificRowHeight != null)
-                ? (rows[rowIndex] as DataRow2).specificRowHeight!
-                : defaultDataRowHeight);
+            rowHeight: rows[rowIndex] is DataRow2
+                ? (rows[rowIndex] as DataRow2).specificRowHeight
+                : null);
 
         if (fixedCornerRows != null && rowIndex < fixedCornerRows.length - 1) {
           fixedCornerRows[rowIndex + 1].children[0] = x;
