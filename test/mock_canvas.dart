@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:ui' as ui show Paragraph, Image;
+import 'dart:ui' as ui show Image, Paragraph;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
@@ -356,10 +356,12 @@ abstract class PaintPattern {
   /// object is reused multiple times, then this may not match the actual
   /// arguments as they were seen by the method.
   void arc(
-      {Color? color,
+      {Rect? rect,
+      Color? color,
       double? strokeWidth,
       bool? hasMaskFilter,
-      PaintingStyle? style});
+      PaintingStyle? style,
+      StrokeCap? strokeCap});
 
   /// Indicates that a paragraph is expected next.
   ///
@@ -486,6 +488,10 @@ abstract class PaintPattern {
   /// The predicate will be applied to each [Canvas] call until it returns false
   /// or all of the method calls have been tested.
   ///
+  /// If the predicate returns false, then the [paints] [Matcher] is considered
+  /// to have failed. If all calls are tested without failing, then the [paints]
+  /// [Matcher] is considered a success.
+  ///
   /// If the predicate throws a [String], then the [paints] [Matcher] is
   /// considered to have failed. The thrown string is used in the message
   /// displayed from the test framework and should be complete sentence
@@ -523,7 +529,9 @@ class _PathMatcher extends Matcher {
         if (path.contains(offset))
           'Offset $offset should be outside the path, but is not.',
     ];
-    if (errors.isEmpty) return true;
+    if (errors.isEmpty) {
+      return true;
+    }
     matchState[this] =
         'Not all the given points were inside or outside the path as expected:\n  ${errors.join("\n  ")}';
     return false;
@@ -533,7 +541,9 @@ class _PathMatcher extends Matcher {
   Description describe(Description description) {
     String points(List<Offset> list) {
       final int count = list.length;
-      if (count == 1) return 'one particular point';
+      if (count == 1) {
+        return 'one particular point';
+      }
       return '$count particular points';
     }
 
@@ -598,7 +608,9 @@ abstract class _TestRecordingCanvasMatcher extends Matcher {
         return false;
       }
       result = _evaluatePredicates(canvas.invocations, description);
-      if (!result) prefixMessage = 'did not match the pattern.';
+      if (!result) {
+        prefixMessage = 'did not match the pattern.';
+      }
     } catch (error, stack) {
       prefixMessage = 'threw the following exception:';
       description.writeln(error.toString());
@@ -676,10 +688,13 @@ class _TestRecordingCanvasPaintsNothingMatcher
       Iterable<RecordedInvocation> calls, StringBuffer description) {
     final Iterable<RecordedInvocation> paintingCalls =
         _filterCanvasCalls(calls);
-    if (paintingCalls.isEmpty) return true;
-    description
-        .write('painted something, the first call having the following stack:\n'
-            '${paintingCalls.first.stackToString(indent: "  ")}\n');
+    if (paintingCalls.isEmpty) {
+      return true;
+    }
+    description.write(
+      'painted something, the first call having the following stack:\n'
+      '${paintingCalls.first.stackToString(indent: "  ")}\n',
+    );
     return false;
   }
 
@@ -691,8 +706,10 @@ class _TestRecordingCanvasPaintsNothingMatcher
   // Filters out canvas calls that are not painting anything.
   static Iterable<RecordedInvocation> _filterCanvasCalls(
       Iterable<RecordedInvocation> canvasCalls) {
-    return canvasCalls.where((RecordedInvocation canvasCall) =>
-        !_nonPaintingOperations.contains(canvasCall.invocation.memberName));
+    return canvasCalls.where(
+      (RecordedInvocation canvasCall) =>
+          !_nonPaintingOperations.contains(canvasCall.invocation.memberName),
+    );
   }
 }
 
@@ -905,15 +922,19 @@ class _TestRecordingCanvasPatternMatcher extends _TestRecordingCanvasMatcher
 
   @override
   void arc(
-      {Color? color,
+      {Rect? rect,
+      Color? color,
       double? strokeWidth,
       bool? hasMaskFilter,
-      PaintingStyle? style}) {
+      PaintingStyle? style,
+      StrokeCap? strokeCap}) {
     _predicates.add(_ArcPaintPredicate(
+        rect: rect,
         color: color,
         strokeWidth: strokeWidth,
         hasMaskFilter: hasMaskFilter,
-        style: style));
+        style: style,
+        strokeCap: strokeCap));
   }
 
   @override
@@ -990,10 +1011,10 @@ class _TestRecordingCanvasPatternMatcher extends _TestRecordingCanvasMatcher
     if (_predicates.isEmpty) {
       return description.add('An object or closure and a paint pattern.');
     }
-    description.add('Object or closure painting: ');
+    description.add('Object or closure painting:\n');
     return description.addAll(
       '',
-      ', ',
+      '\n',
       '',
       _predicates
           .map<String>((_PaintPredicate predicate) => predicate.toString()),
@@ -1009,8 +1030,9 @@ class _TestRecordingCanvasPatternMatcher extends _TestRecordingCanvasMatcher
     }
     if (_predicates.isEmpty) {
       description.writeln(
-          'It painted something, but you must now add a pattern to the paints matcher '
-          'in the test to verify that it matches the important parts of the following.');
+        'It painted something, but you must now add a pattern to the paints matcher '
+        'in the test to verify that it matches the important parts of the following.',
+      );
       return false;
     }
     final Iterator<_PaintPredicate> predicate = _predicates.iterator;
@@ -1027,8 +1049,12 @@ class _TestRecordingCanvasPatternMatcher extends _TestRecordingCanvasMatcher
       return false;
     } on String catch (s) {
       description.writeln(s);
-      description.write(
-          'The stack of the offending call was:\n${call.current.stackToString(indent: "  ")}\n');
+      try {
+        description.write(
+            'The stack of the offending call was:\n${call.current.stackToString(indent: "  ")}\n');
+      } on TypeError catch (_) {
+        // All calls have been evaluated
+      }
       return false;
     }
     return true;
@@ -1074,6 +1100,7 @@ abstract class _DrawCommandPaintPredicate extends _PaintPredicate {
     this.strokeWidth,
     this.hasMaskFilter,
     this.style,
+    this.strokeCap,
   });
 
   final Symbol symbol;
@@ -1084,6 +1111,7 @@ abstract class _DrawCommandPaintPredicate extends _PaintPredicate {
   final double? strokeWidth;
   final bool? hasMaskFilter;
   final PaintingStyle? style;
+  final StrokeCap? strokeCap;
 
   String get methodName => _symbolName(symbol);
 
@@ -1120,6 +1148,9 @@ abstract class _DrawCommandPaintPredicate extends _PaintPredicate {
     if (style != null && paintArgument.style != style) {
       throw 'It called $methodName with a paint whose style, ${paintArgument.style}, was not exactly the expected style ($style).';
     }
+    if (strokeCap != null && paintArgument.strokeCap != strokeCap) {
+      throw 'It called $methodName with a paint whose strokeCap, ${paintArgument.strokeCap}, was not exactly the expected strokeCap ($strokeCap).';
+    }
   }
 
   @override
@@ -1127,19 +1158,27 @@ abstract class _DrawCommandPaintPredicate extends _PaintPredicate {
     final List<String> description = <String>[];
     debugFillDescription(description);
     String result = name;
-    if (description.isNotEmpty) result += ' with ${description.join(", ")}';
+    if (description.isNotEmpty) {
+      result += ' with ${description.join(", ")}';
+    }
     return result;
   }
 
   @protected
   @mustCallSuper
   void debugFillDescription(List<String> description) {
-    if (color != null) description.add('$color');
-    if (strokeWidth != null) description.add('strokeWidth: $strokeWidth');
+    if (color != null) {
+      description.add('$color');
+    }
+    if (strokeWidth != null) {
+      description.add('strokeWidth: $strokeWidth');
+    }
     if (hasMaskFilter != null) {
       description.add(hasMaskFilter! ? 'a mask filter' : 'no mask filter');
     }
-    if (style != null) description.add('$style');
+    if (style != null) {
+      description.add('$style');
+    }
   }
 }
 
@@ -1152,11 +1191,16 @@ class _OneParameterPaintPredicate<T> extends _DrawCommandPaintPredicate {
     required double? strokeWidth,
     required bool? hasMaskFilter,
     required PaintingStyle? style,
-  }) : super(symbol, name, 2, 1,
-            color: color,
-            strokeWidth: strokeWidth,
-            hasMaskFilter: hasMaskFilter,
-            style: style);
+  }) : super(
+          symbol,
+          name,
+          2,
+          1,
+          color: color,
+          strokeWidth: strokeWidth,
+          hasMaskFilter: hasMaskFilter,
+          style: style,
+        );
 
   final T? expected;
 
@@ -1192,11 +1236,16 @@ class _TwoParameterPaintPredicate<T1, T2> extends _DrawCommandPaintPredicate {
     required double? strokeWidth,
     required bool? hasMaskFilter,
     required PaintingStyle? style,
-  }) : super(symbol, name, 3, 2,
-            color: color,
-            strokeWidth: strokeWidth,
-            hasMaskFilter: hasMaskFilter,
-            style: style);
+  }) : super(
+          symbol,
+          name,
+          3,
+          2,
+          color: color,
+          strokeWidth: strokeWidth,
+          hasMaskFilter: hasMaskFilter,
+          style: style,
+        );
 
   final T1? expected1;
 
@@ -1377,10 +1426,16 @@ class _CirclePaintPredicate extends _DrawCommandPaintPredicate {
     if (x != null && y != null) {
       description.add('point ${Offset(x!, y!)}');
     } else {
-      if (x != null) description.add('x-coordinate ${x!.toStringAsFixed(1)}');
-      if (y != null) description.add('y-coordinate ${y!.toStringAsFixed(1)}');
+      if (x != null) {
+        description.add('x-coordinate ${x!.toStringAsFixed(1)}');
+      }
+      if (y != null) {
+        description.add('y-coordinate ${y!.toStringAsFixed(1)}');
+      }
     }
-    if (radius != null) description.add('radius ${radius!.toStringAsFixed(1)}');
+    if (radius != null) {
+      description.add('radius ${radius!.toStringAsFixed(1)}');
+    }
   }
 }
 
@@ -1480,17 +1535,23 @@ class _LinePaintPredicate extends _DrawCommandPaintPredicate {
   @override
   void debugFillDescription(List<String> description) {
     super.debugFillDescription(description);
-    if (p1 != null) description.add('end point p1: $p1');
-    if (p2 != null) description.add('end point p2: $p2');
+    if (p1 != null) {
+      description.add('end point p1: $p1');
+    }
+    if (p2 != null) {
+      description.add('end point p2: $p2');
+    }
   }
 }
 
 class _ArcPaintPredicate extends _DrawCommandPaintPredicate {
   _ArcPaintPredicate(
-      {Color? color,
+      {this.rect,
+      Color? color,
       double? strokeWidth,
       bool? hasMaskFilter,
-      PaintingStyle? style})
+      PaintingStyle? style,
+      StrokeCap? strokeCap})
       : super(
           #drawArc,
           'an arc',
@@ -1500,7 +1561,27 @@ class _ArcPaintPredicate extends _DrawCommandPaintPredicate {
           strokeWidth: strokeWidth,
           hasMaskFilter: hasMaskFilter,
           style: style,
+          strokeCap: strokeCap,
         );
+
+  final Rect? rect;
+
+  @override
+  void verifyArguments(List<dynamic> arguments) {
+    super.verifyArguments(arguments);
+    final Rect rectArgument = arguments[0] as Rect;
+    if (rect != null && rectArgument != rect) {
+      throw 'It called $methodName with a paint whose rect, $rectArgument, was not exactly the expected rect ($rect).';
+    }
+  }
+
+  @override
+  void debugFillDescription(List<String> description) {
+    super.debugFillDescription(description);
+    if (rect != null) {
+      description.add('rect $rect');
+    }
+  }
 }
 
 class _ShadowPredicate extends _PaintPredicate {
@@ -1571,8 +1652,12 @@ class _ShadowPredicate extends _PaintPredicate {
     } else if (excludes != null) {
       description.add('that does not contain $excludes');
     }
-    if (color != null) description.add('$color');
-    if (elevation != null) description.add('elevation: $elevation');
+    if (color != null) {
+      description.add('$color');
+    }
+    if (elevation != null) {
+      description.add('elevation: $elevation');
+    }
     if (transparentOccluder != null) {
       description.add('transparentOccluder: $transparentOccluder');
     }
@@ -1583,7 +1668,9 @@ class _ShadowPredicate extends _PaintPredicate {
     final List<String> description = <String>[];
     debugFillDescription(description);
     String result = methodName;
-    if (description.isNotEmpty) result += ' with ${description.join(", ")}';
+    if (description.isNotEmpty) {
+      result += ' with ${description.join(", ")}';
+    }
     return result;
   }
 }
@@ -1638,12 +1725,18 @@ class _DrawImagePaintPredicate extends _DrawCommandPaintPredicate {
   @override
   void debugFillDescription(List<String> description) {
     super.debugFillDescription(description);
-    if (image != null) description.add('image $image');
+    if (image != null) {
+      description.add('image $image');
+    }
     if (x != null && y != null) {
       description.add('point ${Offset(x!, y!)}');
     } else {
-      if (x != null) description.add('x-coordinate ${x!.toStringAsFixed(1)}');
-      if (y != null) description.add('y-coordinate ${y!.toStringAsFixed(1)}');
+      if (x != null) {
+        description.add('x-coordinate ${x!.toStringAsFixed(1)}');
+      }
+      if (y != null) {
+        description.add('y-coordinate ${y!.toStringAsFixed(1)}');
+      }
     }
   }
 }
@@ -1692,9 +1785,15 @@ class _DrawImageRectPaintPredicate extends _DrawCommandPaintPredicate {
   @override
   void debugFillDescription(List<String> description) {
     super.debugFillDescription(description);
-    if (image != null) description.add('image $image');
-    if (source != null) description.add('source $source');
-    if (destination != null) description.add('destination $destination');
+    if (image != null) {
+      description.add('image $image');
+    }
+    if (source != null) {
+      description.add('source $source');
+    }
+    if (destination != null) {
+      description.add('destination $destination');
+    }
   }
 }
 
@@ -1706,12 +1805,17 @@ class _SomethingPaintPredicate extends _PaintPredicate {
   @override
   void match(Iterator<RecordedInvocation> call) {
     RecordedInvocation currentCall;
+    bool testedAllCalls = false;
     do {
+      if (testedAllCalls) {
+        throw 'It painted methods that the predicate passed to a "something" step, '
+            'in the paint pattern, none of which were considered correct.';
+      }
       currentCall = call.current;
       if (!currentCall.invocation.isMethod) {
         throw 'It called $currentCall, which was not a method, when the paint pattern expected a method call';
       }
-      call.moveNext();
+      testedAllCalls = !call.moveNext();
     } while (!_runPredicate(currentCall.invocation.memberName,
         currentCall.invocation.positionalArguments));
   }
@@ -1736,14 +1840,17 @@ class _EverythingPaintPredicate extends _PaintPredicate {
 
   @override
   void match(Iterator<RecordedInvocation> call) {
-    while (call.moveNext()) {
+    do {
       final RecordedInvocation currentCall = call.current;
       if (!currentCall.invocation.isMethod) {
         throw 'It called $currentCall, which was not a method, when the paint pattern expected a method call';
       }
       if (!_runPredicate(currentCall.invocation.memberName,
-          currentCall.invocation.positionalArguments)) return;
-    }
+          currentCall.invocation.positionalArguments)) {
+        throw 'It painted something that the predicate passed to an "everything" step '
+            'in the paint pattern considered incorrect.\n';
+      }
+    } while (call.moveNext());
   }
 
   bool _runPredicate(Symbol methodName, List<dynamic> arguments) {
@@ -1822,7 +1929,9 @@ class _SaveRestorePairPaintPredicate extends _PaintPredicate {
 }
 
 String _valueName(Object? value) {
-  if (value is double) return value.toStringAsFixed(1);
+  if (value is double) {
+    return value.toStringAsFixed(1);
+  }
   return value.toString();
 }
 

@@ -35,10 +35,6 @@ class DataTable2DemoState extends State<DataTable2Demo> {
           currentRouteOption == rowTaps,
           currentRouteOption == rowHeightOverrides,
           currentRouteOption == showBordersWithZebraStripes);
-      // Default sorting sample. Set __sortColumnIndex to 0 and uncoment the lines below
-      // if (_sortColumnIndex == 0) {
-      //   _sort<String>((d) => d.name, _sortColumnIndex!, _sortAscending);
-      // }
       _initialized = true;
       _dessertsDataSource.addListener(() {
         setState(() {});
@@ -68,102 +64,114 @@ class DataTable2DemoState extends State<DataTable2Demo> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: DataTable2(
-        columnSpacing: 12,
-        horizontalMargin: 12,
-        border: getCurrentRouteOption(context) == fixedColumnWidth
-            ? TableBorder(
-                top: const BorderSide(color: Colors.black),
-                bottom: BorderSide(color: Colors.grey[300]!),
-                left: BorderSide(color: Colors.grey[300]!),
-                right: BorderSide(color: Colors.grey[300]!),
-                verticalInside: BorderSide(color: Colors.grey[300]!),
-                horizontalInside:
-                    const BorderSide(color: Colors.grey, width: 1))
-            : (getCurrentRouteOption(context) == showBordersWithZebraStripes
-                ? TableBorder.all()
-                : null),
-        dividerThickness:
-            1, // this one will be ignored if [border] is set above
-        bottomMargin: 10,
-        minWidth: 900,
-        sortColumnIndex: _sortColumnIndex,
-        sortAscending: _sortAscending,
-        sortArrowIcon: Icons.keyboard_arrow_up, // custom arrow
-        sortArrowAnimationDuration:
-            const Duration(milliseconds: 500), // custom animation duration
-        onSelectAll: (val) =>
-            setState(() => _dessertsDataSource.selectAll(val)),
-        columns: [
-          DataColumn2(
-            label: const Text('Desert'),
-            size: ColumnSize.S,
-            // example of fixed 1st row
-            fixedWidth:
-                getCurrentRouteOption(context) == fixedColumnWidth ? 200 : null,
-            onSort: (columnIndex, ascending) =>
-                _sort<String>((d) => d.name, columnIndex, ascending),
-          ),
-          DataColumn2(
-            label: const Text('Calories'),
-            size: ColumnSize.S,
-            numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.calories, columnIndex, ascending),
-          ),
-          DataColumn2(
-            label: const Text('Fat (gm)'),
-            size: ColumnSize.S,
-            numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.fat, columnIndex, ascending),
-          ),
-          DataColumn2(
-            label: const Text('Carbs (gm)'),
-            size: ColumnSize.S,
-            numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.carbs, columnIndex, ascending),
-          ),
-          DataColumn2(
-            label: const Text('Protein (gm)'),
-            size: ColumnSize.S,
-            numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.protein, columnIndex, ascending),
-          ),
-          DataColumn2(
-            label: const Text('Sodium (mg)'),
-            size: ColumnSize.S,
-            numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.sodium, columnIndex, ascending),
-          ),
-          DataColumn2(
-            label: const Text('Calcium (%)'),
-            size: ColumnSize.S,
-            numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.calcium, columnIndex, ascending),
-          ),
-          DataColumn2(
-            label: const Text('Iron (%)'),
-            size: ColumnSize.S,
-            numeric: true,
-            onSort: (columnIndex, ascending) =>
-                _sort<num>((d) => d.iron, columnIndex, ascending),
-          ),
-        ],
-        empty: Center(
-            child: Container(
-                padding: const EdgeInsets.all(20),
-                color: Colors.grey[200],
-                child: const Text('No data'))),
-        rows: getCurrentRouteOption(context) == noData
-            ? []
-            : List<DataRow>.generate(_dessertsDataSource.rowCount,
-                (index) => _dessertsDataSource.getRow(index)),
-      ),
+      child: Theme(
+          // Using themes to override scroll bar appearence, note that iOS scrollbars do not support color overrides
+          data: ThemeData(
+              scrollbarTheme: ScrollbarThemeData(
+            thickness: MaterialStateProperty.all(5),
+            // thumbVisibility: MaterialStateProperty.all(true),
+            // thumbColor: MaterialStateProperty.all<Color>(Colors.yellow)
+          )),
+          child: DataTable2(
+            // Forcing all scrallbars to be visible, alternatively themes can be used (see above)
+            isHorizontalScrollBarVisible: true,
+            isVerticalScrollBarVisible: true,
+            columnSpacing: 12,
+            horizontalMargin: 12,
+            border: getCurrentRouteOption(context) == fixedColumnWidth
+                ? TableBorder(
+                    top: const BorderSide(color: Colors.black),
+                    bottom: BorderSide(color: Colors.grey[300]!),
+                    left: BorderSide(color: Colors.grey[300]!),
+                    right: BorderSide(color: Colors.grey[300]!),
+                    verticalInside: BorderSide(color: Colors.grey[300]!),
+                    horizontalInside:
+                        const BorderSide(color: Colors.grey, width: 1))
+                : (getCurrentRouteOption(context) == showBordersWithZebraStripes
+                    ? TableBorder.all()
+                    : null),
+            dividerThickness:
+                1, // this one will be ignored if [border] is set above
+            bottomMargin: 10,
+            minWidth: 900,
+            sortColumnIndex: _sortColumnIndex,
+            sortAscending: _sortAscending,
+            sortArrowIcon: Icons.keyboard_arrow_up, // custom arrow
+            sortArrowAnimationDuration:
+                const Duration(milliseconds: 500), // custom animation duration
+            onSelectAll: (val) =>
+                setState(() => _dessertsDataSource.selectAll(val)),
+            columns: [
+              DataColumn2(
+                label: const Text('Desert'),
+                size: ColumnSize.S,
+                // example of fixed 1st row
+                fixedWidth: getCurrentRouteOption(context) == fixedColumnWidth
+                    ? 200
+                    : null,
+                onSort: (columnIndex, ascending) =>
+                    _sort<String>((d) => d.name, columnIndex, ascending),
+              ),
+              DataColumn2(
+                label: const Text('Calories'),
+                size: ColumnSize.S,
+                numeric: true,
+                onSort: (columnIndex, ascending) =>
+                    _sort<num>((d) => d.calories, columnIndex, ascending),
+              ),
+              DataColumn2(
+                label: const Text('Fat (gm)'),
+                size: ColumnSize.S,
+                numeric: true,
+                onSort: (columnIndex, ascending) =>
+                    _sort<num>((d) => d.fat, columnIndex, ascending),
+              ),
+              DataColumn2(
+                label: const Text('Carbs (gm)'),
+                size: ColumnSize.S,
+                numeric: true,
+                onSort: (columnIndex, ascending) =>
+                    _sort<num>((d) => d.carbs, columnIndex, ascending),
+              ),
+              DataColumn2(
+                label: const Text('Protein (gm)'),
+                size: ColumnSize.S,
+                numeric: true,
+                onSort: (columnIndex, ascending) =>
+                    _sort<num>((d) => d.protein, columnIndex, ascending),
+              ),
+              DataColumn2(
+                label: const Text('Sodium (mg)'),
+                size: ColumnSize.S,
+                numeric: true,
+                onSort: (columnIndex, ascending) =>
+                    _sort<num>((d) => d.sodium, columnIndex, ascending),
+              ),
+              DataColumn2(
+                label: const Text('Calcium (%)'),
+                size: ColumnSize.S,
+                numeric: true,
+                onSort: (columnIndex, ascending) =>
+                    _sort<num>((d) => d.calcium, columnIndex, ascending),
+              ),
+              DataColumn2(
+                label: const Text('Iron (%)'),
+                size: ColumnSize.S,
+                numeric: true,
+                onSort: (columnIndex, ascending) =>
+                    _sort<num>((d) => d.iron, columnIndex, ascending),
+              ),
+            ],
+            empty: Center(
+                child: Container(
+                    padding: const EdgeInsets.all(20),
+                    color: Colors.grey[200],
+                    child: const Text('No data'))),
+            rows: getCurrentRouteOption(context) == noData
+                ? []
+                : List<DataRow>.generate(_dessertsDataSource.rowCount,
+                    (index) => _dessertsDataSource.getRow(index)),
+          )),
     );
   }
 }

@@ -848,8 +848,6 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       child: IconTheme.merge(
         data: const IconThemeData(opacity: 0.54),
         child: SizedBox(
-          // TODO(bkonyi): this won't handle text zoom correctly,
-          //  https://github.com/flutter/flutter/issues/48522
           height: 56.0,
           child: SingleChildScrollView(
             dragStartBehavior: widget.dragStartBehavior,
@@ -883,7 +881,6 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(ianh): This whole build function doesn't handle RTL yet.
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         bool isHeaderPresent = widget.header != null || widget.actions != null;

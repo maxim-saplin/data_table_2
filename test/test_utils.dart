@@ -159,6 +159,8 @@ DataTable2 buildTable(
     bool showCheckboxColumn = true,
     ScrollController? scrollController,
     ScrollController? horizontalScrollController,
+    bool? isHorizontalScrollBarVisible,
+    bool? isVerticalScrollBarVisible,
     List<DataColumn2>? columns,
     List<DataRow2>? rows}) {
   return DataTable2(
@@ -184,6 +186,8 @@ DataTable2 buildTable(
     columns: columns ?? testColumns,
     scrollController: scrollController,
     horizontalScrollController: horizontalScrollController,
+    isHorizontalScrollBarVisible: isHorizontalScrollBarVisible,
+    isVerticalScrollBarVisible: isVerticalScrollBarVisible,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     rows: rows ?? testRows,

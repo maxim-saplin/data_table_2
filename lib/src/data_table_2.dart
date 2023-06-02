@@ -8,7 +8,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 bool dataTableShowLogs = true;
 
@@ -133,6 +132,8 @@ class DataTable2 extends DataTable {
     this.minWidth,
     this.scrollController,
     this.horizontalScrollController,
+    this.isVerticalScrollBarVisible,
+    this.isHorizontalScrollBarVisible,
     this.empty,
     this.border,
     this.smRatio = 0.67,
@@ -209,6 +210,12 @@ class DataTable2 extends DataTable {
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? horizontalScrollController;
+
+  /// Determines whether the vertical scroll bar is visible, for iOS takes value from scrollbarTheme when null
+  final bool? isVerticalScrollBarVisible;
+
+  /// Determines whether the horizontal scroll bar is visible, for iOS takes value from scrollbarTheme when null
+  final bool? isHorizontalScrollBarVisible;
 
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
@@ -465,7 +472,7 @@ class DataTable2 extends DataTable {
         onRowSecondaryTap != null ||
         onRowSecondaryTapDown != null) {
       // row level
-      label = _TableRowInkWell(
+      label = TableRowInkWell(
         onTap: onRowTap ?? onSelectChanged,
         onDoubleTap: onRowDoubleTap,
         onLongPress: onRowLongPress,
@@ -930,7 +937,21 @@ class DataTable2 extends DataTable {
                           children: [t, SizedBox(height: bottomMargin!)])
                       : t;
 
+              var scrollBarTheme = Theme.of(context).scrollbarTheme;
+              // flutter/lib/src/material/scrollbar.dart, scrollbar decides whther to create  Cupertino or Material scrollbar, Cupertino ignores themes
+              var isiOS = Theme.of(context).platform == TargetPlatform.iOS;
+
+              // For iOS/Cupertino scrollbar
               fixedRowsAndCoreCol = Scrollbar(
+                  thumbVisibility: isHorizontalScrollBarVisible ??
+                      (isiOS
+                          ? scrollBarTheme.thumbVisibility
+                              ?.resolve({MaterialState.hovered})
+                          : null),
+                  thickness: (isiOS
+                      ? scrollBarTheme.thickness
+                          ?.resolve({MaterialState.hovered})
+                      : null),
                   controller: coreHorizontalController,
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
                     ScrollConfiguration(
@@ -951,13 +972,24 @@ class DataTable2 extends DataTable {
                                   ))),
                     Flexible(
                         fit: FlexFit.tight,
-                        child: SingleChildScrollView(
+                        child: Scrollbar(
+                            thumbVisibility: isVerticalScrollBarVisible ??
+                                (isiOS
+                                    ? scrollBarTheme.thumbVisibility
+                                        ?.resolve({MaterialState.hovered})
+                                    : null),
+                            thickness: (isiOS
+                                ? scrollBarTheme.thickness
+                                    ?.resolve({MaterialState.hovered})
+                                : null),
                             controller: coreVerticalController,
-                            scrollDirection: Axis.vertical,
                             child: SingleChildScrollView(
-                                controller: coreHorizontalController,
-                                scrollDirection: Axis.horizontal,
-                                child: addBottomMargin(coreTable))))
+                                controller: coreVerticalController,
+                                scrollDirection: Axis.vertical,
+                                child: SingleChildScrollView(
+                                    controller: coreHorizontalController,
+                                    scrollDirection: Axis.horizontal,
+                                    child: addBottomMargin(coreTable)))))
                   ]));
 
               fixedColumnAndCornerCol = fixedTopLeftCornerTable == null &&
@@ -1583,56 +1615,4 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
   @override
   Widget build(BuildContext context) =>
       widget.builder(context, _sc11!, _sc12, _sc21!, _sc22);
-}
-
-// TODO: revert back to SDK's TableRowInkWell as soon as it has secondary taps added
-class _TableRowInkWell extends InkResponse {
-  /// Creates an ink well for a table row.
-  const _TableRowInkWell({
-    super.child,
-    super.onTap,
-    super.onDoubleTap,
-    super.onLongPress,
-    super.onSecondaryTap,
-    super.onSecondaryTapDown,
-    super.overlayColor,
-  }) : super(
-          containedInkWell: true,
-          highlightShape: BoxShape.rectangle,
-        );
-
-  @override
-  RectCallback getRectCallback(RenderBox referenceBox) {
-    return () {
-      RenderObject cell = referenceBox;
-      AbstractNode? table = cell.parent;
-      final Matrix4 transform = Matrix4.identity();
-      while (table is RenderObject && table is! RenderTable) {
-        table.applyPaintTransform(cell, transform);
-        assert(table == cell.parent);
-        cell = table;
-        table = table.parent;
-      }
-      if (table is RenderTable) {
-        final TableCellParentData cellParentData =
-            cell.parentData! as TableCellParentData;
-        assert(cellParentData.y != null);
-        final Rect rect = table.getRowBox(cellParentData.y!);
-        // The rect is in the table's coordinate space. We need to change it to the
-        // TableRowInkWell's coordinate space.
-        table.applyPaintTransform(cell, transform);
-        final Offset? offset = MatrixUtils.getAsTranslation(transform);
-        if (offset != null) {
-          return rect.shift(-offset);
-        }
-      }
-      return Rect.zero;
-    };
-  }
-
-  @override
-  bool debugCheckContext(BuildContext context) {
-    assert(debugCheckHasTable(context));
-    return super.debugCheckContext(context);
-  }
 }

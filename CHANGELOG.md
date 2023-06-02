@@ -1,3 +1,8 @@
+## 2.5.1
+- 2 properties at DataTable2 allowing explicit visibility control of vertical/horizontal scrollbars
+- Passing visibility and thickness from scroll bar theme to iOS/Cupertino widget (Flutter SDK doesn't allow to fix that properties via themes)
+- Fix of scroll bars visibility on iOS (#140, #192) - now one can use either explicit properties of scroll bar themes
+
 ## 2.5.0
 - SDK constraint is set to minimum Dart 3
 - Switch to dataRowMinHeight and dataRowMaxHeight (deprecating dataRowHeight and aligning with DataTable from Flutter 3.10.0)

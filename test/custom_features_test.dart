@@ -5,6 +5,7 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'mock_canvas.dart';
 import 'test_utils.dart';
 import 'dart:async';
 import 'dart:math' as math;
@@ -12,6 +13,85 @@ import 'package:vector_math/vector_math_64.dart' show Matrix3;
 
 void main() {
   group('DataTable2', () {
+    // testWidgets('No scrollbars visible by default',
+    //     (WidgetTester tester) async {
+    //   await wrapWidgetSetSurf(tester, buildTable());
+    //   await tester.binding.setSurfaceSize(const Size(200, 300));
+    //   await tester.pumpAndSettle();
+
+    //   expect(find.byType(Scrollbar).hitTestable(), findsNothing);
+    // });
+
+    testWidgets(
+        'Horizontal scrollbar is visible if isHorizontalScrollBarVisible=true',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(tester,
+          buildTable(isHorizontalScrollBarVisible: true), const Size(250, 300));
+
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Scrollbar).first, paints..rect());
+    });
+
+    testWidgets(
+        'Vertical and horizontal scrollbars are visible if isHorizontalScrollBarVisible=true, isVerticalScrollBarVisible=true',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+              isVerticalScrollBarVisible: true,
+              isHorizontalScrollBarVisible: true),
+          const Size(250, 300));
+
+      await tester.pumpAndSettle();
+
+      // Check if both scrollbars are visible
+      expect(find.byType(Scrollbar).first, paints..rect());
+      expect(find.byType(Scrollbar).last, paints..rect());
+    });
+
+    testWidgets(
+        'Vertical and horizontal scrollbars are visible  when using theme',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          Theme(
+              data: ThemeData(
+                  scrollbarTheme: ScrollbarThemeData(
+                      thumbVisibility: MaterialStateProperty.all(true))),
+              child: buildTable()),
+          const Size(250, 300));
+
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Scrollbar).first, paints..rect());
+      expect(find.byType(Scrollbar).last, paints..rect());
+    });
+
+    testWidgets(
+        'Vertical and horizontal scroll bars are not visible by default',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(tester, buildTable(), const Size(250, 300));
+
+      await tester.pumpAndSettle();
+
+      bool invisible = false;
+
+      try {
+        expect(find.byType(Scrollbar).first, paints..rect());
+      } catch (_) {
+        invisible = true;
+      }
+      expect(invisible, true);
+      invisible = false;
+      try {
+        expect(find.byType(Scrollbar).last, paints..rect());
+      } catch (_) {
+        invisible = true;
+      }
+      expect(invisible, true);
+    });
+
     testWidgets('Default column size is applied to header cells',
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(tester, buildTable());
