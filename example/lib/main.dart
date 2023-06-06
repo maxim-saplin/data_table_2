@@ -1,4 +1,5 @@
 import 'package:example/screens/data_table2_fixed_nm.dart';
+import 'package:example/screens/data_table2_minheight.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -51,6 +52,10 @@ Scaffold _getScaffold(BuildContext context, Widget body,
                 Navigator.of(context).pushNamed(v!);
               },
               items: const [
+                DropdownMenuItem(
+                  value: '/demominheight',
+                  child: Text('Demo Min Height Bug'),
+                ),
                 DropdownMenuItem(
                   value: '/datatable2',
                   child: Text('DataTable2'),
@@ -142,6 +147,10 @@ class MyApp extends StatelessWidget {
       initialRoute: initialRoute,
 
       routes: {
+        '/demominheight': (context) => _getScaffold(
+            context,
+            const DataTable2MinHeightDemo(),
+            getOptionsForRoute('/demominheight')),
         '/datatable2': (context) => _getScaffold(
             context, const DataTable2Demo(), getOptionsForRoute('/datatable2')),
         '/datatable2simple': (context) =>

@@ -35,6 +35,14 @@ const goToLast = "Start at last page";
 
 /// Configurations available to given example routes
 const Map<String, List<String>> routeOptions = {
+  '/demominheight': [
+    dflt,
+    noData,
+    showBordersWithZebraStripes,
+    fixedColumnWidth,
+    rowTaps,
+    rowHeightOverrides
+  ],
   '/datatable2': [
     dflt,
     noData,

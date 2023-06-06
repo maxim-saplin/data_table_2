@@ -130,6 +130,8 @@ class DataTable2 extends DataTable {
     super.showBottomBorder = false,
     super.dividerThickness,
     this.minWidth,
+    super.dataRowMaxHeight,
+    super.dataRowMinHeight,
     this.scrollController,
     this.horizontalScrollController,
     this.isVerticalScrollBarVisible,
