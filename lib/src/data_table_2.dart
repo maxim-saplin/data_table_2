@@ -115,7 +115,7 @@ class DataTable2 extends DataTable {
     super.onSelectAll,
     super.decoration,
     super.dataRowColor,
-    super.dataRowHeight,
+    this.dataRowHeight,
     super.dataTextStyle,
     super.headingRowColor,
     this.fixedColumnsColor,
@@ -144,14 +144,7 @@ class DataTable2 extends DataTable {
     this.sortArrowIcon = Icons.arrow_upward,
     required super.rows,
   })  : assert(fixedLeftColumns >= 0),
-        assert(fixedTopRows >= 0) {
-    // // Fix for #111, syncrhonize scroll position for left fixed column with core
-    // // Works fine if there's scrollCongtroller provided externally, allows to avoid jumping
-    // _leftColumnVerticalContoller = ScrollController(
-    //     initialScrollOffset: _coreVerticalController.positions.isNotEmpty
-    //         ? _coreVerticalController.offset
-    //         : 0.0);
-  }
+        assert(fixedTopRows >= 0) {}
 
   static final LocalKey _headingRowKey = UniqueKey();
 
@@ -204,6 +197,18 @@ class DataTable2 extends DataTable {
   /// core of the table higher (e.g. if you would like to have iOS navigation UI at the bottom overlapping the table and
   /// have the ability to slightly scroll up the bototm row to avoid the obstruction)
   final double? bottomMargin;
+
+  /// The height of each row (excluding the row that contains column headings).
+  ///
+  /// If null, [DataTableThemeData.dataRowMinHeight] is used. This value defaults
+  /// to [kMinInteractiveDimension] to adhere to the Material Design
+  /// specifications.
+  ///
+  /// Note that unlike stock [DataTable] from the SDK there's no capability to define min/max
+  /// height of a row, corresponding properties are ingored. This is an implementation tradeoff
+  /// making it possible to have performant sticky columns.
+  @override
+  final double? dataRowHeight;
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows vertically scrollable
   final ScrollController? scrollController;
@@ -261,16 +266,18 @@ class DataTable2 extends DataTable {
   final Color? fixedCornerColor;
 
   (double, double) getMinMaxRowHeight(DataTableThemeData dataTableTheme) {
-    final double effectiveDataRowMinHeight = dataRowMinHeight ??
-        dataTableTheme.dataRowMinHeight ??
+    final double effectiveDataRowMinHeight = dataRowHeight ??
         dataTableTheme.dataRowMinHeight ??
         kMinInteractiveDimension;
-    final double effectiveDataRowMaxHeight = dataRowMaxHeight ??
-        dataTableTheme.dataRowMaxHeight ??
-        dataTableTheme.dataRowMaxHeight ??
-        kMinInteractiveDimension;
+    // Reverting min/max csupport to single row height value in order not to have troubles
+    // with sticky column cells
+    // https://github.com/maxim-saplin/data_table_2/issues/191
+    // final double effectiveDataRowMaxHeight = dataRowMaxHeight ??
+    //     dataTableTheme.dataRowMaxHeight ??
+    //     dataTableTheme.dataRowMaxHeight ??
+    //     kMinInteractiveDimension;
 
-    return (effectiveDataRowMinHeight, effectiveDataRowMaxHeight);
+    return (effectiveDataRowMinHeight, effectiveDataRowMinHeight);
   }
 
   Widget _buildCheckbox(

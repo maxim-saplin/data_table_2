@@ -1,3 +1,6 @@
+## 2.5.2
+- Reverting back to dataRowHeight instead of min/max (issue #191)
+
 ## 2.5.1
 - 2 properties at DataTable2 allowing explicit visibility control of vertical/horizontal scrollbars
 - Passing visibility and thickness from scroll bar theme to iOS/Cupertino widget (Flutter SDK doesn't allow to fix that properties via themes)
