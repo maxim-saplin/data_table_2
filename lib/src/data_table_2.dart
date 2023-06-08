@@ -144,7 +144,7 @@ class DataTable2 extends DataTable {
     this.sortArrowIcon = Icons.arrow_upward,
     required super.rows,
   })  : assert(fixedLeftColumns >= 0),
-        assert(fixedTopRows >= 0) {}
+        assert(fixedTopRows >= 0);
 
   static final LocalKey _headingRowKey = UniqueKey();
 
