@@ -129,6 +129,7 @@ class DataTable2 extends DataTable {
     super.showCheckboxColumn = true,
     super.showBottomBorder = false,
     super.dividerThickness,
+    super.clipBehavior,
     this.minWidth,
     this.scrollController,
     this.horizontalScrollController,

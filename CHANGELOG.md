@@ -1,3 +1,6 @@
+## 2.5.3
+- Exposed clipBehavior in DataTable2
+
 ## 2.5.2
 - Reverting back to dataRowHeight instead of min/max (issue #191)
 
