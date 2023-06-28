@@ -166,6 +166,8 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.sortAscending = true,
     this.sortArrowAnimationDuration = const Duration(milliseconds: 150),
     this.sortArrowIcon = Icons.arrow_upward,
+    this.sortArrowBuilder,
+    this.sortArrowAlwaysVisible = false,
     this.onSelectAll,
     this.dataRowHeight = kMinInteractiveDimension,
     this.headingRowHeight = 56.0,
@@ -261,6 +263,14 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// Icon to be displayed when sorting is applied to a column.
   /// If not set, the default icon is [Icons.arrow_upward]
   final IconData sortArrowIcon;
+
+  /// This used in combination with [sortArrowBuilder] to create a custom sort arrow widget behavior.
+  /// If this is set to true the [sortArrowBuilder] will run for all columns that have [onSort] != null.
+  final bool sortArrowAlwaysVisible;
+
+  /// A builder for the sort arrow widget. Can be used in combination with [sortArrowAlwaysVisible] for a custom
+  /// sort arrow behavior. If this is used [sortArrowIcon], [sortArrowAnimationDuration] will be ignored.
+  final Widget Function(bool ascending, bool sorted)? sortArrowBuilder;
 
   /// Invoked when the user selects or unselects every row, using the
   /// checkbox in the heading row.
@@ -719,6 +729,8 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           sortAscending: widget.sortAscending,
           sortArrowIcon: widget.sortArrowIcon,
           sortArrowAnimationDuration: widget.sortArrowAnimationDuration,
+          sortArrowBuilder: widget.sortArrowBuilder,
+          sortArrowAlwaysVisible: widget.sortArrowAlwaysVisible,
           onSelectAll: widget.onSelectAll,
           // Make sure no decoration is set on the DataTable
           // from the theme, as its already wrapped in a Card.

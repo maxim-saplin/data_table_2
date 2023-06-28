@@ -979,6 +979,141 @@ void main() {
         equals(Matrix3.rotationZ(math.pi)));
   });
 
+  testWidgets('DataTable2 custom sort arrow widget',
+      (WidgetTester tester) async {
+    Widget buildTable({bool sortAscending = true}) {
+      return DataTable2(
+        sortColumnIndex: 0,
+        sortAscending: sortAscending,
+        sortArrowBuilder: (ascending, sorted) => Row(
+          children: [
+            Icon(
+              Icons.arrow_upward,
+              color: sorted && ascending ? Colors.cyan : Colors.black,
+            ),
+            Icon(Icons.arrow_downward,
+                color: sorted && !ascending ? Colors.cyan : Colors.black)
+          ],
+        ),
+        columns: <DataColumn>[
+          DataColumn(
+            label: const Text('Name'),
+            tooltip: 'Name',
+            onSort: (int columnIndex, bool ascending) {},
+          ),
+          DataColumn(
+            label: const Text('Calories'),
+            tooltip: 'Calories',
+            onSort: (int columnIndex, bool ascending) {},
+          ),
+        ],
+        rows: kDesserts.map<DataRow2>((Dessert dessert) {
+          return DataRow2(
+            cells: <DataCell>[
+              DataCell(
+                Text(dessert.name),
+              ),
+              DataCell(
+                Text(dessert.calories.toString()),
+              ),
+            ],
+          );
+        }).toList(),
+      );
+    }
+
+    // Check for ascending list
+    await tester.pumpWidget(MaterialApp(
+      home: Material(child: buildTable(sortAscending: true)),
+    ));
+    // The `tester.widget` ensures that there is exactly 1 [Icons.arrow_upward] visible.
+    List totalSortArrows =
+        tester.widgetList(find.byIcon(Icons.arrow_upward)).toList();
+    expect(totalSortArrows.length, equals(1));
+
+    // The `tester.widget` ensures that the [Icons.arrow_upward] of the table has cyan color.
+    Icon sortArrowAscending =
+        tester.widget(find.byIcon(Icons.arrow_upward).first);
+    expect(sortArrowAscending.color, equals(Colors.cyan));
+
+    // Check for descending list.
+    await tester.pumpWidget(MaterialApp(
+      home: Material(child: buildTable(sortAscending: false)),
+    ));
+    await tester.pumpAndSettle();
+    // The `tester.widget` ensures that the [Icons.arrow_upward] of the table has black color.
+    sortArrowAscending = tester.widget(find.byIcon(Icons.arrow_upward).first);
+    expect(sortArrowAscending.color, equals(Colors.black));
+  });
+
+  testWidgets('DataTable2 custom sort arrow widget with sortArrowAlwaysVisible',
+      (WidgetTester tester) async {
+    Widget buildTable({bool sortAscending = true}) {
+      return DataTable2(
+        sortColumnIndex: 0,
+        sortAscending: sortAscending,
+        sortArrowAlwaysVisible: true,
+        sortArrowBuilder: (ascending, sorted) => Row(
+          children: [
+            Icon(
+              Icons.arrow_upward,
+              color: sorted && ascending ? Colors.cyan : Colors.black,
+            ),
+            Icon(Icons.arrow_downward,
+                color: sorted && !ascending ? Colors.cyan : Colors.black)
+          ],
+        ),
+        columns: <DataColumn>[
+          DataColumn(
+            label: const Text('Name'),
+            tooltip: 'Name',
+            onSort: (int columnIndex, bool ascending) {},
+          ),
+          DataColumn(
+            label: const Text('Calories'),
+            tooltip: 'Calories',
+            onSort: (int columnIndex, bool ascending) {},
+          ),
+        ],
+        rows: kDesserts.map<DataRow2>((Dessert dessert) {
+          return DataRow2(
+            cells: <DataCell>[
+              DataCell(
+                Text(dessert.name),
+              ),
+              DataCell(
+                Text(dessert.calories.toString()),
+              ),
+            ],
+          );
+        }).toList(),
+      );
+    }
+
+    // Check for ascending list
+    await tester.pumpWidget(MaterialApp(
+      home: Material(child: buildTable(sortAscending: true)),
+    ));
+
+    // The `tester.widget` ensures that there are exactly 2 [Icons.arrow_upward] visible.
+    List totalSortArrows =
+        tester.widgetList(find.byIcon(Icons.arrow_upward)).toList();
+    expect(totalSortArrows.length, equals(2));
+
+    Icon sortArrowAscending =
+        tester.widget(find.byIcon(Icons.arrow_upward).last);
+    expect(sortArrowAscending.color, equals(Colors.black));
+
+    // Check for descending list.
+    await tester.pumpWidget(MaterialApp(
+      home: Material(child: buildTable(sortAscending: true)),
+    ));
+    await tester.pumpAndSettle();
+    // The `tester.widget` ensures that there is exactly one upward arrow.
+    sortArrowAscending = tester.widget(find.byIcon(Icons.arrow_downward).last);
+    expect(sortArrowAscending.color, equals(Colors.black));
+  });
+
   testWidgets('DataTable2 row onSelectChanged test',
       (WidgetTester tester) async {
     await tester.pumpWidget(
