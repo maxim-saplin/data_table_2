@@ -730,7 +730,6 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           sortArrowIcon: widget.sortArrowIcon,
           sortArrowAnimationDuration: widget.sortArrowAnimationDuration,
           sortArrowBuilder: widget.sortArrowBuilder,
-          sortArrowAlwaysVisible: widget.sortArrowAlwaysVisible,
           onSelectAll: widget.onSelectAll,
           // Make sure no decoration is set on the DataTable
           // from the theme, as its already wrapped in a Card.

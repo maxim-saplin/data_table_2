@@ -1052,7 +1052,8 @@ void main() {
       return DataTable2(
         sortColumnIndex: 0,
         sortAscending: sortAscending,
-        sortArrowAlwaysVisible: true,
+        // TDOD: Add test
+        //sortArrowAlwaysVisible: true,
         sortArrowBuilder: (ascending, sorted) => Row(
           children: [
             Icon(
