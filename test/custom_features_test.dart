@@ -1808,6 +1808,86 @@ void main() {
     expect(find.text('Donut x3'), findsOneWidget);
     expect(find.text('1–10 of 10'), findsOneWidget);
   });
+
+  testWidgets('DataTable2 custom sort arrow widget',
+      (WidgetTester tester) async {
+    const alwaysShowArrows = false;
+    Widget buildTable({bool sortAscending = true}) {
+      return DataTable2(
+        sortColumnIndex: 0,
+        sortAscending: sortAscending,
+        sortArrowBuilder: (ascending, sorted) => sorted || alwaysShowArrows
+            ? Stack(
+                children: [
+                  Padding(
+                      padding: const EdgeInsets.only(right: 0),
+                      child: _SortIcon(
+                          ascending: true, active: sorted && ascending)),
+                  Padding(
+                      padding: const EdgeInsets.only(left: 10),
+                      child: _SortIcon(
+                          ascending: false, active: sorted && !ascending)),
+                ],
+              )
+            : null,
+        columns: <DataColumn>[
+          DataColumn(
+            label: const Text('Name'),
+            tooltip: 'Name',
+            onSort: (int columnIndex, bool ascending) {},
+          ),
+          DataColumn(
+            label: const Text('Calories'),
+            tooltip: 'Calories',
+            onSort: (int columnIndex, bool ascending) {},
+          ),
+        ],
+        rows: kDesserts.map<DataRow2>((Dessert dessert) {
+          return DataRow2(
+            cells: <DataCell>[
+              DataCell(
+                Text(dessert.name),
+              ),
+              DataCell(
+                Text(dessert.calories.toString()),
+              ),
+            ],
+          );
+        }).toList(),
+      );
+    }
+
+    // Check for ascending list
+    await tester.pumpWidget(MaterialApp(
+      home: Material(child: buildTable(sortAscending: true)),
+    ));
+
+    List upArrow =
+        tester.widgetList(find.byIcon(Icons.arrow_drop_up_rounded)).toList();
+    List downArrow =
+        tester.widgetList(find.byIcon(Icons.arrow_drop_down_rounded)).toList();
+    expect(upArrow.length, equals(1));
+    expect(downArrow.length, equals(1));
+
+    expect(upArrow.first.color, equals(Colors.cyan));
+    expect(downArrow.first.color, null);
+
+    // Check for descending list.
+    await tester.pumpWidget(MaterialApp(
+      home: Material(child: buildTable(sortAscending: false)),
+    ));
+    await tester.pumpAndSettle();
+
+    upArrow =
+        tester.widgetList(find.byIcon(Icons.arrow_drop_up_rounded)).toList();
+    downArrow =
+        tester.widgetList(find.byIcon(Icons.arrow_drop_down_rounded)).toList();
+    expect(upArrow.length, equals(1));
+    expect(downArrow.length, equals(1));
+
+    expect(upArrow.first.color, null);
+    expect(downArrow.first.color, equals(Colors.cyan));
+  });
 }
 
 Tripple<Size> _getColumnSizes(WidgetTester tester, bool header) {
@@ -1865,4 +1945,20 @@ Future<void> _smlOverridenColumnSizeApplied(
 
   // Last column is margin greater (24p) than the middle one.
   expect(((s.v3.width - 24) / s.v2.width - 1.5).abs() < 0.01, true);
+}
+
+class _SortIcon extends StatelessWidget {
+  final bool ascending;
+  final bool active;
+
+  const _SortIcon({required this.ascending, required this.active});
+
+  @override
+  Widget build(BuildContext context) {
+    return Icon(
+      ascending ? Icons.arrow_drop_up_rounded : Icons.arrow_drop_down_rounded,
+      size: 28,
+      color: active ? Colors.cyan : null,
+    );
+  }
 }
