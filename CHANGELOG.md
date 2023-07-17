@@ -1,3 +1,6 @@
+## 2.5.5
+- Customizing checkboxes in DataTable2 via `headingCheckboxTheme` and `datarowCheckboxTheme`
+
 ## 2.5.4
 - Custom arrow builder for heading cells (`sortArrowBuilder`)
 

@@ -35,6 +35,7 @@ Please check the [example folder](https://github.com/maxim-saplin/data_table_2/t
   - `PaginatedDataTable2.renderEmptyRowsInTheEnd` property changes the default Flutter way of rendering pages with empty rows
   - `DataRow2.specificRowHeight` allows overriding default height for any row
 - Overriding sort arrows via `sortArrowIcon` and `sortArrowAnimationDuration` properties, custom arrow builder with `sortArrowBuilder`
+- Customizing checkboxes in DataTable2 via `headingCheckboxTheme` and `datarowCheckboxTheme`
 - `empty` property which allows defining a placeholder widget to be displayed when data source is empty
 - `border` allows drawing inner and outer vertical and horizontal borders (e.g. outlining individual cells) - stock widgets only allow drawing horizontal row splitters
 - `PaginatorController` allows to externally control `PaginatedDataTable2` state (e.g. switch pages, change page size etc.)

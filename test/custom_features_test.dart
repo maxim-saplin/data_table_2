@@ -1888,6 +1888,71 @@ void main() {
     expect(upArrow.first.color, null);
     expect(downArrow.first.color, equals(Colors.cyan));
   });
+
+  testWidgets('DataTable2 checkbox themes', (WidgetTester tester) async {
+    Widget buildTable() {
+      return DataTable2(
+        headingCheckboxTheme:
+            CheckboxThemeData(fillColor: MaterialStateProperty.all(Colors.red)),
+        datarowCheckboxTheme: CheckboxThemeData(
+            fillColor: MaterialStateProperty.all(Colors.yellow)),
+        showCheckboxColumn: true,
+        onSelectAll: (value) {},
+        columns: <DataColumn>[
+          DataColumn(
+            label: const Text('Name'),
+            tooltip: 'Name',
+            onSort: (int columnIndex, bool ascending) {},
+          ),
+          DataColumn(
+            label: const Text('Calories'),
+            tooltip: 'Calories',
+            onSort: (int columnIndex, bool ascending) {},
+          ),
+        ],
+        rows: kDesserts.map<DataRow2>((Dessert dessert) {
+          return DataRow2(
+            onSelectChanged: (v) {},
+            cells: <DataCell>[
+              DataCell(
+                Text(dessert.name),
+              ),
+              DataCell(
+                Text(dessert.calories.toString()),
+              ),
+            ],
+          );
+        }).toList(),
+      );
+    }
+
+    // Check for ascending list
+    await tester.pumpWidget(MaterialApp(
+      home: Material(child: buildTable()),
+    ));
+
+    var h = find.byType(Theme).evaluate().where((element) =>
+        (element.widget as Theme).data.checkboxTheme.fillColor != null &&
+        (element.widget as Theme)
+                .data
+                .checkboxTheme
+                .fillColor!
+                .resolve({MaterialState.hovered}) ==
+            Colors.red);
+    expect(h.length, 1);
+    expect((h.first.widget as Theme).child.runtimeType, Checkbox);
+
+    var d = find.byType(Theme).evaluate().where((element) =>
+        (element.widget as Theme).data.checkboxTheme.fillColor != null &&
+        (element.widget as Theme)
+                .data
+                .checkboxTheme
+                .fillColor!
+                .resolve({MaterialState.hovered}) ==
+            Colors.yellow);
+    expect(d.length, kDesserts.length);
+    expect((d.first.widget as Theme).child.runtimeType, Checkbox);
+  });
 }
 
 Tripple<Size> _getColumnSizes(WidgetTester tester, bool header) {
