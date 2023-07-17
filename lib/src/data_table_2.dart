@@ -143,6 +143,7 @@ class DataTable2 extends DataTable {
     this.lmRatio = 1.2,
     this.sortArrowAnimationDuration = const Duration(milliseconds: 150),
     this.sortArrowIcon = Icons.arrow_upward,
+    this.sortArrowBuilder,
     required super.rows,
   })  : assert(fixedLeftColumns >= 0),
         assert(fixedTopRows >= 0);
@@ -186,8 +187,13 @@ class DataTable2 extends DataTable {
   final Duration sortArrowAnimationDuration;
 
   /// Icon to be displayed when sorting is applied to a column.
-  /// If not set, the default icon is [Icons.arrow_upward]
+  /// If not set, the default icon is [Icons.arrow_upward].
+  /// When set always overrides/preceeds default arrow icons.
   final IconData sortArrowIcon;
+
+  /// A builder for the sort arrow widget. Can be used in combination with [sortArrowAlwaysVisible] for a custom
+  /// sort arrow behavior. If this is used [sortArrowIcon], [sortArrowAnimationDuration] will be ignored.
+  final Widget? Function(bool ascending, bool sorted)? sortArrowBuilder;
 
   /// If set, the table will stop shrinking below the threshold and provide
   /// horizontal scrolling. Useful for the cases with narrow screens (e.g. portrait phone orientation)
@@ -341,17 +347,21 @@ class DataTable2 extends DataTable {
       required double effectiveHeadingRowHeight,
       required MaterialStateProperty<Color?>? overlayColor}) {
     final ThemeData themeData = Theme.of(context);
+
+    var customArrows =
+        sortArrowBuilder != null ? sortArrowBuilder!(ascending, sorted) : null;
     label = Row(
       textDirection: numeric ? TextDirection.rtl : null,
       children: <Widget>[
         Flexible(child: label),
         if (onSort != null) ...<Widget>[
-          _SortArrow(
-            visible: sorted,
-            up: sorted ? ascending : null,
-            duration: sortArrowAnimationDuration,
-            sortArrowIcon: sortArrowIcon,
-          ),
+          customArrows ??
+              _SortArrow(
+                visible: sorted,
+                up: sorted ? ascending : null,
+                duration: sortArrowAnimationDuration,
+                sortArrowIcon: sortArrowIcon,
+              ),
           const SizedBox(width: _sortArrowPadding),
         ],
       ],
