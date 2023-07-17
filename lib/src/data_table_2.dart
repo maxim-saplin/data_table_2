@@ -122,6 +122,8 @@ class DataTable2 extends DataTable {
     this.fixedCornerColor,
     super.headingRowHeight,
     super.headingTextStyle,
+    this.headingCheckboxTheme,
+    this.datarowCheckboxTheme,
     super.horizontalMargin,
     super.checkboxHorizontalMargin,
     this.bottomMargin,
@@ -199,6 +201,14 @@ class DataTable2 extends DataTable {
   /// horizontal scrolling. Useful for the cases with narrow screens (e.g. portrait phone orientation)
   /// and lots of columns (that get messed with little space)
   final double? minWidth;
+
+  /// Overrides theme of the checkbox that is displayed in the leftmost corner
+  /// of the heading (should checkboxes be enabled)
+  final CheckboxThemeData? headingCheckboxTheme;
+
+  /// Overrides theme of the checkbox that is displayed in the checkbox column
+  /// in each data row (should checkboxes be enabled)
+  final CheckboxThemeData? datarowCheckboxTheme;
 
   /// If set the table will have empty space added after the the last row and allow scroll the
   /// core of the table higher (e.g. if you would like to have iOS navigation UI at the bottom overlapping the table and
@@ -293,6 +303,7 @@ class DataTable2 extends DataTable {
       required VoidCallback? onRowTap,
       required ValueChanged<bool?>? onCheckboxChanged,
       required MaterialStateProperty<Color?>? overlayColor,
+      required CheckboxThemeData? checkboxTheme,
       required bool tristate,
       required double? rowHeight}) {
     final DataTableThemeData dataTableTheme = DataTableTheme.of(context);
@@ -317,11 +328,13 @@ class DataTable2 extends DataTable {
     Widget contents = Semantics(
       container: true,
       child: wrapInContainer(Center(
-        child: Checkbox(
-          value: checked,
-          onChanged: onCheckboxChanged,
-          tristate: tristate,
-        ),
+        child: Theme(
+            data: ThemeData(checkboxTheme: checkboxTheme),
+            child: Checkbox(
+              value: checked,
+              onChanged: onCheckboxChanged,
+              tristate: tristate,
+            )),
       )),
     );
     if (onRowTap != null) {
@@ -1105,6 +1118,7 @@ class DataTable2 extends DataTable {
           onCheckboxChanged: (bool? checked) =>
               _handleSelectAll(checked, someChecked),
           overlayColor: null,
+          checkboxTheme: headingCheckboxTheme,
           tristate: true,
           rowHeight: headingHeight);
 
@@ -1138,6 +1152,7 @@ class DataTable2 extends DataTable {
             },
             onCheckboxChanged: row.onSelectChanged,
             overlayColor: row.color ?? effectiveDataRowColor,
+            checkboxTheme: datarowCheckboxTheme,
             tristate: false,
             rowHeight: rows[rowIndex] is DataRow2
                 ? (rows[rowIndex] as DataRow2).specificRowHeight

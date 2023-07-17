@@ -1,5 +1,5 @@
 ## 2.5.4
-- Custom arrow builder for heading cells
+- Custom arrow builder for heading cells (`sortArrowBuilder`)
 
 ## 2.5.3
 - Exposed clipBehavior in DataTable2
