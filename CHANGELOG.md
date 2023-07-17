@@ -1,3 +1,6 @@
+## 2.5.4
+- Custom arrow builder for heading cells
+
 ## 2.5.3
 - Exposed clipBehavior in DataTable2
 

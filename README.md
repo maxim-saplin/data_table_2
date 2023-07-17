@@ -20,6 +20,7 @@ Please check the [example folder](https://github.com/maxim-saplin/data_table_2/t
   - Sticky left columns `DataTable2.fixedLeftColumns`
 - Vertically scrollable main area (with data rows)
   - `autoRowsToHeight` property on PaginatedDataTable2 allows to auto calculate page size depending on how much rows fit the height and makes vertical scrolling unnecessary
+  - Vertical and horizontal scroll visibility via `isVerticalScrollBarVisible` and `isHorizontalScrollBarVisible`
 - All columns are fixed width, table automatically stretches horizontally, individual column's width is determined as **(Width)/(Number of Columns)**
   - Should you want to adjust sizes of columns, you can replace `DataColumn` definitions with `DataColumn2` (which is a descendant of DataColumn). The class provides `size` property which can be set to one of 3 relative sizes (S, M and L)
   - Width ratios between Small and Medium, Large and Medium columns are defined by `smRatio` and `lmRatio` params
@@ -33,7 +34,7 @@ Please check the [example folder](https://github.com/maxim-saplin/data_table_2/t
 - There's `DataRow2` alternative to stock `DataRow` which provides row level tap events (including right clicks)
   - `PaginatedDataTable2.renderEmptyRowsInTheEnd` property changes the default Flutter way of rendering pages with empty rows
   - `DataRow2.specificRowHeight` allows overriding default height for any row
-- Overriding sort arrows via `sortArrowIcon` and `sortArrowAnimationDuration` properties
+- Overriding sort arrows via `sortArrowIcon` and `sortArrowAnimationDuration` properties, custom arrow builder with `sortArrowBuilder`
 - `empty` property which allows defining a placeholder widget to be displayed when data source is empty
 - `border` allows drawing inner and outer vertical and horizontal borders (e.g. outlining individual cells) - stock widgets only allow drawing horizontal row splitters
 - `PaginatorController` allows to externally control `PaginatedDataTable2` state (e.g. switch pages, change page size etc.)
