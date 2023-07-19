@@ -126,7 +126,7 @@ class DataTable2 extends DataTable {
     this.datarowCheckboxTheme,
     super.horizontalMargin,
     super.checkboxHorizontalMargin,
-    this.checkboxAlignment,
+    this.checkboxAlignment = Alignment.center,
     this.bottomMargin,
     super.columnSpacing,
     super.showCheckboxColumn = true,
@@ -209,7 +209,7 @@ class DataTable2 extends DataTable {
 
   /// Alignment of the checkbox if it is displayed
   /// Defaults to the [Alignment.center]
-  final Alignment? checkboxAlignment;
+  final Alignment checkboxAlignment;
 
   /// Overrides theme of the checkbox that is displayed in the checkbox column
   /// in each data row (should checkboxes be enabled)
@@ -333,7 +333,7 @@ class DataTable2 extends DataTable {
     Widget contents = Semantics(
       container: true,
       child: wrapInContainer(Align(
-        alignment: checkboxAlignment ?? Alignment.center,
+        alignment: checkboxAlignment,
         child: Theme(
             data: ThemeData(checkboxTheme: checkboxTheme),
             child: Checkbox(

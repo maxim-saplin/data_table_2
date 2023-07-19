@@ -401,7 +401,7 @@ class PaginatedDataTable2 extends StatefulWidget {
 
   /// Alignment of the checkbox if it is displayed
   /// Defaults to the [Alignment.center]
-  final Alignment? checkboxAlignment;
+  final Alignment checkboxAlignment;
 
   /// If set, the table will stop shrinking below the threshold and provide
   /// horizontal scrolling. Useful for the cases with narrow screens (e.g. portrait phone orientation)
