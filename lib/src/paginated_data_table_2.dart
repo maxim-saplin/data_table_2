@@ -195,6 +195,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.dragStartBehavior = DragStartBehavior.start,
     required this.source,
     this.checkboxHorizontalMargin,
+    this.checkboxAlignment = Alignment.center,
     this.wrapInCard = true,
     this.minWidth,
     this.fit = FlexFit.tight,
@@ -397,6 +398,10 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// of the table and the checkbox, as well as the margin between the checkbox
   /// and the content in the first data column. This value defaults to 24.0.
   final double? checkboxHorizontalMargin;
+
+  /// Alignment of the checkbox if it is displayed
+  /// Defaults to the [Alignment.center]
+  final Alignment? checkboxAlignment;
 
   /// If set, the table will stop shrinking below the threshold and provide
   /// horizontal scrolling. Useful for the cases with narrow screens (e.g. portrait phone orientation)
@@ -744,6 +749,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           headingRowHeight: widget.headingRowHeight,
           horizontalMargin: widget.horizontalMargin,
           checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
+          checkboxAlignment: widget.checkboxAlignment,
           columnSpacing: widget.columnSpacing,
           showCheckboxColumn: widget.showCheckboxColumn,
           showBottomBorder: true,
@@ -779,9 +785,8 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       }).toList();
       if (!widget.autoRowsToHeight) {
         footerWidgets.addAll(<Widget>[
-          Container(
-              width:
-                  14.0), // to match trailing padding in case we overflow and end up scrolling
+          Container(width: 14.0),
+          // to match trailing padding in case we overflow and end up scrolling
           Text(localizations.rowsPerPageTitle),
           ConstrainedBox(
             constraints: const BoxConstraints(
