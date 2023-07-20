@@ -96,8 +96,8 @@ class DataRow2 extends DataRow {
   /// Row double tap handler, won't be called if tapped cell has any tap event handlers
   final GestureTapCallback? onDoubleTap;
 
-  // /// Row long press handler, won't be called if tapped cell has any tap event handlers
-  // final GestureLongPressCallback? onLongPress;
+// /// Row long press handler, won't be called if tapped cell has any tap event handlers
+// final GestureLongPressCallback? onLongPress;
 }
 
 /// In-place replacement of standard [DataTable] widget, mimics it API.
@@ -126,6 +126,7 @@ class DataTable2 extends DataTable {
     this.datarowCheckboxTheme,
     super.horizontalMargin,
     super.checkboxHorizontalMargin,
+    this.checkboxAlignment = Alignment.center,
     this.bottomMargin,
     super.columnSpacing,
     super.showCheckboxColumn = true,
@@ -205,6 +206,10 @@ class DataTable2 extends DataTable {
   /// Overrides theme of the checkbox that is displayed in the leftmost corner
   /// of the heading (should checkboxes be enabled)
   final CheckboxThemeData? headingCheckboxTheme;
+
+  /// Alignment of the checkbox if it is displayed
+  /// Defaults to the [Alignment.center]
+  final Alignment checkboxAlignment;
 
   /// Overrides theme of the checkbox that is displayed in the checkbox column
   /// in each data row (should checkboxes be enabled)
@@ -316,6 +321,7 @@ class DataTable2 extends DataTable {
         getMinMaxRowHeight(dataTableTheme);
 
     Widget wrapInContainer(Widget child) => Container(
+        alignment: checkboxAlignment,
         constraints: BoxConstraints(
             minHeight: rowHeight ?? effectiveDataRowMinHeight,
             maxHeight: rowHeight ?? effectiveDataRowMaxHeight),
@@ -327,15 +333,15 @@ class DataTable2 extends DataTable {
 
     Widget contents = Semantics(
       container: true,
-      child: wrapInContainer(Center(
-        child: Theme(
+      child: wrapInContainer(
+        Theme(
             data: ThemeData(checkboxTheme: checkboxTheme),
             child: Checkbox(
               value: checked,
               onChanged: onCheckboxChanged,
               tristate: tristate,
             )),
-      )),
+      ),
     );
     if (onRowTap != null) {
       contents = TableRowInkWell(

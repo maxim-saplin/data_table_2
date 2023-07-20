@@ -1,3 +1,6 @@
+## 2.5.6
+- Added `checkboxAlignment` to widgets
+
 ## 2.5.5
 - Customizing checkboxes in DataTable2 via `headingCheckboxTheme` and `datarowCheckboxTheme`
 

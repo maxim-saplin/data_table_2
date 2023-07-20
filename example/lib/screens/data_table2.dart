@@ -83,6 +83,7 @@ class DataTable2DemoState extends State<DataTable2Demo> {
             headingTextStyle: const TextStyle(color: Colors.white),
             headingCheckboxTheme: const CheckboxThemeData(
                 side: BorderSide(color: Colors.white, width: 2.0)),
+            //checkboxAlignment: Alignment.topLeft,
             isHorizontalScrollBarVisible: true,
             isVerticalScrollBarVisible: true,
             columnSpacing: 12,
