@@ -321,6 +321,7 @@ class DataTable2 extends DataTable {
         getMinMaxRowHeight(dataTableTheme);
 
     Widget wrapInContainer(Widget child) => Container(
+        alignment: checkboxAlignment,
         constraints: BoxConstraints(
             minHeight: rowHeight ?? effectiveDataRowMinHeight,
             maxHeight: rowHeight ?? effectiveDataRowMaxHeight),
@@ -332,16 +333,15 @@ class DataTable2 extends DataTable {
 
     Widget contents = Semantics(
       container: true,
-      child: wrapInContainer(Align(
-        alignment: checkboxAlignment,
-        child: Theme(
+      child: wrapInContainer(
+        Theme(
             data: ThemeData(checkboxTheme: checkboxTheme),
             child: Checkbox(
               value: checked,
               onChanged: onCheckboxChanged,
               tristate: tristate,
             )),
-      )),
+      ),
     );
     if (onRowTap != null) {
       contents = TableRowInkWell(
