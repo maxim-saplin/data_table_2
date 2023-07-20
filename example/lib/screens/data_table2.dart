@@ -71,11 +71,12 @@ class DataTable2DemoState extends State<DataTable2Demo> {
       child: Theme(
           // Using themes to override scroll bar appearence, note that iOS scrollbars do not support color overrides
           data: ThemeData(
+              iconTheme: const IconThemeData(color: Colors.white),
               scrollbarTheme: ScrollbarThemeData(
-            thickness: MaterialStateProperty.all(5),
-            // thumbVisibility: MaterialStateProperty.all(true),
-            // thumbColor: MaterialStateProperty.all<Color>(Colors.yellow)
-          )),
+                thickness: MaterialStateProperty.all(5),
+                // thumbVisibility: MaterialStateProperty.all(true),
+                // thumbColor: MaterialStateProperty.all<Color>(Colors.yellow)
+              )),
           child: DataTable2(
             // Forcing all scrallbars to be visible, alternatively themes can be used (see above)
             headingRowColor:
