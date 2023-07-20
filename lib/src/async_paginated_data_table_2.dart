@@ -13,6 +13,7 @@ enum SelectionState { none, include, exclude }
 
 class AsyncRowsResponse {
   AsyncRowsResponse(this.totalRows, this.rows);
+
   final int totalRows;
   final List<DataRow> rows;
 }
@@ -48,6 +49,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
   Set<LocalKey> get selectionRowKeys => _selectionRowKeys;
 
   Object? _error;
+
   Object? get error => _error;
 
   List<DataRow> _rows = [];
@@ -349,6 +351,7 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
       super.dragStartBehavior = DragStartBehavior.start,
       required super.source,
       super.checkboxHorizontalMargin,
+      super.checkboxAlignment,
       super.wrapInCard = true,
       super.minWidth,
       super.fit = FlexFit.tight,

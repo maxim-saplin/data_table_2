@@ -413,7 +413,7 @@ void main() {
 
     // Tap on an empty space near checkbox
     var xy = tester.getCenter(find.ancestor(
-        of: find.byType(Checkbox).at(1), matching: find.byType(Center)));
+        of: find.byType(Checkbox).at(1), matching: find.byType(Align)));
 
     await tester.tapAt(Offset(xy.dx - 10, xy.dy - 20));
     await tester.pump(const Duration(milliseconds: 300));
