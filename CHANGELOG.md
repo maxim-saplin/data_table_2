@@ -1,3 +1,6 @@
+## 2.5.6
+- Fixed `DataRow2.specificRowHeight` when used with `AsyncPaginatedDataTable2`
+
 ## 2.5.5
 - Added `checkboxAlignment` to widgets
 - Customizing checkboxes in DataTable2 via `headingCheckboxTheme` and `datarowCheckboxTheme`

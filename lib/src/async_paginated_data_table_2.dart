@@ -72,6 +72,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
       return DataRow2(
           key: row.key,
           selected: selected ?? row.selected,
+          specificRowHeight: row.specificRowHeight,
           onSelectChanged: row.onSelectChanged,
           color: row.color,
           cells: row.cells,
