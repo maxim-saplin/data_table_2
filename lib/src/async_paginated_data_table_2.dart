@@ -60,12 +60,12 @@ abstract class AsyncDataTableSource extends DataTableSource {
   int _prevFetchCount = 0;
 
   /// Override this method to allow the data source asynchronously
-  /// fetch data (e.g. from a server) and convert them to [DataRow]/[DataRow2]
-  /// entities consumed by [AsyncPaginatedDataTable2] widget.
+  /// fetch [count] data beginning from [start] (e.g. from a server) and convert
+  /// them to [DataRow]/[DataRow2] entities consumed by [AsyncPaginatedDataTable2] widget.
   /// Note that besides rows this method is also supposed to return
   /// the total number of available rows (both values are packed into [AsyncRowsResponse] instance
   /// returned from this method)
-  Future<AsyncRowsResponse> getRows(int start, int end);
+  Future<AsyncRowsResponse> getRows(int startIndex, int count);
 
   DataRow _clone(DataRow row, bool? selected) {
     if (row is DataRow2) {
