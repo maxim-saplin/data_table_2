@@ -371,7 +371,8 @@ class PaginatedDataTable2 extends StatefulWidget {
 
   /// The options to offer for the rowsPerPage.
   ///
-  /// The current [rowsPerPage] must be a value in this list.
+  /// The current [rowsPerPage] must be a value in this list. Options that
+  /// are larger than total number of avaialble rows will be hidden.
   ///
   /// The values in this list should be sorted in ascending order.
   final List<int> availableRowsPerPage;

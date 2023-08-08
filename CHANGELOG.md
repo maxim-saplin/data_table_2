@@ -1,3 +1,6 @@
+## 2.5.7
+- `availableRowsPerPage` inline docs update
+
 ## 2.5.6
 - Fixed `DataRow2.specificRowHeight` when used with `AsyncPaginatedDataTable2`
 

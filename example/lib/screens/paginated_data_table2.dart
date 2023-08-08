@@ -120,6 +120,8 @@ class PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
   Widget build(BuildContext context) {
     return Stack(alignment: Alignment.bottomCenter, children: [
       PaginatedDataTable2(
+        // 100 Won't be shown since it is smaller than total records
+        availableRowsPerPage: const [2, 5, 10, 30, 100],
         horizontalMargin: 20,
         checkboxHorizontalMargin: 12,
         columnSpacing: 0,
