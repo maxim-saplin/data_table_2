@@ -1,5 +1,6 @@
 ## 2.5.7
 - `availableRowsPerPage` inline docs update
+- Fix wrong parameter name in AsyncDataTableSource.getRow method (PR #208)
 
 ## 2.5.6
 - Fixed `DataRow2.specificRowHeight` when used with `AsyncPaginatedDataTable2`
