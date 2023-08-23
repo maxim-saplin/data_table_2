@@ -303,10 +303,14 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// in each data row (should checkboxes be enabled)
   final CheckboxThemeData? datarowCheckboxTheme;
 
+  /// The text style for data rows.
+  ///
   /// If null, [DataTableThemeData.dataTextStyle] is used. By default, the text
   /// style is [TextTheme.bodyMedium].
   final TextStyle? dataTextStyle;
 
+  /// The text style for the heading row.
+  ///
   /// If null, [DataTableThemeData.headingTextStyle] is used. By default, the
   /// text style is [TextTheme.titleSmall].
   final TextStyle? headingTextStyle;

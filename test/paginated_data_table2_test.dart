@@ -1106,4 +1106,44 @@ void main() {
 
     await binding.setSurfaceSize(null);
   });
+
+  testWidgets('PaginatedDataTable2 passes through DataTable2 extra fields',
+      (WidgetTester tester) async {
+    final TestDataSource source = TestDataSource(allowSelection: true);
+
+    await tester.pumpWidget(MaterialApp(
+      home: Material(
+        child: PaginatedDataTable2(
+          headingTextStyle: const TextStyle(backgroundColor: Colors.amber),
+          dataTextStyle: const TextStyle(backgroundColor: Colors.red),
+          headingCheckboxTheme: const CheckboxThemeData(splashRadius: 1.5),
+          datarowCheckboxTheme: const CheckboxThemeData(splashRadius: 2.5),
+          header: const Text('Test table'),
+          source: source,
+          rowsPerPage: 2,
+          availableRowsPerPage: const <int>[
+            2,
+            4,
+          ],
+          onRowsPerPageChanged: (int? rowsPerPage) {},
+          onPageChanged: (int rowIndex) {},
+          onSelectAll: (bool? value) {},
+          columns: const <DataColumn>[
+            DataColumn(label: Text('Name')),
+            DataColumn(label: Text('Calories'), numeric: true),
+            DataColumn(label: Text('Generation')),
+          ],
+        ),
+      ),
+    ));
+
+    // Custom checkbox padding.
+    var t = find.byType(DataTable2).first;
+    expect(t, findsOneWidget);
+    var w = t.evaluate().first.widget as DataTable2;
+    expect(w.headingTextStyle!.backgroundColor, Colors.amber);
+    expect(w.dataTextStyle!.backgroundColor, Colors.red);
+    expect(w.headingCheckboxTheme!.splashRadius, 1.5);
+    expect(w.datarowCheckboxTheme!.splashRadius, 2.5);
+  });
 }
