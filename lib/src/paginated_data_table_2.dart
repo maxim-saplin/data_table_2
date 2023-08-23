@@ -169,9 +169,13 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.sortArrowBuilder,
     this.sortArrowAlwaysVisible = false,
     this.onSelectAll,
+    this.dataTextStyle,
     this.dataRowHeight = kMinInteractiveDimension,
+    this.datarowCheckboxTheme,
+    this.headingTextStyle,
     this.headingRowHeight = 56.0,
     this.headingRowColor,
+    this.headingCheckboxTheme,
     this.horizontalMargin = 24.0,
     this.columnSpacing = 56.0,
     this.dividerThickness,
@@ -289,6 +293,23 @@ class PaginatedDataTable2 extends StatefulWidget {
   ///
   /// This value is optional and defaults to 56.0 if not specified.
   final double headingRowHeight;
+
+  /// The theme for the heading row checkboxes.
+  ///
+  /// If null, [DataTableThemeData.headingCheckboxTheme] is used.
+  final CheckboxThemeData? headingCheckboxTheme;
+
+  /// Overrides theme of the checkbox that is displayed in the checkbox column
+  /// in each data row (should checkboxes be enabled)
+  final CheckboxThemeData? datarowCheckboxTheme;
+
+  /// If null, [DataTableThemeData.dataTextStyle] is used. By default, the text
+  /// style is [TextTheme.bodyMedium].
+  final TextStyle? dataTextStyle;
+
+  /// If null, [DataTableThemeData.headingTextStyle] is used. By default, the
+  /// text style is [TextTheme.titleSmall].
+  final TextStyle? headingTextStyle;
 
   /// {@template flutter.material.dataTable.headingRowColor}
   /// The background color for the heading row.
@@ -745,9 +766,13 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           fixedTopRows: widget.fixedTopRows,
           fixedColumnsColor: widget.fixedColumnsColor,
           fixedCornerColor: widget.fixedCornerColor,
+          dataTextStyle: widget.dataTextStyle,
           dataRowHeight: widget.dataRowHeight,
+          headingTextStyle: widget.headingTextStyle,
           headingRowColor: widget.headingRowColor,
           headingRowHeight: widget.headingRowHeight,
+          headingCheckboxTheme: widget.headingCheckboxTheme,
+          datarowCheckboxTheme: widget.datarowCheckboxTheme,
           horizontalMargin: widget.horizontalMargin,
           checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
           checkboxAlignment: widget.checkboxAlignment,
