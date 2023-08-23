@@ -1,6 +1,7 @@
 ## 2.5.7
 - `availableRowsPerPage` inline docs update
 - Fix wrong parameter name in AsyncDataTableSource.getRow method (PR #208)
+- PaginatedDataTable2 and AsyncPaginatedDataTable2 received extra params (headingTextStyle, dataTextStyle, headingCheckboxTheme, datarowCheckboxTheme)
 
 ## 2.5.6
 - Fixed `DataRow2.specificRowHeight` when used with `AsyncPaginatedDataTable2`
