@@ -25,13 +25,15 @@ class DataColumn2 extends DataColumn {
   /// Creates the configuration for a column of a [DataTable2].
   ///
   /// The [label] argument must not be null.
-  const DataColumn2(
-      {required super.label,
-      super.tooltip,
-      super.numeric = false,
-      super.onSort,
-      this.size = ColumnSize.M,
-      this.fixedWidth});
+  const DataColumn2({
+    required super.label,
+    super.tooltip,
+    super.numeric = false,
+    super.onSort,
+    this.size = ColumnSize.M,
+    this.fixedWidth,
+    this.alignment,
+  });
 
   /// Column sizes are determined based on available width by distributing it
   /// to individual columns accounting for their relative sizes (see [ColumnSize])
@@ -41,6 +43,9 @@ class DataColumn2 extends DataColumn {
   /// Warning, if the width happens to be larger than available total width other
   /// columns can be clipped
   final double? fixedWidth;
+
+  /// Alignment on the heading cell and cell
+  final AlignmentGeometry? alignment;
 }
 
 /// Extension of standard [DataRow], adds row level tap events. Also there're
@@ -354,17 +359,19 @@ class DataTable2 extends DataTable {
     return contents;
   }
 
-  Widget _buildHeadingCell(
-      {required BuildContext context,
-      required EdgeInsetsGeometry padding,
-      required Widget label,
-      required String? tooltip,
-      required bool numeric,
-      required VoidCallback? onSort,
-      required bool sorted,
-      required bool ascending,
-      required double effectiveHeadingRowHeight,
-      required MaterialStateProperty<Color?>? overlayColor}) {
+  Widget _buildHeadingCell({
+    required BuildContext context,
+    required EdgeInsetsGeometry padding,
+    required Widget label,
+    required String? tooltip,
+    required bool numeric,
+    required VoidCallback? onSort,
+    required bool sorted,
+    required bool ascending,
+    required double effectiveHeadingRowHeight,
+    required MaterialStateProperty<Color?>? overlayColor,
+    required AlignmentGeometry? alignment,
+  }) {
     final ThemeData themeData = Theme.of(context);
 
     var customArrows =
@@ -393,8 +400,9 @@ class DataTable2 extends DataTable {
     label = Container(
       padding: padding,
       height: effectiveHeadingRowHeight,
-      alignment:
-          numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
+      alignment: numeric
+          ? Alignment.centerRight
+          : alignment ?? AlignmentDirectional.centerStart,
       child: AnimatedDefaultTextStyle(
         style: effectiveHeadingTextStyle,
         softWrap: false,
@@ -436,7 +444,8 @@ class DataTable2 extends DataTable {
       required GestureTapCallback? onRowSecondaryTap,
       required GestureTapDownCallback? onRowSecondaryTapDown,
       required VoidCallback? onSelectChanged,
-      required MaterialStateProperty<Color?>? overlayColor}) {
+      required MaterialStateProperty<Color?>? overlayColor,
+      required AlignmentGeometry? alignment}) {
     final ThemeData themeData = Theme.of(context);
     final DataTableThemeData dataTableTheme = DataTableTheme.of(context);
 
@@ -462,8 +471,9 @@ class DataTable2 extends DataTable {
       constraints: BoxConstraints(
           minHeight: specificRowHeight ?? effectiveDataRowMinHeight,
           maxHeight: specificRowHeight ?? effectiveDataRowMaxHeight),
-      alignment:
-          numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
+      alignment: numeric
+          ? Alignment.centerRight
+          : alignment ?? AlignmentDirectional.centerStart,
       child: DefaultTextStyle(
         style: effectiveDataTextStyle.copyWith(
           color: placeholder
@@ -784,7 +794,8 @@ class DataTable2 extends DataTable {
                       : null,
                   sorted: dataColumnIndex == sortColumnIndex,
                   ascending: sortAscending,
-                  overlayColor: effectiveHeadingRowColor);
+                  overlayColor: effectiveHeadingRowColor,
+                  alignment: column is DataColumn2 ? column.alignment : null);
 
               headingRow.children[displayColumnIndex] =
                   h; // heading row alone is used to display table header should there be no data rows
@@ -839,7 +850,8 @@ class DataTable2 extends DataTable {
                     onSelectChanged: row.onSelectChanged != null
                         ? () => row.onSelectChanged!(!row.selected)
                         : null,
-                    overlayColor: row.color ?? effectiveDataRowColor);
+                    overlayColor: row.color ?? effectiveDataRowColor,
+                    alignment: column is DataColumn2 ? column.alignment : null);
 
                 if (displayColumnIndex < actualFixedColumns) {
                   if (rowIndex + 1 < actualFixedRows) {
