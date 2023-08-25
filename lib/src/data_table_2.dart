@@ -33,6 +33,7 @@ class DataColumn2 extends DataColumn {
     this.size = ColumnSize.M,
     this.fixedWidth,
     this.tooltipTriggerMode,
+    this.alignment,
   });
 
   /// Column sizes are determined based on available width by distributing it
@@ -46,6 +47,9 @@ class DataColumn2 extends DataColumn {
 
   /// Tooltip's trigger mode
   final TooltipTriggerMode? tooltipTriggerMode;
+
+  /// Alignment on the cells
+  final AlignmentGeometry? alignment;
 }
 
 /// Extension of standard [DataRow], adds row level tap events. Also there're
@@ -370,7 +374,8 @@ class DataTable2 extends DataTable {
       required bool ascending,
       required double effectiveHeadingRowHeight,
       required MaterialStateProperty<Color?>? overlayColor,
-      required TooltipTriggerMode? tooltipTriggerMode}) {
+      required TooltipTriggerMode? tooltipTriggerMode,
+      required AlignmentGeometry? alignment}) {
     final ThemeData themeData = Theme.of(context);
 
     var customArrows =
@@ -399,8 +404,9 @@ class DataTable2 extends DataTable {
     label = Container(
       padding: padding,
       height: effectiveHeadingRowHeight,
-      alignment:
-          numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
+      alignment: numeric
+          ? Alignment.centerRight
+          : alignment ?? AlignmentDirectional.centerStart,
       child: AnimatedDefaultTextStyle(
         style: effectiveHeadingTextStyle,
         softWrap: false,
@@ -443,7 +449,8 @@ class DataTable2 extends DataTable {
       required GestureTapCallback? onRowSecondaryTap,
       required GestureTapDownCallback? onRowSecondaryTapDown,
       required VoidCallback? onSelectChanged,
-      required MaterialStateProperty<Color?>? overlayColor}) {
+      required MaterialStateProperty<Color?>? overlayColor,
+      required AlignmentGeometry? alignment}) {
     final ThemeData themeData = Theme.of(context);
     final DataTableThemeData dataTableTheme = DataTableTheme.of(context);
 
@@ -469,8 +476,9 @@ class DataTable2 extends DataTable {
       constraints: BoxConstraints(
           minHeight: specificRowHeight ?? effectiveDataRowMinHeight,
           maxHeight: specificRowHeight ?? effectiveDataRowMaxHeight),
-      alignment:
-          numeric ? Alignment.centerRight : AlignmentDirectional.centerStart,
+      alignment: numeric
+          ? Alignment.centerRight
+          : alignment ?? AlignmentDirectional.centerStart,
       child: DefaultTextStyle(
         style: effectiveDataTextStyle.copyWith(
           color: placeholder
@@ -779,22 +787,23 @@ class DataTable2 extends DataTable {
                   FixedColumnWidth(widths[dataColumnIndex]);
 
               var h = _buildHeadingCell(
-                  context: context,
-                  padding: padding,
-                  effectiveHeadingRowHeight: effectiveHeadingRowHeight,
-                  label: column.label,
-                  tooltip: column.tooltip,
-                  numeric: column.numeric,
-                  onSort: column.onSort != null
-                      ? () => column.onSort!(dataColumnIndex,
-                          sortColumnIndex != dataColumnIndex || !sortAscending)
-                      : null,
-                  sorted: dataColumnIndex == sortColumnIndex,
-                  ascending: sortAscending,
-                  overlayColor: effectiveHeadingRowColor,
-                  tooltipTriggerMode: (column is DataColumn2)
-                      ? column.tooltipTriggerMode
-                      : null);
+                context: context,
+                padding: padding,
+                effectiveHeadingRowHeight: effectiveHeadingRowHeight,
+                label: column.label,
+                tooltip: column.tooltip,
+                numeric: column.numeric,
+                onSort: column.onSort != null
+                    ? () => column.onSort!(dataColumnIndex,
+                        sortColumnIndex != dataColumnIndex || !sortAscending)
+                    : null,
+                sorted: dataColumnIndex == sortColumnIndex,
+                ascending: sortAscending,
+                overlayColor: effectiveHeadingRowColor,
+                tooltipTriggerMode:
+                    (column is DataColumn2) ? column.tooltipTriggerMode : null,
+                alignment: (column is DataColumn2) ? column.alignment : null,
+              );
 
               headingRow.children[displayColumnIndex] =
                   h; // heading row alone is used to display table header should there be no data rows
@@ -826,30 +835,32 @@ class DataTable2 extends DataTable {
                 final DataCell cell = row.cells[dataColumnIndex];
 
                 var c = _buildDataCell(
-                    context: context,
-                    padding: padding,
-                    specificRowHeight:
-                        row is DataRow2 ? row.specificRowHeight : null,
-                    label: cell.child,
-                    numeric: column.numeric,
-                    placeholder: cell.placeholder,
-                    showEditIcon: cell.showEditIcon,
-                    onTap: cell.onTap,
-                    onDoubleTap: cell.onDoubleTap,
-                    onLongPress: cell.onLongPress,
-                    onTapDown: cell.onTapDown,
-                    onTapCancel: cell.onTapCancel,
-                    onRowTap: row is DataRow2 ? row.onTap : null,
-                    onRowDoubleTap: row is DataRow2 ? row.onDoubleTap : null,
-                    onRowLongPress: row.onLongPress,
-                    onRowSecondaryTap:
-                        row is DataRow2 ? row.onSecondaryTap : null,
-                    onRowSecondaryTapDown:
-                        row is DataRow2 ? row.onSecondaryTapDown : null,
-                    onSelectChanged: row.onSelectChanged != null
-                        ? () => row.onSelectChanged!(!row.selected)
-                        : null,
-                    overlayColor: row.color ?? effectiveDataRowColor);
+                  context: context,
+                  padding: padding,
+                  specificRowHeight:
+                      row is DataRow2 ? row.specificRowHeight : null,
+                  label: cell.child,
+                  numeric: column.numeric,
+                  placeholder: cell.placeholder,
+                  showEditIcon: cell.showEditIcon,
+                  onTap: cell.onTap,
+                  onDoubleTap: cell.onDoubleTap,
+                  onLongPress: cell.onLongPress,
+                  onTapDown: cell.onTapDown,
+                  onTapCancel: cell.onTapCancel,
+                  onRowTap: row is DataRow2 ? row.onTap : null,
+                  onRowDoubleTap: row is DataRow2 ? row.onDoubleTap : null,
+                  onRowLongPress: row.onLongPress,
+                  onRowSecondaryTap:
+                      row is DataRow2 ? row.onSecondaryTap : null,
+                  onRowSecondaryTapDown:
+                      row is DataRow2 ? row.onSecondaryTapDown : null,
+                  onSelectChanged: row.onSelectChanged != null
+                      ? () => row.onSelectChanged!(!row.selected)
+                      : null,
+                  overlayColor: row.color ?? effectiveDataRowColor,
+                  alignment: (column is DataColumn2) ? column.alignment : null,
+                );
 
                 if (displayColumnIndex < actualFixedColumns) {
                   if (rowIndex + 1 < actualFixedRows) {
