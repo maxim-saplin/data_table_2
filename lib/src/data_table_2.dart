@@ -25,13 +25,15 @@ class DataColumn2 extends DataColumn {
   /// Creates the configuration for a column of a [DataTable2].
   ///
   /// The [label] argument must not be null.
-  const DataColumn2(
-      {required super.label,
-      super.tooltip,
-      super.numeric = false,
-      super.onSort,
-      this.size = ColumnSize.M,
-      this.fixedWidth});
+  const DataColumn2({
+    required super.label,
+    super.tooltip,
+    super.numeric = false,
+    super.onSort,
+    this.size = ColumnSize.M,
+    this.fixedWidth,
+    this.tooltipTriggerMode,
+  });
 
   /// Column sizes are determined based on available width by distributing it
   /// to individual columns accounting for their relative sizes (see [ColumnSize])
@@ -41,6 +43,9 @@ class DataColumn2 extends DataColumn {
   /// Warning, if the width happens to be larger than available total width other
   /// columns can be clipped
   final double? fixedWidth;
+
+  /// Tooltip's trigger mode
+  final TooltipTriggerMode? tooltipTriggerMode;
 }
 
 /// Extension of standard [DataRow], adds row level tap events. Also there're
@@ -364,7 +369,8 @@ class DataTable2 extends DataTable {
       required bool sorted,
       required bool ascending,
       required double effectiveHeadingRowHeight,
-      required MaterialStateProperty<Color?>? overlayColor}) {
+      required MaterialStateProperty<Color?>? overlayColor,
+      required TooltipTriggerMode? tooltipTriggerMode}) {
     final ThemeData themeData = Theme.of(context);
 
     var customArrows =
@@ -405,6 +411,7 @@ class DataTable2 extends DataTable {
     if (tooltip != null) {
       label = Tooltip(
         message: tooltip,
+        triggerMode: tooltipTriggerMode,
         child: label,
       );
     }
@@ -784,7 +791,10 @@ class DataTable2 extends DataTable {
                       : null,
                   sorted: dataColumnIndex == sortColumnIndex,
                   ascending: sortAscending,
-                  overlayColor: effectiveHeadingRowColor);
+                  overlayColor: effectiveHeadingRowColor,
+                  tooltipTriggerMode: (column is DataColumn2)
+                      ? column.tooltipTriggerMode
+                      : null);
 
               headingRow.children[displayColumnIndex] =
                   h; // heading row alone is used to display table header should there be no data rows
