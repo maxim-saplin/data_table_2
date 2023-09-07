@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
+
 import 'test_utils.dart';
 
 // Table with 10 rows, aproximately 450 pixel tall
@@ -218,6 +219,81 @@ main() {
 
       await expectLater(find.byType(AsyncPaginatedDataTable2),
           matchesGoldenFile('async_paginated_fixed_3_3_colors.png'));
+    });
+
+    testWidgets(
+        '[headingRowDecoration] color will override [headerRowColor] and [fixedCornerColor]',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurfAndWait(
+          tester,
+          buildAsyncPaginatedTable(
+            useKDeserts: true,
+            fixedLeftColumns: 1,
+            fixedTopRows: 1,
+            headingRowColor: Colors.yellow,
+            fixedCornerColor: Colors.blue,
+            headingRowDecoration: const BoxDecoration(color: Colors.pink),
+          ),
+          const Size(500, 300));
+
+      _verifyAsyncPaginatedDataTable2InitialState(tester);
+
+      var decorations = find
+          .byType(Table)
+          .evaluate()
+          .map<Table>((e) => e.widget as Table)
+          .fold<List<Table>>([], (l, i) {
+        l.add(i);
+        return l;
+      }).fold<List<TableRow>>([], (l, i) {
+        l.addAll(i.children);
+        return l;
+      }).map<BoxDecoration>((e) => e.decoration as BoxDecoration);
+
+      expect(decorations.where((c) => c.color == Colors.yellow).length, 0);
+      expect(decorations.where((c) => c.color == Colors.blue).length, 0);
+      expect(decorations.where((c) => c.color == Colors.pink).length, 2);
+    });
+
+    testWidgets(
+        '[headingRowDecoration] gradient will overlay [headerRowColor] and [fixedCornerColor]',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurfAndWait(
+          tester,
+          buildAsyncPaginatedTable(
+              useKDeserts: true,
+              fixedLeftColumns: 1,
+              fixedTopRows: 1,
+              headingRowColor: Colors.yellow,
+              fixedCornerColor: Colors.blue,
+              headingRowDecoration: const BoxDecoration(
+                  gradient:
+                      LinearGradient(colors: [Colors.pink, Colors.purple]))),
+          const Size(500, 300));
+
+      _verifyAsyncPaginatedDataTable2InitialState(tester);
+
+      var decorations = find
+          .byType(Table)
+          .evaluate()
+          .map<Table>((e) => e.widget as Table)
+          .fold<List<Table>>([], (l, i) {
+        l.add(i);
+        return l;
+      }).fold<List<TableRow>>([], (l, i) {
+        l.addAll(i.children);
+        return l;
+      }).map<BoxDecoration>((e) => e.decoration as BoxDecoration);
+
+      expect(decorations.where((c) => c.color == Colors.yellow).length, 1);
+      expect(decorations.where((c) => c.color == Colors.blue).length, 1);
+      expect(
+          decorations
+              .where((c) =>
+                  c.gradient ==
+                  const LinearGradient(colors: [Colors.pink, Colors.purple]))
+              .length,
+          2);
     });
   });
 
