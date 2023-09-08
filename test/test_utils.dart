@@ -7,7 +7,6 @@
 // ignore_for_file: avoid_print
 
 import 'package:data_table_2/data_table_2.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -151,6 +150,7 @@ DataTable2 buildTable(
     Color? fixedColumnsColor,
     Color? fixedCornerColor,
     Color? headingRowColor,
+    BoxDecoration? headingRowDecoration,
     double? dividerThickness,
     bool showBottomBorder = false,
     TableBorder? border,
@@ -171,6 +171,7 @@ DataTable2 buildTable(
     sortAscending: sortAscending,
     sortArrowIcon: sortArrowIcon ?? Icons.arrow_upward,
     headingRowColor: MaterialStatePropertyAll(headingRowColor),
+    headingRowDecoration: headingRowDecoration,
     sortArrowAnimationDuration:
         sortArrowAnimationDuration ?? const Duration(milliseconds: 150),
     minWidth: minWidth,
@@ -279,6 +280,7 @@ PaginatedDataTable2 buildPaginatedTable(
     ScrollController? scrollController,
     ScrollController? horizontalScrollController,
     MaterialStateProperty<Color?>? headingRowColor,
+    BoxDecoration? headingRowDecoration,
     double? minWidth,
     Function(int?)? onRowsPerPageChanged,
     List<DataColumn2>? columns}) {
@@ -298,6 +300,7 @@ PaginatedDataTable2 buildPaginatedTable(
     controller: controller,
     border: border,
     headingRowColor: headingRowColor,
+    headingRowDecoration: headingRowDecoration,
     fixedColumnsColor: fixedColumnsColor,
     fixedCornerColor: fixedCornerColor,
     fixedLeftColumns: fixedLeftColumns,
@@ -335,6 +338,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     int fixedTopRows = 1,
     int fixedLeftColumns = 0,
     Color? headingRowColor,
+    BoxDecoration? headingRowDecoration,
     Color? fixedColumnsColor,
     Color? fixedCornerColor,
     bool showHeader = false,
@@ -365,6 +369,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     wrapInCard: wrapInCard,
     fixedTopRows: fixedTopRows,
     headingRowColor: MaterialStatePropertyAll(headingRowColor),
+    headingRowDecoration: headingRowDecoration,
     fixedColumnsColor: fixedColumnsColor,
     fixedLeftColumns: fixedLeftColumns,
     fixedCornerColor: fixedCornerColor,

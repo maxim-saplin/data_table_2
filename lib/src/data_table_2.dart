@@ -147,6 +147,7 @@ class DataTable2 extends DataTable {
     this.sortArrowAnimationDuration = const Duration(milliseconds: 150),
     this.sortArrowIcon = Icons.arrow_upward,
     this.sortArrowBuilder,
+    this.headingRowDecoration,
     required super.rows,
   })  : assert(fixedLeftColumns >= 0),
         assert(fixedTopRows >= 0);
@@ -219,6 +220,14 @@ class DataTable2 extends DataTable {
   /// core of the table higher (e.g. if you would like to have iOS navigation UI at the bottom overlapping the table and
   /// have the ability to slightly scroll up the bototm row to avoid the obstruction)
   final double? bottomMargin;
+
+  /// Overrides default [BoxDecoration](bottom border) applied to heading row.
+  /// When both [headerRowColor] and this porperty are provided:
+  /// - [headingRowDecoration] takes precedence if there're 0 or 1 fixed rows
+  /// - [headerRowColor] is applied to fixed top forws starting from the second
+  /// When there're both fixed top rows and fixed left columns with [fixedCornerColor] provided,
+  /// this decoration overrides top left cornner cell color.
+  final BoxDecoration? headingRowDecoration;
 
   /// The height of each row (excluding the row that contains column headings).
   ///
@@ -1353,6 +1362,15 @@ class DataTable2 extends DataTable {
               ))
             : null,
         color: effectiveHeadingRowColor?.resolve(<MaterialState>{}),
+      ).copyWith(
+        color: headingRowDecoration?.color,
+        image: headingRowDecoration?.image,
+        border: headingRowDecoration?.border,
+        borderRadius: headingRowDecoration?.borderRadius,
+        boxShadow: headingRowDecoration?.boxShadow,
+        gradient: headingRowDecoration?.gradient,
+        backgroundBlendMode: headingRowDecoration?.backgroundBlendMode,
+        shape: headingRowDecoration?.shape,
       ),
       children: List<Widget>.filled(numberOfCols, const _NullWidget()),
     );

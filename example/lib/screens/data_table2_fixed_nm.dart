@@ -143,6 +143,16 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
         border: TableBorder.all(width: 1.0, color: Colors.grey),
         headingRowColor: MaterialStateProperty.resolveWith(
             (states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
+        headingRowDecoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.grey[400]!,
+              Colors.grey[200]!,
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         fixedColumnsColor: Colors.grey[300],
         fixedCornerColor: Colors.grey[400],
         minWidth: 1000,

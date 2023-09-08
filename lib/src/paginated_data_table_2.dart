@@ -212,6 +212,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.autoRowsToHeight = false,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
+    this.headingRowDecoration,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
@@ -345,6 +346,10 @@ class PaginatedDataTable2 extends StatefulWidget {
   ///    <https://material.io/design/interaction/states.html#anatomy>.
   /// {@endtemplate}
   final MaterialStateProperty<Color?>? headingRowColor;
+
+  /// If set this field will override the current BoxDecoration.
+  /// It takes precedence over headerRowColor when both are provided.
+  final BoxDecoration? headingRowDecoration;
 
   /// The horizontal margin between the edges of the table and the content
   /// in the first and last cells of each row.
@@ -774,6 +779,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           dataRowHeight: widget.dataRowHeight,
           headingTextStyle: widget.headingTextStyle,
           headingRowColor: widget.headingRowColor,
+          headingRowDecoration: widget.headingRowDecoration,
           headingRowHeight: widget.headingRowHeight,
           headingCheckboxTheme: widget.headingCheckboxTheme,
           datarowCheckboxTheme: widget.datarowCheckboxTheme,

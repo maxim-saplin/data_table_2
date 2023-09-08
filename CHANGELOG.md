@@ -1,3 +1,6 @@
+## 2.5.8
+- Added `headingRowDecoration` property to allow more customizations to heading row style (PR #220)
+
 ## 2.5.7
 - `availableRowsPerPage` inline docs update
 - Fix wrong parameter name in AsyncDataTableSource.getRow method (PR #208)
