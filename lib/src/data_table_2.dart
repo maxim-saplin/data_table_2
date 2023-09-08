@@ -9,7 +9,6 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-bool dataTableShowLogs = true;
 
 /// Relative size of a column determines the share of total table width allocated
 /// to each individual column. When determining column widths ratios between S, M and L
@@ -148,6 +147,7 @@ class DataTable2 extends DataTable {
     this.sortArrowIcon = Icons.arrow_upward,
     this.sortArrowBuilder,
     this.headingRowDecoration,
+    this.dataTableShowLogs = true,
     required super.rows,
   })  : assert(fixedLeftColumns >= 0),
         assert(fixedTopRows >= 0);
@@ -295,6 +295,9 @@ class DataTable2 extends DataTable {
   /// this color is static and doesn't repond to state change
   /// Note: to change background color of fixed data rows use [DataTable2.headingRowColor]
   final Color? fixedCornerColor;
+
+  /// Default value is true, which means that logs are being shown
+  final bool dataTableShowLogs;
 
   (double, double) getMinMaxRowHeight(DataTableThemeData dataTableTheme) {
     final double effectiveDataRowMinHeight = dataRowHeight ??
