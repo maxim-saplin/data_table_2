@@ -221,8 +221,12 @@ class DataTable2 extends DataTable {
   /// have the ability to slightly scroll up the bototm row to avoid the obstruction)
   final double? bottomMargin;
 
-  /// If set this field will override the current BoxDecoration.
-  /// It takes precedence over headerRowColor when both are provided.
+  /// Overrides default [BoxDecoration](bottom border) applied to heading row.
+  /// When both [headerRowColor] and this porperty are provided:
+  /// - [headingRowDecoration] takes precedence if there're 0 or 1 fixed rows
+  /// - [headerRowColor] is applied to fixed top forws starting from the second
+  /// When there're both fixed top rows and fixed left columns with [fixedCornerColor] provided,
+  /// this decoration overrides top left cornner cell color.
   final BoxDecoration? headingRowDecoration;
 
   /// The height of each row (excluding the row that contains column headings).
