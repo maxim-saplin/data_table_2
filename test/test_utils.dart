@@ -604,7 +604,8 @@ class WidgetChildTypeFinder extends ChainedFinder {
 
   @override
   String get description =>
-      '${parent.description} (considering only types of children)';
+      //'${parent.description} (considering only types of children)';
+      '$parent (considering only types of children)';
 
   @override
   Iterable<Element> filter(Iterable<Element> parentCandidates) sync* {
@@ -625,8 +626,7 @@ class WidgetChildTextFinder extends ChainedFinder {
   final String? childTextIncludes;
 
   @override
-  String get description =>
-      '${parent.description} (considering only types of children)';
+  String get description => '$parent (considering only types of children)';
 
   @override
   Iterable<Element> filter(Iterable<Element> parentCandidates) sync* {
@@ -653,8 +653,7 @@ class WidgetChildIconFinder extends ChainedFinder {
   final IconData iconData;
 
   @override
-  String get description =>
-      '${parent.description} (considering only types of children)';
+  String get description => '$parent (considering only types of children)';
 
   @override
   Iterable<Element> filter(Iterable<Element> parentCandidates) sync* {
@@ -675,8 +674,7 @@ class WidgetChildSemanticsFinder extends ChainedFinder {
   final String tooltip;
 
   @override
-  String get description =>
-      '${parent.description} (considering only types of children)';
+  String get description => '$parent (considering only types of children)';
 
   @override
   Iterable<Element> filter(Iterable<Element> parentCandidates) sync* {
