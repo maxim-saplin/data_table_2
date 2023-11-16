@@ -67,7 +67,7 @@ class DataRow2 extends DataRow {
       this.onSecondaryTapDown});
 
   DataRow2.byIndex(
-      {int? index,
+      {super.index,
       super.selected = false,
       super.onSelectChanged,
       super.color,
@@ -78,7 +78,7 @@ class DataRow2 extends DataRow {
       super.onLongPress,
       this.onSecondaryTap,
       this.onSecondaryTapDown})
-      : super.byIndex(index: index);
+      : super.byIndex();
 
   /// Specific row height, which will be used only if provided.
   /// If not provided, dataRowHeight will be applied.
