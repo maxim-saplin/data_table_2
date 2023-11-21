@@ -77,6 +77,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
           color: row.color,
           cells: row.cells,
           onTap: row.onTap,
+          onDoubleTap: row.onDoubleTap,
           onSecondaryTap: row.onSecondaryTap,
           onSecondaryTapDown: row.onSecondaryTapDown);
     }

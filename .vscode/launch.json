@@ -23,5 +23,15 @@
                 "--web-renderer", "canvaskit" //TODO, check that fonts are same on canvaskit and native with new Flutter version
             ],
         },
+        {
+            "name": "example-profile",
+            "cwd": "example",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--web-renderer", "canvaskit" //TODO, check that fonts are same on canvaskit and native with new Flutter version
+            ],
+        },
     ]
 }

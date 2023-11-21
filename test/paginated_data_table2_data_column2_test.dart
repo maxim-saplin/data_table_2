@@ -283,9 +283,7 @@ void main() {
     final TestDataSource source = TestDataSource();
     await tester.pumpWidget(MaterialApp(
       home: MediaQuery(
-        data: const MediaQueryData(
-          textScaleFactor: 20.0,
-        ),
+        data: const MediaQueryData(textScaler: TextScaler.linear(20.0)),
         child: PaginatedDataTable2(
           header: const Text('HEADER'),
           source: source,
@@ -482,7 +480,7 @@ void main() {
     const double width = 400;
     const double height = 400;
 
-    final Size originalSize = binding.renderView.size;
+    final Size originalSize = binding.renderViews.first.size;
 
     // Ensure the containing Card is small enough that we don't expand too
     // much, resulting in our custom margin being ignored.
@@ -783,7 +781,7 @@ void main() {
     const double expandedWidth = 1600;
     const double height = 400;
 
-    final Size originalSize = binding.renderView.size;
+    final Size originalSize = binding.renderViews.first.size;
 
     Widget buildWidget() => MaterialApp(
           home: PaginatedDataTable2(
@@ -861,7 +859,7 @@ void main() {
 
   testWidgets('Table should not use decoration from DataTableTheme',
       (WidgetTester tester) async {
-    final Size originalSize = binding.renderView.size;
+    final Size originalSize = binding.renderViews.first.size;
     await binding.setSurfaceSize(const Size(800, 800));
 
     Widget buildTable() {
@@ -904,7 +902,7 @@ void main() {
     const double width = 400;
     const double height = 400;
 
-    final Size originalSize = binding.renderView.size;
+    final Size originalSize = binding.renderViews.first.size;
 
     // Ensure the containing Card is small enough that we don't expand too
     // much, resulting in our custom margin being ignored.
