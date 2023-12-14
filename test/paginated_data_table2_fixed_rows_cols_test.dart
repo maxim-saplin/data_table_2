@@ -13,15 +13,17 @@ import 'package:golden_toolkit/golden_toolkit.dart';
 import 'test_utils.dart';
 
 // Table with 10 rows, aproximately 450 pixel tall
-main() {
-  group('Fixed colums/corner colors', () {
+main() async {
+  group('PaginatedDataTable2 Fixed colums/corner colors', () {
     testWidgets('0 cols, 0 rows', (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(
+          buildPaginatedTable(
+              showPage: false,
+              showGeneration: false,
               fixedLeftColumns: 0,
               fixedTopRows: 0,
-              headingRowColor: Colors.yellow,
+              headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
               fixedColumnsColor: Colors.red,
               fixedCornerColor: Colors.blue),
           const Size(500, 300));
@@ -48,10 +50,12 @@ main() {
     testWidgets('1 col, 0 rows', (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(
+          buildPaginatedTable(
+              showPage: false,
+              showGeneration: false,
               fixedLeftColumns: 1,
               fixedTopRows: 0,
-              headingRowColor: Colors.yellow,
+              headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
               fixedCornerColor: Colors.blue,
               fixedColumnsColor: Colors.red),
           const Size(500, 300));
@@ -78,10 +82,12 @@ main() {
     testWidgets('2 cols, 0 rows', (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(
+          buildPaginatedTable(
+              showPage: false,
+              showGeneration: false,
               fixedLeftColumns: 2,
               fixedTopRows: 0,
-              headingRowColor: Colors.yellow,
+              headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
               fixedCornerColor: Colors.blue,
               fixedColumnsColor: Colors.red),
           const Size(500, 300));
@@ -108,10 +114,12 @@ main() {
     testWidgets('3 cols, 0 rows', (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(
+          buildPaginatedTable(
+              showPage: false,
+              showGeneration: false,
               fixedLeftColumns: 3,
               fixedTopRows: 0,
-              headingRowColor: Colors.yellow,
+              headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
               fixedCornerColor: Colors.blue,
               fixedColumnsColor: Colors.red),
           const Size(500, 300));
@@ -138,10 +146,12 @@ main() {
     testWidgets('1 col, 1 row', (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(
+          buildPaginatedTable(
+              showPage: false,
+              showGeneration: false,
               fixedLeftColumns: 1,
               fixedTopRows: 1,
-              headingRowColor: Colors.yellow,
+              headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
               fixedCornerColor: Colors.blue,
               fixedColumnsColor: Colors.red),
           const Size(500, 300));
@@ -168,10 +178,12 @@ main() {
     testWidgets('3 cols, 3 rows', (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(
+          buildPaginatedTable(
+              showPage: false,
+              showGeneration: false,
               fixedLeftColumns: 3,
               fixedTopRows: 3,
-              headingRowColor: Colors.yellow,
+              headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
               fixedCornerColor: Colors.blue,
               fixedColumnsColor: Colors.red),
           const Size(500, 300));
@@ -199,29 +211,33 @@ main() {
       await loadAppFonts();
       await wrapWidgetSetSurf(
           tester,
-          buildTable(
+          buildPaginatedTable(
+              showPage: false,
+              showGeneration: false,
               fixedLeftColumns: 3,
               fixedTopRows: 3,
-              headingRowColor: Colors.yellow,
+              headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
               fixedCornerColor: Colors.blue,
               fixedColumnsColor: Colors.red),
           const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
 
-      await expectLater(
-          find.byType(DataTable2), matchesGoldenFile('fixed_3_3_colors.png'));
+      await expectLater(find.byType(DataTable2),
+          matchesGoldenFile('paginated_fixed_3_3_colors.png'));
     });
 
     testWidgets(
-        '[headingRowDecoration] will override [headerRowColor] and [fixedCornerColor]',
+        '[headingRowDecoration] color will override [headerRowColor] and [fixedCornerColor]',
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(
+          buildPaginatedTable(
+            showPage: false,
+            showGeneration: false,
             fixedLeftColumns: 1,
             fixedTopRows: 1,
-            headingRowColor: Colors.yellow,
+            headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
             fixedCornerColor: Colors.blue,
             headingRowDecoration: const BoxDecoration(color: Colors.pink),
           ),
@@ -251,10 +267,12 @@ main() {
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(
+          buildPaginatedTable(
+            showPage: false,
+            showGeneration: false,
             fixedLeftColumns: 1,
             fixedTopRows: 1,
-            headingRowColor: Colors.yellow,
+            headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
             fixedCornerColor: Colors.blue,
             headingRowDecoration: const BoxDecoration(
                 gradient: LinearGradient(colors: [Colors.pink, Colors.purple])),
@@ -287,13 +305,17 @@ main() {
     });
   });
 
-  group('Borders', () {
+  group('PaginatedDataTable2 Borders', () {
     testWidgets('0 fixed rows, 0 fixed columns', (WidgetTester tester) async {
       var border = TableBorder.all(color: Colors.red);
 
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 0, fixedLeftColumns: 0, border: border),
+          buildPaginatedTable(
+              showPage: false,
+              fixedTopRows: 0,
+              fixedLeftColumns: 0,
+              border: border),
           const Size(500, 300));
 
       var t = find.byType(Table).evaluate().first.widget as Table;
@@ -305,7 +327,11 @@ main() {
 
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 0, fixedLeftColumns: 1, border: border),
+          buildPaginatedTable(
+              showPage: false,
+              fixedTopRows: 0,
+              fixedLeftColumns: 1,
+              border: border),
           const Size(500, 300));
 
       var tables = find
@@ -324,7 +350,11 @@ main() {
 
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 1, fixedLeftColumns: 0, border: border),
+          buildPaginatedTable(
+              showPage: false,
+              fixedTopRows: 1,
+              fixedLeftColumns: 0,
+              border: border),
           const Size(500, 300));
 
       var tables = find
@@ -343,11 +373,13 @@ main() {
 
       await wrapWidgetSetSurf(
           tester,
-          buildTable(
-              fixedTopRows: 2,
-              fixedLeftColumns: 2,
-              border: border,
-              bottomMargin: 10),
+          buildPaginatedTable(
+            showGeneration: false,
+            showPage: false,
+            fixedTopRows: 2,
+            fixedLeftColumns: 2,
+            border: border,
+          ),
           const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
@@ -367,124 +399,24 @@ main() {
       expect(tables[3].border!.top, BorderSide.none);
       expect(tables[3].border!.bottom, border.right);
     });
-
-    testWidgets(
-        '2 fixed rows, 2 fixed columns - divider is visible in fixed columns',
-        (WidgetTester tester) async {
-      var border = TableBorder.all(color: Colors.red);
-
-      await wrapWidgetSetSurf(
-          tester,
-          buildTable(
-              fixedTopRows: 2,
-              dividerThickness: 4,
-              fixedLeftColumns: 2,
-              fixedColumnsColor: Colors.red,
-              border: border,
-              bottomMargin: 10),
-          const Size(500, 300));
-
-      _verifyDataTable2InitialState(tester);
-
-      // 0 - fixed corner, 1 - fixed left columns, 2 - fixed rows, 3 - core
-      var tables = find
-          .byType(Table)
-          .evaluate()
-          .map<Table>((e) => e.widget as Table)
-          .toList();
-      expect(tables.length, 4);
-
-      expect(
-          (tables[0].children.first.decoration as BoxDecoration).border, null);
-      expect(
-          (tables[0].children.skip(1).first.decoration as BoxDecoration)
-              .border
-              ?.top
-              .width,
-          4);
-
-      expect(
-          (tables[1].children.first.decoration as BoxDecoration)
-              .border
-              ?.top
-              .width,
-          4);
-      expect(
-          (tables[1].children.skip(1).first.decoration as BoxDecoration)
-              .border
-              ?.top
-              .width,
-          4);
-
-      expect(
-          (tables[2].children.first.decoration as BoxDecoration).border, null);
-      expect(
-          (tables[2].children.skip(1).first.decoration as BoxDecoration)
-              .border
-              ?.top
-              .width,
-          4);
-
-      expect(
-          (tables[3].children.first.decoration as BoxDecoration)
-              .border
-              ?.top
-              .width,
-          4);
-      expect(
-          (tables[3].children.skip(1).first.decoration as BoxDecoration)
-              .border
-              ?.top
-              .width,
-          4);
-    });
-
-    // To update the rendered fill run flutter test --update-goldens
-    testWidgets(
-        '2 fixed rows, 2 fixed columns - divider is visible in fixed columns, golden test',
-        (WidgetTester tester) async {
-      var border = TableBorder.all(color: Colors.red);
-      await loadAppFonts();
-      await wrapWidgetSetSurf(
-          tester,
-          buildTable(
-              fixedTopRows: 2,
-              dividerThickness: 4,
-              fixedLeftColumns: 2,
-              fixedColumnsColor: Colors.red,
-              border: border,
-              bottomMargin: 10),
-          const Size(500, 300));
-
-      // var te = find.byType(Table).evaluate().toList();
-
-      // No point using paints, divider strokes are present as rect painting, took me half a day reverse engineering and finding out how table row borders (aka vertical divider) are painted. Wasted time, I'd rather do golden test right aways
-
-      // expect(
-      //   te[2].renderObject,
-      //   paints
-      //     ..everything((methodName, arguments) {
-      //       print(methodName);
-      //       return true;
-      //     }),
-      // );
-
-      _verifyDataTable2InitialState(tester);
-
-      await expectLater(
-          find.byType(DataTable2), matchesGoldenFile('fixed_2_2_divider.png'));
-    });
   });
 
-  group('Fixed cols/rows out of range', () {
+  group('PaginatedDataTable2 Fixed cols/rows out of range', () {
     testWidgets('Fixed columns equal to the number of columns',
         (WidgetTester tester) async {
       // Will fail if not macOS, see data_table_2.dart _isControllerActive()
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
-          tester, buildTable(fixedLeftColumns: 3), const Size(500, 300));
+          tester,
+          buildPaginatedTable(
+              fixedTopRows: 1,
+              showPage: false,
+              showCheckboxColumn: false,
+              showGeneration: false,
+              fixedLeftColumns: 3),
+          const Size(500, 300));
 
-      _verifyDataTable2InitialState(tester);
+      _verifyDataTable2InitialState(tester, true, true, false);
 
       await tester.ensureVisible(find.text('KitKat'));
       expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
@@ -499,7 +431,13 @@ main() {
     testWidgets('Fixed columns greater than number of columns',
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
-          tester, buildTable(fixedLeftColumns: 4), const Size(500, 300));
+          tester,
+          buildPaginatedTable(
+              fixedTopRows: 1,
+              showPage: false,
+              showGeneration: false,
+              fixedLeftColumns: 4),
+          const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
 
@@ -515,7 +453,10 @@ main() {
     testWidgets('Fixed rows equal to the number of rows',
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
-          tester, buildTable(fixedTopRows: 10), const Size(500, 800));
+          tester,
+          buildPaginatedTable(
+              showPage: false, showGeneration: false, fixedTopRows: 10),
+          const Size(500, 800));
 
       _verifyDataTable2InitialState(tester, true, false);
 
@@ -527,7 +468,10 @@ main() {
     testWidgets('Fixed rows greater than number of rows',
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
-          tester, buildTable(fixedTopRows: 11), const Size(500, 800));
+          tester,
+          buildPaginatedTable(
+              showPage: false, showGeneration: false, fixedTopRows: 11),
+          const Size(500, 800));
 
       _verifyDataTable2InitialState(tester, true, false);
 
@@ -540,7 +484,11 @@ main() {
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 12, fixedLeftColumns: 5),
+          buildPaginatedTable(
+              showPage: false,
+              showGeneration: false,
+              fixedTopRows: 12,
+              fixedLeftColumns: 5),
           const Size(500, 800));
 
       _verifyDataTable2InitialState(tester, true, false);
@@ -555,8 +503,12 @@ main() {
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(
-              fixedTopRows: 12, fixedLeftColumns: 5, showCheckboxColumn: false),
+          buildPaginatedTable(
+              showPage: false,
+              showCheckboxColumn: false,
+              showGeneration: false,
+              fixedTopRows: 12,
+              fixedLeftColumns: 5),
           const Size(500, 800));
 
       _verifyDataTable2InitialState(tester, true, false, false);
@@ -567,10 +519,17 @@ main() {
     });
   });
 
-  group('Scrolling', () {
+  group('PaginatedDataTable2 Scrolling', () {
     testWidgets('Default settings (fixed header), scroll to bottom',
         (WidgetTester tester) async {
-      await wrapWidgetSetSurf(tester, buildTable(), const Size(500, 300));
+      await wrapWidgetSetSurf(
+          tester,
+          buildPaginatedTable(
+            fixedTopRows: 1,
+            showGeneration: false,
+            showPage: false,
+          ),
+          const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
 
@@ -586,7 +545,10 @@ main() {
     testWidgets('No fixed sections, scroll to bottom',
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
-          tester, buildTable(fixedTopRows: 0), const Size(500, 300));
+          tester,
+          buildPaginatedTable(
+              showGeneration: false, showPage: false, fixedTopRows: 0),
+          const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
 
@@ -601,7 +563,10 @@ main() {
 
     testWidgets('2 fixed rows, scroll to bottom', (WidgetTester tester) async {
       await wrapWidgetSetSurf(
-          tester, buildTable(fixedTopRows: 2), const Size(500, 300));
+          tester,
+          buildPaginatedTable(
+              showGeneration: false, showPage: false, fixedTopRows: 2),
+          const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
       expect(
@@ -620,7 +585,10 @@ main() {
 
     testWidgets('3 fixed rows, scroll to bottom', (WidgetTester tester) async {
       await wrapWidgetSetSurf(
-          tester, buildTable(fixedTopRows: 3), const Size(500, 300));
+          tester,
+          buildPaginatedTable(
+              showGeneration: false, showPage: false, fixedTopRows: 3),
+          const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
       expect(
@@ -643,7 +611,11 @@ main() {
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 3, fixedLeftColumns: 1),
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 3,
+              fixedLeftColumns: 1),
           const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
@@ -668,7 +640,11 @@ main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 3, fixedLeftColumns: 2),
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 3,
+              fixedLeftColumns: 2),
           const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
@@ -695,7 +671,11 @@ main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 0, fixedLeftColumns: 2),
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 0,
+              fixedLeftColumns: 2),
           const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
@@ -720,7 +700,11 @@ main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 0, fixedLeftColumns: 2),
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 0,
+              fixedLeftColumns: 2),
           const Size(500, 300));
 
       _verifyDataTable2InitialState(tester);
@@ -744,15 +728,21 @@ main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 3, fixedLeftColumns: 2, minWidth: 850),
+          buildPaginatedTable(
+              showPage: false,
+              fixedTopRows: 3,
+              showGeneration: false,
+              showCheckboxColumn: false,
+              fixedLeftColumns: 2,
+              minWidth: 750),
           const Size(500, 300));
 
-      _verifyDataTable2InitialState(tester, false);
+      _verifyDataTable2InitialState(tester, false, true, false);
       expect(
           _isVisibleInTable(find.text('Ice cream sandwich'), tester), isTrue);
 
       await tester.ensureVisible(find.text(
-          'KitKat')); // now this one is ont the fixed column which has separate scrollable/controller from the left item
+          'KitKat')); // now this one is one the fixed column which has separate scrollable/controller from the left item
       expect(_isVisibleInTable(find.text('KitKat'), tester), isTrue);
       expect(_isVisibleInTable(find.text('518'), tester), isTrue);
       expect(_isVisibleInTable(find.text('65'), tester), isFalse);
@@ -769,8 +759,13 @@ main() {
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 0, fixedLeftColumns: 0, minWidth: 850),
-          const Size(500, 300));
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 0,
+              fixedLeftColumns: 0,
+              minWidth: 850),
+          const Size(525, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -789,8 +784,13 @@ main() {
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 0, fixedLeftColumns: 1, minWidth: 850),
-          const Size(500, 300));
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 0,
+              fixedLeftColumns: 1,
+              minWidth: 850),
+          const Size(525, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -809,8 +809,13 @@ main() {
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 0, fixedLeftColumns: 2, minWidth: 850),
-          const Size(500, 300));
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 0,
+              fixedLeftColumns: 2,
+              minWidth: 850),
+          const Size(525, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -831,8 +836,14 @@ main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 1, fixedLeftColumns: 1, minWidth: 850),
-          const Size(500, 300));
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              hidePaginator: true,
+              fixedTopRows: 1,
+              fixedLeftColumns: 1,
+              minWidth: 850),
+          const Size(505, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -854,8 +865,14 @@ main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 1, fixedLeftColumns: 2, minWidth: 850),
-          const Size(500, 300));
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              hidePaginator: true,
+              fixedTopRows: 1,
+              fixedLeftColumns: 2,
+              minWidth: 850),
+          const Size(505, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -877,8 +894,14 @@ main() {
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 3, fixedLeftColumns: 2, minWidth: 850),
-          const Size(500, 300));
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              hidePaginator: true,
+              fixedTopRows: 3,
+              fixedLeftColumns: 2,
+              minWidth: 850),
+          const Size(525, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -898,8 +921,13 @@ main() {
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 0, fixedLeftColumns: 0, minWidth: 850),
-          const Size(500, 300));
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 0,
+              fixedLeftColumns: 0,
+              minWidth: 850),
+          const Size(525, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -921,8 +949,13 @@ main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 1, fixedLeftColumns: 0, minWidth: 850),
-          const Size(500, 300));
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 1,
+              fixedLeftColumns: 0,
+              minWidth: 850),
+          const Size(505, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -946,8 +979,13 @@ main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 2, fixedLeftColumns: 0, minWidth: 850),
-          const Size(500, 300));
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 2,
+              fixedLeftColumns: 0,
+              minWidth: 850),
+          const Size(505, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -972,8 +1010,13 @@ main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 3, fixedLeftColumns: 0, minWidth: 850),
-          const Size(500, 300));
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 3,
+              fixedLeftColumns: 0,
+              minWidth: 850),
+          const Size(505, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -999,8 +1042,13 @@ main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 1, fixedLeftColumns: 1, minWidth: 850),
-          const Size(500, 300));
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 1,
+              fixedLeftColumns: 1,
+              minWidth: 850),
+          const Size(505, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -1024,8 +1072,13 @@ main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 1, fixedLeftColumns: 2, minWidth: 850),
-          const Size(500, 300));
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 1,
+              fixedLeftColumns: 2,
+              minWidth: 850),
+          const Size(505, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -1050,8 +1103,13 @@ main() {
 
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 2, fixedLeftColumns: 2, minWidth: 850),
-          const Size(500, 300));
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 2,
+              fixedLeftColumns: 2,
+              minWidth: 850),
+          const Size(505, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -1076,12 +1134,14 @@ main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       await wrapWidgetSetSurf(
           tester,
-          buildTable(
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
               fixedTopRows: 3,
-              fixedLeftColumns: 1,
               showCheckboxColumn: false,
+              fixedLeftColumns: 1,
               minWidth: 850),
-          const Size(500, 300));
+          const Size(505, 300));
 
       _verifyDataTable2InitialState(tester, false, true, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -1108,8 +1168,13 @@ main() {
 
       await wrapWidgetSetSurf(
           tester,
-          buildTable(fixedTopRows: 3, fixedLeftColumns: 2, minWidth: 850),
-          const Size(500, 300));
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 3,
+              fixedLeftColumns: 2,
+              minWidth: 850),
+          const Size(505, 300));
 
       _verifyDataTable2InitialState(tester, false);
       expect(_isVisibleInTable(find.text('Carbs'), tester), isFalse);
@@ -1136,7 +1201,9 @@ main() {
 
       await wrapWidgetSetSurf(
           tester,
-          buildTable(
+          buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
               fixedTopRows: 3,
               fixedLeftColumns: 2,
               minWidth: 850,
@@ -1169,14 +1236,16 @@ main() {
       var widget = StreamBuilder(
           stream: trigger.stream,
           builder: (c, s) {
-            return buildTable(
-                fixedTopRows: 0,
-                fixedLeftColumns: col,
-                minWidth: 850,
-                showCheckboxColumn: false);
+            return buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 0,
+              fixedLeftColumns: col,
+              minWidth: 850,
+            );
           });
 
-      await wrapWidgetSetSurf(tester, widget, const Size(500, 300));
+      await wrapWidgetSetSurf(tester, widget, const Size(525, 300));
       await tester.pumpAndSettle();
 
       expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
@@ -1206,15 +1275,17 @@ main() {
       var widget = StreamBuilder(
           stream: trigger.stream,
           builder: (c, s) {
-            return buildTable(
-                fixedTopRows: 0,
-                fixedLeftColumns: col,
-                scrollController: sc,
-                minWidth: 850,
-                showCheckboxColumn: false);
+            return buildPaginatedTable(
+              showGeneration: false,
+              showPage: false,
+              fixedTopRows: 0,
+              fixedLeftColumns: col,
+              scrollController: sc,
+              minWidth: 850,
+            );
           });
 
-      await wrapWidgetSetSurf(tester, widget, const Size(500, 300));
+      await wrapWidgetSetSurf(tester, widget, const Size(525, 300));
       await tester.pumpAndSettle();
 
       expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
@@ -1238,12 +1309,15 @@ main() {
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(
           tester,
-          buildTable(
-              fixedTopRows: 1,
-              fixedLeftColumns: 1,
-              minWidth: 850,
-              showCheckboxColumn: false),
-          const Size(500, 300));
+          buildPaginatedTable(
+            showPage: false,
+            showGeneration: false,
+            fixedTopRows: 1,
+            showCheckboxColumn: false,
+            fixedLeftColumns: 1,
+            minWidth: 850,
+          ),
+          const Size(525, 300));
 
       expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
       expect(_isVisibleInTable(find.text('159'), tester), isTrue);
@@ -1268,13 +1342,16 @@ main() {
       var sc = ScrollController();
       await wrapWidgetSetSurf(
           tester,
-          buildTable(
-              fixedTopRows: 1,
-              fixedLeftColumns: 1,
-              minWidth: 850,
-              scrollController: sc,
-              showCheckboxColumn: false),
-          const Size(500, 300));
+          buildPaginatedTable(
+            showGeneration: false,
+            showPage: false,
+            showCheckboxColumn: false,
+            fixedTopRows: 1,
+            fixedLeftColumns: 1,
+            minWidth: 850,
+            scrollController: sc,
+          ),
+          const Size(525, 300));
 
       expect(_isVisibleInTable(find.text('Frozen yogurt'), tester), isTrue);
       expect(_isVisibleInTable(find.text('159'), tester), isTrue);
@@ -1296,7 +1373,7 @@ main() {
 }
 
 bool _isVisibleInTable(Finder widget, WidgetTester tester) {
-  var tableDimentions = tester.getSize(find.byType(DataTable2));
+  var tableDimentions = tester.getSize(find.byType(PaginatedDataTable2));
   var el = widget.evaluate().first;
 
   var pos = el.renderObject!.getTransformTo(null).getTranslation();

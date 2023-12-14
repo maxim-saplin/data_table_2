@@ -257,8 +257,8 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
   }
 
   @override
-  Future<AsyncRowsResponse> getRows(int start, int end) async {
-    print('getRows($start, $end)');
+  Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
+    print('getRows($startIndex, $count)');
     if (_errorCounter != null) {
       _errorCounter = _errorCounter! + 1;
 
@@ -268,19 +268,18 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
       }
     }
 
-    var index = start;
     final format = NumberFormat.decimalPercentPattern(
       locale: 'en',
       decimalDigits: 0,
     );
-    assert(index >= 0);
+    assert(startIndex >= 0);
 
     // List returned will be empty is there're fewer items than startingAt
     var x = _empty
         ? await Future.delayed(const Duration(milliseconds: 2000),
             () => DesertsFakeWebServiceResponse(0, []))
         : await _repo.getData(
-            start, end, _caloriesFilter, _sortColumn, _sortAscending);
+            startIndex, count, _caloriesFilter, _sortColumn, _sortAscending);
 
     var r = AsyncRowsResponse(
         x.totalRecords,

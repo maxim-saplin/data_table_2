@@ -5,6 +5,7 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+// import 'mock_canvas.dart';
 import 'test_utils.dart';
 import 'dart:async';
 import 'dart:math' as math;
@@ -12,6 +13,85 @@ import 'package:vector_math/vector_math_64.dart' show Matrix3;
 
 void main() {
   group('DataTable2', () {
+    // testWidgets('No scrollbars visible by default',
+    //     (WidgetTester tester) async {
+    //   await wrapWidgetSetSurf(tester, buildTable());
+    //   await tester.binding.setSurfaceSize(const Size(200, 300));
+    //   await tester.pumpAndSettle();
+
+    //   expect(find.byType(Scrollbar).hitTestable(), findsNothing);
+    // });
+
+    testWidgets(
+        'Horizontal scrollbar is visible if isHorizontalScrollBarVisible=true',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(tester,
+          buildTable(isHorizontalScrollBarVisible: true), const Size(250, 300));
+
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Scrollbar).first, paints..rect());
+    });
+
+    testWidgets(
+        'Vertical and horizontal scrollbars are visible if isHorizontalScrollBarVisible=true, isVerticalScrollBarVisible=true',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(
+              isVerticalScrollBarVisible: true,
+              isHorizontalScrollBarVisible: true),
+          const Size(250, 300));
+
+      await tester.pumpAndSettle();
+
+      // Check if both scrollbars are visible
+      expect(find.byType(Scrollbar).first, paints..rect());
+      expect(find.byType(Scrollbar).last, paints..rect());
+    });
+
+    testWidgets(
+        'Vertical and horizontal scrollbars are visible  when using theme',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(
+          tester,
+          Theme(
+              data: ThemeData(
+                  scrollbarTheme: ScrollbarThemeData(
+                      thumbVisibility: MaterialStateProperty.all(true))),
+              child: buildTable()),
+          const Size(250, 300));
+
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Scrollbar).first, paints..rect());
+      expect(find.byType(Scrollbar).last, paints..rect());
+    });
+
+    testWidgets(
+        'Vertical and horizontal scroll bars are not visible by default',
+        (WidgetTester tester) async {
+      await wrapWidgetSetSurf(tester, buildTable(), const Size(250, 300));
+
+      await tester.pumpAndSettle();
+
+      bool invisible = false;
+
+      try {
+        expect(find.byType(Scrollbar).first, paints..rect());
+      } catch (_) {
+        invisible = true;
+      }
+      expect(invisible, true);
+      invisible = false;
+      try {
+        expect(find.byType(Scrollbar).last, paints..rect());
+      } catch (_) {
+        invisible = true;
+      }
+      expect(invisible, true);
+    });
+
     testWidgets('Default column size is applied to header cells',
         (WidgetTester tester) async {
       await wrapWidgetSetSurf(tester, buildTable());
@@ -76,6 +156,20 @@ void main() {
       sc.jumpTo(10000);
       await tester.pumpAndSettle();
       expect(find.text('KitKat').hitTestable(), findsOneWidget);
+    });
+
+    testWidgets('horizontalScrollController scrolls to right',
+        (WidgetTester tester) async {
+      var horizontalSc = ScrollController();
+      await wrapWidgetSetSurf(
+          tester,
+          buildTable(horizontalScrollController: horizontalSc, minWidth: 500),
+          const Size(300, 500));
+
+      expect(find.text('Frozen yogurt').hitTestable(), findsOneWidget);
+      horizontalSc.jumpTo(10000);
+      await tester.pumpAndSettle();
+      expect(find.text('Frozen yogurt').hitTestable(), findsNothing);
     });
 
     testWidgets('empty widget is displayed when there\'s no data',
@@ -506,6 +600,24 @@ void main() {
       sc.jumpTo(10000);
       await tester.pumpAndSettle();
       expect(find.text('KitKat').hitTestable(), findsOneWidget);
+    });
+
+    testWidgets('horizontalScrollController scrolls to right',
+        (WidgetTester tester) async {
+      var horizontalSc = ScrollController();
+      await wrapWidgetSetSurf(
+          tester,
+          buildPaginatedTable(
+              horizontalScrollController: horizontalSc,
+              minWidth: 500,
+              showGeneration: false,
+              showPage: false),
+          const Size(300, 500));
+
+      expect(find.text('Frozen yogurt').hitTestable(), findsOneWidget);
+      horizontalSc.jumpTo(10000);
+      await tester.pumpAndSettle();
+      expect(find.text('Frozen yogurt').hitTestable(), findsNothing);
     });
 
     testWidgets('empty widget is displayed when there\'s no data',
@@ -1042,6 +1154,26 @@ void main() {
       sc.jumpTo(10000);
       await tester.pumpAndSettle();
       expect(find.text('Frozen yogurt').hitTestable(), findsOneWidget);
+    });
+
+    testWidgets('horizontalScrollController scrolls to right',
+        (WidgetTester tester) async {
+      var horizontalSc = ScrollController();
+      await wrapWidgetSetSurf(
+          tester,
+          buildAsyncPaginatedTable(
+              horizontalScrollController: horizontalSc,
+              minWidth: 500,
+              showGeneration: false,
+              showPage: false),
+          const Size(300, 500));
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Eclair').hitTestable(), findsOneWidget);
+      horizontalSc.jumpTo(10000);
+      await tester.pumpAndSettle();
+      expect(find.text('Eclair').hitTestable(), findsNothing);
     });
 
     testWidgets('empty widget is displayed when there\'s no data',
@@ -1676,6 +1808,151 @@ void main() {
     expect(find.text('Donut x3'), findsOneWidget);
     expect(find.text('1–10 of 10'), findsOneWidget);
   });
+
+  testWidgets('DataTable2 custom sort arrow widget',
+      (WidgetTester tester) async {
+    const alwaysShowArrows = false;
+    Widget buildTable({bool sortAscending = true}) {
+      return DataTable2(
+        sortColumnIndex: 0,
+        sortAscending: sortAscending,
+        sortArrowBuilder: (ascending, sorted) => sorted || alwaysShowArrows
+            ? Stack(
+                children: [
+                  Padding(
+                      padding: const EdgeInsets.only(right: 0),
+                      child: _SortIcon(
+                          ascending: true, active: sorted && ascending)),
+                  Padding(
+                      padding: const EdgeInsets.only(left: 10),
+                      child: _SortIcon(
+                          ascending: false, active: sorted && !ascending)),
+                ],
+              )
+            : null,
+        columns: <DataColumn>[
+          DataColumn(
+            label: const Text('Name'),
+            tooltip: 'Name',
+            onSort: (int columnIndex, bool ascending) {},
+          ),
+          DataColumn(
+            label: const Text('Calories'),
+            tooltip: 'Calories',
+            onSort: (int columnIndex, bool ascending) {},
+          ),
+        ],
+        rows: kDesserts.map<DataRow2>((Dessert dessert) {
+          return DataRow2(
+            cells: <DataCell>[
+              DataCell(
+                Text(dessert.name),
+              ),
+              DataCell(
+                Text(dessert.calories.toString()),
+              ),
+            ],
+          );
+        }).toList(),
+      );
+    }
+
+    // Check for ascending list
+    await tester.pumpWidget(MaterialApp(
+      home: Material(child: buildTable(sortAscending: true)),
+    ));
+
+    List upArrow =
+        tester.widgetList(find.byIcon(Icons.arrow_drop_up_rounded)).toList();
+    List downArrow =
+        tester.widgetList(find.byIcon(Icons.arrow_drop_down_rounded)).toList();
+    expect(upArrow.length, equals(1));
+    expect(downArrow.length, equals(1));
+
+    expect(upArrow.first.color, equals(Colors.cyan));
+    expect(downArrow.first.color, null);
+
+    // Check for descending list.
+    await tester.pumpWidget(MaterialApp(
+      home: Material(child: buildTable(sortAscending: false)),
+    ));
+    await tester.pumpAndSettle();
+
+    upArrow =
+        tester.widgetList(find.byIcon(Icons.arrow_drop_up_rounded)).toList();
+    downArrow =
+        tester.widgetList(find.byIcon(Icons.arrow_drop_down_rounded)).toList();
+    expect(upArrow.length, equals(1));
+    expect(downArrow.length, equals(1));
+
+    expect(upArrow.first.color, null);
+    expect(downArrow.first.color, equals(Colors.cyan));
+  });
+
+  testWidgets('DataTable2 checkbox themes', (WidgetTester tester) async {
+    Widget buildTable() {
+      return DataTable2(
+        headingCheckboxTheme:
+            CheckboxThemeData(fillColor: MaterialStateProperty.all(Colors.red)),
+        datarowCheckboxTheme: CheckboxThemeData(
+            fillColor: MaterialStateProperty.all(Colors.yellow)),
+        showCheckboxColumn: true,
+        onSelectAll: (value) {},
+        columns: <DataColumn>[
+          DataColumn(
+            label: const Text('Name'),
+            tooltip: 'Name',
+            onSort: (int columnIndex, bool ascending) {},
+          ),
+          DataColumn(
+            label: const Text('Calories'),
+            tooltip: 'Calories',
+            onSort: (int columnIndex, bool ascending) {},
+          ),
+        ],
+        rows: kDesserts.map<DataRow2>((Dessert dessert) {
+          return DataRow2(
+            onSelectChanged: (v) {},
+            cells: <DataCell>[
+              DataCell(
+                Text(dessert.name),
+              ),
+              DataCell(
+                Text(dessert.calories.toString()),
+              ),
+            ],
+          );
+        }).toList(),
+      );
+    }
+
+    // Check for ascending list
+    await tester.pumpWidget(MaterialApp(
+      home: Material(child: buildTable()),
+    ));
+
+    var h = find.byType(Theme).evaluate().where((element) =>
+        (element.widget as Theme).data.checkboxTheme.fillColor != null &&
+        (element.widget as Theme)
+                .data
+                .checkboxTheme
+                .fillColor!
+                .resolve({MaterialState.hovered}) ==
+            Colors.red);
+    expect(h.length, 1);
+    expect((h.first.widget as Theme).child.runtimeType, Checkbox);
+
+    var d = find.byType(Theme).evaluate().where((element) =>
+        (element.widget as Theme).data.checkboxTheme.fillColor != null &&
+        (element.widget as Theme)
+                .data
+                .checkboxTheme
+                .fillColor!
+                .resolve({MaterialState.hovered}) ==
+            Colors.yellow);
+    expect(d.length, kDesserts.length);
+    expect((d.first.widget as Theme).child.runtimeType, Checkbox);
+  });
 }
 
 Tripple<Size> _getColumnSizes(WidgetTester tester, bool header) {
@@ -1733,4 +2010,20 @@ Future<void> _smlOverridenColumnSizeApplied(
 
   // Last column is margin greater (24p) than the middle one.
   expect(((s.v3.width - 24) / s.v2.width - 1.5).abs() < 0.01, true);
+}
+
+class _SortIcon extends StatelessWidget {
+  final bool ascending;
+  final bool active;
+
+  const _SortIcon({required this.ascending, required this.active});
+
+  @override
+  Widget build(BuildContext context) {
+    return Icon(
+      ascending ? Icons.arrow_drop_up_rounded : Icons.arrow_drop_down_rounded,
+      size: 28,
+      color: active ? Colors.cyan : null,
+    );
+  }
 }

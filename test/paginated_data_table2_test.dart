@@ -288,9 +288,7 @@ void main() {
     final TestDataSource source = TestDataSource();
     await tester.pumpWidget(MaterialApp(
       home: MediaQuery(
-        data: const MediaQueryData(
-          textScaleFactor: 20.0,
-        ),
+        data: const MediaQueryData(textScaler: TextScaler.linear(20.0)),
         child: PaginatedDataTable2(
           header: const Text('HEADER'),
           source: source,
@@ -322,6 +320,54 @@ void main() {
         greaterThanOrEqualTo(
             tester.getTopRight(find.text('Rows per page:')).dx + 40.0));
   }, skip: isBrowser); // https://github.com/flutter/flutter/issues/43433
+
+  testWidgets('PaginatedDataTable2 footer info title lastRow number wraps',
+      (WidgetTester tester) async {
+    final TestDataSource source = TestDataSource();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PaginatedDataTable2(
+          source: source,
+          renderEmptyRowsInTheEnd: false,
+          hidePaginator: false,
+          rowsPerPage: 501,
+          availableRowsPerPage: const <int>[501],
+          onRowsPerPageChanged: (int? rowsPerPage) {},
+          columns: const <DataColumn>[
+            DataColumn(label: Text('COL1')),
+            DataColumn(label: Text('COL2')),
+            DataColumn(label: Text('COL3')),
+          ],
+        ),
+      ),
+    );
+
+    expect(find.text('1–500 of 500'), findsOneWidget);
+  });
+  testWidgets(
+      'PaginatedDataTable2 footer info title lastRow number will not wrap',
+      (WidgetTester tester) async {
+    final TestDataSource source = TestDataSource();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PaginatedDataTable2(
+          source: source,
+          renderEmptyRowsInTheEnd: true,
+          hidePaginator: false,
+          rowsPerPage: 501,
+          availableRowsPerPage: const <int>[501],
+          onRowsPerPageChanged: (int? rowsPerPage) {},
+          columns: const <DataColumn>[
+            DataColumn(label: Text('COL1')),
+            DataColumn(label: Text('COL2')),
+            DataColumn(label: Text('COL3')),
+          ],
+        ),
+      ),
+    );
+
+    expect(find.text('1–501 of 500'), findsOneWidget);
+  });
 
   testWidgets('PaginatedDataTable2 footer scrolls',
       (WidgetTester tester) async {
@@ -487,7 +533,7 @@ void main() {
     const double width = 400;
     const double height = 400;
 
-    final Size originalSize = binding.renderView.size;
+    final Size originalSize = binding.renderViews.first.size;
 
     // Ensure the containing Card is small enough that we don't expand too
     // much, resulting in our custom margin being ignored.
@@ -645,6 +691,51 @@ void main() {
     await binding.setSurfaceSize(originalSize);
   });
 
+  testWidgets('PaginatedDataTable set border width test',
+      (WidgetTester tester) async {
+    final TestDataSource source = TestDataSource();
+    const List<DataColumn> columns = <DataColumn>[
+      DataColumn(label: Text('Name')),
+      DataColumn(label: Text('Calories'), numeric: true),
+      DataColumn(label: Text('Generation')),
+    ];
+
+    // no thickness provided - border should be default: i.e "1.0" as it
+    // set in DataTable2 constructor
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: PaginatedDataTable2(
+            columns: columns,
+            source: source,
+          ),
+        ),
+      ),
+    );
+
+    Table table = tester.widgetList(find.byType(Table)).last as Table;
+    TableRow tableRow = table.children.last;
+    BoxDecoration boxDecoration = tableRow.decoration! as BoxDecoration;
+    expect(boxDecoration.border!.bottom.width, 1.0);
+
+    const double thickness = 4.2;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: PaginatedDataTable2(
+            dividerThickness: thickness,
+            columns: columns,
+            source: source,
+          ),
+        ),
+      ),
+    );
+    table = tester.widgetList(find.byType(Table)).last as Table;
+    tableRow = table.children.last;
+    boxDecoration = tableRow.decoration! as BoxDecoration;
+    expect(boxDecoration.border!.bottom.width, thickness);
+  });
+
   testWidgets('PaginatedDataTable2 custom horizontal padding - no checkbox',
       (WidgetTester tester) async {
     const double defaultHorizontalMargin = 24.0;
@@ -788,7 +879,7 @@ void main() {
     const double expandedWidth = 1600;
     const double height = 400;
 
-    final Size originalSize = binding.renderView.size;
+    final Size originalSize = binding.renderViews.first.size;
 
     Widget buildWidget() => MaterialApp(
           home: PaginatedDataTable2(
@@ -866,7 +957,7 @@ void main() {
 
   testWidgets('Table should not use decoration from DataTableTheme',
       (WidgetTester tester) async {
-    final Size originalSize = binding.renderView.size;
+    final Size originalSize = binding.renderViews.first.size;
     await binding.setSurfaceSize(const Size(800, 800));
 
     Widget buildTable() {
@@ -909,7 +1000,7 @@ void main() {
     const double width = 400;
     const double height = 400;
 
-    final Size originalSize = binding.renderView.size;
+    final Size originalSize = binding.renderViews.first.size;
 
     // Ensure the containing Card is small enough that we don't expand too
     // much, resulting in our custom margin being ignored.
@@ -1012,5 +1103,45 @@ void main() {
     expect(selectedTextStyle.color, equals(selectedTextColor));
 
     await binding.setSurfaceSize(null);
+  });
+
+  testWidgets('PaginatedDataTable2 passes through DataTable2 extra fields',
+      (WidgetTester tester) async {
+    final TestDataSource source = TestDataSource(allowSelection: true);
+
+    await tester.pumpWidget(MaterialApp(
+      home: Material(
+        child: PaginatedDataTable2(
+          headingTextStyle: const TextStyle(backgroundColor: Colors.amber),
+          dataTextStyle: const TextStyle(backgroundColor: Colors.red),
+          headingCheckboxTheme: const CheckboxThemeData(splashRadius: 1.5),
+          datarowCheckboxTheme: const CheckboxThemeData(splashRadius: 2.5),
+          header: const Text('Test table'),
+          source: source,
+          rowsPerPage: 2,
+          availableRowsPerPage: const <int>[
+            2,
+            4,
+          ],
+          onRowsPerPageChanged: (int? rowsPerPage) {},
+          onPageChanged: (int rowIndex) {},
+          onSelectAll: (bool? value) {},
+          columns: const <DataColumn>[
+            DataColumn(label: Text('Name')),
+            DataColumn(label: Text('Calories'), numeric: true),
+            DataColumn(label: Text('Generation')),
+          ],
+        ),
+      ),
+    ));
+
+    // Custom checkbox padding.
+    var t = find.byType(DataTable2).first;
+    expect(t, findsOneWidget);
+    var w = t.evaluate().first.widget as DataTable2;
+    expect(w.headingTextStyle!.backgroundColor, Colors.amber);
+    expect(w.dataTextStyle!.backgroundColor, Colors.red);
+    expect(w.headingCheckboxTheme!.splashRadius, 1.5);
+    expect(w.datarowCheckboxTheme!.splashRadius, 2.5);
   });
 }

@@ -1,4 +1,76 @@
-# 2.3.7
+## 2.5.9
+- Fix for DataRow2 clone() inside AsyncPaginatedDataTable2 misses onDoubleTap callback (PR #237)
+- Fixed warnings and updated test to satisfy changes in Flutter 3.16.0
+
+## 2.5.8
+- Added `headingRowDecoration` property to allow more customizations to heading row style (PR #220)
+
+## 2.5.7
+- `availableRowsPerPage` inline docs update
+- Fix wrong parameter name in AsyncDataTableSource.getRow method (PR #208)
+- PaginatedDataTable2 and AsyncPaginatedDataTable2 received extra params (headingTextStyle, dataTextStyle, headingCheckboxTheme, datarowCheckboxTheme)
+
+## 2.5.6
+- Fixed `DataRow2.specificRowHeight` when used with `AsyncPaginatedDataTable2`
+
+## 2.5.5
+- Added `checkboxAlignment` to widgets
+- Customizing checkboxes in DataTable2 via `headingCheckboxTheme` and `datarowCheckboxTheme`
+
+## 2.5.4
+- Custom arrow builder for heading cells (`sortArrowBuilder`)
+
+## 2.5.3
+- Exposed clipBehavior in DataTable2
+
+## 2.5.2
+- Reverting back to dataRowHeight instead of min/max (issue #191)
+
+## 2.5.1
+- 2 properties at DataTable2 allowing explicit visibility control of vertical/horizontal scrollbars
+- Passing visibility and thickness from scroll bar theme to iOS/Cupertino widget (Flutter SDK doesn't allow to fix that properties via themes)
+- Fix of scroll bars visibility on iOS (#140, #192) - now one can use either explicit properties of scroll bar themes
+
+## 2.5.0
+- SDK constraint is set to minimum Dart 3
+- Switch to dataRowMinHeight and dataRowMaxHeight (deprecating dataRowHeight and aligning with DataTable from Flutter 3.10.0)
+- Fixing analyzer warnings 
+
+## 2.4.3
+- Updated to support new version of Flutter (3.10.0)
+- Fix secondary taps blocked by InkWell (PR #176)
+- Test DataTable2 renders with border and background decoration fails on flutter master (issue #178)
+
+## 2.4.2
+- Exposed horizontalScrollController from all widgets (PR#182)
+
+## 2.4.1
+- Removed deprecated exports, you can now import only data_table_2.dart to get access to all widgets
+- Fixed bug #165 (row hover color being displayed outside the widget in some cases)
+- Added gallery image
+
+## 2.3.12
+- Added Flutter version constraint to be 3.7.0 or higher
+
+## 2.3.11
+- Breaking change, Flutter SDK versions below 3.7.0 are not supported
+- Fixing Flutter 3.7.0 warnings
+
+## 2.3.10
+- Added dividerThickness to paginated widgets
+- renderEmptyRowsInTheEnd now allows to override the default behaviour of paginated tables when empty rows are added in order to fill pages to page size
+
+## 2.3.9
+- Added fixed sections params to PaginatedDataTable2 and AsyncPaginatedDataTable2 (fixedLeftColumns, fixedTopRows, fixedColumnsColor, fixedCornerColor)
+
+## 2.3.8
+- Fixed horizontal divider not being displayed in fixed column cells when fixedColumnColor was defined
+- Aligned/refactored fixed sections colors (headingColor, fixedRowColor, fixedColumnColor)
+ - Now headingColor is applied to all fixed rows, before it was only applied to all rows
+ - Fixed colors now take precedence despite any color overrides (e.g. DataRow.color)
+- Added few golden tests
+
+## 2.3.7
 - Row tap events now do not bubble onSelectChanged() event handler, yet it still fires if there's a checkbox column and a checkbox is clicked (PR #133)
 
 ## 2.3.6

@@ -313,9 +313,7 @@ void main() {
 
     await tester.pumpWidget(MaterialApp(
       home: MediaQuery(
-        data: const MediaQueryData(
-          textScaleFactor: 20.0,
-        ),
+        data: const MediaQueryData(textScaler: TextScaler.linear(20.0)),
         child: AsyncPaginatedDataTable2(
           header: const Text('HEADER'),
           source: source,
@@ -523,7 +521,7 @@ void main() {
     const double width = 400;
     const double height = 400;
 
-    final Size originalSize = binding.renderView.size;
+    final Size originalSize = binding.renderViews.first.size;
 
     // Ensure the containing Card is small enough that we don't expand too
     // much, resulting in our custom margin being ignored.
@@ -780,6 +778,56 @@ void main() {
     );
   });
 
+  testWidgets('AsyncPaginatedDataTable2 set border width test',
+      (WidgetTester tester) async {
+    final DessertDataSourceAsync source =
+        DessertDataSourceAsync(allowSelection: true, useKDeserts: true);
+    const List<DataColumn> columns = <DataColumn>[
+      DataColumn(label: Text('Name')),
+      DataColumn(label: Text('Calories'), numeric: true),
+      DataColumn(label: Text('Generation')),
+    ];
+
+    // no thickness provided - border should be default: i.e "1.0" as it
+    // set in DataTable2 constructor
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: AsyncPaginatedDataTable2(
+            columns: columns,
+            source: source,
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    Table table = tester.widgetList(find.byType(Table)).last as Table;
+    TableRow tableRow = table.children.last;
+    BoxDecoration boxDecoration = tableRow.decoration! as BoxDecoration;
+    expect(boxDecoration.border!.bottom.width, 1.0);
+
+    const double thickness = 4.2;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: PaginatedDataTable2(
+            dividerThickness: thickness,
+            columns: columns,
+            source: source,
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+    table = tester.widgetList(find.byType(Table)).last as Table;
+    tableRow = table.children.last;
+    boxDecoration = tableRow.decoration! as BoxDecoration;
+    expect(boxDecoration.border!.bottom.width, thickness);
+  });
+
   testWidgets('AsyncPaginatedDataTable2 table fills Card width',
       (WidgetTester tester) async {
     final DessertDataSourceAsync source =
@@ -793,7 +841,7 @@ void main() {
     const double expandedWidth = 1600;
     const double height = 400;
 
-    final Size originalSize = binding.renderView.size;
+    final Size originalSize = binding.renderViews.first.size;
 
     Widget buildWidget() => MaterialApp(
           home: AsyncPaginatedDataTable2(
@@ -876,7 +924,7 @@ void main() {
 
   testWidgets('Table should not use decoration from DataTableTheme',
       (WidgetTester tester) async {
-    final Size originalSize = binding.renderView.size;
+    final Size originalSize = binding.renderViews.first.size;
     await binding.setSurfaceSize(const Size(800, 800));
 
     Widget buildTable() {
@@ -921,7 +969,7 @@ void main() {
     const double width = 400;
     const double height = 400;
 
-    final Size originalSize = binding.renderView.size;
+    final Size originalSize = binding.renderViews.first.size;
 
     // Ensure the containing Card is small enough that we don't expand too
     // much, resulting in our custom margin being ignored.

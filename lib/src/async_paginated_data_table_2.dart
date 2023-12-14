@@ -13,6 +13,7 @@ enum SelectionState { none, include, exclude }
 
 class AsyncRowsResponse {
   AsyncRowsResponse(this.totalRows, this.rows);
+
   final int totalRows;
   final List<DataRow> rows;
 }
@@ -48,6 +49,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
   Set<LocalKey> get selectionRowKeys => _selectionRowKeys;
 
   Object? _error;
+
   Object? get error => _error;
 
   List<DataRow> _rows = [];
@@ -58,22 +60,24 @@ abstract class AsyncDataTableSource extends DataTableSource {
   int _prevFetchCount = 0;
 
   /// Override this method to allow the data source asynchronously
-  /// fetch data (e.g. from a server) and convert them to [DataRow]/[DataRow2]
-  /// entities consumed by [AsyncPaginatedDataTable2] widget.
+  /// fetch [count] data beginning from [start] (e.g. from a server) and convert
+  /// them to [DataRow]/[DataRow2] entities consumed by [AsyncPaginatedDataTable2] widget.
   /// Note that besides rows this method is also supposed to return
   /// the total number of available rows (both values are packed into [AsyncRowsResponse] instance
   /// returned from this method)
-  Future<AsyncRowsResponse> getRows(int start, int end);
+  Future<AsyncRowsResponse> getRows(int startIndex, int count);
 
   DataRow _clone(DataRow row, bool? selected) {
     if (row is DataRow2) {
       return DataRow2(
           key: row.key,
           selected: selected ?? row.selected,
+          specificRowHeight: row.specificRowHeight,
           onSelectChanged: row.onSelectChanged,
           color: row.color,
           cells: row.cells,
           onTap: row.onTap,
+          onDoubleTap: row.onDoubleTap,
           onSecondaryTap: row.onSecondaryTap,
           onSecondaryTapDown: row.onSecondaryTapDown);
     }
@@ -320,12 +324,25 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
       super.sortAscending = true,
       super.sortArrowAnimationDuration = const Duration(milliseconds: 150),
       super.sortArrowIcon = Icons.arrow_upward,
+      super.sortArrowAlwaysVisible,
+      super.sortArrowBuilder,
       super.onSelectAll,
       super.dataRowHeight = kMinInteractiveDimension,
       super.headingRowColor,
+      super.headingRowDecoration,
       super.headingRowHeight = 56,
+      super.headingCheckboxTheme,
+      super.headingTextStyle,
       super.horizontalMargin = 24,
       super.columnSpacing = 56,
+      super.dividerThickness,
+      super.renderEmptyRowsInTheEnd = true,
+      super.fixedLeftColumns = 0,
+      super.fixedTopRows = 1,
+      super.fixedColumnsColor,
+      super.fixedCornerColor,
+      super.datarowCheckboxTheme,
+      super.dataTextStyle,
       super.showCheckboxColumn = true,
       super.showFirstLastButtons = false,
       super.initialFirstRowIndex = 0,
@@ -341,12 +358,14 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
       super.dragStartBehavior = DragStartBehavior.start,
       required super.source,
       super.checkboxHorizontalMargin,
+      super.checkboxAlignment,
       super.wrapInCard = true,
       super.minWidth,
       super.fit = FlexFit.tight,
       super.hidePaginator = false,
       super.controller,
       super.scrollController,
+      super.horizontalScrollController,
       super.empty,
       this.loading,
       this.errorBuilder,

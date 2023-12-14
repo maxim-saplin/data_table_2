@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 /// Route options are used to configure certain features of
 /// the given example
 String getCurrentRouteOption(BuildContext context) {
-  var isEmpty = ModalRoute.of(context) != null &&
-          ModalRoute.of(context)!.settings.arguments != null &&
-          ModalRoute.of(context)!.settings.arguments is String
+  var isEmpty = ModalRoute.of(context) != null && ModalRoute.of(context)!.settings.arguments != null && ModalRoute.of(context)!.settings.arguments is String
       ? ModalRoute.of(context)!.settings.arguments as String
       : '';
 
@@ -26,6 +24,10 @@ const fixedColumnWidth = 'Fixed column width';
 const resizableCols = "Real time";
 const resizableColsNoRealtime = "No real time";
 const resizableColsMobile = "Mobile";
+const dataTable2 = 'DataTable2';
+const paginatedFixedRowsCols = 'PaginatedDataTable2';
+const asyncPaginatedFixedRowsCols = 'AsyncPaginatedDataTable2';
+const custArrows = 'Custom sort arrows';
 
 /// Async sample that emulates network error and allow retrying load operation
 const asyncErrors = "Errors/Retries";
@@ -35,36 +37,15 @@ const goToLast = "Start at last page";
 
 /// Configurations available to given example routes
 const Map<String, List<String>> routeOptions = {
-  '/datatable2': [
-    dflt,
-    noData,
-    showBordersWithZebraStripes,
-    fixedColumnWidth,
-    rowTaps,
-    rowHeightOverrides
-  ],
+  '/datatable2': [dflt, noData, showBordersWithZebraStripes, fixedColumnWidth, rowTaps, rowHeightOverrides, custArrows],
   '/datatable2resize': [
     resizableCols,
     resizableColsNoRealtime,
     resizableColsMobile,
   ],
-  '/paginated2': [
-    dflt,
-    noData,
-    autoRows,
-    custPager,
-    defaultSorting,
-    resizableCols
-  ],
-  '/asyncpaginated2': [
-    dflt,
-    noData,
-    selectAllPage,
-    autoRows,
-    asyncErrors,
-    goToLast,
-    custPager
-  ],
+  '/paginated2': [dflt, noData, autoRows, custPager, defaultSorting],
+  '/datatable2fixedmn': [dataTable2, paginatedFixedRowsCols, asyncPaginatedFixedRowsCols],
+  '/asyncpaginated2': [dflt, noData, selectAllPage, autoRows, asyncErrors, goToLast, custPager],
 };
 
 List<String>? getOptionsForRoute(String route) {

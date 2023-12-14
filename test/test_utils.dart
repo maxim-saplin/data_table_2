@@ -7,7 +7,6 @@
 // ignore_for_file: avoid_print
 
 import 'package:data_table_2/data_table_2.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -22,6 +21,20 @@ Future wrapWidgetSetSurf(WidgetTester tester, Widget widget,
   //         200 * tester.binding.window.devicePixelRatio);
 
   return tester.pumpWidget(MaterialApp(home: Material(child: widget)));
+}
+
+Future wrapWidgetSetSurfAndWait(WidgetTester tester, Widget widget,
+    [Size? size]) async {
+  await tester.binding.setSurfaceSize(size ?? const Size(1000, 200));
+
+  // tester.binding.window.physicalSizeTestValue = size != null
+  //     ? Size(size.width * tester.binding.window.devicePixelRatio,
+  //         size.height * tester.binding.window.devicePixelRatio)
+  //     : Size(1000 * tester.binding.window.devicePixelRatio,
+  //         200 * tester.binding.window.devicePixelRatio);
+
+  await tester.pumpWidget(MaterialApp(home: Material(child: widget)));
+  return tester.pumpAndSettle(const Duration(minutes: 1));
 }
 
 Finder findFirstContainerFor(String text) =>
@@ -136,6 +149,8 @@ DataTable2 buildTable(
     int fixedLeftColumns = 0,
     Color? fixedColumnsColor,
     Color? fixedCornerColor,
+    Color? headingRowColor,
+    BoxDecoration? headingRowDecoration,
     double? dividerThickness,
     bool showBottomBorder = false,
     TableBorder? border,
@@ -143,6 +158,9 @@ DataTable2 buildTable(
     Widget? empty,
     bool showCheckboxColumn = true,
     ScrollController? scrollController,
+    ScrollController? horizontalScrollController,
+    bool? isHorizontalScrollBarVisible,
+    bool? isVerticalScrollBarVisible,
     List<DataColumn2>? columns,
     List<DataRow2>? rows}) {
   return DataTable2(
@@ -152,6 +170,8 @@ DataTable2 buildTable(
     sortColumnIndex: sortColumnIndex,
     sortAscending: sortAscending,
     sortArrowIcon: sortArrowIcon ?? Icons.arrow_upward,
+    headingRowColor: MaterialStatePropertyAll(headingRowColor),
+    headingRowDecoration: headingRowDecoration,
     sortArrowAnimationDuration:
         sortArrowAnimationDuration ?? const Duration(milliseconds: 150),
     minWidth: minWidth,
@@ -166,6 +186,9 @@ DataTable2 buildTable(
     onSelectAll: (bool? value) {},
     columns: columns ?? testColumns,
     scrollController: scrollController,
+    horizontalScrollController: horizontalScrollController,
+    isHorizontalScrollBarVisible: isHorizontalScrollBarVisible,
+    isVerticalScrollBarVisible: isVerticalScrollBarVisible,
     smRatio: overrideSizes ? 0.5 : 0.67,
     lmRatio: overrideSizes ? 1.5 : 1.2,
     rows: rows ?? testRows,
@@ -239,24 +262,31 @@ PaginatedDataTable2 buildPaginatedTable(
     bool showPage = true,
     bool showGeneration = true,
     bool overrideSizes = false,
+    int fixedLeftColumns = 0,
+    int fixedTopRows = 1,
+    Color? fixedColumnsColor,
+    Color? fixedCornerColor,
     bool autoRowsToHeight = false,
     bool showHeader = false,
     bool wrapInCard = false,
     bool showPageSizeSelector = false,
     bool noData = false,
+    bool showCheckboxColumn = true,
     bool hidePaginator = false,
     TableBorder? border,
     PaginatorController? controller,
     Widget? empty,
     FlexFit fit = FlexFit.tight,
     ScrollController? scrollController,
+    ScrollController? horizontalScrollController,
     MaterialStateProperty<Color?>? headingRowColor,
+    BoxDecoration? headingRowDecoration,
     double? minWidth,
     Function(int?)? onRowsPerPageChanged,
     List<DataColumn2>? columns}) {
   return PaginatedDataTable2(
     horizontalMargin: 24,
-    showCheckboxColumn: true,
+    showCheckboxColumn: showCheckboxColumn,
     wrapInCard: wrapInCard,
     header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
@@ -270,9 +300,15 @@ PaginatedDataTable2 buildPaginatedTable(
     controller: controller,
     border: border,
     headingRowColor: headingRowColor,
+    headingRowDecoration: headingRowDecoration,
+    fixedColumnsColor: fixedColumnsColor,
+    fixedCornerColor: fixedCornerColor,
+    fixedLeftColumns: fixedLeftColumns,
+    fixedTopRows: fixedTopRows,
     empty: empty,
     fit: fit,
     scrollController: scrollController,
+    horizontalScrollController: horizontalScrollController,
     hidePaginator: hidePaginator,
     minWidth: minWidth,
     smRatio: overrideSizes ? 0.5 : 0.67,
@@ -296,8 +332,15 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     Duration? sortArrowAnimationDuration,
     bool showPage = true,
     bool showGeneration = true,
+    bool useKDeserts = false,
     bool overrideSizes = false,
     bool autoRowsToHeight = false,
+    int fixedTopRows = 1,
+    int fixedLeftColumns = 0,
+    Color? headingRowColor,
+    BoxDecoration? headingRowDecoration,
+    Color? fixedColumnsColor,
+    Color? fixedCornerColor,
     bool showHeader = false,
     bool wrapInCard = false,
     bool showPageSizeSelector = false,
@@ -316,6 +359,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     PageSyncApproach syncApproach = PageSyncApproach.doNothing,
     // Return less rows when calling refresh method on the data source
     ScrollController? scrollController,
+    ScrollController? horizontalScrollController,
     double? minWidth,
     Function(int?)? onRowsPerPageChanged,
     List<DataColumn2>? columns}) {
@@ -323,6 +367,12 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
     horizontalMargin: 24,
     showCheckboxColumn: showCheckboxColumn,
     wrapInCard: wrapInCard,
+    fixedTopRows: fixedTopRows,
+    headingRowColor: MaterialStatePropertyAll(headingRowColor),
+    headingRowDecoration: headingRowDecoration,
+    fixedColumnsColor: fixedColumnsColor,
+    fixedLeftColumns: fixedLeftColumns,
+    fixedCornerColor: fixedCornerColor,
     initialFirstRowIndex: initialFirstRowIndex,
     header: showHeader ? const Text('Header') : null,
     sortColumnIndex: sortColumnIndex,
@@ -347,6 +397,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
         : null,
     empty: empty,
     scrollController: scrollController,
+    horizontalScrollController: horizontalScrollController,
     hidePaginator: hidePaginator,
     minWidth: minWidth,
     smRatio: overrideSizes ? 0.5 : 0.67,
@@ -361,6 +412,7 @@ PaginatedDataTable2 buildAsyncPaginatedTable(
         (DessertDataSourceAsync(
             allowSelection: true,
             showPage: showPage,
+            useKDeserts: useKDeserts,
             noData: noData,
             fewerResultsAfterRefresh: fewerResultsAfterRefresh)
           .._errorCounter = throwError ? 0 : null),
@@ -544,3 +596,106 @@ List<Dessert> _dessertsX3 = _desserts.toList()
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)))
   ..addAll(_desserts.map((i) => Dessert('${i.name} x3', i.calories, i.fat,
       i.carbs, i.protein, i.sodium, i.calcium, i.iron)));
+
+class WidgetChildTypeFinder extends ChainedFinder {
+  WidgetChildTypeFinder(super.parent, this.childType);
+
+  final Type childType;
+
+  @override
+  String get description =>
+      //'${parent.description} (considering only types of children)';
+      '$parent (considering only types of children)';
+
+  @override
+  Iterable<Element> filter(Iterable<Element> parentCandidates) sync* {
+    for (final Element candidate in parentCandidates) {
+      var elements = collectAllElementsFrom(candidate, skipOffstage: false);
+      for (var e in elements) {
+        if (e.widget.runtimeType == childType) {
+          yield e;
+        }
+      }
+    }
+  }
+}
+
+class WidgetChildTextFinder extends ChainedFinder {
+  WidgetChildTextFinder(super.parent, this.childTextIncludes);
+
+  final String? childTextIncludes;
+
+  @override
+  String get description => '$parent (considering only types of children)';
+
+  @override
+  Iterable<Element> filter(Iterable<Element> parentCandidates) sync* {
+    for (final Element candidate in parentCandidates) {
+      var elements = collectAllElementsFrom(candidate, skipOffstage: false);
+      for (var e in elements) {
+        if ((e.widget.runtimeType == Text &&
+                (e.widget as Text).data!.contains(childTextIncludes!)) ||
+            ((e.widget.runtimeType == SelectableText &&
+                (e.widget as SelectableText).data != null &&
+                (e.widget as SelectableText)
+                    .data!
+                    .contains(childTextIncludes!)))) {
+          yield e;
+        }
+      }
+    }
+  }
+}
+
+class WidgetChildIconFinder extends ChainedFinder {
+  WidgetChildIconFinder(super.parent, this.iconData);
+
+  final IconData iconData;
+
+  @override
+  String get description => '$parent (considering only types of children)';
+
+  @override
+  Iterable<Element> filter(Iterable<Element> parentCandidates) sync* {
+    for (final Element candidate in parentCandidates) {
+      var elements = collectAllElementsFrom(candidate, skipOffstage: false);
+      for (var e in elements) {
+        if (e.widget is Icon && (e.widget as Icon).icon == iconData) {
+          yield e;
+        }
+      }
+    }
+  }
+}
+
+class WidgetChildSemanticsFinder extends ChainedFinder {
+  WidgetChildSemanticsFinder(super.parent, this.tooltip);
+
+  final String tooltip;
+
+  @override
+  String get description => '$parent (considering only types of children)';
+
+  @override
+  Iterable<Element> filter(Iterable<Element> parentCandidates) sync* {
+    for (final Element candidate in parentCandidates) {
+      var elements = collectAllElementsFrom(candidate, skipOffstage: false);
+      for (var e in elements) {
+        if (e.widget is Semantics &&
+            (e.widget as Semantics).properties.tooltip == tooltip) {
+          yield e;
+        }
+      }
+    }
+  }
+}
+
+extension ExtraFinders on Finder {
+  Finder byChildType(Type childType) => WidgetChildTypeFinder(this, childType);
+  Finder byChildTextIncludes(String? childTextIncludes) =>
+      WidgetChildTextFinder(this, childTextIncludes);
+  Finder byChildIcon(IconData iconData) =>
+      WidgetChildIconFinder(this, iconData);
+  Finder byChildSemantics(String tooltip) =>
+      WidgetChildSemanticsFinder(this, tooltip);
+}

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../data_sources.dart';
+import '../nav_helper.dart';
 
 // Copyright 2019 The Flutter team. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -23,8 +24,10 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
   bool _sortAscending = true;
   int? _sortColumnIndex;
   late DessertDataSource _dessertsDataSource;
+  late DessertDataSourceAsync _asyncDessertsDataSource;
   bool _initialized = false;
   final ScrollController _controller = ScrollController();
+  String selectedTableType = dflt;
 
   int _fixedRows = 1;
   int _fixedCols = 1;
@@ -72,6 +75,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
     super.didChangeDependencies();
     if (!_initialized) {
       _dessertsDataSource = DessertDataSource(context);
+      _asyncDessertsDataSource = DessertDataSourceAsync();
       _initialized = true;
       _dessertsDataSource.addListener(() {
         setState(() {});
@@ -91,6 +95,23 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
     });
   }
 
+  Widget getTableFromSelectedType() {
+    switch (getCurrentRouteOption(context)) {
+      case paginatedFixedRowsCols:
+        {
+          return getPaginatedDataTable();
+        }
+      case asyncPaginatedFixedRowsCols:
+        {
+          return getAsyncPaginatedDataTable();
+        }
+      default:
+        {
+          return getDataTable();
+        }
+    }
+  }
+
   @override
   void dispose() {
     _dessertsDataSource.dispose();
@@ -107,97 +128,250 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
           Flexible(
               fit: FlexFit.tight,
               child: Theme(
-                  data: ThemeData(
-                      scrollbarTheme: ScrollbarThemeData(
-                          thumbVisibility: MaterialStateProperty.all(_dataItems >
-                              0), // hide scrollbars and avoid exception when no data rows
-                          thumbColor:
-                              MaterialStateProperty.all<Color>(Colors.black))),
-                  child: DataTable2(
-                      scrollController: _controller,
-                      columnSpacing: 0,
-                      horizontalMargin: 12,
-                      bottomMargin: 20,
-                      dividerThickness: 0,
-                      border: TableBorder.all(width: 1.5),
-                      headingRowColor: MaterialStateProperty.resolveWith(
-                          (states) => _fixedRows > 0
-                              ? Colors.grey[200]
-                              : Colors.transparent),
-                      fixedColumnsColor: Colors.grey[300],
-                      fixedCornerColor: Colors.grey[400],
-                      minWidth: 1000,
-                      fixedTopRows: _fixedRows,
-                      fixedLeftColumns: _fixedCols,
-                      sortColumnIndex: _sortColumnIndex,
-                      sortAscending: _sortAscending,
-                      onSelectAll: (val) => setState(() => selectAll(val)),
-                      columns: [
-                        DataColumn2(
-                          label: const Text('Desert'),
-                          size: ColumnSize.S,
-                          onSort: (columnIndex, ascending) => _sort<String>(
-                              (d) => d.name, columnIndex, ascending),
-                        ),
-                        DataColumn2(
-                          label: const Text('Calories'),
-                          size: ColumnSize.S,
-                          numeric: true,
-                          onSort: (columnIndex, ascending) => _sort<num>(
-                              (d) => d.calories, columnIndex, ascending),
-                        ),
-                        DataColumn2(
-                          label: const Text('Fat (gm)'),
-                          size: ColumnSize.S,
-                          numeric: true,
-                          onSort: (columnIndex, ascending) =>
-                              _sort<num>((d) => d.fat, columnIndex, ascending),
-                        ),
-                        DataColumn2(
-                          label: const Text('Carbs (gm)'),
-                          size: ColumnSize.S,
-                          numeric: true,
-                          onSort: (columnIndex, ascending) => _sort<num>(
-                              (d) => d.carbs, columnIndex, ascending),
-                        ),
-                        DataColumn2(
-                          label: const Text('Protein (gm)'),
-                          size: ColumnSize.S,
-                          numeric: true,
-                          onSort: (columnIndex, ascending) => _sort<num>(
-                              (d) => d.protein, columnIndex, ascending),
-                        ),
-                        DataColumn2(
-                          label: const Text('Sodium (mg)'),
-                          size: ColumnSize.S,
-                          numeric: true,
-                          onSort: (columnIndex, ascending) => _sort<num>(
-                              (d) => d.sodium, columnIndex, ascending),
-                        ),
-                        DataColumn2(
-                          label: const Text('Calcium (%)'),
-                          size: ColumnSize.S,
-                          numeric: true,
-                          onSort: (columnIndex, ascending) => _sort<num>(
-                              (d) => d.calcium, columnIndex, ascending),
-                        ),
-                        DataColumn2(
-                          label: const Text('Iron (%)'),
-                          size: ColumnSize.S,
-                          numeric: true,
-                          onSort: (columnIndex, ascending) =>
-                              _sort<num>((d) => d.iron, columnIndex, ascending),
-                        ),
-                      ],
-                      rows: List<DataRow>.generate(
-                          _dataItems,
-                          (index) => _getRow(
-                              index,
-                              index + 1 <
-                                      _fixedRows // header row is also treated as fixed row
-                                  ? Colors.grey[200]
-                                  : null)))))
+                  data: ThemeData(dividerColor: Colors.grey[400]),
+                  child: getTableFromSelectedType()))
         ]));
+  }
+
+  DataTable2 getDataTable() {
+    return DataTable2(
+        dividerThickness: 4,
+        scrollController: _controller,
+        columnSpacing: 0,
+        horizontalMargin: 12,
+        bottomMargin: 20,
+        border: TableBorder.all(width: 1.0, color: Colors.grey),
+        headingRowColor: MaterialStateProperty.resolveWith(
+            (states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
+        headingRowDecoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.grey[400]!,
+              Colors.grey[200]!,
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        fixedColumnsColor: Colors.grey[300],
+        fixedCornerColor: Colors.grey[400],
+        minWidth: 1000,
+        fixedTopRows: _fixedRows,
+        fixedLeftColumns: _fixedCols,
+        sortColumnIndex: _sortColumnIndex,
+        sortAscending: _sortAscending,
+        onSelectAll: (val) => setState(() => selectAll(val)),
+        columns: [
+          DataColumn2(
+            label: const Text('Desert'),
+            size: ColumnSize.S,
+            onSort: (columnIndex, ascending) =>
+                _sort<String>((d) => d.name, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Calories'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.calories, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Fat (gm)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.fat, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Carbs (gm)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.carbs, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Protein (gm)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.protein, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Sodium (mg)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.sodium, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Calcium (%)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.calcium, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Iron (%)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.iron, columnIndex, ascending),
+          ),
+        ],
+        rows: List<DataRow>.generate(
+            _dataItems, (index) => _getRow(index, Colors.transparent)));
+  }
+
+  Widget getPaginatedDataTable() {
+    return PaginatedDataTable2(
+        scrollController: _controller,
+        columnSpacing: 0,
+        horizontalMargin: 12,
+        border: TableBorder.all(width: 1.0, color: Colors.grey),
+        headingRowColor: MaterialStateProperty.resolveWith(
+            (states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
+        fixedColumnsColor: Colors.grey[300],
+        fixedCornerColor: Colors.grey[400],
+        minWidth: 1000,
+        fixedTopRows: _fixedRows,
+        fixedLeftColumns: _fixedCols,
+        sortColumnIndex: _sortColumnIndex,
+        sortAscending: _sortAscending,
+        onSelectAll: (val) => setState(() => selectAll(val)),
+        columns: [
+          DataColumn2(
+            label: const Text('Desert'),
+            size: ColumnSize.S,
+            onSort: (columnIndex, ascending) =>
+                _sort<String>((d) => d.name, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Calories'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.calories, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Fat (gm)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.fat, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Carbs (gm)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.carbs, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Protein (gm)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.protein, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Sodium (mg)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.sodium, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Calcium (%)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.calcium, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Iron (%)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.iron, columnIndex, ascending),
+          ),
+        ],
+        source: _dessertsDataSource);
+  }
+
+  Widget getAsyncPaginatedDataTable() {
+    return AsyncPaginatedDataTable2(
+        scrollController: _controller,
+        columnSpacing: 0,
+        horizontalMargin: 12,
+        border: TableBorder.all(width: 1.0, color: Colors.grey),
+        headingRowColor: MaterialStateProperty.resolveWith(
+            (states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
+        fixedColumnsColor: Colors.grey[300],
+        fixedCornerColor: Colors.grey[400],
+        minWidth: 1000,
+        fixedTopRows: _fixedRows,
+        fixedLeftColumns: _fixedCols,
+        sortColumnIndex: _sortColumnIndex,
+        sortAscending: _sortAscending,
+        onSelectAll: (val) => setState(() => selectAll(val)),
+        columns: [
+          DataColumn2(
+            label: const Text('Desert'),
+            size: ColumnSize.S,
+            onSort: (columnIndex, ascending) =>
+                _sort<String>((d) => d.name, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Calories'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.calories, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Fat (gm)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.fat, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Carbs (gm)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.carbs, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Protein (gm)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.protein, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Sodium (mg)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.sodium, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Calcium (%)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.calcium, columnIndex, ascending),
+          ),
+          DataColumn2(
+            label: const Text('Iron (%)'),
+            size: ColumnSize.S,
+            numeric: true,
+            onSort: (columnIndex, ascending) =>
+                _sort<num>((d) => d.iron, columnIndex, ascending),
+          ),
+        ],
+        source: _asyncDessertsDataSource);
   }
 
   Theme _getParamsWidget(BuildContext context) {
