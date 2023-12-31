@@ -18,7 +18,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   vector_math: ^2.1.0
-  intl: ^0.18.0
+  intl: ^0.19.0
   flutter_lints: ^3.0.0
   golden_toolkit: # Solving problem with not rendered fonts
 
