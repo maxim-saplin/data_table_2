@@ -1310,6 +1310,7 @@ class DataTable2 extends DataTable {
                       effectiveDataRowColor))
               ?.resolve(states);
           final Color? rowColor = resolvedDataRowColor;
+
           final BorderSide borderSide = Divider.createBorderSide(
             context,
             width: dividerThickness ??
@@ -1319,16 +1320,28 @@ class DataTable2 extends DataTable {
           final Border border = showBottomBorder
               ? Border(bottom: borderSide)
               : Border(top: borderSide);
+
+          Decoration? rowDecoration = ShapeDecoration(
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.grey, width: 16),
+                      borderRadius: BorderRadius.circular(8)) +
+                  Border.symmetric(
+                    horizontal:
+                        BorderSide(color: Colors.transparent, width: 8.0),
+                  ));
+
           return TableRow(
             key: rows[rowStartIndex + actualIndex].key,
-            decoration: BoxDecoration(
-              // Changed standard behaviour to never add border should the thickness be 0
-              border: dividerThickness == null ||
-                      (dividerThickness != null && dividerThickness != 0.0)
-                  ? border
-                  : null,
-              color: rowColor ?? defaultRowColor.resolve(states),
-            ),
+            decoration: rowDecoration ??
+                BoxDecoration(
+                  // Changed standard behaviour to never add border should the thickness be 0
+                  border: dividerThickness == null ||
+                          (dividerThickness != null && dividerThickness != 0.0)
+                      ? border
+                      : null,
+                  color: rowColor ?? defaultRowColor.resolve(states),
+                ),
             children: List<Widget>.filled(
                 numberOfCols <= 0 ? numberOfCols : numberOfCols,
                 const _NullWidget()),
