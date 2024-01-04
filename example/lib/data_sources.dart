@@ -136,7 +136,7 @@ class DessertDataSource extends DataTableSource {
   }
 
   @override
-  DataRow getRow(int index, [Color? color]) {
+  DataRow2 getRow(int index, [Color? color]) {
     final format = NumberFormat.decimalPercentPattern(
       locale: 'en',
       decimalDigits: 0,

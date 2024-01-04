@@ -58,6 +58,7 @@ class DataRow2 extends DataRow {
       super.selected = false,
       super.onSelectChanged,
       super.color,
+      this.decoration,
       required super.cells,
       this.specificRowHeight,
       this.onTap,
@@ -71,6 +72,7 @@ class DataRow2 extends DataRow {
       super.selected = false,
       super.onSelectChanged,
       super.color,
+      this.decoration,
       required super.cells,
       this.specificRowHeight,
       this.onTap,
@@ -79,6 +81,41 @@ class DataRow2 extends DataRow {
       this.onSecondaryTap,
       this.onSecondaryTapDown})
       : super.byIndex();
+
+  /// Clone row, if non null values are provided - override the corresponding fields
+  DataRow2 clone({
+    LocalKey? key,
+    bool? selected,
+    ValueChanged<bool?>? onSelectChanged,
+    MaterialStateProperty<Color?>? color,
+    Decoration? decoration,
+    List<DataCell>? cells,
+    double? specificRowHeight,
+    GestureTapCallback? onTap,
+    GestureTapCallback? onDoubleTap,
+    GestureLongPressCallback? onLongPress,
+    GestureTapCallback? onSecondaryTap,
+    GestureTapDownCallback? onSecondaryTapDown,
+  }) {
+    return DataRow2(
+      key: key ?? this.key,
+      selected: selected ?? this.selected,
+      onSelectChanged: onSelectChanged ?? this.onSelectChanged,
+      color: color ?? this.color,
+      decoration: decoration ?? this.decoration,
+      cells: cells ?? this.cells,
+      specificRowHeight: specificRowHeight ?? this.specificRowHeight,
+      onTap: onTap ?? this.onTap,
+      onDoubleTap: onDoubleTap ?? this.onDoubleTap,
+      onLongPress: onLongPress ?? this.onLongPress,
+      onSecondaryTap: onSecondaryTap ?? this.onSecondaryTap,
+      onSecondaryTapDown: onSecondaryTapDown ?? this.onSecondaryTapDown,
+    );
+  }
+
+  /// Decoration to nbe applied to the given row. When applied, it [DataTable2.dividerThickness]
+  /// won't take effect
+  final Decoration? decoration;
 
   /// Specific row height, which will be used only if provided.
   /// If not provided, dataRowHeight will be applied.
@@ -227,7 +264,7 @@ class DataTable2 extends DataTable {
   /// - [headerRowColor] is applied to fixed top forws starting from the second
   /// When there're both fixed top rows and fixed left columns with [fixedCornerColor] provided,
   /// this decoration overrides top left cornner cell color.
-  final BoxDecoration? headingRowDecoration;
+  final Decoration? headingRowDecoration;
 
   /// The height of each row (excluding the row that contains column headings).
   ///
@@ -1321,15 +1358,10 @@ class DataTable2 extends DataTable {
               ? Border(bottom: borderSide)
               : Border(top: borderSide);
 
-          Decoration? rowDecoration = ShapeDecoration(
-              color: Colors.white,
-              shape: RoundedRectangleBorder(
-                      side: BorderSide(color: Colors.grey, width: 16),
-                      borderRadius: BorderRadius.circular(8)) +
-                  Border.symmetric(
-                    horizontal:
-                        BorderSide(color: Colors.transparent, width: 8.0),
-                  ));
+          Decoration? rowDecoration =
+              rows[rowStartIndex + actualIndex] is DataRow2
+                  ? (rows[rowStartIndex + actualIndex] as DataRow2).decoration
+                  : null;
 
           return TableRow(
             key: rows[rowStartIndex + actualIndex].key,
