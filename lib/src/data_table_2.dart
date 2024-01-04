@@ -264,7 +264,7 @@ class DataTable2 extends DataTable {
   /// - [headerRowColor] is applied to fixed top forws starting from the second
   /// When there're both fixed top rows and fixed left columns with [fixedCornerColor] provided,
   /// this decoration overrides top left cornner cell color.
-  final Decoration? headingRowDecoration;
+  final BoxDecoration? headingRowDecoration;
 
   /// The height of each row (excluding the row that contains column headings).
   ///

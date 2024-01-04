@@ -2,7 +2,6 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 
 import '../data_sources.dart';
-import '../nav_helper.dart';
 
 class DataTable2RoundedDemo extends StatefulWidget {
   const DataTable2RoundedDemo({super.key});
@@ -54,26 +53,14 @@ class DataTable2RoundedDemoState extends State<DataTable2RoundedDemo> {
       child: DataTable2(
         // Forcing all scrollbars to be visible, alternatively themes can be used (see above)
         headingRowColor:
-            MaterialStateColor.resolveWith((states) => Colors.grey[850]!),
-        headingTextStyle: const TextStyle(color: Colors.white),
-        headingCheckboxTheme: const CheckboxThemeData(
-            side: BorderSide(color: Colors.white, width: 2.0)),
+            MaterialStateColor.resolveWith((states) => Colors.transparent),
         columnSpacing: 12,
         horizontalMargin: 12,
-        border: getCurrentRouteOption(context) == fixedColumnWidth
-            ? TableBorder(
-                top: const BorderSide(color: Colors.black),
-                bottom: BorderSide(color: Colors.grey[300]!),
-                left: BorderSide(color: Colors.grey[300]!),
-                right: BorderSide(color: Colors.grey[300]!),
-                verticalInside: BorderSide(color: Colors.grey[300]!),
-                horizontalInside:
-                    const BorderSide(color: Colors.grey, width: 1))
-            : (getCurrentRouteOption(context) == showBordersWithZebraStripes
-                ? TableBorder.all()
-                : null),
-        dividerThickness:
-            1, // this one will be ignored if [border] is set above
+        border: TableBorder(
+            left: BorderSide(color: Colors.black.withAlpha(5)),
+            right: BorderSide(color: Colors.black.withAlpha(5)),
+            verticalInside: BorderSide(color: Colors.black.withAlpha(10)),
+            horizontalInside: BorderSide(color: Colors.black.withAlpha(10))),
         bottomMargin: 10,
         minWidth: 900,
         sortColumnIndex: _sortColumnIndex,
@@ -143,9 +130,11 @@ class DataTable2RoundedDemoState extends State<DataTable2RoundedDemo> {
                 decoration: ShapeDecoration(
                     shape: RoundedRectangleBorder(
                             side: BorderSide(
-                                color: Colors.grey.withAlpha(150), width: 19),
+                                color: Colors.grey.withAlpha(100), width: 19),
                             borderRadius: BorderRadius.circular(8)) +
                         const Border.symmetric(
+                          vertical:
+                              BorderSide(color: Colors.transparent, width: 3.5),
                           horizontal:
                               BorderSide(color: Colors.transparent, width: 5.0),
                         )))),
