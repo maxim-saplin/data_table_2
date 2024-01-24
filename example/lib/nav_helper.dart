@@ -28,24 +28,32 @@ const dataTable2 = 'DataTable2';
 const paginatedFixedRowsCols = 'PaginatedDataTable2';
 const asyncPaginatedFixedRowsCols = 'AsyncPaginatedDataTable2';
 const custArrows = 'Custom sort arrows';
-
-/// Async sample that emulates network error and allow retrying load operation
-const asyncErrors = "Errors/Retries";
-
-/// Used by asyn example, navigates to the very last page upon opening the screen
-const goToLast = "Start at last page";
+const asyncErrors =
+    "Errors/Retries"; // Async sample that emulates network error and allow retrying load operation
+const goToLast =
+    "Start at last page"; // Used by async example, navigates to the very last page upon opening the screen
+const rounded = 'Rounded style';
 
 /// Configurations available to given example routes
 const Map<String, List<String>> routeOptions = {
-  '/datatable2': [dflt, noData, showBordersWithZebraStripes, fixedColumnWidth, rowTaps, rowHeightOverrides, custArrows],
+  '/datatable2': [
+    dflt,
+    noData,
+    showBordersWithZebraStripes,
+    fixedColumnWidth,
+    rowTaps,
+    rowHeightOverrides,
+    custArrows,
+    rounded
+  ],
+  '/paginated2': [dflt, noData, autoRows, custPager, defaultSorting],
+  '/datatable2fixedmn': [dataTable2, paginatedFixedRowsCols, asyncPaginatedFixedRowsCols],
+  '/asyncpaginated2': [dflt, noData, selectAllPage, autoRows, asyncErrors, goToLast, custPager],
   '/datatable2resize': [
     resizableCols,
     resizableColsNoRealtime,
     resizableColsMobile,
   ],
-  '/paginated2': [dflt, noData, autoRows, custPager, defaultSorting],
-  '/datatable2fixedmn': [dataTable2, paginatedFixedRowsCols, asyncPaginatedFixedRowsCols],
-  '/asyncpaginated2': [dflt, noData, selectAllPage, autoRows, asyncErrors, goToLast, custPager],
 };
 
 List<String>? getOptionsForRoute(String route) {

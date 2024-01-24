@@ -563,7 +563,7 @@ List<Dessert> _desserts = <Dessert>[
     1,
   ),
   Dessert(
-    'Ice Cream Sandich with sugar',
+    'Ice Cream Sandwich with sugar',
     246,
     9.0,
     39,

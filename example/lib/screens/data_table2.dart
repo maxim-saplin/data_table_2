@@ -78,7 +78,7 @@ class DataTable2DemoState extends State<DataTable2Demo> {
                 // thumbColor: MaterialStateProperty.all<Color>(Colors.yellow)
               )),
           child: DataTable2(
-            // Forcing all scrallbars to be visible, alternatively themes can be used (see above)
+            // Forcing all scrollbars to be visible, alternatively themes can be used (see above)
             headingRowColor:
                 MaterialStateColor.resolveWith((states) => Colors.grey[850]!),
             headingTextStyle: const TextStyle(color: Colors.white),

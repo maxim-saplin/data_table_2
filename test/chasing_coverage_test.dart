@@ -146,6 +146,66 @@ void main() {
         0);
   });
 
+  testWidgets('DataRow2.clone() creates a copy with the same properties',
+      (WidgetTester tester) async {
+    const originalKey = ValueKey('original');
+    const cellText = Text('Cell');
+    final originalRow = DataRow2(
+      key: originalKey,
+      selected: true,
+      cells: const <DataCell>[DataCell(cellText)],
+      specificRowHeight: 42.0,
+      onTap: () {},
+      onDoubleTap: () {},
+      onLongPress: () {},
+      onSecondaryTap: () {},
+      onSecondaryTapDown: (TapDownDetails details) {},
+    );
+
+    final clonedRow = originalRow.clone();
+
+    // Verify that the cloned DataRow2 has the same properties as the original
+    expect(clonedRow.key, equals(originalKey));
+    expect(clonedRow.selected, isTrue);
+    expect(clonedRow.cells.length, equals(1));
+    expect((clonedRow.cells.first.child as Text), equals(cellText));
+    expect(clonedRow.specificRowHeight, equals(42.0));
+    expect(clonedRow.onTap, isNotNull);
+    expect(clonedRow.onDoubleTap, isNotNull);
+    expect(clonedRow.onLongPress, isNotNull);
+    expect(clonedRow.onSecondaryTap, isNotNull);
+    expect(clonedRow.onSecondaryTapDown, isNotNull);
+  });
+
+  testWidgets('DataRow2.clone() creates a copy with the overriden properties',
+      (WidgetTester tester) async {
+    const originalKey = ValueKey('original');
+    const cellText = Text('Cell');
+    final originalRow = DataRow2(
+      key: originalKey,
+      selected: true,
+      cells: const <DataCell>[DataCell(cellText)],
+      specificRowHeight: 42.0,
+      onTap: () {},
+      onDoubleTap: () {},
+      onLongPress: () {},
+      onSecondaryTap: () {},
+      onSecondaryTapDown: (TapDownDetails details) {},
+    );
+
+    final modifiedRow = originalRow.clone(
+      selected: false,
+      specificRowHeight: 21.0,
+    );
+
+    // Verify that the modified DataRow2 has the overriden properties
+    expect(modifiedRow.key, equals(originalKey));
+    expect(modifiedRow.selected, isFalse);
+    expect(modifiedRow.cells.length, equals(1));
+    expect((modifiedRow.cells.first.child as Text), equals(cellText));
+    expect(modifiedRow.specificRowHeight, equals(21.0));
+  });
+
   testWidgets('DataTable2, showing sort arrow when changing sort column',
       (WidgetTester tester) async {
     var sortCol = 1;

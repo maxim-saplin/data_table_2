@@ -7,6 +7,7 @@ import 'nav_helper.dart';
 import 'screens/async_paginated_data_table2.dart';
 import 'screens/data_table.dart';
 import 'screens/data_table2.dart';
+import 'screens/data_table2_rounded.dart';
 import 'screens/data_table2_scrollup.dart';
 import 'screens/data_table2_simple.dart';
 import 'screens/data_table2_tests.dart';
@@ -136,16 +137,33 @@ class MyApp extends StatelessWidget {
       initialRoute: initialRoute,
 
       routes: {
-        '/datatable2': (context) => _getScaffold(context, const DataTable2Demo(), getOptionsForRoute('/datatable2')),
-        '/datatable2simple': (context) => _getScaffold(context, const DataTable2SimpleDemo()),
-        '/datatable2scrollup': (context) => _getScaffold(context, const DataTable2ScrollupDemo()),
-        '/datatable2resize': (context) => _getScaffold(context, const ResizeableDataTable2Demo(), getOptionsForRoute('/datatable2resize')),
-        '/datatable2fixedmn': (context) => _getScaffold(context, const DataTable2FixedNMDemo(), getOptionsForRoute('/datatable2fixedmn')),
-        '/paginated2': (context) => _getScaffold(context, const PaginatedDataTable2Demo(), getOptionsForRoute('/paginated2')),
-        '/asyncpaginated2': (context) => _getScaffold(context, const AsyncPaginatedDataTable2Demo(), getOptionsForRoute('/asyncpaginated2')),
+        '/datatable2': (context) {
+          final currentRouteOption = getCurrentRouteOption(context);
+          return _getScaffold(
+              context,
+              currentRouteOption == rounded
+                  ? const DataTable2RoundedDemo()
+                  : const DataTable2Demo(),
+              getOptionsForRoute('/datatable2'));
+        },
+        '/datatable2simple': (context) =>
+            _getScaffold(context, const DataTable2SimpleDemo()),
+        '/datatable2scrollup': (context) =>
+            _getScaffold(context, const DataTable2ScrollupDemo()),
+        '/datatable2fixedmn': (context) => _getScaffold(
+            context,
+            const DataTable2FixedNMDemo(),
+            getOptionsForRoute('/datatable2fixedmn')),
+        '/paginated2': (context) => _getScaffold(context,
+            const PaginatedDataTable2Demo(), getOptionsForRoute('/paginated2')),
+        '/asyncpaginated2': (context) => _getScaffold(
+            context,
+            const AsyncPaginatedDataTable2Demo(),
+            getOptionsForRoute('/asyncpaginated2')),
         '/datatable': (context) => _getScaffold(context, const DataTableDemo()),
         '/paginated': (context) => _getScaffold(context, const PaginatedDataTableDemo()),
         '/datatable2tests': (context) => _getScaffold(context, const DataTable2Tests()),
+        '/datatable2resize': (context) => _getScaffold(context, const ResizeableDataTable2Demo(), getOptionsForRoute('/datatable2resize')),
       },
       localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
       supportedLocales: const [

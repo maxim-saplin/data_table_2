@@ -58,6 +58,7 @@ class DataRow2 extends DataRow {
       super.selected = false,
       super.onSelectChanged,
       super.color,
+      this.decoration,
       required super.cells,
       this.specificRowHeight,
       this.onTap,
@@ -71,6 +72,7 @@ class DataRow2 extends DataRow {
       super.selected = false,
       super.onSelectChanged,
       super.color,
+      this.decoration,
       required super.cells,
       this.specificRowHeight,
       this.onTap,
@@ -79,6 +81,41 @@ class DataRow2 extends DataRow {
       this.onSecondaryTap,
       this.onSecondaryTapDown})
       : super.byIndex();
+
+  /// Clone row, if non null values are provided - override the corresponding fields
+  DataRow2 clone({
+    LocalKey? key,
+    bool? selected,
+    ValueChanged<bool?>? onSelectChanged,
+    MaterialStateProperty<Color?>? color,
+    Decoration? decoration,
+    List<DataCell>? cells,
+    double? specificRowHeight,
+    GestureTapCallback? onTap,
+    GestureTapCallback? onDoubleTap,
+    GestureLongPressCallback? onLongPress,
+    GestureTapCallback? onSecondaryTap,
+    GestureTapDownCallback? onSecondaryTapDown,
+  }) {
+    return DataRow2(
+      key: key ?? this.key,
+      selected: selected ?? this.selected,
+      onSelectChanged: onSelectChanged ?? this.onSelectChanged,
+      color: color ?? this.color,
+      decoration: decoration ?? this.decoration,
+      cells: cells ?? this.cells,
+      specificRowHeight: specificRowHeight ?? this.specificRowHeight,
+      onTap: onTap ?? this.onTap,
+      onDoubleTap: onDoubleTap ?? this.onDoubleTap,
+      onLongPress: onLongPress ?? this.onLongPress,
+      onSecondaryTap: onSecondaryTap ?? this.onSecondaryTap,
+      onSecondaryTapDown: onSecondaryTapDown ?? this.onSecondaryTapDown,
+    );
+  }
+
+  /// Decoration to nbe applied to the given row. When applied, it [DataTable2.dividerThickness]
+  /// won't take effect
+  final Decoration? decoration;
 
   /// Specific row height, which will be used only if provided.
   /// If not provided, dataRowHeight will be applied.
@@ -1130,19 +1167,34 @@ class DataTable2 extends DataTable {
           final Color? resolvedDataRowColor =
               (forceEffectiveDataRowColor ? effectiveDataRowColor : (rows[rowStartIndex + actualIndex].color ?? effectiveDataRowColor))?.resolve(states);
           final Color? rowColor = resolvedDataRowColor;
+
           final BorderSide borderSide = Divider.createBorderSide(
             context,
             width: dividerThickness ?? theme.dataTableTheme.dividerThickness ?? _dividerThickness,
           );
-          final Border border = showBottomBorder ? Border(bottom: borderSide) : Border(top: borderSide);
+          final Border border = showBottomBorder
+              ? Border(bottom: borderSide)
+              : Border(top: borderSide);
+
+          Decoration? rowDecoration =
+              rows[rowStartIndex + actualIndex] is DataRow2
+                  ? (rows[rowStartIndex + actualIndex] as DataRow2).decoration
+                  : null;
+
           return TableRow(
             key: rows[rowStartIndex + actualIndex].key,
-            decoration: BoxDecoration(
-              // Changed standard behaviour to never add border should the thickness be 0
-              border: dividerThickness == null || (dividerThickness != null && dividerThickness != 0.0) ? border : null,
-              color: rowColor ?? defaultRowColor.resolve(states),
-            ),
-            children: List<Widget>.filled(numberOfCols <= 0 ? numberOfCols : numberOfCols, const _NullWidget()),
+            decoration: rowDecoration ??
+                BoxDecoration(
+                  // Changed standard behaviour to never add border should the thickness be 0
+                  border: dividerThickness == null ||
+                          (dividerThickness != null && dividerThickness != 0.0)
+                      ? border
+                      : null,
+                  color: rowColor ?? defaultRowColor.resolve(states),
+                ),
+            children: List<Widget>.filled(
+                numberOfCols <= 0 ? numberOfCols : numberOfCols,
+                const _NullWidget()),
           );
         }
       },
