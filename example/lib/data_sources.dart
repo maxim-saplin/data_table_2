@@ -286,7 +286,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
         x.data.map((dessert) {
           return DataRow(
             key: ValueKey<int>(dessert.id),
-            selected: dessert.selected,
+            //selected: dessert.selected,
             onSelectChanged: (value) {
               if (value != null) {
                 setRowSelection(ValueKey<int>(dessert.id), value);
