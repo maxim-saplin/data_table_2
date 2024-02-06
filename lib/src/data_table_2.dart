@@ -449,8 +449,8 @@ class DataTable2 extends DataTable {
           ),
         ),
       _ => Align(
-          alignment:
-              alignment?.resolve(currentDirection) ?? Alignment.centerLeft,
+          alignment: alignment?.resolve(currentDirection) ??
+              AlignmentDirectional.centerStart.resolve(currentDirection),
           child: label,
         ),
     };
