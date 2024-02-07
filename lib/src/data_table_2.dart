@@ -31,8 +31,7 @@ class DataColumn2 extends DataColumn {
       super.numeric = false,
       super.onSort,
       this.size = ColumnSize.M,
-      this.fixedWidth,
-      this.alignment});
+      this.fixedWidth});
 
   /// Column sizes are determined based on available width by distributing it
   /// to individual columns accounting for their relative sizes (see [ColumnSize])
@@ -42,14 +41,6 @@ class DataColumn2 extends DataColumn {
   /// Warning, if the width happens to be larger than available total width other
   /// columns can be clipped
   final double? fixedWidth;
-
-  /// Defines the alignment of the heading cells.
-  ///
-  /// Warning, if you specify either of [AlignmentDirectional.bottomEnd],
-  /// [AlignmentDirectional.topEnd] or [AlignmentDirectional.centerEnd] and if
-  /// the [onSort] function is not null we will not be render the label over the
-  /// arrow (invisible or not)
-  final AlignmentDirectional? alignment;
 }
 
 /// Extension of standard [DataRow], adds row level tap events. Also there're
@@ -215,7 +206,7 @@ class DataTable2 extends DataTable {
     }
   }
 
-  static const double invisibleSortArrowsTake =
+  static const double sortArrowSpaceWidth =
       _sortArrowPadding + _SortArrowState._arrowIconSize;
 
   /// The default height of the heading row.
@@ -423,33 +414,11 @@ class DataTable2 extends DataTable {
     required bool ascending,
     required double effectiveHeadingRowHeight,
     required MaterialStateProperty<Color?>? overlayColor,
-    AlignmentDirectional alignment = AlignmentDirectional.centerStart,
   }) {
     final ThemeData themeData = Theme.of(context);
 
     var customArrows =
         sortArrowBuilder != null ? sortArrowBuilder!(ascending, sorted) : null;
-
-    final currentDirection = Directionality.of(context);
-    final bool isRTL = currentDirection == TextDirection.rtl;
-
-    label = switch (alignment) {
-      AlignmentDirectional.bottomCenter ||
-      AlignmentDirectional.center ||
-      AlignmentDirectional.topCenter =>
-        Padding(
-          padding: EdgeInsets.only(
-              left: !isRTL && onSort != null ? invisibleSortArrowsTake : 0,
-              right: isRTL && onSort != null ? invisibleSortArrowsTake : 0),
-          child: !numeric
-              ? Align(
-                  alignment: alignment.resolve(currentDirection),
-                  child: label,
-                )
-              : label,
-        ),
-      _ => label,
-    };
 
     label = Row(
       textDirection: numeric ? TextDirection.rtl : null,
@@ -867,9 +836,6 @@ class DataTable2 extends DataTable {
                 sorted: dataColumnIndex == sortColumnIndex,
                 ascending: sortAscending,
                 overlayColor: effectiveHeadingRowColor,
-                alignment: (column is DataColumn2)
-                    ? column.alignment ?? AlignmentDirectional.centerStart
-                    : AlignmentDirectional.centerStart,
               );
 
               headingRow.children[displayColumnIndex] =
@@ -1757,4 +1723,35 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
   @override
   Widget build(BuildContext context) =>
       widget.builder(context, _sc11!, _sc12, _sc21!, _sc22);
+}
+
+extension DataColumn2Ext on DataColumn2 {
+  /// A usefull function to help when you need to center the label. 
+  /// 
+  /// It take into account space the sorting arrow is taking (visible or not)
+  DataColumn2 align(Alignment alignment) {
+    final label = switch (alignment) {
+      Alignment.bottomCenter ||
+      Alignment.center ||
+      Alignment.topCenter =>
+        Padding(
+          padding: EdgeInsetsDirectional.only(
+              start: onSort != null ? DataTable2.sortArrowSpaceWidth : 0,
+              end: onSort != null ? DataTable2.sortArrowSpaceWidth : 0),
+          child: !numeric
+              ? Align(alignment: alignment, child: this.label)
+              : this.label,
+        ),
+      _ => Align(alignment: alignment, child: this.label),
+    };
+
+    return DataColumn2(
+      label: label,
+      fixedWidth: fixedWidth,
+      numeric: numeric,
+      onSort: onSort,
+      size: size,
+      tooltip: tooltip,
+    );
+  }
 }
