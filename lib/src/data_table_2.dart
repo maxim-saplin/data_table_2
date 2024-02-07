@@ -215,6 +215,9 @@ class DataTable2 extends DataTable {
     }
   }
 
+  static const double invisibleSortArrowsTake =
+      _sortArrowPadding + _SortArrowState._arrowIconSize;
+
   /// The default height of the heading row.
   static const double _headingRowHeight = 56.0;
 
@@ -420,7 +423,7 @@ class DataTable2 extends DataTable {
     required bool ascending,
     required double effectiveHeadingRowHeight,
     required MaterialStateProperty<Color?>? overlayColor,
-    AlignmentDirectional? alignment,
+    AlignmentDirectional alignment = AlignmentDirectional.centerStart,
   }) {
     final ThemeData themeData = Theme.of(context);
 
@@ -436,23 +439,14 @@ class DataTable2 extends DataTable {
       AlignmentDirectional.topCenter =>
         Padding(
           padding: EdgeInsets.only(
-              left: !isRTL && onSort != null
-                  ? _sortArrowPadding + _SortArrowState._arrowIconSize
-                  : 0,
-              right: isRTL && onSort != null
-                  ? _sortArrowPadding + _SortArrowState._arrowIconSize
-                  : 0),
+              left: !isRTL && onSort != null ? invisibleSortArrowsTake : 0,
+              right: isRTL && onSort != null ? invisibleSortArrowsTake : 0),
           child: Align(
-            alignment:
-                alignment?.resolve(currentDirection) ?? Alignment.centerLeft,
+            alignment: alignment.resolve(currentDirection),
             child: label,
           ),
         ),
-      _ => Align(
-          alignment: alignment?.resolve(currentDirection) ??
-              AlignmentDirectional.centerStart.resolve(currentDirection),
-          child: label,
-        ),
+      _ => label,
     };
 
     label = Row(
@@ -871,7 +865,9 @@ class DataTable2 extends DataTable {
                 sorted: dataColumnIndex == sortColumnIndex,
                 ascending: sortAscending,
                 overlayColor: effectiveHeadingRowColor,
-                alignment: (column is DataColumn2) ? column.alignment : null,
+                alignment: (column is DataColumn2)
+                    ? column.alignment ?? AlignmentDirectional.centerStart
+                    : AlignmentDirectional.centerStart,
               );
 
               headingRow.children[displayColumnIndex] =
