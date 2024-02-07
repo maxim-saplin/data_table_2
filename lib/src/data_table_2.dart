@@ -433,7 +433,7 @@ class DataTable2 extends DataTable {
     final currentDirection = Directionality.of(context);
     final bool isRTL = currentDirection == TextDirection.rtl;
 
-    final alignedLabel = switch (alignment) {
+    label = switch (alignment) {
       AlignmentDirectional.bottomCenter ||
       AlignmentDirectional.center ||
       AlignmentDirectional.topCenter =>
@@ -441,10 +441,12 @@ class DataTable2 extends DataTable {
           padding: EdgeInsets.only(
               left: !isRTL && onSort != null ? invisibleSortArrowsTake : 0,
               right: isRTL && onSort != null ? invisibleSortArrowsTake : 0),
-          child: Align(
-            alignment: alignment.resolve(currentDirection),
-            child: label,
-          ),
+          child: !numeric
+              ? Align(
+                  alignment: alignment.resolve(currentDirection),
+                  child: label,
+                )
+              : label,
         ),
       _ => label,
     };
@@ -452,7 +454,7 @@ class DataTable2 extends DataTable {
     label = Row(
       textDirection: numeric ? TextDirection.rtl : null,
       children: <Widget>[
-        Flexible(child: alignedLabel),
+        Flexible(child: label),
         if (onSort != null) ...<Widget>[
           customArrows ??
               _SortArrow(
