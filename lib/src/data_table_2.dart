@@ -177,6 +177,7 @@ class DataTable2 extends DataTable {
     this.isHorizontalScrollBarVisible,
     this.empty,
     this.border,
+    this.flexFit,
     this.smRatio = 0.67,
     this.fixedTopRows = 1,
     this.fixedLeftColumns = 0,
@@ -315,6 +316,8 @@ class DataTable2 extends DataTable {
   /// set to >1 in order to fix data rows
   /// (i.e. in order to fix both header and the first data row use value of 2)
   final int fixedTopRows;
+
+  final FlexFit? flexFit;
 
   /// Number of sticky columns fixed at the left side of the table.
   /// Check box column (if enabled) is also counted
@@ -1120,7 +1123,7 @@ class DataTable2 extends DataTable {
                                 fixedColumnAndCornerCol,
                               if (fixedRowsAndCoreCol != null)
                                 Flexible(
-                                    fit: FlexFit.tight,
+                                    fit: flexFit ?? FlexFit.tight,
                                     child: fixedRowsAndCoreCol)
                             ],
                           )));
