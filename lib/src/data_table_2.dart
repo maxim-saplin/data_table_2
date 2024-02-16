@@ -181,6 +181,8 @@ class DataTable2 extends DataTable {
     this.fixedTopRows = 1,
     this.fixedLeftColumns = 0,
     this.lmRatio = 1.2,
+    this.sortArrowIconSize = 16,
+    this.sortArrowIconColor = Colors.black,
     this.sortArrowAnimationDuration = const Duration(milliseconds: 150),
     this.sortArrowIcon = Icons.arrow_upward,
     this.sortArrowBuilder,
@@ -308,6 +310,10 @@ class DataTable2 extends DataTable {
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
 
+  //SORT ARROW ICON SIZE & COLOR
+  final double sortArrowIconSize;
+  final Color sortArrowIconColor;
+
   /// The number of sticky rows fixed at the top of the table.
   /// The heading row is counted/included.
   /// By defult the value is 1 which means header row is fixed.
@@ -426,7 +432,7 @@ class DataTable2 extends DataTable {
                 up: sorted ? ascending : null,
                 duration: sortArrowAnimationDuration,
                 sortArrowIcon: sortArrowIcon,
-              ),
+               ),
           const SizedBox(width: _sortArrowPadding),
         ],
       ],
@@ -1429,6 +1435,9 @@ class _SortArrow extends StatefulWidget {
     required this.up,
     required this.duration,
     required this.sortArrowIcon,
+      required this.sortArrowIconSize,
+    required this.sortArrowIconColor,
+  
   });
 
   final bool visible;
@@ -1438,6 +1447,10 @@ class _SortArrow extends StatefulWidget {
   final Duration duration;
 
   final IconData sortArrowIcon;
+
+  final double sortArrowIconSize;
+  
+  final Color sortArrowIconColor;
 
   @override
   _SortArrowState createState() => _SortArrowState();
@@ -1530,8 +1543,7 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
   }
 
   static const double _arrowIconBaselineOffset = -1.5;
-  static const double _arrowIconSize = 16.0;
-
+  
   @override
   Widget build(BuildContext context) {
     return Opacity(
@@ -1543,7 +1555,9 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
         alignment: Alignment.center,
         child: Icon(
           widget.sortArrowIcon,
-          size: _arrowIconSize,
+            color: widget.sortArrowIconColor,
+          size: widget.sortArrowIconSize,
+        
         ),
       ),
     );
