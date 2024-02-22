@@ -186,6 +186,7 @@ class DataTable2 extends DataTable {
     this.sortArrowIcon = Icons.arrow_upward,
     this.sortArrowBuilder,
     this.headingRowDecoration,
+    this.showHeadingCheckbox = true,
     required super.rows,
   })  : assert(fixedLeftColumns >= 0),
         assert(fixedTopRows >= 0);
@@ -328,6 +329,8 @@ class DataTable2 extends DataTable {
   /// this color is static and doesn't repond to state change
   /// Note: to change background color of fixed data rows use [DataTable2.headingRowColor]
   final Color? fixedColumnsColor;
+
+  final bool showHeadingCheckbox;
 
   /// Backgound color of the top left corner which is fixed whenere both [fixedTopRows]
   /// and [fixedLeftColumns] are greater than 0
@@ -1166,16 +1169,18 @@ class DataTable2 extends DataTable {
       tableColumns[0] = FixedColumnWidth(checkBoxWidth);
 
       // Create heading twice, in the heading row used as back-up for the case of no data and any of the xxx_rows table
-      headingRow.children[0] = _buildCheckbox(
-          context: context,
-          checked: someChecked ? null : allChecked,
-          onRowTap: null,
-          onCheckboxChanged: (bool? checked) =>
-              _handleSelectAll(checked, someChecked),
-          overlayColor: null,
-          checkboxTheme: headingCheckboxTheme,
-          tristate: true,
-          rowHeight: headingHeight);
+      headingRow.children[0] = showHeadingCheckbox
+          ? _buildCheckbox(
+              context: context,
+              checked: someChecked ? null : allChecked,
+              onRowTap: null,
+              onCheckboxChanged: (bool? checked) =>
+                  _handleSelectAll(checked, someChecked),
+              overlayColor: null,
+              checkboxTheme: headingCheckboxTheme,
+              tristate: true,
+              rowHeight: headingHeight)
+          : const SizedBox();
 
       if (fixedCornerRows != null) {
         fixedCornerRows[0].children[0] = headingRow.children[0];
