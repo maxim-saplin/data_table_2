@@ -188,6 +188,7 @@ class DataTable2 extends DataTable {
     this.headingRowDecoration,
     this.showHeadingCheckbox = true,
     required super.rows,
+    this.filterDataRow,
   })  : assert(fixedLeftColumns >= 0),
         assert(fixedTopRows >= 0);
 
@@ -207,6 +208,8 @@ class DataTable2 extends DataTable {
       }
     }
   }
+
+  final DataRow? filterDataRow;
 
   /// The default height of the heading row.
   static const double _headingRowHeight = 56.0;
@@ -929,6 +932,14 @@ class DataTable2 extends DataTable {
               return rows == null || rows.isEmpty || rows[0].children.isEmpty;
             }
 
+            /// ADD Filter row
+            if (filterDataRow != null) {
+              final filterRow = _buildFilterRow(context, filterDataRow!, theme,
+                  effectiveHeadingRowColor, tableColumnWidths.length);
+
+              coreRows?.insert(0, filterRow);
+            }
+
             var coreTable = Table(
                 columnWidths:
                     actualFixedColumns > 0 ? rightWidthsAsMap : widthsAsMap,
@@ -1427,6 +1438,47 @@ class DataTable2 extends DataTable {
       ),
       children: List<Widget>.filled(numberOfCols, const _NullWidget()),
     );
+    return headingRow;
+  }
+
+  /// Build Filter Row
+  TableRow _buildFilterRow(
+      BuildContext context,
+      DataRow dataRow,
+      ThemeData theme,
+      MaterialStateProperty<Color?>? effectiveHeadingRowColor,
+      int numberOfCols) {
+    var headingRow = TableRow(
+        key: _headingRowKey,
+        decoration: BoxDecoration(
+          // Changed standard behaviour to never add border should the thickness be 0
+          border: showBottomBorder &&
+                  border == null &&
+                  (dividerThickness == null ||
+                      (dividerThickness != null && dividerThickness != 0.0))
+              ? Border(
+                  bottom: Divider.createBorderSide(
+                  context,
+                  width: dividerThickness ??
+                      theme.dataTableTheme.dividerThickness ??
+                      _dividerThickness,
+                ))
+              : null,
+          color: effectiveHeadingRowColor?.resolve(<MaterialState>{}),
+        ).copyWith(
+          color: headingRowDecoration?.color,
+          image: headingRowDecoration?.image,
+          border: headingRowDecoration?.border,
+          borderRadius: headingRowDecoration?.borderRadius,
+          boxShadow: headingRowDecoration?.boxShadow,
+          gradient: headingRowDecoration?.gradient,
+          backgroundBlendMode: headingRowDecoration?.backgroundBlendMode,
+          shape: headingRowDecoration?.shape,
+        ),
+        children: List.generate(numberOfCols, (index) {
+          final DataCell cell = dataRow.cells[index];
+          return cell.child;
+        }));
     return headingRow;
   }
 }
