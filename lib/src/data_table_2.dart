@@ -434,6 +434,8 @@ class DataTable2 extends DataTable {
                 up: sorted ? ascending : null,
                 duration: sortArrowAnimationDuration,
                 sortArrowIcon: sortArrowIcon,
+                sortArrowIconColor: sortArrowIconColor,
+                sortArrowIconSize: sortArrowIconSize,
                ),
           const SizedBox(width: _sortArrowPadding),
         ],
