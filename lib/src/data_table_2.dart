@@ -310,8 +310,10 @@ class DataTable2 extends DataTable {
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
 
-  //SORT ARROW ICON SIZE & COLOR
+  ///Sort arrow icon size & COLOR
   final double sortArrowIconSize;
+
+  ///Sort arrow icon color
   final Color sortArrowIconColor;
 
   /// The number of sticky rows fixed at the top of the table.
@@ -1435,7 +1437,7 @@ class _SortArrow extends StatefulWidget {
     required this.up,
     required this.duration,
     required this.sortArrowIcon,
-      required this.sortArrowIconSize,
+    required this.sortArrowIconSize,
     required this.sortArrowIconColor,
   
   });
@@ -1555,7 +1557,7 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
         alignment: Alignment.center,
         child: Icon(
           widget.sortArrowIcon,
-            color: widget.sortArrowIconColor,
+          color: widget.sortArrowIconColor,
           size: widget.sortArrowIconSize,
         
         ),
