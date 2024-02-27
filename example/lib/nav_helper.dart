@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 /// Route options are used to configure certain features of
 /// the given example
 String getCurrentRouteOption(BuildContext context) {
-  var isEmpty = ModalRoute.of(context) != null && ModalRoute.of(context)!.settings.arguments != null && ModalRoute.of(context)!.settings.arguments is String
+  var isEmpty = ModalRoute.of(context) != null &&
+          ModalRoute.of(context)!.settings.arguments != null &&
+          ModalRoute.of(context)!.settings.arguments is String
       ? ModalRoute.of(context)!.settings.arguments as String
       : '';
 
@@ -47,8 +49,20 @@ const Map<String, List<String>> routeOptions = {
     rounded
   ],
   '/paginated2': [dflt, noData, autoRows, custPager, defaultSorting],
-  '/datatable2fixedmn': [dataTable2, paginatedFixedRowsCols, asyncPaginatedFixedRowsCols],
-  '/asyncpaginated2': [dflt, noData, selectAllPage, autoRows, asyncErrors, goToLast, custPager],
+  '/datatable2fixedmn': [
+    dataTable2,
+    paginatedFixedRowsCols,
+    asyncPaginatedFixedRowsCols
+  ],
+  '/asyncpaginated2': [
+    dflt,
+    noData,
+    selectAllPage,
+    autoRows,
+    asyncErrors,
+    goToLast,
+    custPager
+  ],
   '/datatable2resize': [
     resizableCols,
     resizableColsNoRealtime,
