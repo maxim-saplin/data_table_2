@@ -208,6 +208,8 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.lmRatio = 1.2,
     this.columnResizingParameters,
     this.headingRowDecoration,
+    this.isVerticalScrollBarVisible,
+    this.isHorizontalScrollBarVisible,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null || (sortColumnIndex >= 0 && sortColumnIndex < columns.length)),
@@ -506,6 +508,12 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? horizontalScrollController;
 
+  /// Determines whether the vertical scroll bar is visible, for iOS takes value from scrollbarTheme when null
+  final bool? isVerticalScrollBarVisible;
+
+  /// Determines whether the horizontal scroll bar is visible, for iOS takes value from scrollbarTheme when null
+  final bool? isHorizontalScrollBarVisible;
+
   @override
   PaginatedDataTable2State createState() => PaginatedDataTable2State();
 }
@@ -777,6 +785,8 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           border: widget.border,
           smRatio: widget.smRatio,
           lmRatio: widget.lmRatio,
+          isHorizontalScrollBarVisible: widget.isHorizontalScrollBarVisible,
+          isVerticalScrollBarVisible: widget.isVerticalScrollBarVisible,
         ),
       ),
     );

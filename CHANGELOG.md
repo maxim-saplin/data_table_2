@@ -1,5 +1,9 @@
+## 2.5.11
+- Fixed Async example (range selector)
+- Added `isHorizontalScrollBarVisible` and `isVerticalScrollBarVisible` to `PaginatedDataTable` and `AsyncPaginatedDataTable`
+
 ## 2.5.10
-- Added [DataTable2.decoratio]
+- Added [DataTable2.decoration]
 - Example with rows styles as rounded corners rectangles
 
 ## 2.5.9

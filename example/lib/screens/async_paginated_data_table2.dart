@@ -330,11 +330,14 @@ class _TitledRangeSelectorState extends State<_TitledRangeSelector> {
 
     _values = widget.range;
 
-    Timer(
-        widget.titleToSelectorSwitch,
-        () => setState(() {
-              _titleVisible = false;
-            }));
+    Timer(widget.titleToSelectorSwitch, () {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _titleVisible = false;
+      });
+    });
   }
 
   @override
