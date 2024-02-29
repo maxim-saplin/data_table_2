@@ -193,6 +193,7 @@ class DataTable2 extends DataTable {
         assert(fixedTopRows >= 0);
 
   static final LocalKey _headingRowKey = UniqueKey();
+  static final LocalKey _filterRowKey = UniqueKey();
 
   void _handleSelectAll(bool? checked, bool someChecked) {
     // If some checkboxes are checked, all checkboxes are selected. Otherwise,
@@ -933,11 +934,13 @@ class DataTable2 extends DataTable {
             }
 
             /// ADD Filter row
-            if (filterDataRow != null) {
-              final filterRow = _buildFilterRow(context, filterDataRow!, theme,
-                  effectiveHeadingRowColor, tableColumnWidths.length);
+            TableRow? filterTableRow = filterDataRow == null
+                ? null
+                : _buildFilterRow(context, filterDataRow!, theme,
+                    effectiveHeadingRowColor, tableColumnWidths.length);
 
-              coreRows?.insert(0, filterRow);
+            if (filterTableRow != null) {
+              coreRows?.insert(0, filterTableRow);
             }
 
             var coreTable = Table(
@@ -1005,6 +1008,7 @@ class DataTable2 extends DataTable {
                                 borderRadius: border!.borderRadius));
               }
 
+              /// NOTE it's not usable
               if (fixedColumnsRows != null && !isRowsEmpty(fixedColumnsRows)) {
                 fixedColumnsTable = Table(
                     columnWidths: leftWidthsAsMap,
@@ -1026,7 +1030,7 @@ class DataTable2 extends DataTable {
               if (fixedCornerRows != null && !isRowsEmpty(fixedCornerRows)) {
                 fixedTopLeftCornerTable = Table(
                     columnWidths: leftWidthsAsMap,
-                    children: fixedCornerRows,
+                    children: [],
                     border: border);
               }
 
@@ -1125,7 +1129,10 @@ class DataTable2 extends DataTable {
                                 child: Table(
                                     columnWidths: widthsAsMap,
                                     border: border,
-                                    children: [headingRow])),
+                                    children: [
+                                      headingRow,
+                                      if (filterTableRow != null) filterTableRow
+                                    ])),
                             Flexible(
                                 fit: FlexFit.tight,
                                 child: empty ?? const SizedBox())
@@ -1449,7 +1456,7 @@ class DataTable2 extends DataTable {
       MaterialStateProperty<Color?>? effectiveHeadingRowColor,
       int numberOfCols) {
     var headingRow = TableRow(
-        key: _headingRowKey,
+        key: _filterRowKey,
         decoration: BoxDecoration(
           // Changed standard behaviour to never add border should the thickness be 0
           border: showBottomBorder &&
