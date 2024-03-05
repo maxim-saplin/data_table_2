@@ -165,6 +165,37 @@ class ColumnResizeWidgetState extends State<ColumnResizeWidget> {
     }
   }
 
+  Widget _buildIndicatorWidget() {
+    return (widget.desktopMode)
+        ? MouseRegion(
+            cursor: SystemMouseCursors.resizeColumn,
+            onEnter: (_) => setState(() {
+              _hover = true;
+              _update();
+            }),
+            onExit: (_) => setState(() {
+              _hover = false;
+              _update();
+            }),
+            child: SizedOverflowBox(
+              size: Size(_width, widget.height),
+              child: Padding(
+                padding: EdgeInsets.only(left: _width),
+                child: AnimatedContainer(
+                  height: widget.height,
+                  width: _width,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeIn,
+                  decoration: BoxDecoration(
+                    color: widget.realTime || !_dragging ? _color : Colors.grey,
+                  ),
+                ),
+              ),
+            ),
+          )
+        : Icon(color: widget.color, Icons.drag_indicator);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Draggable(
@@ -202,28 +233,7 @@ class ColumnResizeWidgetState extends State<ColumnResizeWidget> {
               ),
             )
           : null,
-      child: (widget.desktopMode)
-          ? MouseRegion(
-              cursor: SystemMouseCursors.resizeColumn,
-              onEnter: (_) => setState(() {
-                _hover = true;
-                _update();
-              }),
-              onExit: (_) => setState(() {
-                _hover = false;
-                _update();
-              }),
-              child: AnimatedContainer(
-                height: widget.height,
-                width: _width,
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeIn,
-                decoration: BoxDecoration(
-                  color: widget.realTime || !_dragging ? _color : Colors.grey,
-                ),
-              ),
-            )
-          : Icon(color: widget.color, Icons.drag_indicator),
+      child: _buildIndicatorWidget(),
     );
   }
 }
@@ -245,6 +255,6 @@ class ColumnResizingParameters {
     this.widgetColor = Colors.black,
     this.realTime = true,
     this.widgetMinWidth = 2,
-    this.widgetMaxWidth = 6,
+    this.widgetMaxWidth = 7,
   });
 }
