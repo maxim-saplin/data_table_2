@@ -378,13 +378,14 @@ class DataTable2 extends DataTable {
 
     Widget wrapInContainer(Widget child) => Container(
         alignment: checkboxAlignment,
+        padding: EdgeInsets.only(right: checkboxHorizontalMargin ?? 0.0),
         constraints: BoxConstraints(
             minHeight: rowHeight ?? effectiveDataRowMinHeight,
             maxHeight: rowHeight ?? effectiveDataRowMaxHeight),
-        padding: EdgeInsetsDirectional.only(
-          start: checkboxHorizontalMargin ?? effectiveHorizontalMargin,
-          end: (checkboxHorizontalMargin ?? effectiveHorizontalMargin) / 2.0,
-        ),
+        // padding: EdgeInsetsDirectional.only(
+        //   start: checkboxHorizontalMargin ?? effectiveHorizontalMargin,
+        //   end: (checkboxHorizontalMargin ?? effectiveHorizontalMargin) / 2.0,
+        // ),
         child: child);
 
     Widget contents = Semantics(
@@ -1455,6 +1456,9 @@ class DataTable2 extends DataTable {
       ThemeData theme,
       MaterialStateProperty<Color?>? effectiveHeadingRowColor,
       int numberOfCols) {
+    final hasRowSelection =
+        rows.every((element) => element.onSelectChanged != null);
+
     var headingRow = TableRow(
         key: _filterRowKey,
         decoration: BoxDecoration(
@@ -1483,6 +1487,15 @@ class DataTable2 extends DataTable {
           shape: headingRowDecoration?.shape,
         ),
         children: List.generate(numberOfCols, (index) {
+          if (hasRowSelection) {
+            if (index == 0) {
+              return const SizedBox();
+            }
+
+            final DataCell cell = dataRow.cells[index - 1];
+            return cell.child;
+          }
+
           final DataCell cell = dataRow.cells[index];
           return cell.child;
         }));
