@@ -185,6 +185,7 @@ class PaginatedDataTable2 extends StatefulWidget {
       this.fixedColumnsColor,
       this.fixedCornerColor,
       this.showCheckboxColumn = true,
+      this.showHeadingCheckbox = true,
       this.showFirstLastButtons = false,
       this.initialFirstRowIndex = 0,
       this.onPageChanged,
@@ -372,6 +373,8 @@ class PaginatedDataTable2 extends StatefulWidget {
 
   /// {@macro flutter.material.dataTable.showCheckboxColumn}
   final bool showCheckboxColumn;
+
+  final bool showHeadingCheckbox;
 
   /// Flag to display the pagination buttons to go to the first and last pages.
   final bool showFirstLastButtons;
@@ -793,6 +796,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           checkboxAlignment: widget.checkboxAlignment,
           columnSpacing: widget.columnSpacing,
           showCheckboxColumn: widget.showCheckboxColumn,
+          showHeadingCheckbox: widget.showHeadingCheckbox,
           showBottomBorder: true,
           rows: _getRows(_firstRowIndex, _effectiveRowsPerPage),
           minWidth: widget.minWidth,
