@@ -760,6 +760,8 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   }
 
   Widget _getTable(BoxConstraints constraints) {
+    final theme = Theme.of(context);
+
     return Flexible(
       fit: widget.fit,
       child: ConstrainedBox(
@@ -776,7 +778,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           filterDataRow: widget.filterDataRow,
           // Make sure no decoration is set on the DataTable
           // from the theme, as its already wrapped in a Card.
-          decoration: const BoxDecoration(),
+          decoration: BoxDecoration(color: Colors.white),
           dividerThickness: widget.dividerThickness,
           fixedLeftColumns: widget.fixedLeftColumns,
           fixedTopRows: widget.fixedTopRows,
@@ -908,7 +910,8 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       style: footerTextStyle!,
       child: IconTheme.merge(
         data: const IconThemeData(opacity: 0.54),
-        child: SizedBox(
+        child: Container(
+          color: Colors.white,
           height: 56.0,
           child: SingleChildScrollView(
             dragStartBehavior: widget.dragStartBehavior,
