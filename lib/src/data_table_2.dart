@@ -465,6 +465,7 @@ class DataTable2 extends DataTable {
 
   Widget _buildDataCell(
       {required BuildContext context,
+      required Decoration? decoration,
       required EdgeInsetsGeometry padding,
       required double? specificRowHeight,
       required Widget label,
@@ -556,6 +557,9 @@ class DataTable2 extends DataTable {
         onRowSecondaryTapDown != null) {
       // row level
       label = TableRowInkWell(
+        borderRadius: decoration is BoxDecoration
+            ? (decoration.borderRadius as BorderRadius?) ?? BorderRadius.zero
+            : BorderRadius.zero,
         onTap: onRowTap ?? onSelectChanged,
         onDoubleTap: onRowDoubleTap,
         onLongPress: onRowLongPress,
@@ -862,6 +866,7 @@ class DataTable2 extends DataTable {
                 final DataCell cell = row.cells[dataColumnIndex];
 
                 var c = _buildDataCell(
+                    decoration: row is DataRow2 ? row.decoration : null,
                     context: context,
                     padding: padding,
                     specificRowHeight:
