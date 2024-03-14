@@ -937,8 +937,13 @@ class DataTable2 extends DataTable {
             /// ADD Filter row
             TableRow? filterTableRow = filterDataRow == null
                 ? null
-                : _buildFilterRow(context, filterDataRow!, theme,
-                    effectiveHeadingRowColor, tableColumnWidths.length);
+                : _buildFilterRow(
+                    context,
+                    filterDataRow!,
+                    theme,
+                    effectiveHeadingRowColor,
+                    tableColumnWidths.length,
+                    isRowsEmpty(fixedRows));
 
             if (filterTableRow != null) {
               coreRows?.insert(0, filterTableRow);
@@ -1455,7 +1460,8 @@ class DataTable2 extends DataTable {
       DataRow dataRow,
       ThemeData theme,
       MaterialStateProperty<Color?>? effectiveHeadingRowColor,
-      int numberOfCols) {
+      int numberOfCols,
+      bool isRowsEmpty) {
     final hasRowSelection =
         rows.every((element) => element.onSelectChanged != null);
 
@@ -1487,7 +1493,7 @@ class DataTable2 extends DataTable {
           shape: headingRowDecoration?.shape,
         ),
         children: List.generate(numberOfCols, (index) {
-          if (hasRowSelection) {
+          if (hasRowSelection && !isRowsEmpty) {
             if (index == 0) {
               return const SizedBox();
             }
