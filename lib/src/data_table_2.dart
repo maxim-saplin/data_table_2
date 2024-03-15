@@ -1286,11 +1286,14 @@ class DataTable2 extends DataTable {
                 ? element.fixedWidth!
                 : 0.0));
 
-    assert(totalFixedWidth < totalColAvailableWidth,
-        "DataTable2, combined width of columns of fixed width is greater than availble parent width. Table will be clipped");
+    // assert(totalFixedWidth < totalColAvailableWidth,
+    //     "DataTable2, combined width of columns of fixed width is greater than availble parent width. Table will be clipped");
 
-    totalColAvailableWidth =
-        math.max(0.0, totalColAvailableWidth - totalFixedWidth);
+    totalColAvailableWidth = math.max(
+        0.0,
+        (totalColAvailableWidth - totalFixedWidth) < 0
+            ? 0
+            : totalColAvailableWidth - totalFixedWidth);
 
     // adjust column sizes relative to S, M, L
     final widths = List<double>.generate(columns.length, (i) {
