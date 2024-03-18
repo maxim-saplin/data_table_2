@@ -1466,9 +1466,9 @@ class DataTable2 extends DataTable {
       int numberOfCols,
       bool isRowsEmpty) {
     final hasRowSelection =
-        rows.every((element) => element.onSelectChanged != null);
+        rows.any((element) => element.onSelectChanged != null);
 
-    var headingRow = TableRow(
+    var filterRow = TableRow(
         key: _filterRowKey,
         decoration: BoxDecoration(
           // Changed standard behaviour to never add border should the thickness be 0
@@ -1508,7 +1508,7 @@ class DataTable2 extends DataTable {
           final DataCell cell = dataRow.cells[index];
           return cell.child;
         }));
-    return headingRow;
+    return filterRow;
   }
 }
 
