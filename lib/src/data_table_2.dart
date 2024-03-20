@@ -166,6 +166,7 @@ class DataTable2 extends DataTable {
     this.checkboxAlignment = Alignment.center,
     this.bottomMargin,
     super.columnSpacing,
+    this.showHeadingCheckBox = true,
     super.showCheckboxColumn = true,
     super.showBottomBorder = false,
     super.dividerThickness,
@@ -248,6 +249,10 @@ class DataTable2 extends DataTable {
   /// Alignment of the checkbox if it is displayed
   /// Defaults to the [Alignment.center]
   final Alignment checkboxAlignment;
+
+  /// Display heading checkbox
+  /// Default set to true
+  final bool showHeadingCheckBox;
 
   /// Overrides theme of the checkbox that is displayed in the checkbox column
   /// in each data row (should checkboxes be enabled)
@@ -1163,16 +1168,17 @@ class DataTable2 extends DataTable {
       tableColumns[0] = FixedColumnWidth(checkBoxWidth);
 
       // Create heading twice, in the heading row used as back-up for the case of no data and any of the xxx_rows table
-      headingRow.children[0] = _buildCheckbox(
-          context: context,
-          checked: someChecked ? null : allChecked,
-          onRowTap: null,
-          onCheckboxChanged: (bool? checked) =>
-              _handleSelectAll(checked, someChecked),
-          overlayColor: null,
-          checkboxTheme: headingCheckboxTheme,
-          tristate: true,
-          rowHeight: headingHeight);
+
+
+        headingRow.children[0] = showHeadingCheckBox ? _buildCheckbox(
+            context: context,
+            checked: someChecked ? null : allChecked,
+            onRowTap: null,
+            onCheckboxChanged: (bool? checked) => _handleSelectAll(checked, someChecked),
+            overlayColor: null,
+            checkboxTheme: headingCheckboxTheme,
+            tristate: true,
+            rowHeight: headingHeight) : const SizedBox();
 
       if (fixedCornerRows != null) {
         fixedCornerRows[0].children[0] = headingRow.children[0];
