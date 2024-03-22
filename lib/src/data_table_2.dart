@@ -1181,7 +1181,7 @@ class DataTable2 extends DataTable {
               checkboxTheme: headingCheckboxTheme,
               tristate: true,
               rowHeight: headingHeight)
-          : const SizedBox();
+          : SizedBox(height: headingHeight,);
 
       if (fixedCornerRows != null) {
         fixedCornerRows[0].children[0] = headingRow.children[0];
