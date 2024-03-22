@@ -112,7 +112,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
     } else {
       //none
       if (_rows[rowIndex].selected) {
-        _rows[rowIndex] = _clone(_rows[rowIndex], false);
+        _rows[rowIndex] = _clone(_rows[rowIndex], true);
       }
     }
   }
