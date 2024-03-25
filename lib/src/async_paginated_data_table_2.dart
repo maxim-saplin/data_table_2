@@ -113,6 +113,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
     } else {
       //none
       if (_rows[rowIndex].selected) {
+         // Need to check if _selectionRowKeys entry exists
          var select = _selectionRowKeys.contains(_rows[rowIndex].key);
         _rows[rowIndex] = _clone(_rows[rowIndex], select);
       }
