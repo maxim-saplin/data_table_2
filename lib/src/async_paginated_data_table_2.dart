@@ -68,6 +68,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
   Future<AsyncRowsResponse> getRows(int startIndex, int count);
 
   DataRow _clone(DataRow row, bool? selected) {
+    //selected = true;
     if (row is DataRow2) {
       return DataRow2(
           key: row.key,
@@ -112,7 +113,8 @@ abstract class AsyncDataTableSource extends DataTableSource {
     } else {
       //none
       if (_rows[rowIndex].selected) {
-        _rows[rowIndex] = _clone(_rows[rowIndex], false);
+         var select = _selectionRowKeys.contains(_rows[rowIndex].key);
+        _rows[rowIndex] = _clone(_rows[rowIndex], select);
       }
     }
   }
@@ -232,6 +234,28 @@ abstract class AsyncDataTableSource extends DataTableSource {
         Timer(Duration(milliseconds: milliseconds), f as void Function());
   }
 
+  // Ensure that selected rows are properly marked as selected
+  void _handleInitialSelection(int startIndex, int count) {
+    _rows
+        .skip(startIndex)
+        .take(count)
+        .map((r) => _selectionRowKeys.remove(r.key!));
+    if (_selectionState == SelectionState.none ||
+        _selectionState == SelectionState.include) {
+      _selectionRowKeys.addAll(_rows
+          .skip(startIndex)
+          .take(count)
+          .where((r) => r.selected)
+          .map((r) => r.key!));
+    } else {
+      _selectionRowKeys.addAll(_rows
+          .skip(startIndex)
+          .take(count)
+          .where((r) => !r.selected)
+          .map((r) => r.key!));
+    }
+  }
+
   // If previously loaded rows encompass requested row range and forceReload
   // is false than no actual fetch will happen
   Future _fetchData(int startIndex, int count,
@@ -247,6 +271,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
         _rows = data.rows;
         _totalRows = data.totalRows;
         _firstRowAbsoluteIndex = startIndex;
+        _handleInitialSelection(startIndex, count);
       } catch (e) {
         _rows = [];
         _totalRows = 0;
