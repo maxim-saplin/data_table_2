@@ -151,6 +151,7 @@ DataTable2 buildTable(
     Color? fixedCornerColor,
     Color? headingRowColor,
     BoxDecoration? headingRowDecoration,
+    bool showHeadingCheckbox = true,
     double? dividerThickness,
     bool showBottomBorder = false,
     TableBorder? border,
@@ -172,6 +173,7 @@ DataTable2 buildTable(
     sortArrowIcon: sortArrowIcon ?? Icons.arrow_upward,
     headingRowColor: MaterialStatePropertyAll(headingRowColor),
     headingRowDecoration: headingRowDecoration,
+    showHeadingCheckBox: showHeadingCheckbox,
     sortArrowAnimationDuration:
         sortArrowAnimationDuration ?? const Duration(milliseconds: 150),
     minWidth: minWidth,

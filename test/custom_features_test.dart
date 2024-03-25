@@ -1981,7 +1981,46 @@ void main() {
     expect(d.length, kDesserts.length);
     expect((d.first.widget as Theme).child.runtimeType, Checkbox);
   });
+
+  testWidgets('DataTable2 heading checkbox', (WidgetTester tester) async {
+    final List<DataColumn2> columns = [
+      const DataColumn2(label: Text('Column1')),
+    ];
+    final List<DataRow2> rows = [
+      DataRow2(
+        onSelectChanged: (value) {},
+        cells: const [DataCell(Text('Content1'))],
+      ),
+    ];
+
+    // Check if heading checkbox is shown by default
+    await wrapWidgetSetSurf(
+        tester,
+        buildTable(
+          columns: columns,
+          rows: rows,
+        ));
+
+   await tester.pumpAndSettle();
+    expect(find.text('Column1'), findsOneWidget);
+    expect(find.byType(Checkbox), findsNWidgets(2));
+
+    // Check if heading checkbox is hided
+    await wrapWidgetSetSurf(
+        tester,
+        buildTable(
+          showHeadingCheckbox: false,
+          columns: columns,
+          rows: rows,
+        ));
+
+    await tester.pumpAndSettle();
+    expect(find.text('Column1'), findsOneWidget);
+    expect(find.byType(Checkbox), findsOneWidget);
+  });
 }
+
+
 
 Tripple<Size> _getColumnSizes(WidgetTester tester, bool header) {
   var s0 = tester.getSize(find.byType(DataTable2));
