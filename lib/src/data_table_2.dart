@@ -166,6 +166,7 @@ class DataTable2 extends DataTable {
     this.checkboxAlignment = Alignment.center,
     this.bottomMargin,
     super.columnSpacing,
+    this.isFilterFixed = false,
     super.showCheckboxColumn = true,
     super.showBottomBorder = false,
     super.dividerThickness,
@@ -321,6 +322,8 @@ class DataTable2 extends DataTable {
   /// set to >1 in order to fix data rows
   /// (i.e. in order to fix both header and the first data row use value of 2)
   final int fixedTopRows;
+
+  final bool isFilterFixed;
 
   final FlexFit? flexFit;
 
@@ -700,7 +703,10 @@ class DataTable2 extends DataTable {
                     context,
                     theme,
                     headingRowColor ?? effectiveHeadingRowColor,
-                    tableColumnWidths.length - actualFixedColumns)
+                    tableColumnWidths.length - actualFixedColumns),
+                if (filterDataRow != null && isFilterFixed)
+                  _buildFilterRow(context, filterDataRow!, theme,
+                      effectiveHeadingRowColor, tableColumnWidths.length, false)
               ]
             : [
                 _buildHeadingRow(
@@ -732,7 +738,15 @@ class DataTable2 extends DataTable {
                         fixedCornerColor != null
                             ? MaterialStatePropertyAll(fixedCornerColor)
                             : effectiveHeadingRowColor,
-                        actualFixedColumns)
+                        actualFixedColumns),
+                    if (filterDataRow != null && isFilterFixed)
+                      _buildFilterRow(
+                          context,
+                          filterDataRow!,
+                          theme,
+                          effectiveHeadingRowColor,
+                          tableColumnWidths.length,
+                          false)
                   ]
                 : [
                     _buildHeadingRow(
@@ -945,7 +959,7 @@ class DataTable2 extends DataTable {
                     tableColumnWidths.length,
                     isRowsEmpty(fixedRows));
 
-            if (filterTableRow != null) {
+            if (filterTableRow != null && !isFilterFixed) {
               coreRows?.insert(0, filterTableRow);
             }
 

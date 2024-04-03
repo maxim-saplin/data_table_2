@@ -185,6 +185,7 @@ class PaginatedDataTable2 extends StatefulWidget {
       this.fixedColumnsColor,
       this.fixedCornerColor,
       this.showCheckboxColumn = true,
+      this.isFilterFixed = false,
       this.showHeadingCheckbox = true,
       this.showFirstLastButtons = false,
       this.initialFirstRowIndex = 0,
@@ -402,6 +403,8 @@ class PaginatedDataTable2 extends StatefulWidget {
   ///  * [onRowsPerPageChanged]
   ///  * [defaultRowsPerPage]
   final int rowsPerPage;
+
+  final bool isFilterFixed;
 
   /// The options to offer for the rowsPerPage.
   ///
@@ -798,6 +801,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           checkboxAlignment: widget.checkboxAlignment,
           columnSpacing: widget.columnSpacing,
           showCheckboxColumn: widget.showCheckboxColumn,
+          isFilterFixed: widget.isFilterFixed,
           showHeadingCheckbox: widget.showHeadingCheckbox,
           showBottomBorder: true,
           rows: _getRows(_firstRowIndex, _effectiveRowsPerPage),
