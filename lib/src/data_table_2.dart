@@ -1670,7 +1670,16 @@ class _NullWidget extends Widget {
   const _NullWidget();
 
   @override
-  Element createElement() => throw UnimplementedError();
+  Element createElement() => StatelessElement(const NullStl());
+}
+
+class NullStl extends StatelessWidget {
+  const NullStl({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox();
+  }
 }
 // coverage:ignore-end
 
