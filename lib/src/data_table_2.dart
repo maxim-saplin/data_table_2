@@ -1260,7 +1260,9 @@ class DataTable2 extends DataTable {
           fixedCornerRows[rowIndex + 1].children[0] = x;
         } else if (fixedColumnRows != null) {
           fixedColumnRows[rowIndex - skipRows].children[0] = x;
-        } else if (fixedRows != null && rowIndex < fixedRows.length - 1) {
+        } else if (fixedRows != null &&
+            rowIndex < fixedRows.length - 1 &&
+            !isFilterFixed) {
           fixedRows[rowIndex + 1].children[0] = x;
         } else {
           coreRows![rowIndex - skipRows].children[0] = x;
