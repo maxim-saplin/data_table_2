@@ -215,6 +215,10 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.headingRowDecoration,
     this.isVerticalScrollBarVisible,
     this.isHorizontalScrollBarVisible,
+    this.rowsPerPageFocusColor = Colors.transparent,
+    this.rowsPerPageRadius,
+    this.enableRowsPerPageSplash = true,
+    this.rowsPerPageTitle,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
@@ -516,6 +520,18 @@ class PaginatedDataTable2 extends StatefulWidget {
 
   /// Determines whether the horizontal scroll bar is visible, for iOS takes value from scrollbarTheme when null
   final bool? isHorizontalScrollBarVisible;
+
+  /// Controls the focusColor for rowsPerPage DropdownButton
+  final Color rowsPerPageFocusColor;
+
+  /// Controls the borderRadius for rowsPerPage DropdownButton
+  final BorderRadius? rowsPerPageRadius;
+
+  /// Controls the splash effect for rowsPerPage DropdownButton
+  final bool enableRowsPerPageSplash;
+
+  /// Customizes the title for rowsPerPage
+  final String? rowsPerPageTitle;
 
   @override
   PaginatedDataTable2State createState() => PaginatedDataTable2State();
@@ -833,21 +849,36 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
         footerWidgets.addAll(<Widget>[
           Container(width: 14.0),
           // to match trailing padding in case we overflow and end up scrolling
-          Text(localizations.rowsPerPageTitle),
+          Text(widget.rowsPerPageTitle ?? localizations.rowsPerPageTitle),
           ConstrainedBox(
             constraints: const BoxConstraints(
                 minWidth: 64.0), // 40.0 for the text, 24.0 for the icon
             child: Align(
               alignment: AlignmentDirectional.centerEnd,
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<int>(
-                  items: availableRowsPerPage.cast<DropdownMenuItem<int>>(),
-                  value: _effectiveRowsPerPage,
-                  onChanged: (r) {
-                    _setRowsPerPage(r);
-                  },
-                  style: footerTextStyle,
-                  iconSize: 24.0,
+              child: Theme(
+                data: Theme.of(context).copyWith(
+                  splashFactory: widget.enableRowsPerPageSplash
+                      ? null
+                      : NoSplash.splashFactory,
+                  highlightColor: widget.enableRowsPerPageSplash
+                      ? null
+                      : Colors.transparent,
+                  hoverColor: widget.enableRowsPerPageSplash
+                      ? null
+                      : Colors.transparent,
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<int>(
+                    borderRadius: widget.rowsPerPageRadius,
+                    focusColor: widget.rowsPerPageFocusColor,
+                    items: availableRowsPerPage.cast<DropdownMenuItem<int>>(),
+                    value: _effectiveRowsPerPage,
+                    onChanged: (r) {
+                      _setRowsPerPage(r);
+                    },
+                    style: footerTextStyle,
+                    iconSize: 24.0,
+                  ),
                 ),
               ),
             ),
