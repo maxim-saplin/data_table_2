@@ -212,7 +212,7 @@ class DessertDataSource extends DataTableSource {
 }
 
 /// Async datasource for AsynPaginatedDataTabke2 example. Based on AsyncDataTableSource which
-/// is an extension to FLutter's DataTableSource and aimed at solving
+/// is an extension to Flutter's DataTableSource and aimed at solving
 /// saync data fetching scenarious by paginated table (such as using Web API)
 class DessertDataSourceAsync extends AsyncDataTableSource {
   DessertDataSourceAsync() {
