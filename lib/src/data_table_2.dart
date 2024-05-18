@@ -34,7 +34,7 @@ class DataColumn2 extends DataColumn {
       super.onSort,
       this.size = ColumnSize.M,
       this.fixedWidth,
-      this.isResizable = true});
+      this.isResizable = false});
 
   /// Column sizes are determined based on available width by distributing it
   /// to individual columns accounting for their relative sizes (see [ColumnSize])
@@ -1261,7 +1261,9 @@ class DataTable2 extends DataTable {
               checkboxTheme: headingCheckboxTheme,
               tristate: true,
               rowHeight: headingHeight)
-          : SizedBox(height: headingHeight,);
+          : SizedBox(
+              height: headingHeight,
+            );
 
       if (fixedCornerRows != null) {
         fixedCornerRows[0].children[0] = headingRow.children[0];
