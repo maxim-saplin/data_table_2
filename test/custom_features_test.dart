@@ -1,6 +1,8 @@
 // ignore_for_file: avoid_print
 
 @TestOn('!chrome')
+library;
+
 
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +60,7 @@ void main() {
           Theme(
               data: ThemeData(
                   scrollbarTheme: ScrollbarThemeData(
-                      thumbVisibility: MaterialStateProperty.all(true))),
+                      thumbVisibility: WidgetStateProperty.all(true))),
               child: buildTable()),
           const Size(250, 300));
 
@@ -661,11 +663,11 @@ void main() {
       await wrapWidgetSetSurf(
           tester,
           buildPaginatedTable(
-              headingRowColor: MaterialStateProperty.all(Colors.yellow)));
+              headingRowColor: WidgetStateProperty.all(Colors.yellow)));
 
       var t = tester.widget(find.byType(DataTable2)) as DataTable2;
       expect(
-          t.headingRowColor!.resolve({MaterialState.focused}), Colors.yellow);
+          t.headingRowColor!.resolve({WidgetState.focused}), Colors.yellow);
 
       await wrapWidgetSetSurf(tester, buildPaginatedTable());
 
@@ -1921,9 +1923,9 @@ void main() {
     Widget buildTable() {
       return DataTable2(
         headingCheckboxTheme:
-            CheckboxThemeData(fillColor: MaterialStateProperty.all(Colors.red)),
+            CheckboxThemeData(fillColor: WidgetStateProperty.all(Colors.red)),
         datarowCheckboxTheme: CheckboxThemeData(
-            fillColor: MaterialStateProperty.all(Colors.yellow)),
+            fillColor: WidgetStateProperty.all(Colors.yellow)),
         showCheckboxColumn: true,
         onSelectAll: (value) {},
         columns: <DataColumn>[
@@ -1965,7 +1967,7 @@ void main() {
                 .data
                 .checkboxTheme
                 .fillColor!
-                .resolve({MaterialState.hovered}) ==
+                .resolve({WidgetState.hovered}) ==
             Colors.red);
     expect(h.length, 1);
     expect((h.first.widget as Theme).child.runtimeType, Checkbox);
@@ -1976,7 +1978,7 @@ void main() {
                 .data
                 .checkboxTheme
                 .fillColor!
-                .resolve({MaterialState.hovered}) ==
+                .resolve({WidgetState.hovered}) ==
             Colors.yellow);
     expect(d.length, kDesserts.length);
     expect((d.first.widget as Theme).child.runtimeType, Checkbox);

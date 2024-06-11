@@ -53,7 +53,7 @@ class DataTable2RoundedDemoState extends State<DataTable2RoundedDemo> {
       child: DataTable2(
         // Forcing all scrollbars to be visible, alternatively themes can be used (see above)
         headingRowColor:
-            MaterialStateColor.resolveWith((states) => Colors.transparent),
+            WidgetStateColor.resolveWith((states) => Colors.transparent),
         columnSpacing: 12,
         horizontalMargin: 12,
         border: TableBorder(

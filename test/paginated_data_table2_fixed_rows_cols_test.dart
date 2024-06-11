@@ -1,6 +1,8 @@
 // ignore_for_file: avoid_print
 
 @TestOn('!chrome')
+library;
+
 
 import 'dart:async';
 
@@ -23,7 +25,7 @@ main() async {
               showGeneration: false,
               fixedLeftColumns: 0,
               fixedTopRows: 0,
-              headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
+              headingRowColor: const WidgetStatePropertyAll(Colors.yellow),
               fixedColumnsColor: Colors.red,
               fixedCornerColor: Colors.blue),
           const Size(500, 300));
@@ -55,7 +57,7 @@ main() async {
               showGeneration: false,
               fixedLeftColumns: 1,
               fixedTopRows: 0,
-              headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
+              headingRowColor: const WidgetStatePropertyAll(Colors.yellow),
               fixedCornerColor: Colors.blue,
               fixedColumnsColor: Colors.red),
           const Size(500, 300));
@@ -87,7 +89,7 @@ main() async {
               showGeneration: false,
               fixedLeftColumns: 2,
               fixedTopRows: 0,
-              headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
+              headingRowColor: const WidgetStatePropertyAll(Colors.yellow),
               fixedCornerColor: Colors.blue,
               fixedColumnsColor: Colors.red),
           const Size(500, 300));
@@ -119,7 +121,7 @@ main() async {
               showGeneration: false,
               fixedLeftColumns: 3,
               fixedTopRows: 0,
-              headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
+              headingRowColor: const WidgetStatePropertyAll(Colors.yellow),
               fixedCornerColor: Colors.blue,
               fixedColumnsColor: Colors.red),
           const Size(500, 300));
@@ -151,7 +153,7 @@ main() async {
               showGeneration: false,
               fixedLeftColumns: 1,
               fixedTopRows: 1,
-              headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
+              headingRowColor: const WidgetStatePropertyAll(Colors.yellow),
               fixedCornerColor: Colors.blue,
               fixedColumnsColor: Colors.red),
           const Size(500, 300));
@@ -183,7 +185,7 @@ main() async {
               showGeneration: false,
               fixedLeftColumns: 3,
               fixedTopRows: 3,
-              headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
+              headingRowColor: const WidgetStatePropertyAll(Colors.yellow),
               fixedCornerColor: Colors.blue,
               fixedColumnsColor: Colors.red),
           const Size(500, 300));
@@ -216,7 +218,7 @@ main() async {
               showGeneration: false,
               fixedLeftColumns: 3,
               fixedTopRows: 3,
-              headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
+              headingRowColor: const WidgetStatePropertyAll(Colors.yellow),
               fixedCornerColor: Colors.blue,
               fixedColumnsColor: Colors.red),
           const Size(500, 300));
@@ -237,7 +239,7 @@ main() async {
             showGeneration: false,
             fixedLeftColumns: 1,
             fixedTopRows: 1,
-            headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
+            headingRowColor: const WidgetStatePropertyAll(Colors.yellow),
             fixedCornerColor: Colors.blue,
             headingRowDecoration: const BoxDecoration(color: Colors.pink),
           ),
@@ -272,7 +274,7 @@ main() async {
             showGeneration: false,
             fixedLeftColumns: 1,
             fixedTopRows: 1,
-            headingRowColor: const MaterialStatePropertyAll(Colors.yellow),
+            headingRowColor: const WidgetStatePropertyAll(Colors.yellow),
             fixedCornerColor: Colors.blue,
             headingRowDecoration: const BoxDecoration(
                 gradient: LinearGradient(colors: [Colors.pink, Colors.purple])),

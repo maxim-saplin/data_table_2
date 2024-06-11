@@ -67,9 +67,9 @@ class DataTable2ScrollupDemoState extends State<DataTable2ScrollupDemo> {
               // is displayed then vertical migh be hidden as it will go out of viewport
               data: ThemeData(
                   scrollbarTheme: ScrollbarThemeData(
-                      thumbVisibility: MaterialStateProperty.all(true),
+                      thumbVisibility: WidgetStateProperty.all(true),
                       thumbColor:
-                          MaterialStateProperty.all<Color>(Colors.black))),
+                          WidgetStateProperty.all<Color>(Colors.black))),
               child: DataTable2(
                   scrollController: _controller,
                   horizontalScrollController: _horizontalController,
@@ -196,8 +196,8 @@ class _ScrollXYButtonState extends State<_ScrollXYButton> {
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeIn),
             style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.grey[800]),
-                foregroundColor: MaterialStateProperty.all(Colors.white)),
+                backgroundColor: WidgetStateProperty.all(Colors.grey[800]),
+                foregroundColor: WidgetStateProperty.all(Colors.white)),
             child: Text(widget.title),
           )
         : const SizedBox();

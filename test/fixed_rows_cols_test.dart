@@ -1,6 +1,8 @@
 // ignore_for_file: avoid_print
 
 @TestOn('!chrome')
+library;
+
 
 import 'dart:async';
 
