@@ -3,7 +3,6 @@
 @TestOn('!chrome')
 library;
 
-
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -666,8 +665,7 @@ void main() {
               headingRowColor: WidgetStateProperty.all(Colors.yellow)));
 
       var t = tester.widget(find.byType(DataTable2)) as DataTable2;
-      expect(
-          t.headingRowColor!.resolve({WidgetState.focused}), Colors.yellow);
+      expect(t.headingRowColor!.resolve({WidgetState.focused}), Colors.yellow);
 
       await wrapWidgetSetSurf(tester, buildPaginatedTable());
 
@@ -2003,7 +2001,7 @@ void main() {
           rows: rows,
         ));
 
-   await tester.pumpAndSettle();
+    await tester.pumpAndSettle();
     expect(find.text('Column1'), findsOneWidget);
     expect(find.byType(Checkbox), findsNWidgets(2));
 
@@ -2021,8 +2019,6 @@ void main() {
     expect(find.byType(Checkbox), findsOneWidget);
   });
 }
-
-
 
 Tripple<Size> _getColumnSizes(WidgetTester tester, bool header) {
   var s0 = tester.getSize(find.byType(DataTable2));

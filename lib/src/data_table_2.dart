@@ -1038,8 +1038,7 @@ class DataTable2 extends DataTable {
                               ?.resolve({WidgetState.hovered})
                           : null),
                   thickness: (isiOS
-                      ? scrollBarTheme.thickness
-                          ?.resolve({WidgetState.hovered})
+                      ? scrollBarTheme.thickness?.resolve({WidgetState.hovered})
                       : null),
                   controller: coreHorizontalController,
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -1181,7 +1180,9 @@ class DataTable2 extends DataTable {
               checkboxTheme: headingCheckboxTheme,
               tristate: true,
               rowHeight: headingHeight)
-          : SizedBox(height: headingHeight,);
+          : SizedBox(
+              height: headingHeight,
+            );
 
       if (fixedCornerRows != null) {
         fixedCornerRows[0].children[0] = headingRow.children[0];
@@ -1394,11 +1395,8 @@ class DataTable2 extends DataTable {
     return tableRows;
   }
 
-  TableRow _buildHeadingRow(
-      BuildContext context,
-      ThemeData theme,
-      WidgetStateProperty<Color?>? effectiveHeadingRowColor,
-      int numberOfCols) {
+  TableRow _buildHeadingRow(BuildContext context, ThemeData theme,
+      WidgetStateProperty<Color?>? effectiveHeadingRowColor, int numberOfCols) {
     var headingRow = TableRow(
       key: _headingRowKey,
       decoration: BoxDecoration(

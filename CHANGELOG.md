@@ -1,3 +1,6 @@
+## 2.5.15
+- `dart fromat .`
+
 ## 2.5.14
 - Fixing linter warnings (replacing deprecated MaterialStateProperty)
 
