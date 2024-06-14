@@ -512,7 +512,7 @@ class PaginatedDataTable2 extends StatefulWidget {
   final bool? isHorizontalScrollBarVisible;
 
   /// Location on the footer
-  final Widget? footer;
+  final List<Widget>? footer;
 
   @override
   PaginatedDataTable2State createState() => PaginatedDataTable2State();
@@ -800,7 +800,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
 
     // Add the location of the footer - but it's a bit light but it helps for what I want
     if (widget.footer != null) {
-      footerWidgets.add(widget.footer!);
+      footerWidgets.addAll(widget.footer!);
     }
 
     if (widget.onRowsPerPageChanged != null) {
