@@ -5,13 +5,10 @@
 // Copyright 2021 Maxim Saplin - chnages and modifications to original Flutter implementation of PaginatedDataTable
 import 'dart:async';
 import 'dart:math' as math;
-
 import 'package:async/async.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/material.dart';
-
 import 'data_table_2.dart';
-
 part 'async_paginated_data_table_2.dart';
 
 /// Allows to externally control [PaginatedDataTable2] state
@@ -726,7 +723,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
         child: IconTheme.merge(
           data: const IconThemeData(opacity: 0.54),
           child: Ink(
-            height: 64.0,
+            height: 80.0,
             color: _selectedRowCount > 0 ? themeData.secondaryHeaderColor : null,
             child: Padding(
               padding: EdgeInsetsDirectional.only(start: startPadding, end: 14.0),
