@@ -1182,7 +1182,7 @@ class DataTable2 extends DataTable {
       // skip fixed width column
       if (!(columns[i] is DataColumn2 && (columns[i] as DataColumn2).fixedWidth != null)) {
         widths[i] *= ratio;
-        if ((columns[i] as DataColumn2).minWidth != null) {
+        if (columns[i] is DataColumn2 && (columns[i] as DataColumn2).minWidth != null) {
           widths[i] = math.max(widths[i], (columns[i] as DataColumn2).minWidth!);
         }
       }
