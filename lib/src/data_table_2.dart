@@ -176,6 +176,7 @@ class DataTable2 extends DataTable {
     this.horizontalScrollController,
     this.isVerticalScrollBarVisible,
     this.isHorizontalScrollBarVisible,
+    this.scrollPhysics,
     this.empty,
     this.border,
     this.smRatio = 0.67,
@@ -295,6 +296,10 @@ class DataTable2 extends DataTable {
 
   /// Determines whether the horizontal scroll bar is visible, for iOS takes value from scrollbarTheme when null
   final bool? isHorizontalScrollBarVisible;
+
+  /// Exposes scroll physics of the SingleChildScrollView that could makes data rows vertical scrollable even if the table view is not full.
+  /// Useful when used in conjunction with [RefreshIndicator]
+  final ScrollPhysics? scrollPhysics;
 
   /// Placeholder widget which is displayed whenever the data rows are empty.
   /// The widget will be displayed below column
@@ -1074,6 +1079,7 @@ class DataTable2 extends DataTable {
                             child: SingleChildScrollView(
                                 controller: coreVerticalController,
                                 scrollDirection: Axis.vertical,
+                                physics: scrollPhysics,
                                 child: SingleChildScrollView(
                                     controller: coreHorizontalController,
                                     scrollDirection: Axis.horizontal,
