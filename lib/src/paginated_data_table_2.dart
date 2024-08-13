@@ -688,7 +688,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
 
     if (_selectedRowCount == 0 && widget.header != null) {
       headerWidgets.add(Expanded(child: widget.header!));
-      if (widget.header is ButtonBar) {
+      if (widget.header is OverflowBar) {
         // We adjust the padding when a button bar is present, because the
         // ButtonBar introduces 2 pixels of outside padding, plus 2 pixels
         // around each button on each side, and the button itself will have 8
