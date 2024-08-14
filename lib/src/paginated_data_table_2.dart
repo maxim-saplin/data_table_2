@@ -215,6 +215,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.headingRowDecoration,
     this.isVerticalScrollBarVisible,
     this.isHorizontalScrollBarVisible,
+    this.shouldAppendLoadingOnLastRow = true,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
@@ -517,6 +518,9 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// Determines whether the horizontal scroll bar is visible, for iOS takes value from scrollbarTheme when null
   final bool? isHorizontalScrollBarVisible;
 
+  /// Determines whether `CircularProgressIndicator` should display at the end of rows if that doesn't hit `rowsPerPage`
+  final bool shouldAppendLoadingOnLastRow;
+
   @override
   PaginatedDataTable2State createState() => PaginatedDataTable2State();
 }
@@ -657,7 +661,9 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       DataRow? row;
       if (index < _rowCount || _rowCountApproximate) {
         row = _rows.putIfAbsent(index, () => widget.source.getRow(index));
-        if (row == null && !haveProgressIndicator) {
+        if (row == null &&
+            !haveProgressIndicator &&
+            widget.shouldAppendLoadingOnLastRow) {
           row ??= _getProgressIndicatorRowFor(index);
           haveProgressIndicator = true;
         }
