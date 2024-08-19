@@ -73,14 +73,14 @@ class DataTable2DemoState extends State<DataTable2Demo> {
           data: ThemeData(
               iconTheme: const IconThemeData(color: Colors.white),
               scrollbarTheme: ScrollbarThemeData(
-                thickness: MaterialStateProperty.all(5),
+                thickness: WidgetStateProperty.all(5),
                 // thumbVisibility: MaterialStateProperty.all(true),
                 // thumbColor: MaterialStateProperty.all<Color>(Colors.yellow)
               )),
           child: DataTable2(
             // Forcing all scrollbars to be visible, alternatively themes can be used (see above)
             headingRowColor:
-                MaterialStateColor.resolveWith((states) => Colors.grey[850]!),
+                WidgetStateColor.resolveWith((states) => Colors.grey[850]!),
             headingTextStyle: const TextStyle(color: Colors.white),
             headingCheckboxTheme: const CheckboxThemeData(
                 side: BorderSide(color: Colors.white, width: 2.0)),

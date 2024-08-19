@@ -5,6 +5,8 @@
 // Copyright 2021 Maxim Saplin - changes and modifications to original Flutter implementation of DataTable
 
 @TestOn('!chrome')
+library;
+
 import 'dart:math' as math;
 
 import 'package:data_table_2/data_table_2.dart';
@@ -2025,9 +2027,9 @@ void main() {
           rows: <DataRow2>[
             DataRow2(
               selected: selected,
-              color: MaterialStateProperty.resolveWith<Color>(
-                (Set<MaterialState> states) {
-                  if (states.contains(MaterialState.selected)) {
+              color: WidgetStateProperty.resolveWith<Color>(
+                (Set<WidgetState> states) {
+                  if (states.contains(WidgetState.selected)) {
                     return selectedColor;
                   }
                   return defaultColor;
@@ -2080,9 +2082,9 @@ void main() {
               onSelectChanged: (bool? value) {},
             ),
             DataRow2(
-              color: MaterialStateProperty.resolveWith<Color>(
-                (Set<MaterialState> states) {
-                  if (states.contains(MaterialState.disabled)) {
+              color: WidgetStateProperty.resolveWith<Color>(
+                (Set<WidgetState> states) {
+                  if (states.contains(WidgetState.disabled)) {
                     return disabledColor;
                   }
                   return defaultColor;
@@ -2127,9 +2129,9 @@ void main() {
         ],
         rows: <DataRow>[
           DataRow2(
-            color: MaterialStateProperty.resolveWith<Color>(
-              (Set<MaterialState> states) {
-                if (states.contains(MaterialState.pressed)) {
+            color: WidgetStateProperty.resolveWith<Color>(
+              (Set<WidgetState> states) {
+                if (states.contains(WidgetState.pressed)) {
                   return pressedColor;
                 }
                 return Colors.transparent;
