@@ -136,7 +136,7 @@ class PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
         wrapInCard: false,
         renderEmptyRowsInTheEnd: false,
         headingRowColor:
-            MaterialStateColor.resolveWith((states) => Colors.grey[200]!),
+            WidgetStateColor.resolveWith((states) => Colors.grey[200]!),
         header:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           const Text('PaginatedDataTable2'),

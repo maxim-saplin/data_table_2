@@ -1,3 +1,9 @@
+## 2.5.15
+- `dart fromat .`
+
+## 2.5.14
+- Fixing linter warnings (replacing deprecated MaterialStateProperty)
+
 ## 2.5.12
 - Add option to hide heading checkbox in data table PR#270
 

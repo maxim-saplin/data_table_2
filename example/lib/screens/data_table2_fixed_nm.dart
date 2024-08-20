@@ -44,7 +44,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
     return DataRow2.byIndex(
       index: index,
       selected: dessert.selected,
-      color: color != null ? MaterialStateProperty.all(color) : null,
+      color: color != null ? WidgetStateProperty.all(color) : null,
       onSelectChanged: (value) {
         if (dessert.selected != value) {
           dessert.selected = value!;
@@ -141,7 +141,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
         horizontalMargin: 12,
         bottomMargin: 20,
         border: TableBorder.all(width: 1.0, color: Colors.grey),
-        headingRowColor: MaterialStateProperty.resolveWith(
+        headingRowColor: WidgetStateProperty.resolveWith(
             (states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
         headingRowDecoration: BoxDecoration(
           gradient: LinearGradient(
@@ -228,7 +228,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
         columnSpacing: 0,
         horizontalMargin: 12,
         border: TableBorder.all(width: 1.0, color: Colors.grey),
-        headingRowColor: MaterialStateProperty.resolveWith(
+        headingRowColor: WidgetStateProperty.resolveWith(
             (states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
         fixedColumnsColor: Colors.grey[300],
         fixedCornerColor: Colors.grey[400],
@@ -304,7 +304,7 @@ class DataTable2FixedNMDemoState extends State<DataTable2FixedNMDemo> {
         columnSpacing: 0,
         horizontalMargin: 12,
         border: TableBorder.all(width: 1.0, color: Colors.grey),
-        headingRowColor: MaterialStateProperty.resolveWith(
+        headingRowColor: WidgetStateProperty.resolveWith(
             (states) => _fixedRows > 0 ? Colors.grey[200] : Colors.transparent),
         fixedColumnsColor: Colors.grey[300],
         fixedCornerColor: Colors.grey[400],

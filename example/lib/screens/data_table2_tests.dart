@@ -207,7 +207,7 @@ PaginatedDataTable2 buildPaginatedTable(
     Widget? empty,
     FlexFit fit = FlexFit.tight,
     ScrollController? scrollController,
-    MaterialStateProperty<Color?>? headingRowColor,
+    WidgetStateProperty<Color?>? headingRowColor,
     double? minWidth,
     Function(int?)? onRowsPerPageChanged,
     List<DataColumn2>? columns}) {
