@@ -1,10 +1,62 @@
 part of 'data_table_2.dart';
 
+/// Controller that unifies scroll and column resize controller
+class DataTableController extends StatelessWidget {
+  const DataTableController(
+      {super.key,
+      required this.builder,
+      this.scrollController,
+      this.sc12toSc11Position = false,
+      this.horizontalScrollController,
+      this.sc22toSc21Position = false});
+
+  /// One of the controllers (sc11) won't be created by this widget
+  /// but rather use externally provided one
+  final ScrollController? scrollController;
+
+  /// One of the controllers (sc21) won't be created by this widget
+  /// but rather use externally provided one
+  final ScrollController? horizontalScrollController;
+
+  /// Whether to set sc12 initial offset to the value from sc11
+  final bool sc12toSc11Position;
+
+  /// Whether to set sc22 initial offset to the value from sc21
+  final bool sc22toSc21Position;
+
+  /// Positions of 2 pairs of scroll controllers (sc11|sc12 and sc21|sc22)
+  /// will be synchronized, attached scrollables will copy the positions
+  final Widget Function(
+      BuildContext context,
+      ScrollController sc11,
+      ScrollController sc12,
+      ScrollController sc21,
+      ScrollController sc22,
+      ColumnDataController dataController,
+      Function(List<DataColumn> columns, DataColumn2 dc2, double delta)
+          onColumnResized) builder;
+
+  @override
+  Widget build(BuildContext context) {
+    return SyncedScrollControllers(
+      scrollController: scrollController,
+      sc12toSc11Position: sc12toSc11Position,
+      horizontalScrollController: horizontalScrollController,
+      sc22toSc21Position: sc22toSc21Position,
+      builder:
+          (context, sc11, sc12, sc21, sc22, dataController, onColumnResized) =>
+              ResizeColumns(
+        builder: (context, dataController, onColumnResized) => builder(
+            context, sc11, sc12, sc21, sc22, dataController, onColumnResized),
+      ),
+    );
+  }
+}
+
 /// Stateful widget to manage column resizing and implements events logic
 class ResizeColumns extends StatefulWidget {
   const ResizeColumns({
     super.key,
-    required this.columns,
     required this.builder,
   });
 
@@ -13,8 +65,6 @@ class ResizeColumns extends StatefulWidget {
       ColumnDataController dataController,
       Function(List<DataColumn> columns, DataColumn2 dc2, double delta)
           onColumnResized) builder;
-
-  final List<DataColumn> columns;
 
   @override
   ResizeColumnsState createState() => ResizeColumnsState();
