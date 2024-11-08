@@ -209,6 +209,7 @@ class PaginatedDataTable2 extends StatefulWidget {
       this.controller,
       this.scrollController,
       this.horizontalScrollController,
+      this.horizontalScrollPhysics,
       this.empty,
       this.border,
       this.autoRowsToHeight = false,
@@ -516,6 +517,9 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? horizontalScrollController;
 
+  /// Physics for making horizontal scroll smooter
+  final ScrollPhysics? horizontalScrollPhysics;
+
   final DataRow? filterDataRow;
 
   @override
@@ -808,6 +812,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           minWidth: widget.minWidth,
           scrollController: widget.scrollController,
           horizontalScrollController: widget.horizontalScrollController,
+          horizontalScrollPhysics: widget.horizontalScrollPhysics,
           empty: _showNothing ? null : widget.empty,
           border: widget.border,
           smRatio: widget.smRatio,

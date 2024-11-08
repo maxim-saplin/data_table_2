@@ -174,6 +174,7 @@ class DataTable2 extends DataTable {
     this.minWidth,
     this.scrollController,
     this.horizontalScrollController,
+    this.horizontalScrollPhysics,
     this.isVerticalScrollBarVisible,
     this.isHorizontalScrollBarVisible,
     this.empty,
@@ -290,6 +291,9 @@ class DataTable2 extends DataTable {
 
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? horizontalScrollController;
+
+  /// Physics for making horizontal scroll smooter
+  final ScrollPhysics? horizontalScrollPhysics;
 
   /// Determines whether the vertical scroll bar is visible, for iOS takes value from scrollbarTheme when null
   final bool? isVerticalScrollBarVisible;
@@ -1079,60 +1083,72 @@ class DataTable2 extends DataTable {
                   controller: coreHorizontalController,
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
                     ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(context)
-                            .copyWith(scrollbars: false),
-                        child: SingleChildScrollView(
-                            controller: fixedRowsHorizontalController,
-                            scrollDirection: Axis.horizontal,
-                            child: (fixedRowsTabel != null)
-                                ? fixedRowsTabel
-                                // WOrkaround for a bug when there's no horizontal scrollbar should there be no this SingleChildScrollView. I.e. originally this part was ommited and not scrollable was added to the column if not fixed top row was visible
-                                : SizedBox(
-                                    height: 0,
-                                    width: widths.fold<double>(
-                                        0,
-                                        (previousValue, value) =>
-                                            previousValue + value),
-                                  ))),
+                      behavior: ScrollConfiguration.of(context)
+                          .copyWith(scrollbars: false),
+                      child: SingleChildScrollView(
+                          controller: fixedRowsHorizontalController,
+                          scrollDirection: Axis.horizontal,
+                          physics: horizontalScrollPhysics,
+                          child: (fixedRowsTabel != null)
+                              ? fixedRowsTabel
+                              // WOrkaround for a bug when there's no horizontal scrollbar should there be no this SingleChildScrollView. I.e. originally this part was ommited and not scrollable was added to the column if not fixed top row was visible
+                              : SizedBox(
+                                  height: 0,
+                                  width: widths.fold<double>(
+                                      0,
+                                      (previousValue, value) =>
+                                          previousValue + value),
+                                )),
+                    ),
                     Flexible(
-                        fit: FlexFit.tight,
-                        child: Scrollbar(
-                            thumbVisibility: isVerticalScrollBarVisible ??
-                                (isiOS
-                                    ? scrollBarTheme.thumbVisibility
-                                        ?.resolve({MaterialState.hovered})
-                                    : null),
-                            thickness: (isiOS
-                                ? scrollBarTheme.thickness
-                                    ?.resolve({MaterialState.hovered})
-                                : null),
-                            controller: coreVerticalController,
+                      fit: FlexFit.tight,
+                      child: Scrollbar(
+                          thumbVisibility: isVerticalScrollBarVisible ??
+                              (isiOS
+                                  ? scrollBarTheme.thumbVisibility
+                                      ?.resolve({MaterialState.hovered})
+                                  : null),
+                          thickness: (isiOS
+                              ? scrollBarTheme.thickness
+                                  ?.resolve({MaterialState.hovered})
+                              : null),
+                          controller: coreVerticalController,
+                          child: Container(
+                            margin: EdgeInsets.only(
+                                bottom: headingRowHeight ?? 0.0),
                             child: SingleChildScrollView(
                                 controller: coreVerticalController,
                                 scrollDirection: Axis.vertical,
                                 child: SingleChildScrollView(
                                     controller: coreHorizontalController,
                                     scrollDirection: Axis.horizontal,
-                                    child: addBottomMargin(coreTable)))))
+                                    physics: horizontalScrollPhysics,
+                                    child: addBottomMargin(coreTable))),
+                          )),
+                    )
                   ]));
 
               fixedColumnAndCornerCol = fixedTopLeftCornerTable == null &&
                       fixedColumnsTable == null
                   ? null
-                  : Column(mainAxisSize: MainAxisSize.min, children: [
-                      if (fixedTopLeftCornerTable != null)
-                        fixedTopLeftCornerTable,
-                      if (fixedColumnsTable != null)
-                        Flexible(
-                            fit: FlexFit.loose,
-                            child: ScrollConfiguration(
-                                behavior: ScrollConfiguration.of(context)
-                                    .copyWith(scrollbars: false),
-                                child: SingleChildScrollView(
-                                    controller: leftColumnVerticalContoller,
-                                    scrollDirection: Axis.vertical,
-                                    child: addBottomMargin(fixedColumnsTable))))
-                    ]);
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (fixedTopLeftCornerTable != null)
+                          fixedTopLeftCornerTable,
+                        if (fixedColumnsTable != null)
+                          Flexible(
+                              fit: FlexFit.loose,
+                              child: ScrollConfiguration(
+                                  behavior: ScrollConfiguration.of(context)
+                                      .copyWith(scrollbars: false),
+                                  child: SingleChildScrollView(
+                                      controller: leftColumnVerticalContoller,
+                                      scrollDirection: Axis.vertical,
+                                      child:
+                                          addBottomMargin(fixedColumnsTable))))
+                      ],
+                    );
             }
 
             var completeWidget = Container(
@@ -1146,6 +1162,7 @@ class DataTable2 extends DataTable {
                             SingleChildScrollView(
                                 controller: coreHorizontalController,
                                 scrollDirection: Axis.horizontal,
+                                physics: horizontalScrollPhysics,
                                 child: Table(
                                     columnWidths: widthsAsMap,
                                     border: border,
@@ -1157,7 +1174,10 @@ class DataTable2 extends DataTable {
                                 fit: FlexFit.tight,
                                 child: empty ?? const SizedBox())
                           ])
-                        : Row(
+                        :
+
+                        // NOTE: This is a widget where setted table
+                        Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               if (fixedColumnAndCornerCol != null)
