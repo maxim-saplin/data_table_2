@@ -2,7 +2,7 @@ name: PR Build
 
 on:
   pull_request:
-    branches: [main]
+    branches: *
 
 jobs:
   build:
@@ -12,7 +12,7 @@ jobs:
     - uses: actions/setup-java@v3
       with:
         distribution: 'zulu'
-        java-version: "12.x"
+        java-version: "23.0.1+11"
         cache: gradle
     - uses: subosito/flutter-action@v2
       with:
