@@ -8,6 +8,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 
 bool dataTableShowLogs = true;
 
@@ -1722,6 +1723,17 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      widget.builder(context, _sc11!, _sc12, _sc21!, _sc22);
+  Widget build(BuildContext context) {
+    // Add a ScrollConfiguration wrapper with dragDevices including PointerDeviceKind.mouse
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(
+        dragDevices: {
+          PointerDeviceKind.touch,
+          PointerDeviceKind.mouse,
+          PointerDeviceKind.trackpad,
+        },
+      ),
+      child: widget.builder(context, _sc11!, _sc12, _sc21!, _sc22),
+    );
+  }
 }
