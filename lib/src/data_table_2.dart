@@ -251,7 +251,7 @@ class DataTable2 extends DataTable {
   /// Defaults to the [Alignment.center]
   final Alignment checkboxAlignment;
 
-  /// If true, will skip the checkboxes within DataRows.
+  /// If true, will skip [DataRow2] checkboxes in keyboard traversal.
   /// 
   /// If [DataTable.showCheckboxColumn] is false, this does nothing.
   final bool skipDataRowCheckbox;
