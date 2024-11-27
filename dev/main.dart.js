@@ -22982,7 +22982,7 @@ A.aii.prototype={
 $1(a){var s=A.dy().b
 if(s==null)s=null
 else{s=s.canvasKitBaseUrl
-if(s==null)s=null}return(s==null?"https://www.gstatic.com/flutter-canvaskit/db49896cf25ceabc44096d5f088d86414e05a7aa/":s)+a},
+if(s==null)s=null}return(s==null?"https://www.gstatic.com/flutter-canvaskit/a18df97ca57a249df5d8d68cd0820600223ce262/":s)+a},
 $S:51}
 A.SV.prototype={
 du(){B.c.ah(this.a.a.save())},
