@@ -17,6 +17,8 @@ void main() {
   final TestWidgetsFlutterBinding binding =
       TestWidgetsFlutterBinding.ensureInitialized();
 
+  dataTableShowLogs = false;
+
   testWidgets('AsyncPaginatedDataTable2 paging', (WidgetTester tester) async {
     final DessertDataSourceAsync source =
         DessertDataSourceAsync(useKDeserts: true);

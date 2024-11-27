@@ -1,3 +1,7 @@
+## 2.5.16
+- Updating dependencies
+- Fixing analyzer warnings
+
 ## 2.5.15
 - `dart fromat .`
 
