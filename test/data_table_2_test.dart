@@ -88,7 +88,7 @@ void main() {
     expect(log, <String>['select-all: true']);
     log.clear();
 
-    // clicking on a cell empty space outside chekbox should still select the row
+    // clicking on a cell empty space outside checkbox should still select the row
     var c = tester.getCenter(find.byType(Checkbox).at(1));
     await tester.tapAt(Offset(c.dx - 16, c.dy - 16));
     expect(log, <String>['row-selected: Frozen yogurt']);
@@ -245,7 +245,7 @@ void main() {
     expect(log, <String>['select-all: true']);
     log.clear();
 
-    // clicking on a cell empty space outside chekbox should still select the row
+    // clicking on a cell empty space outside checkbox should still select the row
     var c = tester.getCenter(find.byType(Checkbox).at(1));
     await tester.tapAt(Offset(c.dx - 16, c.dy - 16));
     expect(log, <String>['row-selected: Frozen yogurt']);
@@ -2303,4 +2303,68 @@ void main() {
     expect(tableBorder?.bottom.width, null);
     expect(tableBorder?.top.color, null);
   });
+
+  final skipDataRowCheckboxVariants = ValueVariant({true, false});
+
+  testWidgets(
+    'DataTable row checkbox can be skipped',
+    (WidgetTester tester) async {
+      const List<DataColumn> columns = <DataColumn>[
+        DataColumn(label: Text('column1')),
+        DataColumn(label: Text('column2')),
+      ];
+
+      const List<DataCell> cells = <DataCell>[
+        DataCell(Text('cell1')),
+        DataCell(Text('cell2')),
+      ];
+
+      final List<DataRow> rows = <DataRow>[
+        DataRow(
+          onSelectChanged: (_) {},
+          cells: cells,
+        ),
+      ];
+
+      final skipDataRowCheckbox = skipDataRowCheckboxVariants.currentValue!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: DataTable2(
+              border: TableBorder.all(width: 2, color: Colors.red),
+              columns: columns,
+              rows: rows,
+              showHeadingCheckBox: true,
+              showCheckboxColumn: true,
+              skipDataRowCheckbox: skipDataRowCheckbox,
+              onSelectAll: (_) {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await expectLater(find.byType(Checkbox), findsNWidgets(2));
+      final headerCheckbox = find.byType(Checkbox).first;
+      final rowCheckbox = find.byType(Checkbox).last;
+
+      final headerExcludeFocus = tester.widget<ExcludeFocus>(
+        find.ancestor(
+          of: headerCheckbox,
+          matching: find.byType(ExcludeFocus),
+        ),
+      );
+      final rowExcludeFocus = tester.widget<ExcludeFocus>(
+        find.ancestor(
+          of: rowCheckbox,
+          matching: find.byType(ExcludeFocus),
+        ),
+      );
+
+      expect(headerExcludeFocus.excluding, isFalse);
+      expect(rowExcludeFocus.excluding, equals(skipDataRowCheckbox));
+    },
+    variant: skipDataRowCheckboxVariants,
+  );
 }

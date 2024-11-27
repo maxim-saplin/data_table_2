@@ -168,6 +168,7 @@ class DataTable2 extends DataTable {
     super.columnSpacing,
     this.showHeadingCheckBox = true,
     super.showCheckboxColumn = true,
+    this.skipDataRowCheckbox = false,
     super.showBottomBorder = false,
     super.dividerThickness,
     super.clipBehavior,
@@ -249,6 +250,11 @@ class DataTable2 extends DataTable {
   /// Alignment of the checkbox if it is displayed
   /// Defaults to the [Alignment.center]
   final Alignment checkboxAlignment;
+
+  /// If true, will skip [DataRow2] checkboxes in keyboard traversal.
+  /// 
+  /// If [DataTable.showCheckboxColumn] is false, this does nothing.
+  final bool skipDataRowCheckbox;
 
   /// Whether to display heading checkbox or not if the checkbox column is present. Defaults to true.
   /// Also check [DataTable.showCheckboxColumn] for details
@@ -362,7 +368,8 @@ class DataTable2 extends DataTable {
       required WidgetStateProperty<Color?>? overlayColor,
       required CheckboxThemeData? checkboxTheme,
       required bool tristate,
-      required double? rowHeight}) {
+      required double? rowHeight,
+      required bool skipCheckbox}) {
     final DataTableThemeData dataTableTheme = DataTableTheme.of(context);
 
     final double effectiveHorizontalMargin = horizontalMargin ??
@@ -388,11 +395,15 @@ class DataTable2 extends DataTable {
       child: wrapInContainer(
         Theme(
             data: ThemeData(checkboxTheme: checkboxTheme),
+            child: ExcludeFocus(
+            excluding: skipCheckbox,
             child: Checkbox(
               value: checked,
               onChanged: onCheckboxChanged,
               tristate: tristate,
-            )),
+            ),
+          ),
+        ),
       ),
     );
     if (onRowTap != null) {
@@ -1179,7 +1190,8 @@ class DataTable2 extends DataTable {
               overlayColor: null,
               checkboxTheme: headingCheckboxTheme,
               tristate: true,
-              rowHeight: headingHeight)
+              rowHeight: headingHeight,
+              skipCheckbox: false)
           : SizedBox(
               height: headingHeight,
             );
@@ -1213,6 +1225,7 @@ class DataTable2 extends DataTable {
               }
             },
             onCheckboxChanged: row.onSelectChanged,
+            skipCheckbox: skipDataRowCheckbox,
             overlayColor: row.color ?? effectiveDataRowColor,
             checkboxTheme: datarowCheckboxTheme,
             tristate: false,
