@@ -9,6 +9,8 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+part 'data_table_2_resizable.dart';
+
 bool dataTableShowLogs = true;
 
 /// Relative size of a column determines the share of total table width allocated
@@ -31,7 +33,8 @@ class DataColumn2 extends DataColumn {
       super.numeric = false,
       super.onSort,
       this.size = ColumnSize.M,
-      this.fixedWidth});
+      this.fixedWidth,
+      this.isResizable = false});
 
   /// Column sizes are determined based on available width by distributing it
   /// to individual columns accounting for their relative sizes (see [ColumnSize])
@@ -41,6 +44,9 @@ class DataColumn2 extends DataColumn {
   /// Warning, if the width happens to be larger than available total width other
   /// columns can be clipped
   final double? fixedWidth;
+
+  /// If you want enable resizing for a given column, set this field to true
+  final bool isResizable;
 }
 
 /// Extension of standard [DataRow], adds row level tap events. Also there're
@@ -182,6 +188,7 @@ class DataTable2 extends DataTable {
     this.fixedTopRows = 1,
     this.fixedLeftColumns = 0,
     this.lmRatio = 1.2,
+    this.columnResizingParameters,
     this.sortArrowAnimationDuration = const Duration(milliseconds: 150),
     this.sortArrowIcon = Icons.arrow_upward,
     this.sortArrowBuilder,
@@ -314,6 +321,8 @@ class DataTable2 extends DataTable {
   /// I.e. 2.0 means that Large column is twice wider than Medium column.
   final double lmRatio;
 
+  final ColumnResizingParameters? columnResizingParameters;
+
   /// The number of sticky rows fixed at the top of the table.
   /// The heading row is counted/included.
   /// By defult the value is 1 which means header row is fixed.
@@ -416,7 +425,10 @@ class DataTable2 extends DataTable {
       required bool sorted,
       required bool ascending,
       required double effectiveHeadingRowHeight,
-      required WidgetStateProperty<Color?>? overlayColor}) {
+      required WidgetStateProperty<Color?>? overlayColor,
+      DataColumn2? column,
+      required Function(List<DataColumn>, DataColumn2, double)
+          onColumnResized}) {
     final ThemeData themeData = Theme.of(context);
 
     var customArrows =
@@ -466,7 +478,39 @@ class DataTable2 extends DataTable {
       overlayColor: overlayColor,
       child: label,
     );
+    if (column != null && column.isResizable) {
+      label = Row(
+        children: [
+          Expanded(child: label),
+          _buildResizeWidget(
+            column,
+            effectiveHeadingRowHeight,
+            onColumnResized,
+          ),
+        ],
+      );
+    }
     return label;
+  }
+
+  Widget _buildResizeWidget(DataColumn2 column, double widgetHeight,
+      Function(List<DataColumn>, DataColumn2, double) onColumnResized) {
+    ColumnResizingParameters crp = columnResizingParameters != null
+        ? columnResizingParameters!
+        : ColumnResizingParameters();
+    return ColumnResizeWidget(
+      height: widgetHeight,
+      color: crp.widgetColor,
+      minWidth: crp.widgetMinWidth,
+      maxWidth: crp.widgetMaxWidth,
+      onDragUpdate: (delta) {
+        if (column.isResizable) {
+          onColumnResized(columns, column, delta);
+        }
+      },
+      desktopMode: crp.desktopMode,
+      realTime: crp.realTime,
+    );
   }
 
   Widget _buildDataCell(
@@ -771,12 +815,12 @@ class DataTable2 extends DataTable {
         effectiveDataRowColor);
 
     var builder = LayoutBuilder(builder: (context, constraints) {
-      return SyncedScrollControllers(
+      return DataTableController(
           scrollController: scrollController,
           sc12toSc11Position: true,
           horizontalScrollController: horizontalScrollController,
           sc22toSc21Position: true,
-          builder: (context, sc11, sc12, sc21, sc22) {
+          builder: (context, sc11, sc12, sc21, sc22, cdc, onColumnResized) {
             var coreVerticalController = sc11;
             var leftColumnVerticalContoller = sc12;
             var coreHorizontalController = sc21;
@@ -791,7 +835,7 @@ class DataTable2 extends DataTable {
 
             // size data columns
             final widths = _calculateDataColumnSizes(
-                constraints, checkBoxWidth, effectiveHorizontalMargin);
+                constraints, checkBoxWidth, effectiveHorizontalMargin, cdc);
 
             // File empty cells in created rows with actual widgets
             for (int dataColumnIndex = 0;
@@ -836,7 +880,9 @@ class DataTable2 extends DataTable {
                       : null,
                   sorted: dataColumnIndex == sortColumnIndex,
                   ascending: sortAscending,
-                  overlayColor: effectiveHeadingRowColor);
+                  overlayColor: effectiveHeadingRowColor,
+                  column: column is DataColumn2 ? column : null,
+                  onColumnResized: onColumnResized);
 
               headingRow.children[displayColumnIndex] =
                   h; // heading row alone is used to display table header should there be no data rows
@@ -866,6 +912,7 @@ class DataTable2 extends DataTable {
 
               for (final DataRow row in rows) {
                 final DataCell cell = row.cells[dataColumnIndex];
+                //dataRows[rowIndex].children![displayColumnIndex]
 
                 var c = _buildDataCell(
                     context: context,
@@ -1236,9 +1283,26 @@ class DataTable2 extends DataTable {
     return checkBoxWidth;
   }
 
-  List<double> _calculateDataColumnSizes(BoxConstraints constraints,
-      double checkBoxWidth, double effectiveHorizontalMargin) {
+  List<double> _calculateDataColumnSizes(
+      BoxConstraints constraints,
+      double checkBoxWidth,
+      double effectiveHorizontalMargin,
+      ColumnDataController columnDataController) {
     var totalColAvailableWidth = constraints.maxWidth;
+    double totalExtraWidth = 0;
+    double totalFixedWidth = 0;
+    for (var c in columns) {
+      if (c is DataColumn2) {
+        var extraWidth = columnDataController.getExtraWidth(columns.indexOf(c));
+        totalExtraWidth += extraWidth;
+        if (c.fixedWidth != null) {
+          totalFixedWidth += c.fixedWidth!;
+        } else if (columnDataController.hasExtraWidth(columns.indexOf(c))) {
+          totalFixedWidth +=
+              columnDataController.colsWidthNoExtra[columns.indexOf(c)]!;
+        }
+      }
+    }
     if (minWidth != null && totalColAvailableWidth < minWidth!) {
       totalColAvailableWidth = minWidth!;
     }
@@ -1246,36 +1310,30 @@ class DataTable2 extends DataTable {
     // full margins are added to side column widths when no check box column is
     // present, half-margin added to first data column width is check box column
     // is present and full margin added to the right
-
-    totalColAvailableWidth = totalColAvailableWidth -
-        checkBoxWidth -
-        effectiveHorizontalMargin -
+    var minColWidth = checkBoxWidth +
+        effectiveHorizontalMargin +
         (checkBoxWidth > 0
             ? effectiveHorizontalMargin / 2
             : effectiveHorizontalMargin);
+    totalColAvailableWidth = totalColAvailableWidth - minColWidth;
 
+    // We only check fixed width if there are no resisable columns
+    if (totalExtraWidth == 0) {
+      assert(totalFixedWidth < totalColAvailableWidth,
+          "DataTable2, combined width of columns of fixed width is greater than availble parent width. Table will be clipped");
+    }
+    totalColAvailableWidth = math.max(
+        0.0, totalColAvailableWidth - totalFixedWidth - totalExtraWidth);
     var columnWidth = totalColAvailableWidth / columns.length;
     var totalColCalculatedWidth = 0.0;
-    var totalFixedWidth = columns.fold<double>(
-        0.0,
-        (previousValue, element) =>
-            previousValue +
-            (element is DataColumn2 && element.fixedWidth != null
-                ? element.fixedWidth!
-                : 0.0));
-
-    assert(totalFixedWidth < totalColAvailableWidth,
-        "DataTable2, combined width of columns of fixed width is greater than availble parent width. Table will be clipped");
-
-    totalColAvailableWidth =
-        math.max(0.0, totalColAvailableWidth - totalFixedWidth);
-
     // adjust column sizes relative to S, M, L
     final widths = List<double>.generate(columns.length, (i) {
       var w = columnWidth;
       var column = columns[i];
       if (column is DataColumn2) {
-        if (column.fixedWidth != null) {
+        if (columnDataController.hasExtraWidth(i)) {
+          w = columnDataController.colsWidthNoExtra[i]!;
+        } else if (column.fixedWidth != null) {
           w = column.fixedWidth!;
         } else if (column.size == ColumnSize.S) {
           w *= smRatio;
@@ -1284,21 +1342,32 @@ class DataTable2 extends DataTable {
         }
       }
 
-      // skip fixed width columns
-      if (!(column is DataColumn2 && column.fixedWidth != null)) {
+      //skip fixed width columns
+      if (!(column is DataColumn2 && column.fixedWidth != null) &&
+          !columnDataController.hasExtraWidth(i)) {
         totalColCalculatedWidth += w;
       }
       return w;
     });
 
-    // scale columns to fit the total lemnght into available width
+    // scale columns to fit the total lenght into available width
 
-    var ratio = totalColAvailableWidth / totalColCalculatedWidth;
+    var ratio = totalColCalculatedWidth != 0
+        ? totalColAvailableWidth / totalColCalculatedWidth
+        : 0;
     for (var i = 0; i < widths.length; i++) {
+      double extraWidth = columnDataController.getExtraWidth(i);
       // skip fixed width column
       if (!(columns[i] is DataColumn2 &&
-          (columns[i] as DataColumn2).fixedWidth != null)) {
+              (columns[i] as DataColumn2).fixedWidth != null) &&
+          !columnDataController.hasExtraWidth(i)) {
         widths[i] *= ratio;
+      }
+      columnDataController.colsWidthNoExtra[i] = widths[i];
+      widths[i] += extraWidth;
+      if (widths[i] < ColumnDataController.minColWidth) {
+        widths[i] = ColumnDataController.minColWidth;
+        columnDataController.colsWidthNoExtra[i] = widths[i];
       }
     }
 
@@ -1612,7 +1681,10 @@ class SyncedScrollControllers extends StatefulWidget {
       ScrollController sc11,
       ScrollController sc12,
       ScrollController sc21,
-      ScrollController sc22) builder;
+      ScrollController sc22,
+      ColumnDataController dataController,
+      Function(List<DataColumn> columns, DataColumn2 dc2, double delta)
+          onColumnResized) builder;
 
   @override
   SyncedScrollControllersState createState() => SyncedScrollControllersState();
@@ -1623,6 +1695,7 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
   late ScrollController _sc12;
   ScrollController? _sc21;
   late ScrollController _sc22;
+  late ColumnDataController _cdc;
 
   final List<void Function()> _listeners = [];
 
@@ -1677,6 +1750,7 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
 
     _syncScrollControllers(_sc11!, _sc12);
     _syncScrollControllers(_sc21!, _sc22);
+    _cdc = ColumnDataController();
   }
 
   void _disposeOrUnsubscribe() {
@@ -1695,6 +1769,25 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
     _sc22.dispose();
 
     _listeners.clear();
+    _cdc.dispose();
+  }
+
+  void _onColumnResized(
+      List<DataColumn> columns, DataColumn2 dc2, double delta) {
+    var idx = columns.indexOf(dc2);
+
+    /// Force non fixed width columns to the left of the column beeing resized to fixed
+    if ((_cdc.getCurrentWidth(idx) + delta) >=
+        ColumnDataController.minColWidth) {
+      setState(() {
+        for (int i = 0; i < idx; i++) {
+          if (!_cdc.hasExtraWidth(i)) {
+            _cdc.updateDataColumn(i, 0);
+          }
+        }
+        _cdc.updateDataColumn(idx, delta);
+      });
+    }
   }
 
   final Map<ScrollController, bool> _doNotReissueJump = {};
@@ -1722,6 +1815,6 @@ class SyncedScrollControllersState extends State<SyncedScrollControllers> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      widget.builder(context, _sc11!, _sc12, _sc21!, _sc22);
+  Widget build(BuildContext context) => widget.builder(
+      context, _sc11!, _sc12, _sc21!, _sc22, _cdc, _onColumnResized);
 }

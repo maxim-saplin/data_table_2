@@ -23,6 +23,9 @@ const selectAllPage = 'Select all at page';
 const rowTaps = 'Row Taps';
 const rowHeightOverrides = 'Row height overrides';
 const fixedColumnWidth = 'Fixed column width';
+const resizableCols = "Real time";
+const resizableColsNoRealtime = "No real time";
+const resizableColsMobile = "Mobile";
 const dataTable2 = 'DataTable2';
 const paginatedFixedRowsCols = 'PaginatedDataTable2';
 const asyncPaginatedFixedRowsCols = 'AsyncPaginatedDataTable2';
@@ -59,6 +62,11 @@ const Map<String, List<String>> routeOptions = {
     asyncErrors,
     goToLast,
     custPager
+  ],
+  '/datatable2resize': [
+    resizableCols,
+    resizableColsNoRealtime,
+    resizableColsMobile,
   ],
 };
 
