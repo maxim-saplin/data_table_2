@@ -1,3 +1,6 @@
+## 2.5.18
+- Added DataCoulm.headingRowAlignment fixing #320
+
 ## 2.5.17
 - Fixing analyzer warnings
 - Aligning with Fluttwr 3.27.0
