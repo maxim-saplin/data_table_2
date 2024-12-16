@@ -73,7 +73,7 @@ void main() {
         .first
         .widget as DefaultTextStyle;
 
-    expect(t.style.color!.opacity, 0.6);
+    expect(t.style.color!.a, 0.6);
   });
   testWidgets('DataTable2, placholder text is 0.6 opacity',
       (WidgetTester tester) async {
@@ -107,7 +107,7 @@ void main() {
         .first
         .widget as DefaultTextStyle;
 
-    expect(t.style.color!.opacity, 0.6);
+    expect(t.style.color!.a, 0.6);
   });
 
   testWidgets('DataTable2, divider thickness 0 shows no border',

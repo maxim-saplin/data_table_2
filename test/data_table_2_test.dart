@@ -1971,7 +1971,7 @@ void main() {
     await tester.pumpWidget(buildTable(selected: true));
     expect(
       lastTableRowBoxDecoration().color,
-      themeData.colorScheme.primary.withOpacity(0.08),
+      themeData.colorScheme.primary.withValues(alpha: 0.08),
     );
   });
 

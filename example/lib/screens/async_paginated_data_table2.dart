@@ -244,7 +244,7 @@ class _ErrorAndRetry extends StatelessWidget {
   Widget build(BuildContext context) => Center(
         child: Container(
             padding: const EdgeInsets.all(10),
-            height: 70,
+            height: 80,
             color: Colors.red,
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
