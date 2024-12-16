@@ -66,49 +66,57 @@ class PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
 
   List<DataColumn> get _columns {
     return [
-      DataColumn(
+      DataColumn2(
         label: const Text('Desert'),
+        isResizable: getCurrentRouteOption(context) == resizableCols,
         onSort: (columnIndex, ascending) =>
             sort<String>((d) => d.name, columnIndex, ascending),
       ),
-      DataColumn(
+      DataColumn2(
         label: const Text('Calories'),
+        isResizable: getCurrentRouteOption(context) == resizableCols,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.calories, columnIndex, ascending),
       ),
-      DataColumn(
+      DataColumn2(
         label: const Text('Fat (gm)'),
+        isResizable: getCurrentRouteOption(context) == resizableCols,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.fat, columnIndex, ascending),
       ),
-      DataColumn(
+      DataColumn2(
         label: const Text('Carbs (gm)'),
+        isResizable: getCurrentRouteOption(context) == resizableCols,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.carbs, columnIndex, ascending),
       ),
-      DataColumn(
+      DataColumn2(
         label: const Text('Protein (gm)'),
+        isResizable: getCurrentRouteOption(context) == resizableCols,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.protein, columnIndex, ascending),
       ),
-      DataColumn(
+      DataColumn2(
         label: const Text('Sodium (mg)'),
+        isResizable: getCurrentRouteOption(context) == resizableCols,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.sodium, columnIndex, ascending),
       ),
-      DataColumn(
+      DataColumn2(
         label: const Text('Calcium (%)'),
+        isResizable: getCurrentRouteOption(context) == resizableCols,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.calcium, columnIndex, ascending),
       ),
-      DataColumn(
+      DataColumn2(
         label: const Text('Iron (%)'),
+        isResizable: getCurrentRouteOption(context) == resizableCols,
         numeric: true,
         onSort: (columnIndex, ascending) =>
             sort<num>((d) => d.iron, columnIndex, ascending),
@@ -186,6 +194,11 @@ class PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
         source: getCurrentRouteOption(context) == noData
             ? DessertDataSource.empty(context)
             : _dessertsDataSource,
+        columnResizingParameters: ColumnResizingParameters(
+          desktopMode: true,
+          realTime: true,
+          widgetColor: Theme.of(context).primaryColor,
+        ),
       ),
       if (getCurrentRouteOption(context) == custPager)
         Positioned(bottom: 16, child: CustomPager(_controller!))
