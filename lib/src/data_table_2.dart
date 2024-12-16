@@ -30,6 +30,7 @@ class DataColumn2 extends DataColumn {
       super.tooltip,
       super.numeric = false,
       super.onSort,
+      super.headingRowAlignment,
       this.size = ColumnSize.M,
       this.fixedWidth});
 
@@ -416,13 +417,15 @@ class DataTable2 extends DataTable {
       required bool sorted,
       required bool ascending,
       required double effectiveHeadingRowHeight,
-      required WidgetStateProperty<Color?>? overlayColor}) {
+      required WidgetStateProperty<Color?>? overlayColor,
+      required MainAxisAlignment headingRowAlignment}) {
     final ThemeData themeData = Theme.of(context);
 
     var customArrows =
         sortArrowBuilder != null ? sortArrowBuilder!(ascending, sorted) : null;
     label = Row(
       textDirection: numeric ? TextDirection.rtl : null,
+      mainAxisAlignment: headingRowAlignment,
       children: <Widget>[
         Flexible(child: label),
         if (onSort != null) ...<Widget>[
@@ -582,6 +585,7 @@ class DataTable2 extends DataTable {
     assert(debugCheckHasMaterial(context));
 
     final theme = Theme.of(context);
+    final DataTableThemeData dataTableTheme = DataTableTheme.of(context);
     final effectiveHeadingRowColor =
         headingRowColor ?? theme.dataTableTheme.headingRowColor;
     final effectiveDataRowColor =
@@ -824,19 +828,23 @@ class DataTable2 extends DataTable {
                   FixedColumnWidth(widths[dataColumnIndex]);
 
               var h = _buildHeadingCell(
-                  context: context,
-                  padding: padding,
-                  effectiveHeadingRowHeight: effectiveHeadingRowHeight,
-                  label: column.label,
-                  tooltip: column.tooltip,
-                  numeric: column.numeric,
-                  onSort: column.onSort != null
-                      ? () => column.onSort!(dataColumnIndex,
-                          sortColumnIndex != dataColumnIndex || !sortAscending)
-                      : null,
-                  sorted: dataColumnIndex == sortColumnIndex,
-                  ascending: sortAscending,
-                  overlayColor: effectiveHeadingRowColor);
+                context: context,
+                padding: padding,
+                effectiveHeadingRowHeight: effectiveHeadingRowHeight,
+                label: column.label,
+                tooltip: column.tooltip,
+                numeric: column.numeric,
+                onSort: column.onSort != null
+                    ? () => column.onSort!(dataColumnIndex,
+                        sortColumnIndex != dataColumnIndex || !sortAscending)
+                    : null,
+                sorted: dataColumnIndex == sortColumnIndex,
+                ascending: sortAscending,
+                overlayColor: effectiveHeadingRowColor,
+                headingRowAlignment: column.headingRowAlignment ??
+                    dataTableTheme.headingRowAlignment ??
+                    MainAxisAlignment.start,
+              );
 
               headingRow.children[displayColumnIndex] =
                   h; // heading row alone is used to display table header should there be no data rows

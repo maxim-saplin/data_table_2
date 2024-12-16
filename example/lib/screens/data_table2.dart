@@ -140,6 +140,7 @@ class DataTable2DemoState extends State<DataTable2Demo> {
                     : null,
                 onSort: (columnIndex, ascending) =>
                     _sort<String>((d) => d.name, columnIndex, ascending),
+                // headingRowAlignment: MainAxisAlignment.end,
               ),
               DataColumn2(
                 label: const Text('Calories'),
