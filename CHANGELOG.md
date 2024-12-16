@@ -1,3 +1,7 @@
+## 2.5.17
+- Fixing analyzer warnings
+- Aligning with Fluttwr 3.27.0
+
 ## 2.5.16
 - Updating dependencies
 - Fixing analyzer warnings
