@@ -11,18 +11,18 @@ enum SourceState { none, ok, loading, error }
 /// exclude -> toggle/selectAllOnPage/deselectAllOnPage -> exclude
 enum SelectionState { none, include, exclude }
 
-class AsyncRowsResponse {
+class AsyncRowsResponse<D> {
   AsyncRowsResponse(this.totalRows, this.rows);
 
   final int totalRows;
-  final List<DataRow> rows;
+  final List<D> rows;
 }
 
 /// Implement this class and use it in conjunction with [AsyncPaginatedDataTable2]
 /// to allow asynchronous data fetching.
 /// Please overide [AsyncDataTableSource.getRows] and [DataTableSource.selectedRowCount]
 /// to make it legible as a data source.
-abstract class AsyncDataTableSource extends DataTableSource {
+abstract class AsyncDataTableSource<T> extends DataTableSource {
   SourceState _state = SourceState.none;
 
   SourceState get state => _state;
@@ -52,6 +52,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
 
   Object? get error => _error;
 
+  List<T> _rawRows = [];
   List<DataRow> _rows = [];
   int _totalRows = 0;
   int _firstRowAbsoluteIndex = 0;
@@ -65,7 +66,8 @@ abstract class AsyncDataTableSource extends DataTableSource {
   /// Note that besides rows this method is also supposed to return
   /// the total number of available rows (both values are packed into [AsyncRowsResponse] instance
   /// returned from this method)
-  Future<AsyncRowsResponse> getRows(int startIndex, int count);
+  Future<AsyncRowsResponse<T>> getRows(int startIndex, int count);
+  DataRow buildRow(int index, T data);
 
   DataRow _clone(DataRow row, bool? selected) {
     if (row is DataRow2) {
@@ -219,8 +221,8 @@ abstract class AsyncDataTableSource extends DataTableSource {
   /// This method triggers getRows() requesting same rows as the last time
   /// and intitaite update workflow (and thus rebuilding of [AsyncPaginatedDataTable2]
   /// attached to this data source). Can be used for sorting
-  void refreshDatasource() {
-    _fetchData(_prevFetchSratIndex, _prevFetchCount);
+  void refreshDatasource([bool forceReload = false]) {
+    _fetchData(_prevFetchSratIndex, _prevFetchCount, forceReload);
   }
 
   Timer? _debounceTimer;
@@ -239,12 +241,12 @@ abstract class AsyncDataTableSource extends DataTableSource {
     void fetch() async {
       try {
         _fetchOpp?.cancel();
-        _fetchOpp = CancelableOperation<AsyncRowsResponse>.fromFuture(
+        _fetchOpp = CancelableOperation<AsyncRowsResponse<T>>.fromFuture(
             getRows(startIndex, count));
         var data = await _fetchOpp!.value;
         if (_fetchOpp!.isCanceled) return;
-        //var data = await getRows(startIndex, count);
-        _rows = data.rows;
+        _rawRows = data.rows as List<T>;
+        _rows = _rawRows.map((d) => buildRow(0, d)).toList();
         _totalRows = data.totalRows;
         _firstRowAbsoluteIndex = startIndex;
       } catch (e) {
@@ -272,6 +274,7 @@ abstract class AsyncDataTableSource extends DataTableSource {
         _prevFetchSratIndex = startIndex;
         _prevFetchCount = count;
         _state = SourceState.ok;
+        _rows = _rawRows.map((d) => buildRow(0, d)).toList();
         await Future(() => notifyListeners());
         return;
       }
