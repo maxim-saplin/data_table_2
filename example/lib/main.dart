@@ -178,6 +178,7 @@ class MyApp extends StatelessWidget {
         Locale('be', ''),
         Locale('ru', ''),
         Locale('fr', ''),
+        Locale('zh', ''),
       ],
       // change to see how PaginatedDataTable2 controls (e.g. Rows per page) get translated
       locale: const Locale('en', ''),
