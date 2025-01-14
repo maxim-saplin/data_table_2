@@ -175,6 +175,7 @@ class DataTable2 extends DataTable {
     this.minWidth,
     this.scrollController,
     this.horizontalScrollController,
+    this.expandToFitContent = false,
     this.isVerticalScrollBarVisible,
     this.isHorizontalScrollBarVisible,
     this.empty,
@@ -291,6 +292,9 @@ class DataTable2 extends DataTable {
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? horizontalScrollController;
 
+  /// Allow to Avoid the use of the vertical scroll and expand the height content as much as needed
+  final bool expandToFitContent;
+  
   /// Determines whether the vertical scroll bar is visible, for iOS takes value from scrollbarTheme when null
   final bool? isVerticalScrollBarVisible;
 
@@ -1066,6 +1070,13 @@ class DataTable2 extends DataTable {
                                         (previousValue, value) =>
                                             previousValue + value),
                                   ))),
+                    expandToFitContent ?
+                    SingleChildScrollView(
+                      controller: coreHorizontalController,
+                      scrollDirection: Axis.horizontal,
+                      child: addBottomMargin(coreTable),
+                    )
+                    : 
                     Flexible(
                         fit: FlexFit.tight,
                         child: Scrollbar(
