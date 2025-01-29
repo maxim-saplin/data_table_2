@@ -378,6 +378,7 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
     super.lmRatio = 1.2,
     super.isHorizontalScrollBarVisible,
     super.isVerticalScrollBarVisible,
+    super.shouldAppendLoadingOnLastRow,
   });
 
   /// Widget that is goin to be displayed while loading is in progress
