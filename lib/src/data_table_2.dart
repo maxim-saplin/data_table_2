@@ -185,6 +185,7 @@ class DataTable2 extends DataTable {
     this.lmRatio = 1.2,
     this.sortArrowAnimationDuration = const Duration(milliseconds: 150),
     this.sortArrowIcon = Icons.arrow_upward,
+    this.sortArrowIconColor,
     this.sortArrowBuilder,
     this.headingRowDecoration,
     required super.rows,
@@ -233,6 +234,9 @@ class DataTable2 extends DataTable {
   /// If not set, the default icon is [Icons.arrow_upward].
   /// When set always overrides/preceeds default arrow icons.
   final IconData sortArrowIcon;
+
+  /// When set always overrides/preceeds default arrow icon color.
+  final Color? sortArrowIconColor;
 
   /// A builder for the sort arrow widget. Can be used in combination with [sortArrowAlwaysVisible] for a custom
   /// sort arrow behavior. If this is used [sortArrowIcon], [sortArrowAnimationDuration] will be ignored.
@@ -435,6 +439,7 @@ class DataTable2 extends DataTable {
                 up: sorted ? ascending : null,
                 duration: sortArrowAnimationDuration,
                 sortArrowIcon: sortArrowIcon,
+                sortArrowIconColor: sortArrowIconColor,
               ),
           const SizedBox(width: _sortArrowPadding),
         ],
@@ -1444,6 +1449,7 @@ class _SortArrow extends StatefulWidget {
     required this.up,
     required this.duration,
     required this.sortArrowIcon,
+    this.sortArrowIconColor,
   });
 
   final bool visible;
@@ -1453,6 +1459,8 @@ class _SortArrow extends StatefulWidget {
   final Duration duration;
 
   final IconData sortArrowIcon;
+
+  final Color? sortArrowIconColor;
 
   @override
   _SortArrowState createState() => _SortArrowState();
@@ -1558,6 +1566,7 @@ class _SortArrowState extends State<_SortArrow> with TickerProviderStateMixin {
         alignment: Alignment.center,
         child: Icon(
           widget.sortArrowIcon,
+          color: widget.sortArrowIconColor,
           size: _arrowIconSize,
         ),
       ),

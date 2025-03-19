@@ -166,6 +166,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.sortAscending = true,
     this.sortArrowAnimationDuration = const Duration(milliseconds: 150),
     this.sortArrowIcon = Icons.arrow_upward,
+    this.sortArrowIconColor,
     this.sortArrowBuilder,
     this.sortArrowAlwaysVisible = false,
     this.onSelectAll,
@@ -271,6 +272,9 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// Icon to be displayed when sorting is applied to a column.
   /// If not set, the default icon is [Icons.arrow_upward]
   final IconData sortArrowIcon;
+
+  /// You can customize the icon color by setting [sortArrowIconColor].
+  final Color? sortArrowIconColor;
 
   /// This used in combination with [sortArrowBuilder] to create a custom sort arrow widget behavior.
   /// If this is set to true the [sortArrowBuilder] will run for all columns that have [onSort] != null.
@@ -772,6 +776,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           sortColumnIndex: widget.sortColumnIndex,
           sortAscending: widget.sortAscending,
           sortArrowIcon: widget.sortArrowIcon,
+          sortArrowIconColor: widget.sortArrowIconColor,
           sortArrowAnimationDuration: widget.sortArrowAnimationDuration,
           sortArrowBuilder: widget.sortArrowBuilder,
           onSelectAll: widget.onSelectAll,
