@@ -1,12 +1,12 @@
 name: data_table_2
 description: In-place substitute for Flutter's DataTable and PaginatedDataTable with fixed/sticky headers and few extra features
-version: 2.5.18
+version: 2.5.19
 homepage: https://github.com/maxim-saplin/data_table_2
 repository: https://github.com/maxim-saplin/data_table_2
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.10.0"
+  flutter: ">=3.27.0"
 
 dependencies:
   flutter: 

@@ -1,9 +1,14 @@
+## 2.6.0
+- Sort Icon Color override (PR #354)
+- Chinese support (PR #335)
+- Flutter 3.27+ constraint
+
 ## 2.5.18
 - Added DataCoulm.headingRowAlignment fixing #320
 
 ## 2.5.17
 - Fixing analyzer warnings
-- Aligning with Fluttwr 3.27.0
+- Aligning with Flutter 3.27.0
 
 ## 2.5.16
 - Updating dependencies
