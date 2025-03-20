@@ -185,10 +185,12 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.fixedTopRows = 1,
     this.fixedColumnsColor,
     this.fixedCornerColor,
+    this.paginatorTextStyle,
     this.showCheckboxColumn = true,
     this.showFirstLastButtons = false,
     this.initialFirstRowIndex = 0,
     this.onPageChanged,
+    this.paginatorHeight,
     this.rowsPerPage = defaultRowsPerPage,
     this.availableRowsPerPage = const <int>[
       defaultRowsPerPage,
@@ -216,6 +218,8 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.headingRowDecoration,
     this.isVerticalScrollBarVisible,
     this.isHorizontalScrollBarVisible,
+    this.forwardIcon,
+    this.backwardIcon,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
@@ -504,6 +508,18 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// Hides the paginator at the bottom. Can be useful in case you decide create
   /// your own paginator and control the widget via [PaginatedDataTable2.controller]
   final bool hidePaginator;
+
+  /// Changes paginator height to the given value. If not set, the height is
+  final double? paginatorHeight;
+
+  /// Text style of the paginator text
+  final TextStyle? paginatorTextStyle;
+
+  /// Icon to be displayed for the forward button
+  final Icon? forwardIcon;
+
+  /// Icon to be displayed for the backward button
+  final Icon? backwardIcon;
 
   /// Used to comntrol widget's state externally and trigger actions. See
   /// [PaginatorController]
@@ -878,8 +894,9 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           _rowCount,
           _rowCountApproximate,
         ),
+        style: widget.paginatorTextStyle,
       ),
-      Container(width: 32.0),
+      SizedBox(width: 32.0),
       if (widget.showFirstLastButtons)
         IconButton(
           icon: const Icon(Icons.skip_previous),
@@ -888,14 +905,14 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           onPressed: _firstRowIndex <= 0 ? null : _handleFirst,
         ),
       IconButton(
-        icon: const Icon(Icons.chevron_left),
+        icon: widget.backwardIcon ?? const Icon(Icons.chevron_left),
         padding: EdgeInsets.zero,
         tooltip: localizations.previousPageTooltip,
         onPressed: _firstRowIndex <= 0 ? null : _handlePrevious,
       ),
-      Container(width: 24.0),
+      SizedBox(width: 24.0),
       IconButton(
-        icon: const Icon(Icons.chevron_right),
+        icon: widget.forwardIcon ?? const Icon(Icons.chevron_right),
         padding: EdgeInsets.zero,
         tooltip: localizations.nextPageTooltip,
         onPressed: _isNextPageUnavailable() ? null : _handleNext,
@@ -907,7 +924,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           tooltip: localizations.lastPageTooltip,
           onPressed: _isNextPageUnavailable() ? null : _handleLast,
         ),
-      Container(width: 14.0),
+      SizedBox(width: 14.0),
     ]);
 
     return DefaultTextStyle(
@@ -915,7 +932,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       child: IconTheme.merge(
         data: const IconThemeData(opacity: 0.54),
         child: SizedBox(
-          height: 56.0,
+          height: widget.paginatorHeight ?? 56,
           child: SingleChildScrollView(
             dragStartBehavior: widget.dragStartBehavior,
             scrollDirection: Axis.horizontal,
