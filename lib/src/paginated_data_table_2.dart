@@ -216,6 +216,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.headingRowDecoration,
     this.isVerticalScrollBarVisible,
     this.isHorizontalScrollBarVisible,
+    this.rowsPerPageTitle,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
@@ -227,6 +228,9 @@ class PaginatedDataTable2 extends StatefulWidget {
           }
           return true;
         }());
+
+  /// Custom title for the "Rows per page" label in the paginator. If null, uses the default localization.
+  final String? rowsPerPageTitle;
 
   final bool wrapInCard;
 
@@ -838,7 +842,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
         footerWidgets.addAll(<Widget>[
           Container(width: 14.0),
           // to match trailing padding in case we overflow and end up scrolling
-          Text(localizations.rowsPerPageTitle),
+          Text(widget.rowsPerPageTitle ?? localizations.rowsPerPageTitle),
           ConstrainedBox(
             constraints: const BoxConstraints(
                 minWidth: 64.0), // 40.0 for the text, 24.0 for the icon
