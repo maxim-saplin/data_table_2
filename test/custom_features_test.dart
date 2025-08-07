@@ -771,6 +771,28 @@ void main() {
       expect(controller.rowCount, 500);
     });
 
+    testWidgets('PaginatedDataTable2 detaches from paginator when destroyed', (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(1000, 300));
+      var controller = PaginatorController();
+      await tester.pumpWidget(MaterialApp(
+          home: Material(
+              child: buildPaginatedTable(
+                  showPage: false,
+                  showGeneration: false,
+                  showPageSizeSelector: true,
+                  controller: controller))));
+      await tester.pumpAndSettle();
+
+      expect(controller.isAttached, true);
+
+      await tester.pumpWidget(MaterialApp(
+        home: Material()
+      ));
+      await tester.pumpAndSettle();
+
+      expect(controller.isAttached, false);
+    });
+
     testWidgets(
         'PaginatedDataTable2 initial sort indicator orientation not spoiled',
         (WidgetTester tester) async {
