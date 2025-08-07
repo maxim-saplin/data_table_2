@@ -66,7 +66,8 @@ class DataRow2 extends DataRow {
       this.onDoubleTap,
       super.onLongPress,
       this.onSecondaryTap,
-      this.onSecondaryTapDown});
+      this.onSecondaryTapDown,
+      this.onHover});
 
   DataRow2.byIndex(
       {super.index,
@@ -80,7 +81,8 @@ class DataRow2 extends DataRow {
       this.onDoubleTap,
       super.onLongPress,
       this.onSecondaryTap,
-      this.onSecondaryTapDown})
+      this.onSecondaryTapDown,
+      this.onHover})
       : super.byIndex();
 
   /// Clone row, if non null values are provided - override the corresponding fields
@@ -97,6 +99,7 @@ class DataRow2 extends DataRow {
     GestureLongPressCallback? onLongPress,
     GestureTapCallback? onSecondaryTap,
     GestureTapDownCallback? onSecondaryTapDown,
+    ValueChanged<bool>? onHover,
   }) {
     return DataRow2(
       key: key ?? this.key,
@@ -111,6 +114,7 @@ class DataRow2 extends DataRow {
       onLongPress: onLongPress ?? this.onLongPress,
       onSecondaryTap: onSecondaryTap ?? this.onSecondaryTap,
       onSecondaryTapDown: onSecondaryTapDown ?? this.onSecondaryTapDown,
+      onHover: onHover ?? this.onHover,
     );
   }
 
@@ -133,6 +137,9 @@ class DataRow2 extends DataRow {
 
   /// Row double tap handler, won't be called if tapped cell has any tap event handlers
   final GestureTapCallback? onDoubleTap;
+
+  /// Row hover handler
+  final ValueChanged<bool>? onHover;
 
 // /// Row long press handler, won't be called if tapped cell has any tap event handlers
 // final GestureLongPressCallback? onLongPress;
@@ -495,6 +502,7 @@ class DataTable2 extends DataTable {
       required GestureLongPressCallback? onRowLongPress,
       required GestureTapCallback? onRowSecondaryTap,
       required GestureTapDownCallback? onRowSecondaryTapDown,
+      required ValueChanged<bool>? onRowHover,
       required VoidCallback? onSelectChanged,
       required WidgetStateProperty<Color?>? overlayColor}) {
     final ThemeData themeData = Theme.of(context);
@@ -559,6 +567,7 @@ class DataTable2 extends DataTable {
         // Also add row level events to cells
         onSecondaryTap: onRowSecondaryTap,
         onSecondaryTapDown: onRowSecondaryTapDown,
+        onHover: onRowHover,
         overlayColor: overlayColor,
         child: label,
       );
@@ -567,7 +576,8 @@ class DataTable2 extends DataTable {
         onRowDoubleTap != null ||
         onRowLongPress != null ||
         onRowSecondaryTap != null ||
-        onRowSecondaryTapDown != null) {
+        onRowSecondaryTapDown != null ||
+        onRowHover != null) {
       // row level
       label = TableRowInkWell(
         onTap: onRowTap ?? onSelectChanged,
@@ -575,6 +585,7 @@ class DataTable2 extends DataTable {
         onLongPress: onRowLongPress,
         onSecondaryTap: onRowSecondaryTap,
         onSecondaryTapDown: onRowSecondaryTapDown,
+        onHover: onRowHover,
         overlayColor: overlayColor,
         child: label,
       );
@@ -901,6 +912,7 @@ class DataTable2 extends DataTable {
                         row is DataRow2 ? row.onSecondaryTap : null,
                     onRowSecondaryTapDown:
                         row is DataRow2 ? row.onSecondaryTapDown : null,
+                    onRowHover: row.onHover,
                     onSelectChanged: row.onSelectChanged != null
                         ? () => row.onSelectChanged!(!row.selected)
                         : null,
