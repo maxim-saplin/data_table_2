@@ -542,15 +542,15 @@ class DataTable2 extends DataTable {
         onTapCancel != null) {
       // cell level
       label = InkWell(
-        onTap: () {
+        onTap: ((onTap == null) && (onRowTap == null)) ? null : () {
           onTap?.call();
           onRowTap?.call();
         },
-        onDoubleTap: () {
+        onDoubleTap: ((onDoubleTap == null) && (onRowDoubleTap == null)) ? null : () {
           onDoubleTap?.call();
           onRowDoubleTap?.call();
         },
-        onLongPress: () {
+        onLongPress: ((onLongPress == null) && (onRowLongPress == null)) ? null : () {
           onLongPress?.call();
           onRowLongPress?.call();
         },
