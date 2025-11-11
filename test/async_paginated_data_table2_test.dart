@@ -381,7 +381,7 @@ void main() {
       Offset(50.0, tester.getTopLeft(find.text('Rows per page:')).dy),
       const Offset(1000.0, 0.0),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.text('Rows per page:'), findsOneWidget);
     expect(tester.getTopLeft(find.text('Rows per page:')).dx,
         18.0); // 14 padding in the footer row, 4 padding from the card
