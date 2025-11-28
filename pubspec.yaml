@@ -1,6 +1,6 @@
 name: data_table_2
 description: In-place substitute for Flutter's DataTable and PaginatedDataTable with fixed/sticky headers and few extra features
-version: 2.6.0
+version: 2.7.1
 homepage: https://github.com/maxim-saplin/data_table_2
 repository: https://github.com/maxim-saplin/data_table_2
 
@@ -9,10 +9,9 @@ environment:
   flutter: ">=3.27.0"
 
 dependencies:
-  flutter: 
+  flutter:
     sdk: flutter
   async: ^2.10.0
-
 
 dev_dependencies:
   flutter_test:
@@ -23,5 +22,5 @@ dev_dependencies:
   golden_toolkit: # Solving problem with not rendered fonts
 
 screenshots:
-  - description: 'DataTable2 with fixed top row and left column and customized styling'
+  - description: "DataTable2 with fixed top row and left column and customized styling"
     path: screenshots/fixed_row_col.png

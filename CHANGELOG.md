@@ -1,3 +1,9 @@
+## 2.7.1
+- Fixing analyzer warnings
+
+## 2.7.0
+- Resizable columns, merged PR #93
+
 ## 2.6.0
 - Sort Icon Color override (PR #354)
 - Chinese support (PR #335)

@@ -213,6 +213,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.autoRowsToHeight = false,
     this.smRatio = 0.67,
     this.lmRatio = 1.2,
+    this.columnResizingParameters,
     this.headingRowDecoration,
     this.isVerticalScrollBarVisible,
     this.isHorizontalScrollBarVisible,
@@ -512,6 +513,9 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows vertically scrollable
   final ScrollController? scrollController;
 
+  /// Parameters to control column resizing
+  final ColumnResizingParameters? columnResizingParameters;
+
   /// Exposes scroll controller of the SingleChildScrollView that makes data rows horizontally scrollable
   final ScrollController? horizontalScrollController;
 
@@ -810,6 +814,7 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
           border: widget.border,
           smRatio: widget.smRatio,
           lmRatio: widget.lmRatio,
+          columnResizingParameters: widget.columnResizingParameters,
           isHorizontalScrollBarVisible: widget.isHorizontalScrollBarVisible,
           isVerticalScrollBarVisible: widget.isVerticalScrollBarVisible,
         ),
