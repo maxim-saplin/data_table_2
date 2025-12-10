@@ -377,6 +377,7 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
     super.autoRowsToHeight = false,
     super.smRatio = 0.67,
     super.lmRatio = 1.2,
+    super.columnResizingParameters,
     super.isHorizontalScrollBarVisible,
     super.isVerticalScrollBarVisible,
   });

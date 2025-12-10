@@ -511,6 +511,58 @@ void main() {
     log.clear();
   });
 
+  testWidgets(
+      'DataTable2 - cell with only onTapDown (no onTap) still receives events',
+      (WidgetTester tester) async {
+    // This test verifies that when a cell has onTapDown but NOT onTap,
+    // the onTapDown callback is still properly triggered. This is an edge case
+    // where the InkWell's onTap is set to null (optimization) but onTapDown
+    // should still work independently.
+    final List<String> log = <String>[];
+
+    Widget buildTable() {
+      return DataTable2(
+        columns: const <DataColumn>[
+          DataColumn(label: Text('Name')),
+          DataColumn(label: Text('Value')),
+        ],
+        rows: <DataRow2>[
+          DataRow2(
+            cells: <DataCell>[
+              const DataCell(Text('Item 1')),
+              DataCell(
+                const Text('100'),
+                // Only onTapDown is set, NOT onTap
+                onTapDown: (TapDownDetails details) {
+                  log.add('cell-tapDown: 100');
+                },
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+
+    await tester.pumpWidget(MaterialApp(
+      home: Material(child: buildTable()),
+    ));
+
+    // Tap on the cell with only onTapDown
+    final gesture =
+        await tester.startGesture(tester.getRect(find.text('100')).center);
+    await tester.pump(const Duration(milliseconds: 100));
+
+    // onTapDown should be called even though onTap is null
+    expect(log, equals(<String>['cell-tapDown: 100']));
+
+    await gesture.up();
+    await tester.pump(const Duration(seconds: 1));
+
+    // No additional callbacks since onTap was not set
+    expect(log, equals(<String>['cell-tapDown: 100']));
+    log.clear();
+  });
+
   testWidgets('DataTable2 control test - tristate',
       (WidgetTester tester) async {
     final List<String> log = <String>[];
