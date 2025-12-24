@@ -58,12 +58,20 @@ class CustomPager extends StatefulWidget {
 class CustomPagerState extends State<CustomPager> {
   static const List<int> _availableSizes = [3, 5, 10, 20];
 
+  void update() {
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
-    widget.controller.addListener(() {
-      setState(() {});
-    });
+    widget._controller.addListener(update);
+  }
+
+  @override
+  void dispose() {
+    widget._controller.removeListener(update);
+    super.dispose();
   }
 
   @override
