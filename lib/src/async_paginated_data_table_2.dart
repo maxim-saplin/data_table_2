@@ -366,6 +366,7 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
     super.minWidth,
     super.fit = FlexFit.tight,
     super.hidePaginator = false,
+    super.paginatorAlignment,
     super.controller,
     super.scrollController,
     super.horizontalScrollController,

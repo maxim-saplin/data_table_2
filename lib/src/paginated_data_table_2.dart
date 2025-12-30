@@ -205,6 +205,7 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.minWidth,
     this.fit = FlexFit.tight,
     this.hidePaginator = false,
+    this.paginatorAlignment = MainAxisAlignment.end,
     this.controller,
     this.scrollController,
     this.horizontalScrollController,
@@ -505,6 +506,10 @@ class PaginatedDataTable2 extends StatefulWidget {
   /// Hides the paginator at the bottom. Can be useful in case you decide create
   /// your own paginator and control the widget via [PaginatedDataTable2.controller]
   final bool hidePaginator;
+
+  /// Alignment of footer (paginator)
+  /// start = left, center = center, end = right (default Material behavior)
+  final MainAxisAlignment paginatorAlignment;
 
   /// Used to comntrol widget's state externally and trigger actions. See
   /// [PaginatorController]
@@ -921,13 +926,35 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
         data: const IconThemeData(opacity: 0.54),
         child: SizedBox(
           height: 56.0,
-          child: SingleChildScrollView(
-            dragStartBehavior: widget.dragStartBehavior,
-            scrollDirection: Axis.horizontal,
-            reverse: true,
-            child: Row(
-              children: footerWidgets,
-            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                dragStartBehavior: widget.dragStartBehavior,
+                scrollDirection: Axis.horizontal,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minWidth: constraints.maxWidth,
+                  ),
+                  child: Align(
+                    alignment: () {
+                      switch (widget.paginatorAlignment) {
+                        case MainAxisAlignment.start:
+                          return Alignment.centerLeft;
+                        case MainAxisAlignment.center:
+                          return Alignment.center;
+                        case MainAxisAlignment.end:
+                        default:
+                          return Alignment.centerRight;
+                      }
+                    }(),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: footerWidgets,
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),

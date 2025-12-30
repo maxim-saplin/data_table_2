@@ -199,6 +199,7 @@ class PaginatedDataTable2DemoState extends State<PaginatedDataTable2Demo> {
           realTime: true,
           widgetColor: Theme.of(context).primaryColor,
         ),
+        paginatorAlignment: MainAxisAlignment.start,
       ),
       if (getCurrentRouteOption(context) == custPager)
         Positioned(bottom: 16, child: CustomPager(_controller!))
