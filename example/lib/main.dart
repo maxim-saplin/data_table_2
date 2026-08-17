@@ -1,7 +1,7 @@
 import 'package:example/screens/data_table2_fixed_nm.dart';
 import 'package:example/screens/data_table2_resizable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'nav_helper.dart';
 import 'screens/async_paginated_data_table2.dart';
@@ -13,7 +13,6 @@ import 'screens/data_table2_simple.dart';
 import 'screens/data_table2_tests.dart';
 import 'screens/paginated_data_table.dart';
 import 'screens/paginated_data_table2.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(MyApp());
@@ -181,7 +180,7 @@ class MyApp extends StatelessWidget {
             const ResizableDataTable2Demo(),
             getOptionsForRoute('/datatable2resize')),
       },
-      localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: const [
         Locale('en', ''),
         Locale('be', ''),

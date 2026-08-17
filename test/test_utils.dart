@@ -7,7 +7,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:data_table_2/data_table_2.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Future wrapWidgetSetSurf(WidgetTester tester, Widget widget,

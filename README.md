@@ -46,17 +46,24 @@ Please check the [example folder](https://github.com/maxim-saplin/data_table_2/t
 
 **NOTE:*** don't put the widgets into any unconstrained parents with infinite width or height (e.g. scrollables such as SingleChildScrollView, Column etc.). The widgets are designed to stretch and fill all available space within parent and have a number of own scrollables inside to address fixed rows/columns feature. Putting it inside unconstrained parent break widgets.
 
-1. Add reference to pubspec.yaml.
+1. Add reference to pubspec.yaml (v3+ also requires `material_ui`):
+
+```yaml
+dependencies:
+  data_table_2: ^3.0.0
+  material_ui: ^1.0.0
+```
 
 2. Import:
 ```dart
 import 'package:data_table_2/data_table_2.dart';
+import 'package:material_ui/material_ui.dart';
 ```
 
 3. Code:
 ```dart
 import 'package:data_table_2/data_table_2.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 
 /// Example without a datasource
@@ -104,7 +111,22 @@ class DataTable2SimpleDemo extends StatelessWidget {
 }
 
 ```
-If you're already using the standard widgets you can reference the package and add '2' to the names of stock widgets (making them **DataTable2** or **PaginatedDataTable2**) and that is it. 
+If you're already using the standard widgets you can reference the package and add '2' to the names of stock widgets (making them **DataTable2** or **PaginatedDataTable2**) and that is it.
+
+**Breaking change in 3.0.0:** Material widgets and types (`DataColumn`, `DataRow`, `DataTable`, etc.) now come from the standalone `material_ui` package instead of `package:flutter/material.dart`. Add `material_ui` to your dependencies and update Material imports. Public types in this package extend Material classes from `material_ui`, so mixing SDK Material imports with `data_table_2` 3.x can cause type identity mismatches.
+
+If your app uses localized Material widgets (e.g. paginator labels), replace `flutter_localizations` Material delegates with `material_ui`:
+
+```dart
+import 'package:material_ui/material_ui.dart';
+
+MaterialApp(
+  localizationsDelegates: GlobalMaterialLocalizations.delegates,
+  // ...
+)
+```
+
+Do not import both `package:flutter_localizations/flutter_localizations.dart` and `package:material_ui/material_ui.dart` without `hide`/`as` prefixes — `GlobalMaterialLocalizations` is defined in both and will cause ambiguous-import errors.
 
 ##  Know issues/limitations/caveats
 - There's no capability to size data table cells to fit contents. Column width's adapt to available width (either to parent width or `minWidth`), data rows width are predefined by constructor params. Content that doesn't fit a cell gets clipped

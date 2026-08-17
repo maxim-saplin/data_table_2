@@ -1,5 +1,5 @@
 import 'package:data_table_2/data_table_2.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Example without datasource
 class DataTable2SimpleDemo extends StatelessWidget {

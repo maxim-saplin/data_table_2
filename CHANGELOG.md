@@ -1,3 +1,10 @@
+## 3.0.0
+- **Breaking:** Migrated from `package:flutter/material.dart` to standalone `material_ui` package (Flutter 3.47+ Material decoupling)
+- Added `material_ui: ^1.0.0` dependency; consumers must add `material_ui` and update Material imports
+- **Breaking:** Consumers using localized Material widgets must set `localizationsDelegates: GlobalMaterialLocalizations.delegates` from `material_ui` and remove/replace `GlobalMaterialLocalizations.delegate` from `flutter_localizations`
+- Public types (`DataColumn2`, `DataRow2`, `DataTable2`, etc.) now extend Material classes from `material_ui`
+- Example app: migrated localization delegates to `GlobalMaterialLocalizations.delegates` from `material_ui`
+
 ## 2.8.0
 - Minimum Flutter SDK raised to 3.47.0 (Dart 3.13+)
 - Updated dependencies (`async`, `intl`, `flutter_lints`, `vector_math`)
