@@ -1060,6 +1060,21 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  test('DataTable2 supports dataRowMinHeight/dataRowMaxHeight', () {
+    const double minHeight = 40.0;
+    const double maxHeight = 72.0;
+
+    final DataTable2 table = DataTable2(
+      dataRowMinHeight: minHeight,
+      dataRowMaxHeight: maxHeight,
+      columns: const <DataColumn>[DataColumn(label: Text('A'))],
+      rows: const <DataRow2>[DataRow2(cells: <DataCell>[DataCell(Text('1'))])],
+    );
+
+    expect(table.dataRowMinHeight, minHeight);
+    expect(table.dataRowMaxHeight, maxHeight);
+  });
+
   testWidgets('DataTable2 custom row height', (WidgetTester tester) async {
     Widget buildCustomTable({
       int? sortColumnIndex,
