@@ -205,9 +205,27 @@ void main() {
         tester.state(find.byType(PaginatedDataTable2));
 
     expect(log, isEmpty);
-    state.pageTo(23);
+
+    state.pageTo(10);
+    expect(log, <String>['page-changed: 10']);
+    log.clear();
+    state.pageTo(19);
+    // shouldn't change page since index 19 is same page as index 10
+    expect(log, isEmpty);
+
+    state.pageTo(0);
+    expect(log, <String>['page-changed: 0']);
+    log.clear();
+    state.pageTo(9);
+    // shouldn't change page since index 9 is same page as index 0
+    expect(log, isEmpty);
+
+    state.pageTo(20);
     expect(log, <String>['page-changed: 20']);
     log.clear();
+    state.pageTo(23);
+    // shouldn't change page since index 23 is same page as index 20
+    expect(log, isEmpty);
 
     await tester.pump();
 
