@@ -386,6 +386,7 @@ class AsyncPaginatedDataTable2 extends PaginatedDataTable2 {
     super.columnResizingParameters,
     super.isHorizontalScrollBarVisible,
     super.isVerticalScrollBarVisible,
+    super.shouldAppendLoadingOnLastRow,
   });
 
   /// Widget that is goin to be displayed while loading is in progress
