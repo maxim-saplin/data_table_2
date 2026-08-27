@@ -172,7 +172,21 @@ class MyApp extends StatelessWidget {
             getOptionsForRoute('/asyncpaginated2')),
         '/datatable': (context) => _getScaffold(context, const DataTableDemo()),
         '/paginated': (context) =>
-            _getScaffold(context, const PaginatedDataTableDemo()),
+                _getScaffold(context,  PaginatedDataTableDemo(
+              tableBorder: Border.all(color: Colors.red),
+              borderRadius: BorderRadius.circular(16),
+              backgroundColor: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withValues(alpha: 0.5),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+              dividerColor: Colors.amber,
+
+            ),
+            getOptionsForRoute('/paginated')),
         '/datatable2tests': (context) =>
             _getScaffold(context, const DataTable2Tests()),
         '/datatable2resize': (context) => _getScaffold(
