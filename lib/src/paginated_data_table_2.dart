@@ -583,6 +583,9 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
   @override
   void dispose() {
     widget.source.removeListener(_handleDataSourceChanged);
+    if (widget.controller?._state == this) {
+      widget.controller?._detach();
+    }
     super.dispose();
   }
 
