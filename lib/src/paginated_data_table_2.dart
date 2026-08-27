@@ -217,6 +217,17 @@ class PaginatedDataTable2 extends StatefulWidget {
     this.headingRowDecoration,
     this.isVerticalScrollBarVisible,
     this.isHorizontalScrollBarVisible,
+    this.nextPageIcon,
+    this.previousPageIcon,
+    this.firstPageIcon,
+    this.lastPageIcon,
+    this.iconSize,
+    this.iconOpacity = 0.54,
+    this.paginatorIconDisabledColor,
+    this.paginatorIconEnabledColor,
+    this.footerTextStyle,
+    this.footerDecoration,
+    this.footerHeight = 56.0,
   })  : assert(actions == null || (header != null)),
         assert(columns.isNotEmpty),
         assert(sortColumnIndex == null ||
@@ -524,6 +535,39 @@ class PaginatedDataTable2 extends StatefulWidget {
 
   /// Determines whether the horizontal scroll bar is visible, for iOS takes value from scrollbarTheme when null
   final bool? isHorizontalScrollBarVisible;
+
+  /// Icon for the next page button. If null, [Icons.chevron_right] is used.
+  final Icon? nextPageIcon;
+
+  /// Icon for the previous page button. If null, [Icons.chevron_left] is used.
+  final Icon? previousPageIcon;
+
+  /// Icon for the first page button. If null, [Icons.skip_previous] is used.
+  final Icon? firstPageIcon;
+
+  /// Icon for the last page button. If null, [Icons.skip_next] is used.
+  final Icon? lastPageIcon;
+
+  /// The size of the paginator's arrow icons.
+  final double? iconSize;
+
+  /// Opacity of the paginator's arrow icons. Defaults to 0.54
+  final double iconOpacity;
+
+  /// Custom color for any of the paginator's arrow icons when disabled.
+  final Color? paginatorIconDisabledColor;
+
+  /// Custom color for any of the paginator's arrow icons when enabled.
+  final Color? paginatorIconEnabledColor;
+
+  /// The style to use for the footer text.
+  final TextStyle? footerTextStyle;
+
+  /// The decoration to use for the footer.
+  final BoxDecoration? footerDecoration;
+
+  /// The height of the footer.
+  final double footerHeight;
 
   @override
   PaginatedDataTable2State createState() => PaginatedDataTable2State();
@@ -887,27 +931,43 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
       Container(width: 32.0),
       if (widget.showFirstLastButtons)
         IconButton(
-          icon: const Icon(Icons.skip_previous),
-          padding: EdgeInsets.zero,
+          icon: widget.firstPageIcon ?? const Icon(Icons.skip_previous),
+          iconSize: widget.iconSize,
+          color: _firstRowIndex <= 0
+		     ? widget.paginatorIconDisabledColor
+		     : widget.paginatorIconEnabledColor,
+	  padding: EdgeInsets.zero,
           tooltip: localizations.firstPageTooltip,
           onPressed: _firstRowIndex <= 0 ? null : _handleFirst,
         ),
       IconButton(
-        icon: const Icon(Icons.chevron_left),
+        icon: widget.previousPageIcon ?? const Icon(Icons.chevron_left),
+        iconSize: widget.iconSize,
+        color: _firstRowIndex <= 0
+		   ? widget.paginatorIconDisabledColor
+		   : widget.paginatorIconEnabledColor,
         padding: EdgeInsets.zero,
         tooltip: localizations.previousPageTooltip,
         onPressed: _firstRowIndex <= 0 ? null : _handlePrevious,
       ),
       Container(width: 24.0),
       IconButton(
-        icon: const Icon(Icons.chevron_right),
-        padding: EdgeInsets.zero,
+        icon: widget.nextPageIcon ?? const Icon(Icons.chevron_right),
+        iconSize: widget.iconSize,
+        color: _isNextPageUnavailable()
+		   ? widget.paginatorIconDisabledColor
+		   : widget.paginatorIconEnabledColor,
+	padding: EdgeInsets.zero,
         tooltip: localizations.nextPageTooltip,
         onPressed: _isNextPageUnavailable() ? null : _handleNext,
       ),
       if (widget.showFirstLastButtons)
         IconButton(
-          icon: const Icon(Icons.skip_next),
+          icon: widget.lastPageIcon ?? const Icon(Icons.skip_next),
+          iconSize: widget.iconSize,
+          color: _isNextPageUnavailable()
+		     ? widget.paginatorIconDisabledColor
+		     : widget.paginatorIconEnabledColor,
           padding: EdgeInsets.zero,
           tooltip: localizations.lastPageTooltip,
           onPressed: _isNextPageUnavailable() ? null : _handleLast,
@@ -916,11 +976,13 @@ class PaginatedDataTable2State extends State<PaginatedDataTable2> {
     ]);
 
     return DefaultTextStyle(
-      style: footerTextStyle!,
+      style: widget.footerTextStyle ?? footerTextStyle!,
       child: IconTheme.merge(
-        data: const IconThemeData(opacity: 0.54),
-        child: SizedBox(
-          height: 56.0,
+        data: IconThemeData(opacity: widget.iconOpacity),
+        child: Container(
+          height: widget.footerHeight,
+	  width: double.infinity,
+	  decoration: widget.footerDecoration,
           child: SingleChildScrollView(
             dragStartBehavior: widget.dragStartBehavior,
             scrollDirection: Axis.horizontal,
